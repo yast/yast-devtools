@@ -16,6 +16,7 @@ my $debug = 0;
 my $supported = "builtin|widget";
 my $prog;
 my ($filename,$filepath,$filesuffix);
+my $file_summary;
 
 my $f = {};
 
@@ -57,9 +58,9 @@ sub scan_file ($)
                 $in_comment = 0;
                 $parse = 1;
             }
-            if( /\@(builtin_ignore)(.*)/)
+            if ( /Summary:(.*)/ )
             {
-                $valid_comment = 0;
+                $file_summary=$1;
             }
             elsif( /\@(widget|builtin)(.*)/)
             {
@@ -113,6 +114,7 @@ sub parse_comments (@)
     tie %{$entry->{"return"}}, "return";
 
     $entry->{"filename"} = $filename;
+    $entry->{"file_summary"} = $file_summary;
     $entry->{"type"} = "";
     $entry->{"parameters"} = [$oentry];
     tie @{$entry->{"parameters"}}, "parameters";

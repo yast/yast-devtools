@@ -2,7 +2,6 @@
 # neededforbuild  autoconf automake gettext yast2-devtools
 
 @HEADER@
-# Requires:	yast2-config-XXpkgXX
 BuildArchitectures:	noarch
 
 Summary:	YaST2 translations for XXpkgXX localization

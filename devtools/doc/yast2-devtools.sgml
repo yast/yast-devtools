@@ -582,7 +582,7 @@ execcompdir=${prefix}/lib/YaST2
   have to append servers, servers_non_y2, clients or
   clients_non_y2.
 
-datadir=${yast2dir}/data
+ydatadir=${yast2dir}/data
   for general data
 
 </code>

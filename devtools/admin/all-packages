@@ -60,7 +60,6 @@ yast2-dns-server	default			DNS server
 yast2-firewall		default			firewall
 yast2-firewall-cd	firewall		firewall CD
 yast2-imap-server	email			IMAP server
-yast2-openteam-server	email			SuSE Linux Openteam Server
 yast2-inetd		default			inetd editor
 yast2-ldap-client	default			ldap client
 yast2-mail		default			mail
@@ -69,10 +68,12 @@ yast2-network		default			network
 yast2-nfs-client	default			nfs client
 yast2-nfs-server	default			nfs server
 yast2-nis-client	default			nis client
-yast2-kerberos-client	default		kerberos client
+yast2-ntp-client	default			NTP client 
+yast2-kerberos-client	default			kerberos client
 yast2-nis-server	default			nis server
 yast2-nisplus-client	default			nis+ client
 yast2-online-update	default			YOU
+yast2-openteam-server	email			SuSE Linux Openteam Server
 yast2-phone-services	default			isdn
 yast2-powertweak	expert_user		powertweak configuration
 yast2-printer		default			printer

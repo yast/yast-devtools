@@ -4,6 +4,7 @@
 
 @HEADER@
 Requires:	yast2 perl
+Requires:	perl-XML-Writer
 Provides:	ycpdoc ydoc
 Obsoletes:	ycpdoc ydoc
 Provides:	yast2-config-newmodule yast2-trans-newmodule

@@ -27,6 +27,8 @@
 
 use strict;
 use File::Basename;
+use XML::Writer;
+use Tie::Hash;
 
 sub main
 {
@@ -237,6 +239,7 @@ sub base_source_name ($)
 sub parse_sources ()
 {
     $g->{"intro_html"} = "";
+    tie %{$g->{files}}, "file";
     foreach my $source (@sources)
     {
 	print STDERR "Parsing $source\n";
@@ -1092,4 +1095,66 @@ sub write_onefile ($$)
     close(OUT);
 }
 
+package ycpdoc::XML;
+
+use IO;
+
+my $writer;
+
+sub write_docs
+{
+    my $output = new IO::File(">ycpdoc.xml");
+    $writer = new XML::Writer (OUTPUT => $output, NEWLINES => 1);
+    $writer->xmlDecl ();
+    $writer->startTag ("ycpdoc");
+    dump_data ($g);
+    $writer->endTag ();
+    $writer->end ();
+    $output->close ();
+}
+
+sub dump_data
+{
+    my $node = shift;
+
+    if (!ref ($node))
+    {
+	$writer->characters ($node);
+    }
+    elsif (ref ($node) eq "ARRAY")
+    {
+	foreach (@{$node})
+	{
+	    $writer->startTag ("ITEM")	if (!ref ($_));
+	    dump_data ($_);
+	    $writer->endTag ()		if (!ref ($_));
+	}
+    }
+    elsif (ref ($node) eq "HASH")
+    {
+	my $t = tied(%{$node});
+	foreach (sort keys %{$node})
+	{
+	    if (defined ($t))
+	    {
+		$writer->startTag (ref ($t)."_item", "key" => $_);
+	    }
+	    else
+	    {
+		$writer->startTag ($_);
+	    }
+	    dump_data ($node->{$_});
+	    $writer->endTag ();
+	}
+    }
+    else
+    {
+	$writer->comment (ref($node));
+    }
+}
+
+package file;
+@file::ISA = ("Tie::StdHash");
+
+package main;
 main ();

@@ -15,17 +15,6 @@ AC_SUBST(YCPDOC)
 @YAST2-CHECKS-PROGRAM@
 #@YAST2-CHECKS-YCP@
 
-# sgml checks
-AC_PATH_PROG(SGML2HTML, sgml2html, false)
-if test "$SGML2HTML" = "false"; then
-	AC_MSG_ERROR([sgmltool not installed])
-	exit
-fi
-
-AC_PATH_PROG(SGML2TXT,   sgml2txt,   false)
-AC_PATH_PROG(SGML2INFO,  sgml2info,  false)
-AC_PATH_PROG(SGML2LATEX, sgml2latex, false)
-
 # perl checks
 AC_CHECK_PROG(PERL, perl, perl, no)
 
@@ -47,6 +36,8 @@ fi
 rm -f $TMPFILE
 ])
 
+
+## needed for documentation
 CHECK_PERL_MODULE(XML::Writer, XMLWRITER)
 if test "$XMLWRITER" = "false"; then
 	AC_MSG_ERROR([perl xml writer not installed])

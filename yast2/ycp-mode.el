@@ -154,6 +154,7 @@
 			"`plainText"
 			"`scaleToFit"
 			"`shrinkable"
+			"`testMode"
 			"`tiled"
 			"`vstretch"
 			"`warncolor"

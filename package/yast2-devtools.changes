@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Jan 29 18:09:51 CET 2004 - mvidner@suse.cz
+
+- create-spec: set DESTDIR also for "make check",
+  (used by yast2-perl-bindings)
+- 2.9.8
+
+-------------------------------------------------------------------
 Thu Jan 29 12:16:37 CET 2004 - kkaempf@suse.de
 
 - test for expect prior to runtest, complain about missing

@@ -11,7 +11,6 @@ PREFIX			= /usr
 VERSION			= $(shell cat $(srcdir)/VERSION)
 RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
-Y2TEXTDOMAIN_FILE	= $(shell test -e $(srcdir)/Y2TEXTDOMAIN && echo Y2TEXTDOMAIN)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
 
 HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
@@ -77,7 +76,7 @@ POT_DST = $(addprefix $(srcdir)/,$(addsuffix .pot,$(POT_DOMAINS)))
 EXTRA_DIST = \
 	VERSION RPMNAME MAINTAINER configure.in.in		\
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
-	$(Y2TEXTDOMAIN_FILE) $(POTFILES_FILE)			\
+	$(POTFILES_FILE)			\
 	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))
 
 show-extra-dist:
@@ -247,5 +246,5 @@ checkin-stable: package
 
 # For po/ modules
 checkpo:
-	test ! -e $(srcdir)/Y2TEXTDOMAIN \
+	test ! -d $(srcdir)/po \
 	  || { $(MAKE) -C po checkpo && $(MAKE) -C po make-pox; }

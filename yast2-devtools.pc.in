@@ -1,8 +1,0 @@
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
-
-Name: @RPMNAME@
-Version: @VERSION@
-Description: YaST2 package "@RPMNAME@"

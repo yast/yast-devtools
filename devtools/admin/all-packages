@@ -18,7 +18,8 @@
 yast2			inst-sys,default	all
 yast2-core		inst-sys,default	all
 yast2-installation	inst-sys		install
-yast2-autoinstallation	inst-sys,default	all,autoinstall
+autoyast2-installation	inst-sys,default	all,autoinstall
+autoyast2			default	all,autoinstall
 yast2-control-center	default			all
 yast2-ncurses		inst-sys,default	all
 yast2-qt		inst-sys,default	all

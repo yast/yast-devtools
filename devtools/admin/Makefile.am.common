@@ -3,7 +3,7 @@
 
 # suffix mapping
 %.ybc: %.ycp $(ycpchook)
-	Y2DIR=$(yast2dir) $(bindir)/ycpc -c -M. -I. -q $(YCPCFLAGS) $<
+	$(bindir)/ycpc -c -M. -I. -q $(YCPCFLAGS) $<
 
 modulebin_DATA = $(patsubst %.ycp,%.ybc,$(module_DATA))
 modulebindir = $(moduledir)
@@ -17,6 +17,6 @@ CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 	mv .new.dep .dep
 
 check-syntax: $(client_DATA)
-	ycpc -qE -M. -I. $^
+	$(bindir)/ycpc -qE -M. -I. $(YCPCFLAGS) $^
 
 -include .dep

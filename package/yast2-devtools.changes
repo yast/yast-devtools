@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
-Sat Feb  7 17:42:17 CET 2004 - msvec@suse.cz
+Mon Feb  9 16:42:46 CET 2004 - msvec@suse.cz
 
+- drop setting of Y2DIR in common Makefile.am
 - drop configdir substitution
+- better check-syntax target
+- 2.9.11
 
 -------------------------------------------------------------------
 Thu Feb  5 15:59:48 CET 2004 - msvec@suse.cz

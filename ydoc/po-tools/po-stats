@@ -6,7 +6,7 @@ sed -e 's:,:,\
 | awk '\
 BEGIN{
   FS = " ";
-  trans = untrans = fuzzy = 0;
+  all = trans = untrans = fuzzy = 0;
 }
 
 # 113 translated messages, 481 fuzzy translations, 605 untranslated messages.
@@ -30,5 +30,7 @@ END{
   printf(format, "Fuzzy", fuzzy);
   printf(format, "Untranslated", untrans);
   print "--------------------";
-  printf("%12s : %5d\n", " All strings", trans + fuzzy + untrans);
+  all = trans + fuzzy + untrans
+  printf("%12s : %5d\n", " All strings", all);
+  printf("%12s   %.0f %%\n", " ", 100 / all * trans);
 }'

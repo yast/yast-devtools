@@ -98,11 +98,7 @@ Group:		SuSE internal",
 
     "\@BUILD\@" =>
 "\%build
-aclocal
-libtoolize --force --automake --copy
-autoheader
-automake --add-missing --copy
-autoconf
+autoreconf --force --install
 
 \%ifarch s390x
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG -fsigned-char\"
@@ -112,6 +108,20 @@ export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir}
+make",
+
+    "\@BUILD-QT\@" =>
+"\%build
+autoreconf --force --install
+
+\%ifarch s390x
+export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG -fsigned-char\"
+\%else
+export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
+\%endif
+
+\%{?suse_update_config:\%{suse_update_config -f}}
+./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib}
 make",
 
     "\@BUILD-PROGRAM\@" =>

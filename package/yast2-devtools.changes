@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 30 14:36:45 CEST 2002 - mvidner@suse.cz
+
+- fixed a perl-5.8.0 warning about ycpdoc
+- removed remnants of ydoc
+
+-------------------------------------------------------------------
 Fri Jul 26 10:47:07 CEST 2002 - arvin@suse.de
 
 - fixed generation of plural forms of message texts

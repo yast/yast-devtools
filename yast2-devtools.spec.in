@@ -41,8 +41,6 @@ make
 @ybindir@/makehtml
 @ybindir@/makedocs
 @ybindir@/makebuiltindocs
-@ybindir@/ydocHTML.pm
-@ybindir@/Ast.pm
 @ybindir@/installmo
 @ybindir@/makemo
 @ybindir@/makepot

@@ -44,6 +44,7 @@ my @core_binaries =
      "liby2util",
      "packagemanager",
      "core",
+     "pkg-bindings",
      "qt",
      "ncurses",
      "testsuite",
@@ -948,7 +949,7 @@ sub calc_ycp_compilation_order()
     log_progress( "Calculating YCP module compilation order" );
 
     chdir( $modules_dir );
-    my $cmd = "$ycpc_cmd -f -r -I $ycp_include_dir *.ycp 2>>$make_log | egrep -v '(^Check)|(^\$)'";
+    my $cmd = "$ycpc_cmd -f -r -I $ycp_include_dir *.ycp 2>>$make_log | egrep -v '(^Check)|(^\$)|(is newer than)'";
 
     log_info( "$cmd" );
     my @order = split( "\n", `$cmd` );

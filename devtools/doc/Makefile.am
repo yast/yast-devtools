@@ -27,6 +27,7 @@ $(BUILD)/index.html: $(xml_files)
 $(BUILD)/susebooks.css:
 	cp ../../docbook/css/susebooks.css $(BUILD)
 	cp -a ../../docbook/images $(BUILD)
+	find $(BUILD) -name "Makefile*"  | xargs rm
 
 clean-local:
 	rm -rf $(BUILD)/*.html

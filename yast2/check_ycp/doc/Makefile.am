@@ -21,9 +21,8 @@ html/index.html: check_ycp-section.xml check_ycp.xml
 	--xinclude \
 	$(STYLESHEET_HTML)  check_ycp.xml
 	cp ../../../docbook/css/susebooks.css $(BUILD)
-	cp -a ../../../docbook/images/admin/*.png $(BUILD)
-	cp -a ../../../docbook/images/navig/*. $(BUILD)
-
+	cp -a ../../../docbook/images $(BUILD)
+	find $(BUILD) -name "Makefile*"  | xargs rm
 
 validate:
 	xmllint --dropdtd --loaddtd check_ycp-section.xml

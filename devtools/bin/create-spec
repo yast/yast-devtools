@@ -79,7 +79,7 @@ Source0:	$RPMNAME-$VERSION.tar.bz2",
 
     "\@HEADER-DEVEL\@" =>
 "\%package devel
-Requires:	$RPMNAME
+Requires:	$RPMNAME = %version
 Group:		Development/Libraries",
 
     "\@HEADER-INSTSYS\@" =>

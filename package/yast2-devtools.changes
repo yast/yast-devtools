@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
-Wed Nov  5 10:39:28 CET 2003 - mvidner@suse.cz
+Thu Nov  6 16:49:57 CET 2003 - mvidner@suse.cz
 
 - Added a doxygen wrapper
+- Turned on norootforbuild in spec files
 - 2.9.1
 
 -------------------------------------------------------------------

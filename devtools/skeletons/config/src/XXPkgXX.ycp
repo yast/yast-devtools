@@ -51,7 +51,9 @@ global boolean() AbortFunction = Modified;
  */
 global define boolean Abort() ``{
     if(AbortFunction != nil)
-	return eval(AbortFunction) == true;
+    {
+	return AbortFunction () == true;
+    }
     return false;
 }
 

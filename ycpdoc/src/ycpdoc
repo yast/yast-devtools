@@ -140,7 +140,6 @@ sub main
 my @sources = ();
 
 my @formats_wanted = ();
-my $is_xml = 0;
 my $help = 0;
 my $man = 0;
 my $skip_index = 0;
@@ -213,10 +212,6 @@ sub write_docs
     foreach my $format (@formats_wanted)
     {
 	my $fun = $formats{$format} ."::write_docs";
-        if ( $format eq 'xml' )
-        {
-            $is_xml = 1;
-        }
 	&$fun;
     }
 }
@@ -729,16 +724,6 @@ sub do_shipout ($$$$$@)
     push @{$entry->{"descr"}}, @descr;
     push @{$entry->{"example_file"}}, @example_file;
 
-    if ($entry->{"example"} ne "" )
-    {
-        foreach my $format (@formats_wanted)
-        {
-            if ( $format eq 'html' )
-            {
-                $entry->{"example"} =~ s:^\n*(.*):<pre>$1</pre>:s;
-            }
-        }
-    }
 
     # check arguments
 
@@ -1340,7 +1325,7 @@ sub write_onefile ($$)
 	if ($one->{"example"} ne "")
 	{
 	    printf OUT $genericintro, "Example";
-	    print OUT $one->{"example"};
+	    print OUT '<pre>' . $one->{"example"} . '</pre>';
 	    print OUT $genericoutro;
 	}
 	if ($one->{"since"} ne "")

@@ -94,7 +94,7 @@ sub main()
 	    "Use -s to get a list.\n";
     }
 
-    $new_name ~= s/_(.)/-$1/g;
+    $new_name =~ s/_(.)/-$1/g;
 
     # XXpkgXX
     $raw_name = $new_name;

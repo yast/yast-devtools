@@ -197,7 +197,7 @@ sub main()
     $enable_make_all			= 0	if $opt_b or $opt_m or $opt_y;
     $enable_make_core_binaries		= 1	if $opt_b;
     $enable_byte_compile_modules	= 1	if $opt_m;
-    $enable_make_ycp_packages		= 1	if $opt_y;
+    $enable_make_ycp_packages		= 1	if $opt_y or $opt_u;
 
     $disable_make_makefile_cvs		= 1	if $opt_f;
     $favourites_only			= 1	if $opt_u;

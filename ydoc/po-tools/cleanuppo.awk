@@ -5,6 +5,8 @@ function sl2ul(l) {
   gsub(/SuSE[ -]?Linux/,"UnitedLinux",l);
   # pt_BR:
   gsub(/Linux SuSE/,"UnitedLinux",l);
+  # the rest
+  gsub(/SuSE/,"UnitedLinux",l);
   print l;
 }
 

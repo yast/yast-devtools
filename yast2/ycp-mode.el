@@ -135,6 +135,7 @@
 			"`rgb"
 
 			"`animated"
+			"`autoScrollDown"
 			"`autoShortcut"
 			"`countShowDelta"
 			"`debugLayout"
@@ -156,10 +157,13 @@
 			"`shrinkable"
 			"`testMode"
 			"`tiled"
+			"`updateMode"
 			"`vstretch"
 			"`warncolor"
+			"`youMode"
 			"`zeroHeight"
 			"`zeroWidth"
+
 			"`key_F1"
 			"`key_F2"
 			"`key_F3"
@@ -172,9 +176,6 @@
 			"`key_F10"
 			"`key_F11"
 			"`key_F12"
-			"`key_Return"
-			"`youMode"
-			"`updateMode"
 		       ))))
 
        (ycp-ui-widget-properties
@@ -182,6 +183,7 @@
 	 (regexp-opt '(
 		       "`CurrentButton"
 		       "`CurrentItem"
+		       "`EasterEgg"
 		       "`Enabled"
 		       "`ExpectedSize"
 		       "`Filename"
@@ -192,9 +194,10 @@
 		       "`LastLine"
 		       "`Notify"
 		       "`SelectedItems"
+		       "`ValidChars"
 		       "`Value"
 		       "`Values"
-		       "`ValidChars"
+		       "`WindowID"
 		       ))))
 
        (ycp-ui-glyphs
@@ -216,6 +219,9 @@
 	  ;; or WFM context, thus it is optional - see regexp below (the
 	  ;; '(cons (concat ...))' line)
 	 (regexp-opt '(
+		       "AskForExistingDirectory"
+		       "AskForExistingFile"
+		       "AskForSaveFileName"
 		       "BusyCursor"
 		       "ChangeWidget"
 		       "CloseDialog"
@@ -233,13 +239,16 @@
 		       "PollInput"
 		       "QueryWidget"
 		       "RecalcLayout"
+		       "Recode"
 		       "RecordMacro"
+		       "RedrawScreen"
 		       "ReplaceWidget"
 		       "RunPkgSelection"
 		       "SetConsoleFont"
 		       "SetFocus"
 		       "SetLanguage"
 		       "SetModulename"
+		       "StopRecordMacro"
 		       "UserInput"
 		       "WidgetExists"
 		       ))))

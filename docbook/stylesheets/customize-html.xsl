@@ -46,7 +46,9 @@
   <xsl:param name="admon.style" select="''"/>
 
   <!-- Use shade for verbatim environments -->
+  <!-- 
   <xsl:param name="shade.verbatim" select="1"></xsl:param>
+  -->
 
   <!-- Use own stylesheet, adopted version of susebook.css -->
   <!-- I'm not sure whether this is really an improvement -->

@@ -22,5 +22,5 @@
 .XXpkgXX
 
 `ag_XXpkgXX(
-    XXPkgXXAgent()
+    `XXPkgXXAgent()
 )

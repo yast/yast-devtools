@@ -23,26 +23,30 @@ if [ -d /var/log/YaST2 -a -w /var/log/YaST2 ]; then
 else
     LOGDIR=~
 fi
-exec 3>&2 &> $LOGDIR/freshdoc.log
+exec 3>&2 &> $LOGDIR/freshdoc.new.log
 
 echo ' -*- outline -*-'
 set -x
 date
 
 CVSUSER=mvidner
-CVSROOT=:pserver:$CVSUSER@yast2-cvs.suse.de:/suse/yast2/cvs
+CVSROOT=:pserver:$CVSUSER@yast2-cvs.suse.de:/real-home/CVS/YaST2
 export CVSROOT
 # TEMPWEB will be always rm -rf'd
 # it is for currently built docs.
 TEMPWEB=/local/home2/tempweb
-# WEB/freshdoc will be rm -rf'd if --scratch is given
+TARGET=freshdoc.new
+# $WEB/$TARGET will be rm -rf'd if --scratch is given
 WEB=/usr/local/httpd/htdocs
 # Where an up to date cvs tree will be kept.
 # Do not use your usual working directory!
-DOC_SANDBOX=/local/home2/yast2fresh
+DOC_SANDBOX=/local/home2/yast2-$TARGET
 #BRANCH="-r freshdoc-branch"
 HTDIGCONF=/opt/www/htdig/conf/yast2.conf
 SERVERNAME=valkyrie.suse.cz
+
+# kdoc workaround
+PATH=$PATH:/opt/kde3/bin
 
 mkdir --parents $DOC_SANDBOX
 cd $DOC_SANDBOX
@@ -57,12 +61,12 @@ function eecho() {
 function usage() {
     eecho "usage: $0 [options...]"
     eecho "options:"
-    eecho "	--scratch	remove \$WEB/freshdoc"
+    eecho "	--scratch	remove \$WEB/$TARGET"
     eecho "	--clean		always \"make clean\" first"
     eecho "	--login		invoke \"cvs login\" before updating"
     eecho "	--no-update	do not update from cvs"
     eecho "	--no-index	do not call htdig"
-    eecho "	--only  modules	only these cvs modules (eg. modules/y2c_mail)"
+    eecho "	--only  modules	only these cvs modules (eg. source/mail)"
     exit $EXITC
 }
 
@@ -73,7 +77,7 @@ function update() {
     if [ $DOLOGIN ]; then
 	cvs login
     fi
-    for I in devtools doc modules source tools; do # 'po' is not interesting
+    for I in source; do # 'trans' is not interesting
 	if [ -d $I ]; then
 	    {
 		echo \*\* $I
@@ -197,17 +201,17 @@ function newmain() {
     # probably should do yast2/doc last and take care of it there
     modules_index
 
-    mkdir --parents $WEB/freshdoc
+    mkdir --parents $WEB/$TARGET
     # scratch the web if requested
     if [ $SCRATCH ]; then
-	rm -rf $WEB/freshdoc/*
+	rm -rf $WEB/$TARGET/*
     fi
     # move in the fresh doc
-    cp -a $TEMPWEB/usr/share/doc/packages/* $WEB/freshdoc
+    cp -a $TEMPWEB/usr/share/doc/packages/* $WEB/$TARGET
 
     # pretend /usr/share/doc
     mkdir -p $WEB/usr/share/doc
-    ( cd $WEB/usr/share/doc; [ -L packages ] || ln -s ../../../freshdoc packages )
+    ln -snf ../../../$TARGET $WEB/usr/share/doc/packages
 
     if [ $DOINDEX ]; then
 	echo \* htdig

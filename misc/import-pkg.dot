@@ -1,5 +1,5 @@
 digraph import {
-	graph [size="16,11", rotate=90];
+	graph [rankdir=LR, size="16,11", rotate=90];
 	"yast2-bootloader" -> "yast2-storage";
 	"yast2-bootloader" -> "yast2-testsuite";
 	"yast2-installation" -> "yast2-xml";

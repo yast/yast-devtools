@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Sep 21 22:29:14 CEST 2004 - nashif@suse.de
+
+- Use xsl locally, not using http
+
+-------------------------------------------------------------------
 Fri Sep 17 14:36:57 CEST 2004 - mvidner@suse.cz
 
 - Recognize parameters passed by& reference (AsciiFile).

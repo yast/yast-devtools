@@ -2,7 +2,11 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0">
 
+                <!--
    <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
+   -->
+   <xsl:import
+       href="file:///usr/share/xml/docbook/stylesheet/nwalsh/current/html/chunk.xsl"/>
 
   <!-- Output directory -->
   <xsl:param name="base.dir" select="'html/'"/>
@@ -62,6 +66,53 @@
   <!--
   <xsl:include href="header.xsl" />
   -->
+
+  <xsl:param name="funcsynopsis.style">kr</xsl:param>
+  <xsl:param name="funcsynopsis.decoration">1</xsl:param>
+  <xsl:param name="funcsynopsis.tabular.threshold" select="40"></xsl:param>
+  <xsl:variable name="arg.choice.def.open.str"></xsl:variable>
+  <xsl:variable name="arg.choice.def.close.str"></xsl:variable>
+
+  <xsl:template match="paramdef" mode="kr-tabular">
+      <xsl:variable name="choice" select="@choice"/>
+      <td>
+          <xsl:choose>
+              <xsl:when test="$choice='req'">
+                  <xsl:value-of select="$arg.choice.req.open.str"/>
+              </xsl:when>
+              <xsl:when test="$choice='opt'">
+                  <xsl:value-of select="$arg.choice.opt.open.str"/>
+              </xsl:when>
+              <xsl:otherwise>
+                  <xsl:value-of select="$arg.choice.def.open.str"/>
+              </xsl:otherwise>
+          </xsl:choose>
+
+          <xsl:apply-templates select="parameter" mode="kr-tabular"/>
+          <xsl:choose>
+              <xsl:when test="$choice='req'">
+                  <xsl:value-of select="$arg.choice.req.close.str"/>
+              </xsl:when>
+              <xsl:when test="$choice='opt'">
+                  <xsl:value-of select="$arg.choice.opt.close.str"/>
+              </xsl:when>
+              <xsl:otherwise>
+                  <xsl:value-of select="$arg.choice.def.close.str"/>
+              </xsl:otherwise>
+          </xsl:choose>
+
+          <xsl:choose>
+              <xsl:when test="following-sibling::*">
+                  <xsl:text>, </xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                  <code>)</code>
+                  <xsl:text>;</xsl:text>
+              </xsl:otherwise>
+          </xsl:choose>
+      </td>
+      <td>&#160;</td>
+  </xsl:template>
 
 
 </xsl:stylesheet>

@@ -12,54 +12,61 @@ digraph import {
 	subgraph "cluster-yast2" {
 		Mode;
 		Popup;
+		ProductFeatures;
+		Misc;
 		Arch;
 		HTML;
-		Require;
+		PackageSystem;
 		Encoding;
 		Label;
-		Misc;
 		Report;
 		Kernel;
 		CWM;
 		TablePopup;
 		Directory;
-		ProductFeatures;
 		Map;
 		String;
 		Summary;
 		Wizard;
+		Progress;
+		Service;
+		Package;
+		Require;
 		PackageAI;
 		Call;
-		Progress;
-		LogView;
-		Desktop;
 		Hostname;
+		LogView;
+		URL;
+		Desktop;
 		AsciiFile;
 		RichText;
-		Package;
-		Service;
+		Message;
 		Confirm;
 		Crash;
 		NetworkPopup;
-		Runlevel;
-		URL;
-		PackageSystem;
 		Initrd;
-		IP;
 		TypeRepository;
 		Address;
+		IP;
 		Netmask;
 		PackageCallbacksInit;
 		Sequencer;
 		ModuleLoading;
+		CWMServiceStart;
 		ModulesConf;
+		CWMTsigKeys;
+		DialogTree;
+		Runlevel;
+		CWMTab;
 		Version;
 		CommandLine;
+		Linuxrc;
 		Cron;
 		Wizard_hw;
 	}
 	subgraph "cluster-yast2-online-update" {
 		OnlineUpdateCallbacks;
+		OnlineUpdateDialogs;
 		AutoOnlineUpdate;
 		OnlineUpdate;
 	}
@@ -85,13 +92,13 @@ digraph import {
 		ProfileManager;
 	}
 	subgraph "cluster-yast2-sound" {
-		Sound;
 		Joystick;
+		Sound;
 	}
 	subgraph "cluster-yast2-dhcp-server" {
 		DhcpServerUI;
-		DhcpTsigKeys;
 		DhcpServer;
+		"YaPI::DHCPD";
 	}
 	subgraph "cluster-autoyast2-installation" {
 		AutoinstConfig;
@@ -103,22 +110,18 @@ digraph import {
 		AutoinstGeneral;
 		AutoInstall;
 		AutoinstFile;
+		AutoInstallRules;
 		AutoinstStorage;
-		AutoinstCompat;
 		AutoinstLVM;
 		AutoinstRAID;
 		ProfileLocation;
-		AutoInstallRules;
 		AutoinstScripts;
+	}
+	subgraph "cluster-yast2-bluetooth" {
+		Bluetooth;
 	}
 	subgraph "cluster-yast2-runlevel" {
 		RunlevelEd;
-	}
-	subgraph "cluster-yast2-x11" {
-		AutoinstX11;
-		XProposal;
-		XMessages;
-		Display;
 	}
 	subgraph "cluster-yast2-bootloader" {
 		BootCommon;
@@ -131,14 +134,25 @@ digraph import {
 		BootLILO;
 		BootPPC;
 	}
+	subgraph "cluster-yast2-x11" {
+		AutoinstX11;
+		XProposal;
+		XMessages;
+		Display;
+	}
 	subgraph "cluster-yast2-samba-server" {
 		SambaServerWidgets;
 		SambaServer;
 		SambaServerPassdb;
+		SambaSecrets;
+		"YaPI::Samba";
+		TabWidget;
+		UsersPluginSamba;
+		UsersPluginSambaGroups;
 	}
 	subgraph "cluster-yast2-installation" {
-		ProductControl;
 		Product;
+		ProductControl;
 		Installation;
 		X11Version;
 		HwStatus;
@@ -148,10 +162,6 @@ digraph import {
 	}
 	subgraph "cluster-yast2-mouse" {
 		Mouse;
-	}
-	subgraph "cluster-yast2-tv" {
-		Tv;
-		ModulesComments;
 	}
 	subgraph "cluster-yast2-repair" {
 		OSRFsck;
@@ -193,12 +203,10 @@ digraph import {
 	}
 	subgraph "cluster-yast2-firewall" {
 		SuSEFirewall;
+		CWMFirewallInterfaces;
 	}
 	subgraph "cluster-yast2-restore" {
 		Restore;
-	}
-	subgraph "cluster-yast2-testsuite" {
-		Pkg;
 	}
 	subgraph "cluster-yast2-sysconfig" {
 		Sysconfig;
@@ -213,8 +221,8 @@ digraph import {
 		UsersLDAP;
 		UsersRoutines;
 		UsersUI;
-		"YaPI::USERS";
 		UsersPluginLDAPAll;
+		"YaPI::USERS";
 	}
 	subgraph "cluster-yast2-country" {
 		Language;
@@ -230,6 +238,7 @@ digraph import {
 		Pam;
 		PamSettings;
 		Autologin;
+		Nsswitch;
 	}
 	subgraph "cluster-yast2-security" {
 		Security;
@@ -238,19 +247,19 @@ digraph import {
 		Provider;
 		NetworkModules;
 		NetworkDevices;
+		DNS;
 		Routing;
 		Detection;
 		Host;
-		DNS;
 		Modem;
 		Firewall;
 		Proxy;
 		DSL;
 		Lan;
 		Network;
+		Remote;
 		NetworkConfig;
 		Internet;
-		Remote;
 		ISDN;
 	}
 	subgraph "cluster-yast2-tftp-server" {
@@ -288,13 +297,20 @@ digraph import {
 	subgraph "cluster-yast2-kerberos-client" {
 		Kerberos;
 	}
+	subgraph "cluster-yast2-ldap-server" {
+		"YaPI::LdapServer";
+		LdapServer;
+		LdapServerConf;
+	}
 	subgraph "cluster-yast2-dns-server" {
 		DnsServer;
 		DnsServerUI;
 		DnsTsigKeys;
 		DnsZones;
-		DnsData;
+		DnsFakeTabs;
 		DnsRoutines;
+		"YaPI::DNSD";
+		DnsData;
 	}
 	subgraph "cluster-autoyast2" {
 		AutoinstClass;
@@ -304,21 +320,15 @@ digraph import {
 	subgraph "cluster-yast2-nis-server" {
 		NisServer;
 	}
-	subgraph "cluster-yast2-http-server" {
-		HttpServerWidgets;
-		HttpServer;
-		"YaST::HTTPDData";
-		"YaPI::HTTPD";
-		"YaST::httpdUtils";
-		"YaPI::HTTPDModules";
+	subgraph "cluster-yast2-ldap" {
+		LdapServerAccess;
 	}
 	subgraph "cluster-yast2-printer" {
 		Printerdb;
 		Printerlib;
-		Spooler;
 		Printer;
 		CUPS;
-		LPRng;
+		Spooler;
 		PrinterTest;
 	}
 	subgraph "cluster-yast2-ldap-client" {
@@ -329,10 +339,13 @@ digraph import {
 	OSRFsck -> OSRExecute;
 	OSRFsck -> OSRModuleLoading;
 	OSRFsck -> OSRPopup;
-	BootCommon -> Require;
+	ProductFeatures -> Misc;
+	ProductFeatures -> Mode;
+	BootCommon -> PackageSystem;
 	BootCommon -> Storage;
 	BootCommon -> Pkg;
-	BootCommon -> Misc;
+	BootCommon -> Product;
+	BootCommon -> ProductFeatures;
 	BootCommon -> TablePopup;
 	UsersPlugins -> Directory;
 	OSRExecute -> Mode;
@@ -349,23 +362,26 @@ digraph import {
 	SlideShow -> Language;
 	SlideShow -> String;
 	SlideShow -> Wizard;
+	Bluetooth -> Progress;
+	Bluetooth -> Report;
+	Bluetooth -> Service;
+	Printerdb -> Package;
 	Printerdb -> Printerlib;
 	X11Version -> Installation;
 	X11Version -> Require;
+	X11Version -> Package;
 	PackageAI -> Wizard;
 	NetworkModules -> NetworkDevices;
 	Security -> Pam;
 	Security -> Progress;
 	OSRFloppy -> StorageDevices;
-	OSRFloppy -> Report;
 	OSRFloppy -> OSRModuleLoading;
-	Routing -> Detection;
+	"YaPI::LdapServer" -> Ldap;
 	Routing -> NetworkDevices;
 	SambaServerWidgets -> LogView;
 	SambaServerWidgets -> TablePopup;
 	SambaServerWidgets -> SambaServer;
 	AutoinstClass -> AutoinstConfig;
-	AutoinstClass -> Summary;
 	Desktop -> Map;
 	Host -> Hostname;
 	Host -> String;
@@ -374,6 +390,7 @@ digraph import {
 	AutoinstSoftware -> Packages;
 	AutoinstSoftware -> ProductControl;
 	AutoinstSoftware -> AutoinstImage;
+	AutoinstSoftware -> PackageAI;
 	Popup -> Label;
 	Popup -> Mode;
 	Summary -> Mode;
@@ -382,33 +399,31 @@ digraph import {
 	Keyboard -> Language;
 	OSRDirect -> OSRFstab;
 	RichText -> String;
-	DnsServer -> Package;
+	DnsServer -> Ldap;
 	DnsServer -> SuSEFirewall;
 	StorageDevices -> String;
 	StorageDevices -> HwStatus;
 	StorageDevices -> Partitions;
 	StorageDevices -> Installation;
 	StorageDevices -> Kernel;
-	StorageDevices -> Popup;
+	StorageDevices -> Report;
 	ProfileManager -> Progress;
 	ProfileManager -> Report;
 	ProfileManager -> Require;
-	Printer -> Arch;
-	Printer -> Confirm;
 	Printer -> Crash;
 	Printer -> HTML;
-	Printer -> Printerdb;
-	Printer -> Progress;
+	Printer -> Spooler;
 	Autologin -> ProductFeatures;
 	Autologin -> Require;
-	OnlineUpdateCallbacks -> AutoOnlineUpdate;
-	OnlineUpdateCallbacks -> Wizard;
+	OnlineUpdateCallbacks -> OnlineUpdateDialogs;
 	NetworkPopup -> Label;
 	SambaServer -> Samba;
-	SambaServer -> Runlevel;
 	SambaServer -> SambaServerPassdb;
-	SambaServer -> Spooler;
+	SambaServer -> SambaSecrets;
 	SambaServer -> Ldap;
+	SambaServer -> URL;
+	SambaServer -> LdapServerAccess;
+	SambaServer -> Spooler;
 	AutoinstConfig -> Misc;
 	AutoinstConfig -> URL;
 	AutoinstConfig -> XML;
@@ -416,7 +431,11 @@ digraph import {
 	AutoinstConfig -> FTP;
 	AutoinstConfig -> StorageDevices;
 	AutoinstConfig -> TFTP;
-	Printerlib -> Spooler;
+	LdapServer -> Progress;
+	LdapServer -> Report;
+	Printerlib -> Directory;
+	Printerlib -> Popup;
+	"YaPI::Samba" -> SambaServer;
 	Package -> PackageAI;
 	Package -> PackageSystem;
 	RunlevelEd -> Service;
@@ -438,10 +457,6 @@ digraph import {
 	AutoinstClone -> Y2ModuleConfig;
 	AutoinstClone -> Keyboard;
 	AutoinstClone -> Timezone;
-	HttpServerWidgets -> LogView;
-	HttpServerWidgets -> TablePopup;
-	HttpServerWidgets -> HttpServer;
-	HttpServerWidgets -> DNS;
 	TypeRepository -> Address;
 	TypeRepository -> Netmask;
 	TypeRepository -> URL;
@@ -451,7 +466,6 @@ digraph import {
 	Require -> PackageCallbacksInit;
 	PowerManagement -> Package;
 	PowerManagement -> Progress;
-	PowerManagement -> Report;
 	PowerManagement -> Service;
 	Modem -> Firewall;
 	Modem -> Routing;
@@ -459,11 +473,13 @@ digraph import {
 	BootS390 -> StorageControllers;
 	BootS390 -> BootCommon;
 	OSRRepairUI -> OSR;
-	"YaPI::HTTPD" -> SuSEFirewall;
+	NisServer -> SuSEFirewall;
 	NisServer -> Nis;
 	StorageClients -> Popup;
+	CWMServiceStart -> CWM;
+	CWMServiceStart -> ProductFeatures;
+	CWMServiceStart -> Service;
 	BootABOOT -> BootCommon;
-	BootABOOT -> Product;
 	BootABOOT -> StorageControllers;
 	OSRFstab -> Initrd;
 	OSRFstab -> OSRFsck;
@@ -472,30 +488,25 @@ digraph import {
 	Initrd -> Misc;
 	Initrd -> Report;
 	Encoding -> Mode;
-	HttpServer -> "YaST::HTTPDData";
-	HttpServer -> NetworkDevices;
-	HttpServer -> Report;
-	HttpServer -> Service;
 	Proxy -> NetworkDevices;
-	Proxy -> Package;
-	Proxy -> Service;
 	Confirm -> Popup;
 	DSL -> Lan;
 	Hotplug -> Arch;
 	Hotplug -> ModuleLoading;
 	Hotplug -> HwStatus;
+	TabWidget -> CWM;
 	Mouse -> Arch;
 	Mouse -> Misc;
 	Mouse -> ModuleLoading;
 	PackageSystem -> PackageCallbacksInit;
+	PackageSystem -> Report;
 	PackageSystem -> Wizard;
 	OSRPkgUI -> HTML;
 	OSRPkgUI -> OSRSystem;
 	OSRPkgUI -> OSRPkgVerify;
 	OSRPkgUI -> OSRPopup;
-	LogView -> Report;
+	LogView -> CWM;
 	OSRModuleLoading -> ModuleLoading;
-	BootMILO -> Product;
 	BootMILO -> StorageControllers;
 	BootMILO -> BootCommon;
 	AutoinstGeneral -> AutoInstall;
@@ -509,18 +520,17 @@ digraph import {
 	OSRSummary -> OSRProgress;
 	OSRSummary -> OSRCommon;
 	AutoinstFile -> AutoInstall;
-	RootPart -> Storage;
+	RootPart -> Update;
 	OSRPkg -> Packages;
 	OSRPkg -> OSRPkgUI;
 	XF86Path -> Installation;
 	PackageCallbacks -> PackageCallbacksInit;
 	PackageCallbacks -> SlideShow;
-	Language -> Misc;
 	Language -> AsciiFile;
 	Language -> XF86Path;
 	Language -> Encoding;
 	Language -> ProductFeatures;
-	AutoInstall -> Profile;
+	AutoInstall -> AutoInstallRules;
 	Sysconfig -> Progress;
 	Sysconfig -> Report;
 	Sysconfig -> IP;
@@ -531,71 +541,72 @@ digraph import {
 	StorageControllers -> Storage;
 	CWM -> Report;
 	CWM -> Wizard;
-	DhcpServerUI -> DhcpTsigKeys;
 	DhcpServerUI -> DhcpServer;
 	DhcpServerUI -> Address;
 	DhcpServerUI -> LogView;
 	DhcpServerUI -> TablePopup;
+	DhcpServerUI -> DialogTree;
+	DhcpServerUI -> CWMServiceStart;
 	DhcpServerUI -> Sequencer;
-	DhcpServer -> Package;
+	DhcpServer -> CWMTsigKeys;
+	DhcpServer -> Ldap;
+	DhcpServer -> LdapServerAccess;
+	DhcpServer -> Netmask;
 	DhcpServer -> SuSEFirewall;
 	Runlevel -> Service;
-	CUPS -> Label;
-	Firewall -> Service;
+	CUPS -> Printerlib;
+	CUPS -> SuSEFirewall;
 	Firewall -> NetworkDevices;
-	Firewall -> Package;
 	OSRSwap -> OSRExecute;
 	OSRSwap -> OSRPopup;
 	OSRSwap -> Storage;
-	Fax -> Package;
 	Fax -> Users;
+	Kickstart -> AutoinstStorage;
 	Kickstart -> Profile;
 	Kickstart -> Keyboard;
+	UsersPluginLDAPAll -> Ldap;
+	Nis -> Address;
+	Nis -> Nsswitch;
 	Nis -> Service;
-	Nis -> Report;
 	Nis -> Progress;
 	Nis -> Autologin;
-	Nis -> Address;
 	Kernel -> Arch;
 	Kernel -> Mode;
 	BootELILO -> BootCommon;
-	BootELILO -> Product;
 	Detection -> Directory;
 	Detection -> Arch;
 	Detection -> Confirm;
 	Detection -> Map;
+	Nsswitch -> Message;
+	Nsswitch -> Report;
 	Restore -> Bootloader;
 	Restore -> Service;
 	Restore -> Package;
 	Restore -> URL;
-	AutoinstCompat -> AutoinstStorage;
 	Hooks -> Popup;
 	SpaceCalculation -> ProductFeatures;
 	SpaceCalculation -> Storage;
-	Network -> Progress;
 	Profile -> AutoinstConfig;
-	Profile -> AutoinstCompat;
+	Network -> Progress;
+	LdapServerAccess -> Package;
 	NfsServer -> Service;
 	NfsServer -> Report;
 	NfsServer -> Progress;
 	LdapPopup -> Ldap;
-	SuSEFirewall -> Progress;
-	SuSEFirewall -> Report;
-	SuSEFirewall -> Service;
+	SuSEFirewall -> Remote;
+	SuSEFirewall -> NetworkDevices;
 	Console -> Language;
-	TftpServer -> Runlevel;
+	TftpServer -> Service;
 	TftpServer -> Report;
-	NtpClient -> NetworkDevices;
-	NtpClient -> Package;
-	NtpClient -> SuSEFirewall;
-	NtpClient -> IP;
-	NtpClient -> LogView;
 	NtpClient -> SLP;
+	NtpClient -> SuSEFirewall;
 	AutoinstX11 -> XProposal;
+	DialogTree -> CWM;
 	Nfs -> Report;
 	Nfs -> Service;
 	Nfs -> Progress;
 	Nfs -> Require;
+	Alice -> AutoinstStorage;
 	Alice -> Profile;
 	OSRPkgVerify -> Kernel;
 	OSRPkgVerify -> OSRExecute;
@@ -604,29 +615,33 @@ digraph import {
 	OSRPtbl -> OSRFloppy;
 	OSRPtbl -> OSRPopup;
 	OSRPtbl -> Storage;
-	AutoinstStorage -> Bootloader;
+	AutoinstStorage -> RootPart;
 	AutoinstStorage -> AutoinstLVM;
 	AutoinstStorage -> AutoinstRAID;
-	AutoinstStorage -> RootPart;
 	BootLILO -> BootCommon;
 	BootGRUB -> BootCommon;
+	DnsServerUI -> DnsServer;
 	DnsServerUI -> DnsTsigKeys;
 	DnsServerUI -> DnsZones;
-	DnsServerUI -> Require;
 	DnsServerUI -> Runlevel;
-	DnsServerUI -> DnsServer;
+	DnsServerUI -> DnsFakeTabs;
 	DnsServerUI -> LogView;
 	DnsServerUI -> TablePopup;
+	DnsServerUI -> DialogTree;
+	DnsServerUI -> CWMServiceStart;
+	DnsServerUI -> CWMFirewallInterfaces;
+	DnsServerUI -> DnsRoutines;
 	DnsServerUI -> Sequencer;
+	"YaPI::DNSD" -> DnsServer;
 	Address -> Hostname;
 	Idedma -> Report;
 	Idedma -> Service;
-	Kerberos -> Summary;
-	Kerberos -> Require;
-	Kerberos -> Progress;
+	CWMFirewallInterfaces -> CWM;
+	CWMFirewallInterfaces -> SuSEFirewall;
+	Kerberos -> Package;
 	Kerberos -> PamSettings;
+	Kerberos -> Progress;
 	Kerberos -> Runlevel;
-	Lan -> DNS;
 	Lan -> NetworkModules;
 	Lan -> Routing;
 	Lan -> Firewall;
@@ -649,13 +664,14 @@ digraph import {
 	ProfileLocation -> AutoInstallRules;
 	AutoinstImage -> Progress;
 	Internet -> NetworkDevices;
+	CWMTab -> CWM;
 	InitHWinfo -> String;
 	InitHWinfo -> Confirm;
 	InitHWinfo -> Progress;
 	InitHWinfo -> Arch;
 	InitHWinfo -> Report;
 	AutoinstScripts -> AutoinstConfig;
-	AutoinstScripts -> Summary;
+	AutoinstScripts -> Service;
 	ModulesConf -> Misc;
 	ModulesConf -> Kernel;
 	XProposal -> Mouse;
@@ -665,18 +681,15 @@ digraph import {
 	XProposal -> Display;
 	ModuleLoading -> Mode;
 	ModuleLoading -> Label;
+	AutoInstallRules -> Storage;
 	AutoInstallRules -> Profile;
 	PackageInstallation -> Version;
 	PackageInstallation -> Packages;
 	UsersUI -> Label;
 	Product -> Mode;
-	Tv -> Report;
-	Tv -> ModulesComments;
-	Tv -> Require;
-	Tv -> Service;
-	Tv -> Sound;
 	TablePopup -> CWM;
 	Hostname -> IP;
+	"YaPI::DHCPD" -> DhcpServer;
 	AutoinstRAID -> Storage;
 	DNS -> Detection;
 	DNS -> Host;
@@ -686,11 +699,7 @@ digraph import {
 	DNS -> Service;
 	PackagesUI -> Label;
 	Spooler -> CUPS;
-	Spooler -> LPRng;
-	Spooler -> Package;
-	Spooler -> Report;
-	Spooler -> Require;
-	Spooler -> Service;
+	Spooler -> Printerdb;
 	AutoOnlineUpdate -> Report;
 	OSRMode -> OSRLogFile;
 	OSRMode -> Report;
@@ -702,9 +711,13 @@ digraph import {
 	Crash -> Popup;
 	Report -> Popup;
 	Report -> Summary;
+	OnlineUpdateDialogs -> AutoOnlineUpdate;
+	OnlineUpdateDialogs -> Wizard;
 	Timezone -> Language;
 	Timezone -> Storage;
 	Pam -> PamSettings;
+	Linuxrc -> Mode;
+	OSR -> Linuxrc;
 	OSR -> OSRSummary;
 	OSR -> OSRDirect;
 	OSR -> OSRPtbl;
@@ -716,7 +729,7 @@ digraph import {
 	Vendor -> Installation;
 	Y2ModuleConfig -> Profile;
 	Y2ModuleConfig -> Desktop;
-	Answering_machine -> Package;
+	Y2ModuleConfig -> Wizard;
 	Answering_machine -> Users;
 	Update -> Packages;
 	Installation -> Mode;
@@ -732,12 +745,11 @@ digraph import {
 	Remote -> Package;
 	Remote -> Service;
 	ISDN -> Firewall;
-	ISDN -> Confirm;
 	Display -> Mode;
-	NetworkDevices -> Arch;
 	NetworkDevices -> Call;
 	NetworkDevices -> Progress;
 	NetworkDevices -> Require;
+	NetworkDevices -> DNS;
 	NetworkDevices -> Provider;
 	Bootloader -> Progress;
 	Bootloader -> BootABOOT;
@@ -749,23 +761,22 @@ digraph import {
 	Bootloader -> BootGRUB;
 	Bootloader -> Sequencer;
 	Ldap -> Autologin;
+	Ldap -> Nsswitch;
+	Ldap -> Package;
 	Ldap -> PamSettings;
 	Ldap -> Progress;
-	Ldap -> Report;
 	Ldap -> Service;
-	PackageSelectionIO -> Report;
 	PackageSelectionIO -> StorageDevices;
 	UsersLDAP -> UsersCache;
 	UsersLDAP -> UsersPlugins;
 	UsersLDAP -> UsersRoutines;
+	CWMTsigKeys -> CWM;
 	PrinterTest -> Printer;
 	"YaPI::USERS" -> Users;
 	OnlineUpdate -> Arch;
 	OnlineUpdate -> Installation;
 	SlideShowCallbacks -> PackageCallbacks;
 	BootPPC -> BootCommon;
-	"YaST::httpdUtils" -> SuSEFirewall;
-	"YaST::httpdUtils" -> NetworkDevices;
 	Sound -> Arch;
 	Sound -> Summary;
 	Sound -> Crash;
@@ -776,6 +787,5 @@ digraph import {
 	Storage -> Hotplug;
 	Storage -> Wizard;
 	Storage -> HTML;
-	Storage -> Report;
 	Progress -> Wizard;
 }

@@ -103,7 +103,7 @@ foreach (glob ("$y2dir/modules/{*,*/*}.{ycp,pm}"))
     my $module = $_;
     my $rpm = `rpm -qf --qf \%{name} $module`;
 #    chomp $rpm;
-#    $rpm =~ s/[0-9.-]*$//; 
+#    $rpm =~ s/[0-9.-]*$//;
     chomp $rpm;
     $module =~ s:$y2dir/modules/(.*)\.[^.]*:$1:;
     $module =~ s{/}{::}g;

@@ -1,0 +1,23 @@
+#! /usr/bin/perl -w
+# $Id$
+# Preprocess a YaST Perl module for POD:
+# Use TYPEINFO lines to create function entries with headings and signatures
+
+use strict;
+
+# TODO: "use" it and process the typeinfo
+while (defined ($_ = <>))
+{
+    print;
+    if (m/^BEGIN\s*\{\s*\$TYPEINFO\s*\{\s*(\S*)\s*\}\s*=\s*(.*);/)
+    {
+	chomp;
+	print "\n";
+	print "=head2 $1\n";
+	print "\n";
+	print "C<<< $2 >>>\n";
+	print "\n";
+	print "=cut\n";
+	print "\n";
+    }
+}

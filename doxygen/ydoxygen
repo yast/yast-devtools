@@ -26,6 +26,10 @@ Show this help screen
 
 Use a template file different from <y2datadir>/devtools/Doxyfile
 
+=item B<--prefix>=I<dir>
+
+Use this prefix for the template, don't deduce it from the script's path.
+
 =item B<-d>, B<--debug>
 
 Show what is substituted.
@@ -47,9 +51,10 @@ use Getopt::Long;
 
 my $help = 0;
 my $man = 0;
-my $y2datadir = "/usr/share/YaST2/data";
-my $template = "$y2datadir/devtools/Doxyfile";
 my $debug = 0;
+# prefix is an intermediate to find the template
+my $prefix = "";
+my $template;
 
 sub debug
 {
@@ -63,11 +68,29 @@ GetOptions (
 	    "help|h" => \$help,
 	    "man" => \$man,
 
+	    "prefix=s" => \$prefix,
 	    "template|t=s" => \$template,
 	    "debug|d" => \$debug,
 	   ) or pod2usage (2);
 pod2usage (1) if $help;
 pod2usage (-exitstatus => 0, -verbose => 2) if $man;
+
+# compute paths
+# - if the prefix is not given, thake the same that this script has
+if ($prefix eq "")
+{
+    $prefix = $0;
+    $prefix =~ s:/lib[^/]*/YaST2/bin/[^/]+::;
+    # if we were not called with an absolute path name, take the default prefix
+    if ($prefix =~ m:^[^/]:)
+    {
+	$prefix = "/usr";
+    }
+}
+my $y2datadir = "${prefix}/share/YaST2/data";
+# - if the teplate is specified, use it, otherwise deduce from the prefix
+$template ||= "${y2datadir}/devtools/Doxyfile";
+
 
 # - arguments
 my %replacements = ();

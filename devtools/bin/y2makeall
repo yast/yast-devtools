@@ -544,9 +544,6 @@ sub make()
 
     if ( ! $error )
     {
-	log_progress( "\tmake clean" );
-	system_int( "make clean >>$make_log 2>&1" );
-
 	log_progress( "\tmake $make_target" );
 	system_int( "make $make_target >>$make_log 2>&1" );
 

@@ -1,19 +1,15 @@
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "/usr/share/xml/docbook/schema/dtd/4.2/docbookx.dtd"[
-]>
-
-<section id="check_ycp">
-  <title>Checking YCP Syntax</title>
+<?xml version="1.0" encoding="ISO-8859-1"?>
   <section id="ycp_check_quickstart">
     <title>Quick Start</title>
     <para>
       Simply invoke <literal>check_ycp</literal> with the YCP file(s) you wish to check as
       arguments:
       <screen>
-	check_ycp <emphasis>myfile.ycp</emphasis>
+check_ycp <emphasis>myfile.ycp</emphasis>
       </screen>
 
       <screen>
-	check_ycp *.ycp
+check_ycp *.ycp
       </screen>
 
     </para>
@@ -28,7 +24,7 @@
       Most of the checks can individually be turned off.
       Type
       <screen>
-	check_ycp -h
+check_ycp -h
       </screen>
 
       for a complete list of command line options. Those options are intentionally
@@ -174,14 +170,14 @@
   </section>
 
   <section>
-    <title>CVS $Id$ Marker Check</title>
+    <title>CVS &dollar;Id:&dollar; Marker Check</title>
 
     <section><title>What</title>
 
       <para>
-	Presence of a $Id$ CVS / RCS identity marker is checked, e.g.
+	Presence of a &dollar;Id&dollar; CVS / RCS identity marker is checked, e.g.
 	<screen>
-            $Id myfile.ycp,v 1.2 2001/02/14 18:04:50 sh Exp $ 
+            &dollar;Id myfile.ycp,v 1.2 2001/02/14 18:04:50 sh Exp &dollar;
 	</screen>
       </para>
 
@@ -211,7 +207,7 @@
       <para>
 	Presence of
 	<screen>
-	  $Id$
+&dollar;Id:&dollar;
 	</screen>
 
 	is checked. There may be more characters before the closing dollar sign
@@ -222,7 +218,7 @@
       <note>
 	<para>
 	  When creating a new file, it is absolutely sufficient to
-	  include the unexpanded string ("<literal>$Id$</literal>") somewhere in the
+	  include the unexpanded string ("<literal>&dollar;Id:&dollar;</literal>") somewhere in the
 	  file. CVS or RCS will automatically expand this to the full ID string.
 
 	</para>
@@ -259,7 +255,7 @@
 	<para>
 	  Technically one <literal>textdomain</literal> statement somewhere in the YCP program
 	  would be sufficient, i.e. include files or modules called with
-	  <literal>CallModules()</literal> or <literal>CallFunction()</literal> don't really require an
+	   <literal>CallFunction()</literal> don't really require an
 	  additional <literal>textdomain</literal> specification.
 	</para>
 
@@ -453,16 +449,16 @@
 
         <para>
 	  <screen>
-	    help_text = _("&lt;p&gt;
-	    bla blurb bla ...
-	    blurb bla blurb ...
-	    bla blurb bla ...
-	    &lt;/p&gt;
-	    &lt;p&gt;
-	    bla blurb bla ...
-	    blurb bla blurb ...
-	    bla blurb bla ...
-	    &lt;/p&gt;");
+help_text = _("&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;
+&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;");
 	  </screen>
 	</para>
       </formalpara>
@@ -471,19 +467,19 @@
 	<title>Instead, do:</title>
 	<para>
 	  <screen>
-	    // Help text (HTML like)
-	    help_text = _("&lt;p&gt;
-	    bla blurb bla ...
-	    blurb bla blurb ...
-	    bla blurb bla ...
-	    &lt;/p&gt;");
+// Help text (HTML like)
+help_text = _("&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;");
 
-	    // Help text (HTML like), continued
-	    help_text = help_text + _("&lt;p&gt;
-	    bla blurb bla ...
-	    blurb bla blurb ...
-	    bla blurb bla ...
-	    &lt;/p&gt;");
+// Help text (HTML like), continued
+help_text = help_text + _("&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;");
 	  </screen>
 	</para>
       </formalpara>
@@ -565,7 +561,7 @@
 
     <para>
       Parameters to YaST2 UI widgets plus some commonly used functions
-      (e.g. <literal>SetWizardContents()</literal>, <literal>DisplayMessage()</literal> etc.) are checked
+      (e.g. <literal>Wizard::SetContents()</literal>, <literal>Popup::Message()</literal> etc.) are checked
       where possible - if the parameters are simple string constants, maybe
       surrounded by translation markers ("<literal>_("</literal>...<literal>")</literal>").
     </para>
@@ -579,16 +575,16 @@
       The following examples <emphasis>will be checked:</emphasis>
 
       <programlisting>
-	PushButton("OK");
+PushButton("OK");
       </programlisting>
       <programlisting>
-	PushButton( _("Cancel"));
+PushButton( _("Cancel"));
       </programlisting>
       <programlisting>
-	PushButton(`id(`apply), _("Apply"));
+PushButton(`id(`apply), _("Apply"));
       </programlisting>
       <programlisting>
-	PushButton(`opt(`default), _("OK"));
+PushButton(`opt(`default), _("OK"));
       </programlisting>
 
     </para>
@@ -713,8 +709,8 @@
 
 	<para>
 	  Presence of definitions of functions from the <emphasis>wizard lib</emphasis> (Package
-	  <literal>yast2-lib-wizard</literal>) outside the <emphasis>wizard lib</emphasis> itself is checked
-	  such as <literal>SetWizardContents()</literal> etc.
+	  <literal>yast2</literal>) outside the <emphasis>wizard library</emphasis> itself is checked
+	  such as <literal>Wizard::SetContents()</literal> etc.
 	</para>
       </section>
 
@@ -752,7 +748,7 @@
 
       <para>
 	Usage or presence of definitions of known obsolete functions is checked,
-	e.g. <literal>DisplayMessage()</literal>, <literal>YesOrNo()</literal> etc.; using an equivalent
+	e.g. <literal>Popup::Message()</literal>, <literal>Popup::YesOrNo()</literal> etc.; using an equivalent
 	replacement function from the <emphasis>wizard lib</emphasis>'s <literal>common_popups.ycp</literal>
 	include file is suggested.
       </para>
@@ -789,8 +785,8 @@
       <para>
 	Presence of predefined message strings is checked, e.g. "<literal>&amp;Next</literal>",
 	"<literal>&amp;Back</literal>" etc.; using a corresponding function from the <emphasis>wizard
-	  lib</emphasis> (<literal>yast2-lib-wizard</literal>) is suggested,
-	e.g. <literal>NextButtonLabel()</literal>, <literal>BackButtonLabel()</literal> etc.
+            lib</emphasis> (<literal>Label</literal> Module) is suggested,
+	e.g. <literal>Label::NextButton()</literal>, <literal>Label::BackButton()</literal> etc.
       </para>
 
     </section>
@@ -856,14 +852,17 @@
 	<para>
 	  Alternative variable declarations are rejected, e.g.
 	  <screen>
-	    string|void value = anything();
-	    symbol|term result = UI( `UserInput() );
-	    integer|string x = 42;
+
+string|void value = anything();
+symbol|term result = UI::UserInput();
+integer|string x = 42;
+
 	  </screen>
 	</para>
       </section>
 
-      <section><title>Why</title>
+      <section>
+          <title>Why</title>
 
 	<para>
 	  Just about the only situation where this made sense was when a variable might
@@ -873,7 +872,8 @@
 	  becomes totally redundant. It will very likely be dropped in the near future.
 	</para>
       </section>
-      <section><title>How</title>
+      <section>
+          <title>How</title>
 
 	<para>
 	  The entire YCP code, stripped of comments, is checked for occurences of one of
@@ -908,7 +908,7 @@
 	  the <literal>-x</literal> command line option:
 
 	  <screen>
-	    check_ycp -x HelloWorld.ycp
+check_ycp -x HelloWorld.ycp
 	  </screen>
 	</para>
 
@@ -932,7 +932,7 @@
 
 	  <listitem><para>Invoke the Emacs compile command:</para>
 	    <programlisting>
-	      M-x compile
+M-x compile
 	    </programlisting>
 	  </listitem>
 
@@ -940,7 +940,7 @@
 		minibuffer; change it to the <literal>check_ycp</literal> command you wish to invoke (you only need to do this once for each Emacs session):
 
 		<programlisting>
-		  check_ycp *.ycp
+check_ycp *.ycp
 		</programlisting>
 	      </para>
           </listitem>
@@ -962,8 +962,8 @@
       <literal>next-error</literal> functions to keys in your <literal>~/.emacs</literal> file, e.g.
 
       <screen>
-	(global-set-key "f42" 'compile)
-	(global-set-key "f43" 'next-error)
+(global-set-key "f42" 'compile)
+(global-set-key "f43" 'next-error)
       </screen>
 
     </para>
@@ -978,7 +978,7 @@
       default compile command to <literal>check_ycp</literal> in <literal>~/.emacs</literal>:
 
       <screen>
-	(setq compile-command "check_ycp *.ycp")
+(setq compile-command "check_ycp *.ycp")
       </screen>
 
     </para>
@@ -988,9 +988,9 @@
 
 
 
-  <section>Extending <literal>check_ycp</literal>
+  <section><title>Extending <literal>check_ycp</literal></title>
 
-    <section>Adding new Widgets / UI Functions
+      <section><title>Adding new Widgets / UI Functions</title>
 
       <para>
 	Everybody should be able to add checks for a new widget or a new function that
@@ -1021,11 +1021,11 @@
 	      <literal>if()</literal>...<literal>elsif()</literal>...<literal>elsif()</literal> construction:
 
 	      <programlisting>
-		elsif ( $widget =~ /MyWidget/ )
-		{
-		check_keyboard_shortcut ( $widget, $line_no, 1, @args );
-		check_translation       ( $widget, $line_no, 1, @args );
-		}
+elsif ( $widget =~ /MyWidget/ )
+{
+    check_keyboard_shortcut ( $widget, $line_no, 1, @args );
+    check_translation       ( $widget, $line_no, 1, @args );
+}
 	      </programlisting>
 	    </para>
 	  </listitem>
@@ -1072,4 +1072,3 @@
 
     </section>
   </section>
-</section>

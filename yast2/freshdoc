@@ -33,8 +33,15 @@ CVSUSER=mvidner
 CVSROOT=:pserver:$CVSUSER@yast2-cvs.suse.de:/real-home/CVS/YaST2
 export CVSROOT
 
-# source configuration variables that are different on CML
-. `dirname $0`/freshdoc.conf
+# source configuration variables that are different on CML:
+# WEB, TARGET, TEMPWEB, DOC_SANDBOX, SERVERNAME
+for d in /usr/local/etc /etc `dirname $0`; do
+    . $d/freshdoc.conf && break
+done
+if [ -z "$WEB" ]; then
+    eecho "Configuration file not found"
+    exit 1
+fi
 
 #BRANCH="-r freshdoc-branch"
 HTDIGCONF=/srv/www/htdig/conf/yast2.conf

@@ -101,11 +101,7 @@ y2tool y2autoconf
 y2tool y2automake
 autoreconf --force --install
 
-\%ifarch s390x
-export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG -fsigned-char\"
-\%else
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
-\%endif
 
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir}
@@ -117,11 +113,7 @@ y2tool y2autoconf
 y2tool y2automake
 autoreconf --force --install
 
-\%ifarch s390x
-export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG -fsigned-char\"
-\%else
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
-\%endif
 
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib}

@@ -28,6 +28,7 @@ use vars qw(
 	    $opt_c
 	    $opt_d
 	    $opt_h
+	    $opt_i
 	    $opt_k
 	    $opt_m
 	    $opt_o
@@ -58,6 +59,7 @@ my $dont_check_keyboard_shortcuts	= 0;	# -k (keyboard)
 my $dont_force_translations		= 0;	# -t (translations)
 my $dont_check_obsolete_functions	= 0;	# -b (oBsolete)
 my $dont_check_predefined_messages	= 0;	# -m (messages)
+my $dont_check_imports			= 0;	# -i (imports)
 
 
 # Other command line switches:
@@ -100,7 +102,7 @@ sub main()
     # This will set a variable opt_? for any option,
     # e.g. opt_v if option '-v' is passed on the command line.
 
-    getopts('abcdhkmoprstvx');
+    getopts('abcdhikmoprstvx');
 
     #
     # Set flags according to the command line options.
@@ -114,6 +116,7 @@ sub main()
     $dont_check_alternate_declarations	= 1	if $opt_a;
     $dont_check_obsolete_functions	= 1	if $opt_b;
     $dont_check_header			= 1	if $opt_c;
+    $dont_check_imports			= 1	if $opt_i;
     $dont_check_keyboard_shortcuts	= 1	if $opt_k;
     $dont_check_predefined_messages	= 1	if $opt_m;
     $dont_force_textdomain		= 1	if $opt_o;
@@ -210,6 +213,7 @@ sub check_ycp_file()
     check_alternate_declarations( $ycp_code )	unless $dont_check_alternate_declarations;
     check_obsolete_functions( $ycp_code )	unless $dont_check_obsolete_functions;
     check_predefined_messages( $ycp_code )	unless $dont_check_predefined_messages;
+    check_imports( $ycp_code )			unless $dont_check_imports;
 
     # print count_lines( $ycp_code ) . "\n" ;
 }
@@ -567,6 +571,56 @@ sub check_translations()
 
 #-----------------------------------------------------------------------------
 
+# Check whether there are symbols from modules that are not imported
+#
+# Parameters:
+#	$ycp_code	code to check
+
+sub check_imports()
+{
+    my ( $ycp_code ) = @_;
+
+    # find imported modules
+
+    # initialize the hash
+    my %imported = map {$_ => 1} qw { WFM UI SCR Pkg };
+
+    while ( $ycp_code =~
+	    m{
+		\b				# word boundary
+		import \s+ "
+		([^"]*)				# $1 import name
+		" \s* ;
+	    }xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	$imported{$1} = 1;
+    }
+
+    # check used modules
+    while ( $ycp_code =~
+	    m{
+		([_[:alpha:]][_[:alnum:]]+)::	# $1, SYMBOL
+	    }xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	if (! defined ($imported{$1}))
+	{
+	    my $line_no = count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+	    error( $line_no, "Used but not imported: $1" );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
 # Check one tranlation for valid HTML tags:
 #
 # If a translation contains any tags, make sure:
@@ -726,7 +780,7 @@ sub check_widget_params()
 
     while ( $ycp_code =~
 	    m{
-			\W					# non-word character
+			\b					# word boundary
 		(						# $1 start
 			(CheckBox)			|
 			(ComboBox)			|
@@ -1905,6 +1959,7 @@ sub usage()
 	"\t-c don't check file header comments\n"				.
 	"\t-d debug\n"								.
 	"\t-h help (this message)\n"						.
+	"\t-i don't check for using non-imported symbols\n"						.
 	"\t-k don't check keyboard shortcuts\n"					.
 	"\t-o don't enforce textdomain statement\n"				.
 	"\t-p multiple <p> / </p> paragraphs are OK in HTML messages\n"		.

@@ -1,0 +1,84 @@
+/**
+ * File:
+ *   example.ycp
+ *
+ * Module:
+ *   ycpdoc tool
+ *
+ * Summary:
+ *   Documentation for ycpdoc.
+ *
+ * Authors:
+ *   Petr Blahos <pblahos@suse.cz>
+ *   Other Author <his_mail@suse.de>
+ *
+ * $Id$
+ *
+ * A few examples can be found here. 
+ */
+
+/**
+ * Additional comments to this module. We can also document
+ * inputs and outputs of modules. Note that characters < and >
+ * are allowed in body.
+ *
+ * @param first First argument description
+ * @param second Second argument description. <string>
+ * @return void|map <map> of results or nil.
+ *
+ * @example
+ *  This example shows multiline example tag.
+ *     CallModule(
+ *                io.ycp // <filename>
+ *               );
+ *
+ * @see <a href="http://www.suse.cz">Suse</a>
+ * @see tohex
+ * @see example#
+ * @see example#another
+ */
+
+{
+    include "module/misc.ycp";
+    include "common/conv.ycp";
+/***
+ * <H1>Some intro.</H1>
+ * It is started by /***. All texts in intro are transfered to intro.html
+ * without change. <br>
+ */
+
+    
+/***
+ * Some other intro on some other place.<br>
+ */
+
+    /**
+     * Convert numeric value to hexadecimal string.
+     * @param i value to convert
+     * @return string hexadecimal rep. of i starting by 0x
+     * @example string hex = tohex(65);
+     */
+    define tohex(integer i) ``{
+    }
+
+    /**
+     * Who knows what is this function for?!? Note that there can be couple of
+     * empty lines between end of comment and define.
+     * @param i Value to convert.
+     *  Descriptions of parameters can be multiline.
+     * @param j Some string.
+     * @return ? Unknown. Lets show that return value description
+     *  can be multiline.
+     */
+  
+    define another(integer i,string j) ``{
+    }
+  
+    /**
+     * This function has no return value defined.
+     */
+  
+    define black_hole() ``{
+    }
+
+}

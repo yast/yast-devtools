@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ycpdoc
+><files
+><file_item key="t1-example.ycp"
+><header
+><authors
+><ITEM
+>   Petr Blahos &amp;lt;&lt;a href="mailto:pblahos@suse.cz"&gt;pblahos@suse.cz&lt;/a&gt;&amp;gt;</ITEM
+><ITEM
+>   Other Author &amp;lt;&lt;a href="mailto:his_mail@suse.de"&gt;his_mail@suse.de&lt;/a&gt;&amp;gt;</ITEM
+></authors
+><descr
+>
+
+ A few examples can be found here. </descr
+><file
+>
+   example.ycp
+</file
+><module
+>
+
+   ycpdoc tool
+</module
+><summary
+>
+   Documentation for ycpdoc.
+</summary
+></header
+><provides
+><provides_item
+><body
+>
+ Additional comments to this module. We can also document
+ inputs and outputs of modules. Note that characters &amp;lt; and &amp;gt;
+ are allowed in body.
+</body
+><example
+>&lt;pre&gt; 
+  This example shows multiline example tag.
+     CallModule(
+                io.ycp // &lt;filename&gt;
+               );
+&lt;/pre&gt;</example
+><file
+>t1-example.ycp</file
+><global
+>0</global
+><kind
+>info</kind
+><name
+></name
+><parameters
+><description
+>First argument description</description
+><name
+>first</name
+><description
+>Second argument description. &lt;string&gt;</description
+><name
+>second</name
+></parameters
+><return
+>|map &lt;map&gt; of results or nil.
+</return
+><see
+>&lt;a href="http://www.suse.cz"&gt;Suse&lt;/a&gt;
+&lt;a href="#tohex"&gt;tohex&lt;/a&gt;
+&lt;a href="example.html"&gt;example&lt;/a&gt;
+&lt;a href="example.html#another"&gt;another in example&lt;/a&gt;
+</see
+><signature
+></signature
+><since
+></since
+><type
+>void</type
+></provides_item
+><provides_item
+><body
+>
+ Convert numeric value to hexadecimal string.</body
+><example
+>&lt;pre&gt;  string hex = tohex(65);&lt;/pre&gt;</example
+><file
+>t1-example.ycp</file
+><global
+></global
+><kind
+>function</kind
+><name
+>tohex</name
+><parameters
+><description
+>value to convert</description
+><name
+>i</name
+><type
+>integer</type
+></parameters
+><return
+>hexadecimal rep. of i starting by 0x</return
+><see
+></see
+><signature
+></signature
+><since
+></since
+><type
+>string</type
+></provides_item
+><provides_item
+><body
+>
+ Who knows what is this function for?!? Note that there can be couple of
+ empty lines between end of comment and define.</body
+><example
+></example
+><file
+>t1-example.ycp</file
+><global
+></global
+><kind
+>function</kind
+><name
+>another</name
+><parameters
+><description
+>Value to convert.
+  Descriptions of parameters can be multiline.</description
+><name
+>i</name
+><type
+>integer</type
+><description
+>Some string.</description
+><name
+>j</name
+><type
+>string</type
+></parameters
+><return
+>? Unknown. Lets show that return value description
+  can be multiline.</return
+><see
+></see
+><signature
+></signature
+><since
+></since
+><type
+></type
+></provides_item
+><provides_item
+><body
+>
+ This function has no return value defined.</body
+><example
+></example
+><file
+>t1-example.ycp</file
+><global
+></global
+><kind
+>function</kind
+><name
+>black_hole</name
+><parameters
+></parameters
+><return
+></return
+><see
+></see
+><signature
+></signature
+><since
+></since
+><type
+></type
+></provides_item
+></provides
+><requires
+><kind
+>include</kind
+><name
+>module/misc.ycp</name
+><kind
+>include</kind
+><name
+>common/conv.ycp</name
+></requires
+></file_item
+><file_item key="t1-mis.ycp"
+><header
+><authors
+><ITEM
+>   Petr Blahos &amp;lt;&lt;a href="mailto:pblahos@suse.cz"&gt;pblahos@suse.cz&lt;/a&gt;&amp;gt;</ITEM
+></authors
+><descr
+>
+
+ Shows ycpdoc capability to report undocumented
+ functions and misdocumented params.</descr
+><file
+>
+   mis.ycp
+</file
+><module
+>
+
+   ycpdoc tool
+</module
+><summary
+>
+   Documentation for ycpdoc.
+</summary
+></header
+><provides
+><provides_item
+><body
+>
+ Description.
+ @param a
+ @param c</body
+><example
+></example
+><file
+>t1-mis.ycp</file
+><global
+></global
+><kind
+>function</kind
+><name
+>misdocumented</name
+><parameters
+><description
+></description
+><name
+>a</name
+><type
+>string</type
+><description
+></description
+><name
+>b</name
+><type
+>string</type
+></parameters
+><return
+></return
+><see
+></see
+><signature
+></signature
+><since
+></since
+><type
+></type
+></provides_item
+></provides
+><requires
+></requires
+></file_item
+><file_item key="t1-modules.ycp"
+><header
+><authors
+><ITEM
+>   Petr Blahos &amp;lt;&lt;a href="mailto:pblahos@suse.cz"&gt;pblahos@suse.cz&lt;/a&gt;&amp;gt;</ITEM
+></authors
+><descr
+>
+
+ This example shows how ycpdoc handle more modules.</descr
+><file
+>
+   module.ycp
+</file
+><module
+>
+
+   ycpdoc tool
+</module
+><summary
+>
+   Documentation for ycpdoc.
+</summary
+></header
+><provides
+><provides_item
+><body
+>
+ I was just too lazy to fabricate some good name of sample function.</body
+><example
+></example
+><file
+>t1-modules.ycp</file
+><global
+></global
+><kind
+>function</kind
+><name
+>lazy</name
+><parameters
+><description
+>some value</description
+><name
+>i</name
+><type
+>integer</type
+></parameters
+><return
+></return
+><see
+></see
+><signature
+></signature
+><since
+></since
+><type
+></type
+></provides_item
+></provides
+><requires
+></requires
+></file_item
+></files
+><intro_html
+>&lt;!-- t1-example.ycp --&gt;
+ &lt;H1&gt;Some intro.&lt;/H1&gt;
+ It is started by /***. All texts in intro are transfered to intro.html
+ without change. &lt;br&gt;
+&lt;!-- t1-example.ycp --&gt;
+ Some other intro on some other place.&lt;br&gt;
+&lt;!-- t1-modules.ycp --&gt;
+ &lt;H1&gt;Intro to &lt;b&gt;modules.ycp&lt;/b&gt;&lt;/H1&gt;
+ All intros are merged into one intro in one file.
+</intro_html
+></ycpdoc
+>

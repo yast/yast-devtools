@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Sep 13 02:12:23 CEST 2004 - nashif@suse.de
+
+- ycodoc: parameters in xml output are lists, every parameter description
+  appears as an item
+- added ycpdoc.xsl for generating docbook refentries from ycpdoc xml
+  output
+- added docbook stylesheets and and admin/navigation images
+
+-------------------------------------------------------------------
 Mon Sep  6 16:25:09 CEST 2004 - mvidner@suse.cz
 
 - ycpdoc: Allow zero space between type and identifier (list<string>a).

@@ -171,6 +171,8 @@ make check",
 
     "\@BUILD-PO\@" =>
 "\%build
+autoreconf --force --install
+\%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir}
 make",
 

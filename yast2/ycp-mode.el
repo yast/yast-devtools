@@ -304,41 +304,19 @@ See `c-offsets-alist' for details")
 	       (version-lessp-1 (cdr versions1) (cdr versions2)))))))
 
 ;;;###autoload
-(defun ycp-mode ()
+(define-derived-mode ycp-mode c++-mode "YCP"
   "Major mode for editing YCP code.
-This is much like C mode.  It uses the same keymap as C mode and has the
+This is much like C++ mode.  It uses the same keymap as C++ mode and has the
 same variables for customizing indentation.  It has its own abbrev table
 and its own syntax table.
 
 Turning on YCP mode calls the value of the variable `ycp-mode-hook'
 with no args, if that value is non-nil."
-  (interactive)
-  (kill-all-local-variables)
-  (require 'cc-mode)
-  (c-initialize-cc-mode)
-  (use-local-map c++-mode-map)
-  (setq major-mode 'ycp-mode)
-  (setq mode-name "YCP")
   (setq local-abbrev-table ycp-mode-abbrev-table)
-  (if (version-lessp c-version "5.29")
-      (progn
-	(c-common-init)
-	(setq comment-start "// "
-	      comment-end   ""
-	      c-conditional-key "\\b\\(for\\|if\\|do\\|else\\|while\\)\\b[^_]"
-	      c-class-key c-C-class-key	; WRONG
-	      c-baseclass-key nil
-	      c-comment-start-regexp c-C++-comment-start-regexp
-	      imenu-create-index-function 'cc-imenu-c-generic-expression ; XXX
-	      imenu-case-fold-search nil))
-    (c-common-init 'c++-mode))
   (set-syntax-table ycp-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults)
-       '(ycp-font-lock-keywords nil nil ((?_ . "w") (?` . "w"))))
-  (run-hooks 'c-mode-common-hook)
-  (run-hooks 'ycp-mode-hook)
-  (c-update-modeline)
-  )
+       '(ycp-font-lock-keywords nil nil ((?_ . "w") (?` . "w")))))
+
 (provide 'ycp-mode)
 
 ;;; ycp-mode.el ends here

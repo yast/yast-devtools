@@ -60,12 +60,14 @@ yast2-xml		inst-sys		xml agent (autoinst)
 # config packages
 yast2-backup		default			backup
 yast2-bootloader	default			bootloader
+yast2-ca-management	default			CA management
 yast2-cd-creator	default			create installation CDs
 yast2-country		default			keyboard,language,timezone
 yast2-dhcp-server	defalut			DHCP server
 yast2-dns-server	default			DNS server
 yast2-firewall		default			firewall
 yast2-firewall-cd	firewall		firewall CD
+yast2-heartbeat		default			HA (heartbeat)
 yast2-http-server	default			HTTP server
 yast2-imap-server	email			IMAP server
 yast2-inetd		default			inetd editor
@@ -73,7 +75,9 @@ yast2-instserver	default			installation server
 yast2-ipsec		default			IPsec
 yast2-kerberos-client	default			kerberos client
 yast2-ldap-client	default			ldap client
+yast2-ldap-server	default			LDAP server
 yast2-mail		default			mail
+yast2-mail-server	default			mail server
 yast2-mouse		default			mouse
 yast2-network		default			network
 yast2-nfs-client	default			nfs client
@@ -108,7 +112,6 @@ yast2-uml		default			UML
 yast2-users		default			users
 yast2-x11		default			runtime x11
 yast2-you-server	default			YOU server
-yast2-ca-management	default			CA Management
 
 # translations
 yast2-trans-bg		inst-sys		all
@@ -129,6 +132,7 @@ yast2-trans-ko		inst-sys		all
 yast2-trans-lt		inst-sys		all
 yast2-trans-nb		inst-sys		all
 yast2-trans-nl		inst-sys		all
+yast2-trans-pl		inst-sys		all
 yast2-trans-pt_BR	inst-sys		all
 yast2-trans-ro		inst-sys		all
 yast2-trans-ru		inst-sys		all

@@ -28,6 +28,7 @@
 $RPMNAME = `cat RPMNAME`;
 $VERSION = `cat VERSION`;
 $MAINTAINER = `cat MAINTAINER`;
+$LICENSE = -f "YAST_LICENSE" ? "YaST License" : "GPL";
 
 $PREFIX = "/usr";
 
@@ -74,7 +75,7 @@ if ($#ARGV > 0)
 "Name:		$RPMNAME
 Version:	$VERSION
 Release:	0
-License:	YaST License
+License:	$LICENSE
 Group:		System/YaST
 BuildRoot:	%{_tmppath}/%{name}-%{version}-build
 Source0:	$RPMNAME-$VERSION.tar.bz2
@@ -139,7 +140,7 @@ for f in po/*.po ; do
   awk -f \@ybindir\@/cleanuppo.awk \$f.orig >\$f
 done
 \%endif
-\%if \%sles_version > 0
+\%if \%sles_version == 8
 for f in po/*.po ; do
   cp \$f \$f.orig
   awk -f \@ybindir\@/cleanuppo.awk -v sles=8 \$f.orig >\$f

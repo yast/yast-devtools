@@ -121,6 +121,7 @@
 		       "`DummySpecialWidget"
 		       "`BarGraph"
 		       "`ColoredLabel"
+		       "`DumbTab"
 		       "`Slider"
 		       "`PartitionSplitter"
 		       "`Wizard"

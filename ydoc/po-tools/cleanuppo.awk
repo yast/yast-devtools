@@ -1,10 +1,12 @@
 #!/bin/awk -f
 BEGIN{
   found=0;
-  if (sles >= 8) {
+  if (sles == 8) {
     linux = "SLES";
     suse = "SuSE";
   } else if (sles && sles < 8) {
+    exit;
+  } else if (sles && sles > 8) {
     exit;
   } else {
     linux = "UnitedLinux";

@@ -1,9 +1,21 @@
 -------------------------------------------------------------------
-Mon May 10 14:16:29 CEST 2004 - mvidner@suse.cz
+Thu May 27 16:07:08 CEST 2004 - ke@suse.de
+
+- On SLES9 do not cleanup PO files (disable cleanuppo.awk).
+
+-------------------------------------------------------------------
+Wed May 19 11:36:55 CEST 2004 - sh@suse.de
+
+- Add correct license to .spec file
+- V 2.9.20 
+
+-------------------------------------------------------------------
+Tue May 11 13:04:11 CEST 2004 - mvidner@suse.cz
 
 - Let "make pot" find __ (#40160).
+- Updated skeleton .pm (#40160).
 - Sort file names according to C to have comparable pot files.
-- 2.10.1
+- 2.9.19
 
 -------------------------------------------------------------------
 Wed Apr 14 12:03:48 CEST 2004 - msvec@suse.cz

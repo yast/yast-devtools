@@ -14,18 +14,10 @@ package XXPkgXX;
 
 use strict;
 
-use ycp;
-use YaST::YCP qw(Boolean);
+use YaST::YCP qw(Boolean :LOGGING);
+use YaPI;
 
-use Locale::gettext;
-use POSIX ();     # Needed for setlocale()
-
-POSIX::setlocale(LC_MESSAGES, "");
 textdomain("XXpkgXX");
-
-sub _ {
-    return gettext($_[0]);
-}
 
 our %TYPEINFO;
 
@@ -82,7 +74,7 @@ BEGIN { $TYPEINFO{Read} = ["function", "boolean"]; }
 sub Read {
 
     # XXPkgXX read dialog caption
-    my $caption = _("Initializing XXpkgXX Configuration");
+    my $caption = __("Initializing XXpkgXX Configuration");
 
     # TODO FIXME Set the right number of stages
     my $steps = 4;
@@ -94,20 +86,20 @@ sub Read {
     # We do not set help text here, because it was set outside
     Progress::New( $caption, " ", $steps, [
 	    # Progress stage 1/3
-	    _("Read the database"),
+	    __("Read the database"),
 	    # Progress stage 2/3
-	    _("Read the previous settings"),
+	    __("Read the previous settings"),
 	    # Progress stage 3/3
-	    _("Detect the devices")
+	    __("Detect the devices")
 	], [
 	    # Progress step 1/3
-	    _("Reading the database..."),
+	    __("Reading the database..."),
 	    # Progress step 2/3
-	    _("Reading the previous settings..."),
+	    __("Reading the previous settings..."),
 	    # Progress step 3/3
-	    _("Detecting the devices..."),
+	    __("Detecting the devices..."),
 	    # Progress finished
-	    _("Finished")
+	    __("Finished")
 	],
 	""
     );
@@ -117,7 +109,7 @@ sub Read {
     # Error message
     if(0)
     {
-	Report::Error(_("Cannot read the database1."));
+	Report::Error(__("Cannot read the database1."));
     }
     sleep($sl);
 
@@ -126,7 +118,7 @@ sub Read {
     # Error message
     if(0)
     {
-	Report::Error(_("Cannot read the database2."));
+	Report::Error(__("Cannot read the database2."));
     }
     sleep($sl);
 
@@ -135,7 +127,7 @@ sub Read {
     # Error message
     if(0)
     {
-	Report::Error(_("Cannot read current settings."));
+	Report::Error(__("Cannot read current settings."));
     }
     sleep($sl);
 
@@ -144,7 +136,7 @@ sub Read {
     # Error message
     if(0)
     {
-	Report::Warning(_("Cannot detect devices."));
+	Report::Warning(__("Cannot detect devices."));
     }
     sleep($sl);
 
@@ -164,7 +156,7 @@ BEGIN { $TYPEINFO{Write} = ["function", "boolean"]; }
 sub Write {
 
     # XXPkgXX read dialog caption
-    my $caption = _("Saving XXpkgXX Configuration");
+    my $caption = __("Saving XXpkgXX Configuration");
 
     # TODO FIXME And set the right number of stages
     my $steps = 2;
@@ -176,16 +168,16 @@ sub Write {
     # We do not set help text here, because it was set outside
     Progress::New($caption, " ", $steps, [
 	    # Progress stage 1/2
-	    _("Write the settings"),
+	    __("Write the settings"),
 	    # Progress stage 2/2
-	    _("Run SuSEconfig")
+	    __("Run SuSEconfig")
 	], [
 	    # Progress step 1/2
-	    _("Writing the settings..."),
+	    __("Writing the settings..."),
 	    # Progress step 2/2
-	    _("Running SuSEconfig..."),
+	    __("Running SuSEconfig..."),
 	    # Progress finished
-	    _("Finished")
+	    __("Finished")
 	],
 	""
     );
@@ -195,7 +187,7 @@ sub Write {
     # Error message
     if(0)
     {
-	Report::Error (_("Cannot write settings."));
+	Report::Error (__("Cannot write settings."));
     }
     sleep($sl);
 
@@ -204,7 +196,7 @@ sub Write {
     # Error message
     if(0)
     {
-	Report::Error (_("SuSEconfig script failed."));
+	Report::Error (__("SuSEconfig script failed."));
     }
     sleep($sl);
 
@@ -248,7 +240,7 @@ sub Summary {
     # TODO FIXME: your code here...
     # Configuration summary text for autoyast
     return (
-	_("Configuration summary ...")
+	__("Configuration summary ...")
     );
 }
 

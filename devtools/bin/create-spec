@@ -105,7 +105,7 @@ export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --mandir=%{_mandir}
-make",
+make %{?jobs:-j%jobs}",
 
     "\@BUILD-QT\@" =>
 "\%build
@@ -117,7 +117,7 @@ export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
-make",
+make %{?jobs:-j%jobs}",
 
     "\@BUILD-PO\@" =>
 "\%build
@@ -136,7 +136,7 @@ for f in po/*.po ; do
   awk -f \@ybindir\@/cleanuppo.awk -v sles=8 \$f.orig >\$f
 done
 \%endif
-make",
+make %{?jobs:-j%jobs}",
 
 ##### INSTALL #####
 

@@ -60,7 +60,7 @@ $OUTPUT = qx(SUBDIRS=`cat SUBDIRS 2> /dev/null` ;
 
     # init: common stuff
     "\@YAST2-INIT-COMMON\@" =>
-"AC_INIT($RPMNAME, $VERSION, feedback\@suse.de)
+"AC_INIT($RPMNAME, $VERSION, http://www.suse.de/feedback)
 dnl Check for presence of file 'RPMNAME'
 AC_CONFIG_SRCDIR([RPMNAME])
 

@@ -12,6 +12,9 @@
            <xsl:attribute name="id">
                <xsl:value-of select="entries_item/filename"/>
            </xsl:attribute>
+            <title>
+                <xsl:value-of select="entries_item/file_summary"/>
+            </title>
             <xsl:apply-templates select="entries_item"/> 
         </reference>
     </xsl:template>
@@ -21,8 +24,6 @@
         <refentry>
                 <xsl:attribute name="id">
                     <xsl:value-of select="filename"/>
-                    <xsl:text>_</xsl:text>
-                    <xsl:value-of select="type"/>
                     <xsl:text>_</xsl:text>
                     <xsl:choose>
                         <xsl:when test="id != ''">
@@ -101,12 +102,40 @@
                 <xsl:apply-templates select="parameters"/>
                 <xsl:apply-templates select="options"/>
                 <xsl:apply-templates select="optargs"/>
+                <xsl:apply-templates select="properties"/>
                 <xsl:apply-templates select="return"/>
                 <xsl:apply-templates select="description"/>
                 <xsl:apply-templates select="usage"/>
         </refentry>
       </xsl:template>
 
+    <xsl:template match="properties">
+        <xsl:if test="count(properties_item) > 0 ">
+            <refsect1>
+                <title>Properties</title>
+                <variablelist>
+                    <xsl:for-each select="properties_item">
+                        <varlistentry>
+                            <term>
+                                <type>
+                                    <xsl:value-of select="type"/>
+                                </type> 
+                                <parameter>
+                                    <xsl:value-of select="name"/>
+                                </parameter>
+                            </term>
+                            <listitem>
+                                <para>
+                                    <xsl:value-of select="description"/>
+                                </para>
+                            </listitem>
+                        </varlistentry>
+                    </xsl:for-each>
+                </variablelist>
+            </refsect1>
+        </xsl:if>
+
+    </xsl:template>
 
     <xsl:template match="optargs">
         <xsl:if test="count(optargs_item) > 0 ">
@@ -164,7 +193,18 @@
                             <listitem>
                                 <xsl:for-each select="description/ITEM">
                                     <para>
-                                        <xsl:value-of select="."/>
+                                    <xsl:choose>
+                                        <xsl:when test="contains(., '&lt;code&gt;')">
+                                            <programlisting>
+                                                <xsl:value-of select="."/>
+                                            </programlisting>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <para>
+                                                <xsl:value-of select="."/>
+                                            </para>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                     </para>
                                 </xsl:for-each>
                             </listitem>
@@ -211,13 +251,35 @@
                 <title>Description</title>
                 <xsl:for-each select="description_item">
                     <para>
-                        <xsl:value-of select="."/>
+                                    <xsl:choose>
+                                        <xsl:when test="contains(., '&lt;code&gt;')">
+                                            <programlisting>
+                                                <xsl:value-of select="."/>
+                                            </programlisting>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <para>
+                                                <xsl:value-of select="."/>
+                                            </para>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                     </para>
                 </xsl:for-each>
+                <xsl:if test="../note != ''">
+                    <note>
+                        <xsl:for-each select="../note/note_item">
+                            <para>
+                                <xsl:value-of select="."/>
+                            </para>
+                        </xsl:for-each>
+                    </note>
+                </xsl:if> 
             </refsect1>
         </xsl:if>
-        
     </xsl:template>
+
+
+
     <xsl:template match="usage">
             <refsect1>
                 <title>Usage</title>
@@ -226,7 +288,11 @@
                     </programlisting>
             </refsect1>
     </xsl:template>
-    <xsl:template name="return_type">
+
+    
+
+    <xsl:template match="return|return_type">
+        <xsl:if test="type != ''">
             <refsect1>
                 <title>Return</title>
                 <variablelist>
@@ -246,27 +312,7 @@
                         </varlistentry>
                 </variablelist>
             </refsect1>
-    </xsl:template>
-    <xsl:template match="return">
-            <refsect1>
-                <title>Return</title>
-                <variablelist>
-                        <varlistentry>
-                            <term>
-                                <type>
-                                    <xsl:value-of select="type"/>
-                                </type>
-                            </term>
-                            <listitem>
-                                <xsl:for-each select="description">
-                                    <para>
-                                        <xsl:value-of select="."/>
-                                    </para>
-                                </xsl:for-each>
-                            </listitem>
-                        </varlistentry>
-                </variablelist>
-            </refsect1>
+        </xsl:if>
     </xsl:template>
 
    <xsl:template name="html-replace-entities">

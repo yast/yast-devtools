@@ -82,29 +82,10 @@ dist-hook:
 	done
 
 xgettext_call = \
-	echo "\# LANGUAGE message file for YaST2 ($$MODULE)."; \
-	echo "\# Copyright (C) `date +%Y` SuSE Linux AG, Nuernberg, Germany."; \
-	echo "\# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR."; \
-	echo "\#"; \
-	echo "\#, fuzzy"; \
-	echo "msgid \"\""; \
-	echo "msgstr \"\""; \
-	echo "\"Project-Id-Version: YaST2 ($$MODULE)\n\""; \
-	echo -n "\"POT-Creation-Date: "; \
-	    date "+%Y-%m-%d %H:%M:%S%z\\n\""; \
-	echo "\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n\""; \
-	echo "\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n\""; \
-	echo "\"Language-Team: LANGUAGE <i18n@suse.de>\n\""; \
-	echo "\"MIME-Version: 1.0\n\""; \
-	echo "\"Content-Type: text/plain; charset=CHARSET\n\""; \
-	echo "\"Content-Transfer-Encoding: ENCODING\n\""; \
-	echo "" ; \
-	$(XGETTEXT) --width=0 --language=YCP --add-comments --keyword=_:1,2 \
-		    --omit-header --foreign-user --add-location \
-		    --default-domain=$$MODULE --output=- $$FILES
-
-print_xgettext_call = \
-	echo "Creating $(srcdir)/$$MODULE.pot from $$FILES..."
+	echo "Creating $(srcdir)/$$MODULE.pot from $$FILES..." ;		\
+	$(XGETTEXT) --no-wrap --add-comments --add-location --keyword=_		\
+		--foreign-user --copyright-holder="SuSE Linux AG, Nuernberg"	\
+		--default-domain=$$MODULE --output=$$MODULE.pot $$FILES
 
 # we need a "dummy" pot target for the case, when $(POT_DST) is empty
 $(POT_DST) pot: $(POT_SRC)
@@ -124,16 +105,14 @@ $(POT_DST) pot: $(POT_SRC)
 	    F=$${I#*:} ; \
 	    if [ "$$D" != "$$MODULE" ] ; \
 	    then \
-		$(print_xgettext_call) ; \
-		{ $(xgettext_call) ; } > $(srcdir)/$$MODULE.pot ; \
+		$(xgettext_call) ; \
 		MODULE=$$D ; \
 		FILES=$$F ; \
 	    else \
 		FILES="$$FILES $$F" ; \
 	    fi ; \
 	done ; \
-	$(print_xgettext_call) ; \
-	{ $(xgettext_call) ; } > $(srcdir)/$$MODULE.pot
+	$(xgettext_call)
 
 install-pot: $(POT_DST)
 	@if [ -n "$^" ] ; then \

@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue Jun 17 18:46:48 CEST 2003 - mvidner@suse.cz
+
+- enable YCP testsuites again
+- check_ycp: detect symbols from modules that are not imported
+  (applied to the skeleton too)
+- simplified files for trans spec (ke)
+- ycp-mode.el: added new UI builtins (sh)
+- 2.8.3
+
+-------------------------------------------------------------------
 Thu Jun 12 13:02:25 CEST 2003 - jsrain@suse.de
 
 - added packages yast2-dhcp-server, yast2-dns-server,
@@ -8,6 +18,8 @@ Thu Jun 12 13:02:25 CEST 2003 - jsrain@suse.de
 Thu Jun 12 10:15:37 CEST 2003 - arvin@suse.de
 
 - added missing directories to file list
+- even better name creation (msvec)
+- check_ycp: a hack not to complain about Popup::ContinueCancel (mvidner)
 
 -------------------------------------------------------------------
 Fri Jun  6 09:43:06 CEST 2003 - mvidner@suse.cz

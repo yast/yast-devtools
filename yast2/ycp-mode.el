@@ -123,6 +123,7 @@
 		       "`ColoredLabel"
 		       "`Slider"
 		       "`PartitionSplitter"
+		       "`Wizard"
 		       ))))
 
        (ycp-ui-widget-options
@@ -155,6 +156,7 @@
 			"`plainText"
 			"`scaleToFit"
 			"`shrinkable"
+			"`stepsEnabled"
 			"`testMode"
 			"`tiled"
 			"`updateMode"
@@ -255,6 +257,7 @@
 		       "UserInput"
 		       "WaitForEvent"
 		       "WidgetExists"
+		       "WizardCommand"
 		       ))))
        )
   (list

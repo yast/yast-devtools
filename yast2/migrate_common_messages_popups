@@ -1,0 +1,96 @@
+#!/bin/bash
+# mvidner@suse.cz, 2003-05-14
+# $Id$
+#
+# migrate usage of common_{messages,popups} to {Label,Popup}::
+#
+# usage: migrate_common_messages_popups *.ycp
+#   performs in-place substitution, leaving *.ycp.bak backups
+
+for i in "$@"; do
+    perl -p -i.bak -e '
+s:include\s+"ui/common_messages.ycp":import "Label":g;
+s:include\s+"ui/common_popups.ycp":import "Popup":g;
+
+s/\bWarningMsg\b/Label::WarningMsg/g;
+s/\bErrorMsg\b/Label::ErrorMsg/g;
+s/\bPleaseWaitMsg\b/Label::PleaseWaitMsg/g;
+
+s/\bDefaultFunctionKeyMap\b/Label::DefaultFunctionKeyMap/g;
+
+# 25 button labels, alphabetically
+s/\bAbortButtonLabel\b/Label::AbortButton/g;
+s/\bAcceptButtonLabel\b/Label::AcceptButton/g;
+s/\bAddButtonLabel\b/Label::AddButton/g;
+s/\bBackButtonLabel\b/Label::BackButton/g;
+s/\bCancelButtonLabel\b/Label::CancelButton/g;
+s/\bCloseButtonLabel\b/Label::CloseButton/g;
+s/\bContinueButtonLabel\b/Label::ContinueButton/g;
+s/\bDeleteButtonLabel\b/Label::DeleteButton/g;
+s/\bDoNotAcceptButtonLabel\b/Label::DoNotAcceptButton/g;
+s/\bDontInstallButtonLabel\b/Label::DontInstallButton/g;
+s/\bDownloadButtonLabel\b/Label::DownloadButton/g;
+s/\bEditButtonLabel\b/Label::EditButton/g;
+s/\bFinishButtonLabel\b/Label::FinishButton/g;
+s/\bHelpButtonLabel\b/Label::HelpButton/g;
+s/\bIgnoreButtonLabel\b/Label::IgnoreButton/g;
+s/\bInstallButtonLabel\b/Label::InstallButton/g;
+s/\bNewButtonLabel\b/Label::NewButton/g;
+s/\bNextButtonLabel\b/Label::NextButton/g;
+s/\bNoButtonLabel\b/Label::NoButton/g;
+s/\bOKButtonLabel\b/Label::OKButton/g;
+s/\bQuitButtonLabel\b/Label::QuitButton/g;
+s/\bRetryButtonLabel\b/Label::RetryButton/g;
+s/\bSaveButtonLabel\b/Label::SaveButton/g;
+s/\bStopButtonLabel\b/Label::StopButton/g;
+s/\bYesButtonLabel\b/Label::YesButton/g;
+
+s/\bNoHeadline\b/Popup::NoHeadline/g; #!
+s/\bContinueCancelHeadlinePopup\b/Popup::ContinueCancelHeadline/g;
+s/\bContinueCancelPopup\b/Popup::ContinueCancel/g;
+s/\bYesNoHeadlinePopup\b/Popup::YesNoHeadline/g;
+s/\bYesNoPopup\b/Popup::YesNo/g;
+s/\bLongTextPopup\b/Popup::LongText/g;
+s/\bConfirmAbortPopup\b/Popup::ConfirmAbort/g;
+s/\bReallyAbortPopup\b/Popup::ReallyAbort/g;
+s/\bMessagePopup\b/Popup::Message/g;
+s/\bWarningPopup\b/Popup::Warning/g;
+s/\bErrorPopup\b/Popup::Error/g;
+s/\bNotifyPopup\b/Popup::Notify/g;
+s/\bAnyMessagePopup\b/Popup::AnyMessage/g;
+s/\bTimedMessagePopup\b/Popup::TimedMessage/g;
+s/\bTimedOKCancelPopup\b/Popup::TimedOKCancel/g;
+s/\bAnyQuestionPopup\b/Popup::AnyQuestion/g;
+s/\bAnyQuestionPopup3\b/Popup::AnyQuestion3/g; #!
+s/\bModuleError\b/Popup::ModuleError/g; #!
+s/\bAnyTimedMessagePopup\b/Popup::AnyTimedMessage/g;
+s/\bTimedWarningPopup\b/Popup::TimedWarning/g;
+s/\bTimedErrorPopup\b/Popup::TimedError/g;
+s/\bShowFilePopup\b/Popup::ShowFile/g;
+
+# most defines were in UI
+s/UI::Label::/Label::/g;
+s/UI::Popup::/Popup::/g;
+' "$i"
+
+    # maybe it uses common_messages implicitly, thru common_popups
+    # so we need to add import "Label";
+    if ! grep -q 'import "Label";' "$i"; then
+	if grep -q '\<Label::' "$i"; then
+	    echo >&1 "import Label is needed for $i"
+	    perl -pi -e '
+if (m/^(\s*)import "Popup"/) { print "$1import \"Label\";\n"; $done=1 }
+END {
+  if  ($done) {
+    print STDERR "  OK, done\n";
+  } else {
+    print STDERR "  I do not know where to put it. Do it yourself.\n";
+  }
+}
+' "$i"
+	fi
+    fi
+
+    # if there were no changes, move the backup back
+    cmp -s "$i.bak" "$i" && mv "$i.bak" "$i"
+done

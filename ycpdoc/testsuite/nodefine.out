@@ -16,10 +16,10 @@
  Main DNS GUI</body
 ><file
 >nodefine.ycp</file
-><global
->0</global
 ><kind
->info</kind
+>function</kind
+><name
+>DNSGUI</name
 ><parameters
 ></parameters
 ><return
@@ -28,6 +28,8 @@
 ></scruple
 ><see
 ></see
+><type
+>any</type
 ></provides_item
 ><provides_item
 ><body
@@ -36,15 +38,19 @@
 ><file
 >nodefine.ycp</file
 ><global
->0</global
+>1</global
 ><kind
->info</kind
+>function</kind
+><name
+>Global</name
 ><parameters
 ></parameters
 ><scruple
 ></scruple
 ><see
 ></see
+><type
+>void</type
 ></provides_item
 ></provides
 ><requires

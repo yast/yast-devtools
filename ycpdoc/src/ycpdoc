@@ -317,18 +317,19 @@ my $ycp_quad = "(?:::)";
 my $ycp_qualified_symbol = "(?:$ycp_quad?$ycp_symbol(?:$ycp_quad$ycp_symbol)*)";
 
 my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock"
-    . "|list|map" 		# _syntactically_ simple types
+    . "|list|map"		# _syntactically_ simple types
     . "|${ycp_symbol}_t"	# if it ends with _t, it is a type
     . "|locale|term|path|block|declaration|symbol)";
 
 sub recursive_type ($)
 {
     my $t = shift;
-    return qr{(?: $t
-    |list  \s* \( \s* $t \s* \) # old syntax
-    |list  \s* <  \s* $t \s* >
+    return qr{(?:
+     list  \s* <  \s* $t \s* >
     |block \s* <  \s* $t \s* >
     |map   \s* <  \s* $t \s* , \s* $t \s* >
+    | $t	# must come last otherwise "list<foo>" would not
+		# be parsed because of "list"
     )}x;
 }
 
@@ -374,7 +375,7 @@ sub parse_file ($)
 	if ("aftercomment" eq $state)
 	{
 	    # function definition
-	    if (/^\s*(global\s+)?define\s+($ycp_typedecl)?\s*($ycp_qualified_symbol)(.*)/o)
+	    if (/^\s*(global\s+)?(?:define\s+)?($ycp_typedecl)\s*($ycp_qualified_symbol)(\s*\(.*)/o)
 	    {
 		$isglobal = defined $1;
 		$declared_type = $2 || "";
@@ -469,7 +470,7 @@ sub parse_file ($)
 	    }
 
 	    # function, but not a declaration (;)
-	    if (/^\s*(?:global\s+)?define\s+(?:$ycp_typedecl)?\s*(${ycp_qualified_symbol})\s*\([^;]*$/o)
+	    if (/^\s*(?:global\s+)?(?:define\s+)?(?:$ycp_typedecl)\s*(${ycp_qualified_symbol})\s*\([^;]*$/o)
 	    {
 		warning ("Function $1 has no comment.");
 	    }

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 10 14:34:24 CET 2004 - mvidner@suse.cz
+
+- removed -Woverloaded-virtual, cerqtain libraries don't like it
+- 2.9.12
+
+-------------------------------------------------------------------
 Tue Feb 10 12:55:02 CET 2004 - msvec@suse.cz
 
 - added check-syntax target dependence to make package-local

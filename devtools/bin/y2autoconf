@@ -176,7 +176,7 @@ AC_PROG_CC
 AC_PROG_CPP
 
 CFLAGS=\"\${CFLAGS} -Wall -Wformat -Wmissing-prototypes\"
-CXXFLAGS=\"\${CXXFLAGS} -Wall -Wformat -Woverloaded-virtual\"
+CXXFLAGS=\"\${CXXFLAGS} -Wall -Wformat\"
 
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL

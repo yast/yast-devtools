@@ -1,8 +1,9 @@
 -------------------------------------------------------------------
 Thu Oct 14 13:35:33 CEST 2004 - jsrain@suse.cz
 
-- added missing AC_SUBST(ystartupdir) to yěautoconf
+- added missing AC_SUBST(ystartupdir) to y2autoconf
 - updated neededforbuild due to changed dependencies of docbook
+- 2.11.0
 
 -------------------------------------------------------------------
 Thu Oct 14 13:26:50 CEST 2004 - visnov@suse.de

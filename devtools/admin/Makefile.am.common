@@ -9,7 +9,7 @@ modulebin_DATA = $(patsubst %.ycp,%.ybc,$(module_DATA))
 modulebindir = $(moduledir)
 
 # files to clean
-CLEANFILES = $(modulebin_DATA)
+CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 
 # generate dependencies
 .dep: $(wildcard *.ycp)

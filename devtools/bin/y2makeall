@@ -2,12 +2,12 @@
 #
 # File:		y2makeall
 # Package:	devtools
-# Summary:	Build all YaST2 sources from CVS
+# Summary:	Build all YaST2 sources from CVS or Subversion
 # Authors:	Stefan Hundhammer <sh@suse.de>
 #
 # $Id$
 #
-# Call this from your toplevel yast2/source CVS working directory.
+# Call this from your toplevel yast2/source CVS or Subversion working directory.
 
 use strict;
 use English;
@@ -61,6 +61,7 @@ my @core_binaries =
 my @exclude_list =
     (
      "CVS",
+     ".svn",
      "openteam",
      "certify",
      "debugger"
@@ -218,7 +219,7 @@ sub main()
     # Check if we are in the right directory
     #
 
-    die "FATAL: Call \"$prog_name\" from your YaST2 CVS working directory! (yast2/source)\n"
+    die "FATAL: Call \"$prog_name\" from your YaST2 CVS or Subversion working directory! (yast2/source)\n"
 	unless -f "devtools/RPMNAME";
 
     #
@@ -684,7 +685,7 @@ sub find_include_statements()
 
 
 # Locate all include files in the global %needed_ycp_include_files hash in the
-# CVS working directory - write the full path into the hash.
+# CVS or Subversion working directory - write the full path into the hash.
 
 sub locate_include_files()
 {
@@ -886,9 +887,9 @@ sub make_install_dir()
 #
 # Yes, this is broken by design.
 #
-# This function now searches all Makefile.am files in the CVS working directory
+# This function now searches all Makefile.am files in the CVS or SVN working directory
 # for lines with @yncludedir@ and fills the global %ycp_install_dirs hash with
-# the result. The keys of this hash are directories in the CVS working tree,
+# the result. The keys of this hash are directories in the CVS or SVN working tree,
 # the values are the target directories below /usr/share/YaST2/include
 # (with the @yncludedir@ macro removed, e.g. "network/services" ).
 
@@ -1145,8 +1146,8 @@ sub usage()
 {
     die "Usage: $prog_name [opt] [make-target]\n"				.
 	"\n"									.
-	"Builds all YaST2 sources from CVS.\n"					.
-	"Call this from your toplevel yast2/source CVS working directory!\n"	.
+	"Builds all YaST2 sources from CVS or Subversion.\n"					.
+	"Call this from your toplevel yast2/source CVS or SVN working directory!\n"	.
 	"\n"									.
 	"\t-a all (default) - same as -bmy if none of -b -m -y is given\n"	.
 	"\t-b binaries - make core binaries\n"					.

@@ -389,7 +389,7 @@ sub check_header()
 
     if ( $header !~ m{[\$]Id.*[\$]}m )
     {
-	warning( $line_no, "No \$" . "Id" . "\$ CVS marker in header" );
+	warning( $line_no, "No \$" . "Id" . "\$ CVS/Subversion marker in header" );
 
     }
 

@@ -84,11 +84,19 @@ checkpo:
 checkin:
 	p=$(MODULE).$(ci_ll); \
 	cp --backup=numbered $(ci_opt) $$p.po $$p.po.bak; \
-	cvs -n update $$p.po | grep -q -v '^[UPMC]'; \
-        if [ $$? = 0 ]; then \
-	  echo "CVS mismatch; trying to merge..."; \
+	if [ -d CVS ]; then \
+	  cvs -n update $$p.po | grep -q -v '^[UPMC]'; \
+	else \
+	  LC_ALL=C svn status --show-updates --quiet $$p.po| grep -v '^Status against revision'; \
+	fi; \
+	if [ $$? = 0 ]; then \
+	  echo "CVS/Subversion mismatch; trying to merge..."; \
 	  rm -f $$p.po; \
-          cvs -q update $$p.po; \
+	  if [ -d CVS ]; then \
+	    cvs -q update $$p.po; \
+	  else \
+	    svn update $$p.po; \
+	  fi; \
 	  cp $$p.pox $$p.pox.new; \
 	  $(MSGCAT) $$p.po $$p.pox.new -o $$p.pox; \
 	  echo -e "\nCheck \"$$p.pox\" for fuzzy entries.  Status:"; \
@@ -96,11 +104,24 @@ checkin:
 	  echo -e "Then try again to checkin \"$$p.pox\"."; \
 	else \
 	  cp $(ci_opt) $$p.pox $$p.po; \
-	  if cvs -n ci $$p.po; then \
-	    cvs ci -m "$(ci_msg)" $$p.po; \
+	  if [ -d CVS ]; then \
+	    cvs -n ci $$p.po; \
+	  else \
+	    svn --dry-run commit $$p.po; \
+	  fi; \
+	  if [ $$? = 0 ] ; then \
+	    if [ -d CVS ]; then \
+	      cvs ci -m "$(ci_msg)" $$p.po; \
+	    else \
+	      svn commit --message "$(ci_msg)" $$p.po; \
+	    fi; \
 	  else \
 	    rm -f $$p.po; \
-            cvs -q update $$p.po; \
+	    if [ -d CVS ]; then \
+	      cvs -q update $$p.po; \
+	    else \
+	      svn update $$p.po; \
+	    fi; \
 	    cp $$p.pox $$p.pox.new; \
 	    $(MSGCAT) $$p.po $$p.pox.new -o $$p.pox; \
 	    echo -e "\nCheck \"$$p.pox\" for fuzzy entries.  Status:"; \

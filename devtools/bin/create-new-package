@@ -121,7 +121,7 @@ sub main()
 
     # now change each file
  
-    foreach $file ( `find $skeletons_dir/$skeleton -not -path "*CVS*"`  )
+    foreach $file ( `find $skeletons_dir/$skeleton -not -path "*CVS*" -and -not -path "*.svn"`  )
     {
 	$file =~ s/\n*$//;
 	my $target = $file;

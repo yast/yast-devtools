@@ -64,30 +64,45 @@ function usage() {
     eecho "options:"
     eecho "	--scratch	remove \$WEB/$TARGET"
     eecho "	--clean		always \"make clean\" first"
-    eecho "	--login		invoke \"cvs login\" before updating"
-    eecho "	--no-update	do not update from cvs"
+    eecho "	--login		invoke \"cvs login\" before updating (CVS only)"
+    eecho "	--no-update	do not update from cvs/svn"
     eecho "	--no-index	do not call htdig"
-    eecho "	--only  modules	only these cvs modules (eg. source/mail)"
+    eecho "	--only  modules	only these cvs/svn modules (eg. source/mail)"
     exit $EXITC
 }
 
 DOLOGIN=""
-# checkout or update the CVS
+# checkout or update the CVS/SVN
 function update() {
     echo \* $FUNCNAME "$@"
-    if [ $DOLOGIN ]; then
+    if [ -d CVS -a $DOLOGIN ]; then
 	cvs login
     fi
+    if [ "$BRANCH" ]; then
+        UBRANCH="branches/$BRANCH"
+    else
+        UBRANCH=trunk
+    if
+    URL="https://svn.suse.de/svn/yast/$UBRANCH/"
+    
     for I in doc source; do # 'trans' is not interesting
 	if [ -d $I ]; then
 	    {
 		echo \*\* $I
 		pushd $I
-		cvs update -d
+		if [ -d CVS ]; then
+		    cvs update -d
+		else
+		    svn update
+		fi
 		popd
 	    }
 	else
-	    cvs checkout $BRANCH $I
+	    if [ -d CVS ]; then
+		cvs checkout $BRANCH $I
+	    else
+		svn checkout $URL/$I
+	    fi
 	fi
 	if [ $? != 0 ]; then
 	    eecho "Error updating $I"
@@ -129,7 +144,7 @@ function modules_index() {
 }
 
 function newmain() {
-    CVSMODULES=""
+    MODULES=""
     SCRATCH=""
     MAKECLEAN=""
     DOUPDATE=1
@@ -158,7 +173,7 @@ function newmain() {
 		;;
 	    --only)
 		shift
-		CVSMODULES="$@"
+		MODULES="$@"
 		break
 		;;
 	    *)
@@ -170,13 +185,13 @@ function newmain() {
 	update
     fi
 
-    if [ -z "$CVSMODULES" ]; then
-	CVSMODULES=`findmodules`
+    if [ -z "$MODULES" ]; then
+	MODULES=`findmodules`
     fi
     rm -f $DOC_SANDBOX/config.cache
     mkdir --parents $TEMPWEB
     rm -rf $TEMPWEB
-    for I in $CVSMODULES; do
+    for I in $MODULES; do
 	{
 	    echo \*\* $I
 	    pushd $I

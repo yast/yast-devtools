@@ -1,28 +1,102 @@
 #!/bin/bash
 # $Id$
-if [ "$1" == "-h" -o "$1" == "--help" ]; then
-    echo "tagversion, tag version in cvs"
+usage () {
+    echo "tagversion, tag version in subversion"
     echo "options:"
-    echo "  -n: don't tag, just echo tag name"
-    echo "  -h, --help: this help"
-    exit
-fi
+    echo "  -h, --help:    this help"
+    echo "  -n, --echo:    don't tag, just echo tag name"
+    echo "  -u, --echourl: don't tag, just echo tag url (Subversion only)"
+}
+
+OPTIONS=`getopt --name $0 --options hnu --longoptions help,echo,echourl -- "$@"` || { usage; exit 1; }
+eval set -- "$OPTIONS"
+while true; do
+    case "$1" in
+	--)
+	    shift
+	    break
+	    ;;
+	-h|--help)
+	    usage
+	    exit
+	    ;;
+	-n|--echo)
+	    ECHO=1
+	    ;;
+	-u|--echourl)
+	    ECHOURL=1
+	    ;;
+    esac
+    shift
+done
 
 p=`cat RPMNAME`
-b=`cvs status VERSION | grep 'SuSE-.*-Branch' | sed 's/^.*SuSE-\(.*\)-Branch.*$/\1/'`
 v=`cat VERSION | tr "." "_"`
 if [ -z "$p" -o -z "$v" ]; then
     echo "Cannot find RPMNAME or VERSION in `pwd`"
     exit 1
 fi
-if [ "$b" ]; then
-  t=branch-$b-$v
+
+if [ -d CVS ]; then
+
+    b=`cvs status VERSION | grep 'SuSE-.*-Branch' | sed 's/^.*SuSE-\(.*\)-Branch.*$/\1/'`
+    if [ "$b" ]; then
+      t=branch-$b-$v
+    else
+      t=stable-$v
+    fi
+    if [ "$ECHO" ]; then
+	echo "$t"
+    elif [ "$ECHOURL" ]; then
+	echo "echo tag url not supported in CVS"
+    else
+	echo "$p $t"
+	cvs tag $t
+    fi
+    
 else
-  t=stable-$v
-fi
-if [ "$1" == "-n" ]; then
-  echo "$t"
-else
-  echo "$p $t"
-  cvs tag $t
+
+    # sed -n -e 's///;T;p;q'
+    # means: print just the line on which the subst succeeded
+
+    # URLs don't contain spaces so it's safe to use them as delimiters
+    svn info | sed -n -e 's@^URL: \(.*\)/\(trunk\|branches/[^/]*\)/\(.*\)$@\1 \2 \3@;T;p;q' | {
+    # the pipe creates a subshell. the variables will be lost when it's left
+    # therefore the {braces}
+    read REPOSITORY BRANCH MODULE
+    
+    b=`echo "$BRANCH" | sed -n -e 's@^branches/SuSE-\([^/]*\)-Branch$@\1@;T;p'`
+    if [ "$b" ]; then
+	t=branch-$b-$v
+    else
+	t=stable-$v
+    fi
+
+    URL_t=$REPOSITORY/tags/$t/$MODULE
+    if [ "$ECHO" ]; then
+	echo "$t"
+    elif [ "$ECHOURL" ]; then
+	echo "$URL_t"
+    else
+	echo "$p $t"
+	svn mkdir --message "Created tag $t" $REPOSITORY/tags/$t
+
+	# create parent directories
+	# (they may exist already)
+	case $MODULE in
+	    */*) MODULEPARENT=${MODULE%/*} ;;
+	    *) MODULEPARENT="" ;;
+	esac
+	MDIR=""
+	# this will iterate thru directory components of MODULEPARENT
+	OIFS="$IFS"; IFS="/"
+	for DIR in $MODULEPARENT; do
+	    MDIR="$MDIR$DIR/"
+	    svn mkdir --message "Created tag $t for $MDIR" "$REPOSITORY/tags/$t/$MDIR"
+	done
+	IFS="$OIFS"
+
+        svn copy --message "Created tag $t for $MODULE" "$REPOSITORY/$BRANCH/$MODULE" "$URL_t"
+    fi
+    }
 fi

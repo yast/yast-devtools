@@ -18,6 +18,7 @@ install-data-local:
 		rm -rf $(skeletonsdir)/$$D ; \
 		find $$D \
 		     -type f -and -not -path "*CVS*" \
+			     -and -not -path "*.svn*" \
 			     -and -not -path "*.deps*" \
 		             -and -not -path "*~" \
 		     -exec cp --parents {} $(skeletonsdir) \; ; \
@@ -35,6 +36,7 @@ dist-hook:
 	    then \
 		find $$D \
 		     -type f -and -not -path "*CVS*" \
+			     -and -not -path "*.svn*" \
 			     -and -not -path "*.deps*" \
 		             -and -not -path "*~" \
 		     -exec cp --parents {} $${distdir} \; ; \

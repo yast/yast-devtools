@@ -202,15 +202,24 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 	    $(PREFIX)/bin/y2tool create-spec < $$i > $$here/package/$${newname} ; \
 	done
 
-package: check-cvs-up-to-date check-tagversion check-all-packages package-local
+package: check-up-to-date check-tagversion check-all-packages package-local
 
 TAGVERSION	 = $(PREFIX)/bin/y2tool tagversion
 
-check-cvs-up-to-date:
-	cd $(srcdir) && ! cvs -q -n up 2>/dev/null | grep '^[MCAR] '
+check-up-to-date check-cvs-up-to-date check-svn-up-to-date:
+	if [ -d $(srcdir)/CVS ]; then \
+	  cd $(srcdir) && ! cvs -q -n up 2>/dev/null | grep '^[MCAR] ';\
+	else \
+	  cd $(srcdir) && ! LC_ALL=C svn status --show-updates --quiet | grep -v '^Status against revision' ;\
+	fi
 
 check-tagversion:
-	@cd $(srcdir) && cvs status -v VERSION | grep -w `$(TAGVERSION) -n` >/dev/null || ( echo "ERROR: Please run 'tagversion' first"; false )
+	@if [ -d $(srcdir)/CVS ]; then \
+	  cd $(srcdir) && cvs status -v VERSION | grep -w `$(TAGVERSION) -n` ;\
+	else \
+	  cd $(srcdir) && svn cat `$(TAGVERSION) --echourl`/VERSION; \
+	fi >/dev/null; \
+	[ $$? = 0 ] || ( echo "ERROR: Please run 'tagversion' first"; false )
 
 check-parse-old:
 	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "yast2-core" ] ; then \

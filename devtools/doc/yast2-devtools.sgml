@@ -658,7 +658,7 @@ You will very likely never call this manually.
 </p>
 
 
-<sect1><tt/make check-cvs-up-to-date/
+<sect1><tt/make check-up-to-date/
 
 <p>
 This is performed by <tt/make package/ prior to actually creating a tarball:

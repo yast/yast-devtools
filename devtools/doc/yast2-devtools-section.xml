@@ -774,11 +774,11 @@ You will very likely never call this manually.
 </section>
 
 <section>
-<title><literal>make check-cvs-up-to-date</literal></title>
+<title><literal>make check-up-to-date</literal></title>
 <para>
 This is performed by <literal remap="tt">make package</literal> prior to actually creating a tarball:
 It checks whether or not everyting in this directory tree is checked into
-CVS. Any modified, added or removed files make this check fail.
+CVS or Subversion. Any modified, added or removed files make this check fail.
 </para>
 
 <note>

@@ -68,7 +68,11 @@ yast2-users		default			users
 yast2-x11		default			runtime x11
 
 # translations
+yast2-trans-cs		inst-sys		all
 yast2-trans-de		inst-sys		all
+yast2-trans-es		inst-sys		all
+yast2-trans-fr		inst-sys		all
+yast2-trans-it		inst-sys		all
 
 # old stuff
 #yast2-agent-ftp		inst-sys,default	ftp-install,you

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jul 11 10:36:19 CEST 2003 - mvidner@suse.cz
+
+- check_ycp (check_imports): it's not an error to use Foo::
+  in a file called Foo.ycp.
+
+-------------------------------------------------------------------
 Tue Jul  1 10:57:01 CEST 2003 - msvec@suse.de
 
 - again include cvsignore in skeletons

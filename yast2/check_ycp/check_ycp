@@ -585,6 +585,16 @@ sub check_imports()
     # initialize the hash
     my %imported = map {$_ => 1} qw { WFM UI SCR Pkg };
 
+    # The module itself needs not importing.
+    # Hack: let's not check a 'module "Foo"' declaration, just uppercasing
+    # of the first letter
+    my $thismodule = basename ($current_filename);
+    $thismodule =~ s/\.ycp$//;
+    if ($thismodule =~ /^[[:upper:]]/)
+    {
+	$imported{$thismodule} = 1;
+    }
+
     while ( $ycp_code =~
 	    m{
 		\b				# word boundary

@@ -12,12 +12,13 @@ install-data-local:
 	cd $(srcdir); \
 	for D in `ls` ; \
 	do \
-	    if [ -d $$D -a "$$D" != "CVS" ] ; \
+	    if [ -d $$D -a "$$D" != "CVS" -a "$$D" != ".deps" ] ; \
 	    then \
 		echo "Removing old $(skeletonsdir)/$$D and installing new one..." ; \
 		rm -rf $(skeletonsdir)/$$D ; \
 		find $$D \
 		     -type f -and -not -path "*CVS*" \
+			     -and -not -path "*.deps*" \
 		             -and -not -path "*~" \
 		     -exec cp --parents {} $(skeletonsdir) \; ; \
 	    fi ; \
@@ -30,10 +31,11 @@ dist-hook:
 	ls; \
 	for D in `ls` ; \
 	do \
-	    if [ -d $$D -a "$$D" != "CVS" ] ; \
+	    if [ -d $$D -a "$$D" != "CVS" -a "$$D" != ".deps" ] ; \
 	    then \
 		find $$D \
 		     -type f -and -not -path "*CVS*" \
+			     -and -not -path "*.deps*" \
 		             -and -not -path "*~" \
 		     -exec cp --parents {} $${distdir} \; ; \
 	    fi ; \

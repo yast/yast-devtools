@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# svnall - invoke "svn" with a command in every subdir that has a .svn subdir
+# Example: "svnall up"
+#
+# Author: Stefan Hundhammer <sh@suse.de>
+
+if [ "$1" == "" ]; then
+    echo "Usage: $0 <svn-command> [arg] [arg...]"
+    echo "Invokes 'svn <svn-command>' in each subversion'ed subdir"
+    echo "Example: $0 up"
+    exit 1
+fi
+
+here=`pwd`
+
+for dir in *; do
+
+cd $here
+if [ -d $dir -a -d $dir/.svn ] ; then
+    echo "cd $dir; svn $*"
+    cd $dir
+    svn $*
+    if [ "$?" -gt 255 ]; then
+        echo "svn $* caught signal" 
+        exit 2
+    fi
+fi
+
+done

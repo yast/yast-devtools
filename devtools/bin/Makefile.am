@@ -16,6 +16,7 @@ pkgdata_SCRIPTS = 				\
 	get-lib					\
 	kill-leftover-stuff			\
 	rny2rnc					\
+	svnall					\
 	tagversion 				\
 	version					\
 	y2autoconf 				\

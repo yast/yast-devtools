@@ -1,26 +1,33 @@
 -------------------------------------------------------------------
+Mon Sep 13 15:46:21 CEST 2004 - arvin@suse.de
+
+- use option tar-ustar to allow "long" filenames in tar-balls
+
+-------------------------------------------------------------------
 Mon Sep 13 02:12:23 CEST 2004 - nashif@suse.de
 
-- ycodoc: parameters in xml output are lists, every parameter description
-  appears as an item
-- added ycpdoc.xsl for generating docbook refentries from ycpdoc xml
-  output
+- ycodoc: parameters in xml output are lists, every parameter
+  description appears as an item
+- added ycpdoc.xsl for generating docbook refentries from ycpdoc
+  xml output
 - added docbook stylesheets and and admin/navigation images
 
 -------------------------------------------------------------------
 Mon Sep  6 16:25:09 CEST 2004 - mvidner@suse.cz
 
-- ycpdoc: Allow zero space between type and identifier (list<string>a).
+- ycpdoc: Allow zero space between type and identifier
+  (list<string>a).
 
 -------------------------------------------------------------------
 Tue Aug 31 13:55:44 CEST 2004 - sh@suse.de
 
-- Added yast2-firstboot to all-packages 
+- Added yast2-firstboot to all-packages
 
 -------------------------------------------------------------------
 Tue Aug 31 12:31:35 CEST 2004 - lnussel@suse.de
 
-- ycp_puttext: save log in $HOME by default; also search *.pm and *.cc files
+- ycp_puttext: save log in $HOME by default; also search *.pm and
+  *.cc files
 
 -------------------------------------------------------------------
 Mon Aug 30 19:18:13 CEST 2004 - nashif@suse.de
@@ -58,7 +65,7 @@ Thu May 27 16:07:08 CEST 2004 - ke@suse.de
 Wed May 19 11:36:55 CEST 2004 - sh@suse.de
 
 - Add correct license to .spec file
-- V 2.9.20 
+- V 2.9.20
 
 -------------------------------------------------------------------
 Tue May 11 13:04:11 CEST 2004 - mvidner@suse.cz
@@ -83,12 +90,12 @@ Fri Apr  2 14:30:05 CEST 2004 - sh@suse.de
 
 - Changed default license to GPL
   Packages with YaST license now need a file YAST_LICENSE
-  in their package toplevel directory to indicate that 
+  in their package toplevel directory to indicate that
 
 -------------------------------------------------------------------
 Mon Mar 29 18:14:45 CEST 2004 - sh@suse.de
 
-- Added summary output for y2makeall 
+- Added summary output for y2makeall
 
 -------------------------------------------------------------------
 Fri Mar 19 14:57:10 CET 2004 - mvidner@suse.cz
@@ -183,8 +190,8 @@ Thu Feb  5 15:59:48 CET 2004 - msvec@suse.cz
 -------------------------------------------------------------------
 Fri Jan 30 11:33:02 CET 2004 - visnov@suse.cz
 
-- use "install -p" for installing files to preserve modification time
-  (fixes perl modules timestamps)
+- use "install -p" for installing files to preserve modification
+  time (fixes perl modules timestamps)
 - 2.9.9
 
 -------------------------------------------------------------------

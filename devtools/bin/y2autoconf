@@ -71,7 +71,7 @@ AC_ARG_PROGRAM
 
 AC_PREFIX_DEFAULT(/usr)
 
-AM_INIT_AUTOMAKE($RPMNAME, $VERSION) dnl searches for some needed programs
+AM_INIT_AUTOMAKE(tar-ustar) dnl searches for some needed programs
 
 dnl Important YaST2 variables
 VERSION=\"$VERSION\"

@@ -72,7 +72,7 @@ Version:	$VERSION
 Release:	0
 License:	YaST License
 Group:		System/YaST
-BuildRoot:	/var/tmp/%{name}-%{version}-root
+BuildRoot:	%{_tmppath}/%{name}-%{version}-build
 Source0:	$RPMNAME-$VERSION.tar.bz2",
 
 # The group tag is only a dummy entry. The correct one is inserted by

@@ -39,5 +39,5 @@ clean-local:
 #	mkdir -p $(htmldir)
 #	cp -a $(BUILD)/images $(htmldir)
 
-EXTRA_DIST =  $(xml_files)
+EXTRA_DIST =  $(xml_files) rny2rnc.html
 

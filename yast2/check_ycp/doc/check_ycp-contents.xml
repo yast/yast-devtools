@@ -1,0 +1,1073 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+  <section id="check_ycp_quickstart">
+    <title>Quick Start</title>
+    <para>
+      Simply invoke <literal>check_ycp</literal> with the YCP file(s) you wish to check as
+      arguments:
+      <screen>
+check_ycp <emphasis>myfile.ycp</emphasis>
+      </screen>
+
+      <screen>
+check_ycp *.ycp
+      </screen>
+
+    </para>
+    <para>
+      The error messages should be self explanatory. They stick to the GNU standards
+      for error messages, so you can use your favourite editor's
+      (e.g. <link linkend="check_ycp_emacs">Emacs</link>)
+	function to process them.
+    </para>
+
+    <para>
+      Most of the checks can individually be turned off.
+      Type
+      <screen>
+check_ycp -h
+      </screen>
+
+      for a complete list of command line options. Those options are intentionally
+      not listed here since such a list would inevitably be outdated before too long.
+    </para>
+
+
+  </section>
+
+
+
+  <section id="check_ycp_why">
+    <title>Why this Document?</title>
+
+    <para>
+      Even though using <literal>check_ycp</literal> is pretty straightforward, some background
+      information is useful in order to understand what it does, its output and the
+      limitations of this tool - in short, what you can expect it to do and why not
+      to blindly rely on it.
+    </para>
+
+    <para>
+      <literal>check_ycp</literal> is far from fool proof. In fact, it is pretty dumb. It just
+      tries to parse YCP code ("try" is the operative word here!) and applies various
+      checks for obvious programming errors. Some errors it will catch and report,
+      many it will not. But we (i.e. the YaST2 core development team) decided we'd
+      rather have a tool with limited capabilities than none at all.
+    </para>
+
+    <para>
+      Another reason for writing this document is pointing out why we try to enforce
+      certain things, many of which are because of ergonomics or mere conventions in
+      developing as a team, not true requirements of YaST2 or the YCP language.
+    </para>
+  </section>
+
+  <section id="check_ycp_header_comments">
+    <title>Header Comment Checks</title>
+
+    <para>
+      The YaST2 team uses a standardized file header format for YCP modules.
+      Standard fields are included there for various purposes - see the "why"
+      sections of the individual checks.
+    </para>
+
+    <para>
+      Everything up to the first opening brace "<literal>{</literal>" outside a comment is
+      considered part of the header. Nothing outside this portion of the file is
+      checked. You may, however, open and close as many comments as you like up to
+      this opening brace.
+    </para>
+
+    <para>
+      Leading asterisks "<literal>*</literal>" at the start of lines are silently discarded
+      since they are often used to beautify multi line comments.
+    </para>
+
+    <para>
+      The comment markers themselves of course are also discarded for the checks:
+      <itemizedlist>
+	<listitem><literal>   /*</literal></listitem>
+	<listitem><literal>   */</literal></listitem>
+	<listitem><literal>   //</literal></listitem>
+      </itemizedlist>
+    </para>
+  </section>
+  <section id="check_ycp_filename">
+    <title>Filename Check</title>
+
+    <simplesect>
+      <title>What</title>
+      <para>
+	If present, the contents of a <literal>Module</literal> field is checked against the
+	current file name.
+      </para>
+    </simplesect>
+    <simplesect>
+      <title>Why</title>
+
+      <para>
+	Much code gets written by copying existing code. There is nothing wrong with
+	that (in fact, it saves a lot of work), but when you do, please change fields
+	accordingly - fields like <literal>Author</literal>, <literal>Maintainer</literal>,
+	<literal>Purpose</literal> etc. - and the file name in <literal>Module</literal>.
+      </para>
+    </simplesect>
+    <simplesect>
+      <title>How</title>
+
+      <para>
+	This file name is particularly easy to check (plus, it's the only one that can
+	reliably be checked), so <literal>check_ycp</literal> checks it: It compares the base
+	name (not the complete path) of the current file to what you specified in
+	<literal>Module:</literal> in the header.
+      </para>
+
+    </simplesect>
+  </section>
+
+  <section>
+    <title>Author / Maintainer Entry Check</title>
+
+    <simplesect><title>What</title>
+      <para>
+	<literal>check_ycp</literal> checks the file header for presence of at least one of
+	<itemizedlist>
+	  <listitem><literal>Author:</literal></listitem>
+	  <listitem><literal>Authors:</literal></listitem>
+	  <listitem><literal>Maintainer:</literal></listitem>
+	  <listitem><literal>Maintainers:</literal></listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	If found, each entry is checked for some contents, i.e. it may not be
+	completely empty (but use whitespace as you like).
+      </para>
+
+      <para>
+	The contents must include something that looks like an e-mail address.
+      </para>
+
+    </simplesect>
+    <simplesect>
+      <title>Why</title>
+
+      <para>
+	There must be at least one person to contact when there are any problems or
+	questions about the module. The full name is desired, but at least an e-mail
+	address must be there to get in contact with the maintainer or the author.
+      </para>
+
+    </simplesect>
+    <simplesect>
+      <title>How</title>
+
+      <para>
+	The fields are checked for presence of something like
+	<literal>somebody@somewhere.domain</literal> - in fact only for something before the at
+	sign "@" and something with a period "." behind it.
+      </para>
+    </simplesect>
+  </section>
+
+  <section>
+    <title>CVS Id: Marker Check</title>
+
+    <simplesect><title>What</title>
+
+      <para>
+	Presence of a Id CVS / RCS identity marker is checked, e.g.
+	<screen>
+            Id myfile.ycp,v 1.2 2001/02/14 18:04:50 sh Exp 
+	</screen>
+      </para>
+
+
+    </simplesect>
+    <simplesect>
+      <title>Why</title>
+
+      <para>
+	This CVS / RCS ID is the only way of finding out exactly what CVS revision the
+	file has and what change date. The file date (what <literal>ls -l</literal> shows) is
+	absolutely unreliable and irrelevant: This may have changed just by copying the
+	file around which didn't change anything.
+      </para>
+
+      <para>
+	This is important for bug tracking and for finding and fixing bugs - only when
+	a developer knows what version of a file has been used he has a chance to
+	reproduce a bug - or even make sure that a supposedly fixed bug didn't turn up
+	again.
+      </para>
+
+    </simplesect>
+    <simplesect>
+      <title>How</title>
+
+      <para>
+	Presence of
+	<screen>
+Id:
+	</screen>
+
+	is checked. There may be more characters before the closing dollar sign
+	"<literal>$</literal>", but the exact contents is not checked.
+      </para>
+
+
+      <note>
+	<para>
+	  When creating a new file, it is absolutely sufficient to
+	  include the unexpanded string ("<literal>Id:</literal>") somewhere in the
+	  file. CVS or RCS will automatically expand this to the full ID string.
+
+	</para>
+      </note>
+
+    </simplesect>
+  </section>
+
+
+
+  <section>
+    <title>Translatable Messages Checks</title>
+
+    <section>
+      <title><literal>textdomain</literal> Check</title>
+
+      <simplesect>
+	<title>What</title>
+
+	<para>
+	  If there is any message that is marked for translation with
+	  <literal>_("</literal>...<literal>")</literal>, there must be a <literal>textdomain</literal>
+	  statement.
+	</para>
+      </simplesect>
+      <simplesect>
+	<title>Why</title>
+
+	<para>
+	  The YaST2 translator module needs to know where to take the messages to be
+	  translated from. This is what the <literal>textdomain</literal> specification does.
+	</para>
+
+	<para>
+	  Technically one <literal>textdomain</literal> statement somewhere in the YCP program
+	  would be sufficient, i.e. include files or modules called with
+	   <literal>CallFunction()</literal> don't really require an
+	  additional <literal>textdomain</literal> specification.
+	</para>
+
+	<para>
+	  However, it is highy recommended all YCP files with translatable messages
+	  include their own <literal>textdomain</literal> statement so each YCP file is
+	  self-sufficient in that regard, thus more easily reusable for other
+	  purposes. This policy is enforced with this check.
+	</para>
+
+      </simplesect>
+      <simplesect>
+	<title>How</title>
+
+	<para>
+	  After being stripped of all comments, the entire YCP code is scanned for the
+	  translation marker sequence: An underscore immediately followed by an opening
+	  parenthesis: <literal>_(</literal>
+	</para>
+
+	<para>
+	  If this sequence is found, presence of translatable messages is assumed. If no
+	  <literal>textdomain</literal> statment is found there will be an error.
+	</para>
+
+	<para>
+	  On the other hand, if there is no text to translate, a <literal>textdomain</literal>
+	  statement is not necessary (but it can't hurt).
+	</para>
+
+
+	<note>
+	  <para>
+	    Theoretically the "<literal>_(</literal>" sequence contained in a
+	    literal string (i.e. within double quotes
+            <literal>"</literal>...<literal>"</literal>)
+	    could falsely trigger this error, too. But if you do that, you are very likely
+	    to run into trouble with other tools as well - most likely even the original
+	    <literal>getext</literal> tools regularly used to extract the messages for
+	    translation. Bottom line: Don't do that.
+	  </para>
+	</note>
+      </simplesect>
+    </section>
+
+</section>
+    <section id="check_ycp_html-check">
+      <title>RichText / HTML Sanity Check</title>
+
+      <para>
+	Literal strings in YCP code that contains HTML tags are usually help text that
+	will be displayed in the YaST2 RichText widget. This HTML text is subjected to
+	the sanity checks explained below.
+      </para>
+
+      <para>
+	Please notice that everything within double quotes <literal>"</literal> will be
+	checked that contains anything surrounded by angle brackets
+	<literal>&lt;</literal>...<literal>&gt;</literal> - i.e. anything that looks remotely like an HTML
+	tag. Unknown tags will be silently ignored, but the entire text within the
+	quotes will be checked.
+      </para>
+
+      <formalpara><title>Limitation:</title>
+	<para>
+	  If a portion of help text lacks any HTML tag, it will not be checked since it
+	  will not be recognized by <literal>check_ycp</literal> as help text. Such completely
+	  wrong portions of help text will slip through undetected, thus unchecked.
+	</para>
+      </formalpara>
+    <section>
+      <title>Completeness of &lt;p&gt; / &lt;/p&gt; Paragraph Tags</title>
+
+      <simplesect>
+	<title>What</title>
+
+	<para>
+	  Each HTML text must start with a <literal>&lt;p&gt;</literal> tag and end with a
+	  <literal>&lt;/p&gt;</literal> tag.
+	</para>
+
+	<para>
+	  There must be a corresponding closing <literal>&lt;/p&gt;</literal> tag for each opening
+	  <literal>&lt;p&gt;</literal> tag.
+	</para>
+
+      </simplesect>
+      <simplesect><title>Why</title>
+
+	<para>
+	  This is a basic requirement of HTML. The underlying YaST2 widgets may or may
+	  not be forgiving enough to tolerate missing tags, but we'd rather not rely on
+	  that.
+	</para>
+
+	<para>
+	  Besides, no other types of paragraphs other than plain text paragraphs
+	  <literal>&lt;</literal>p<literal>&gt;</literal> ... <literal>&lt;</literal>/p<literal>&gt;</literal> are desired in
+	  YaST2 help texts - in particular, no large font boldface headings etc.
+	</para>
+      </simplesect>
+
+      <simplesect><title>How</title>
+	<para>
+            See the <link linkend="check_ycp_html-check">intro</link> of this section.
+	</para>
+      </simplesect>
+    </section>
+
+    <section>
+      <title>Text Before, After, Between Paragraphs</title>
+
+      <simplesect><title>What</title>
+
+	<para>
+	  For each portion of HTML text:
+	  <itemizedlist>
+	    <listitem>No text before the first <literal>&lt;p&gt;</literal> tag is
+	      permitted.</listitem>
+
+	    <listitem>No text after the last <literal>&lt;/p&gt;</literal> tag is
+	      permitted.</listitem>
+
+	    <listitem>No text between a closing <literal>&lt;/p&gt;</literal> and the next opening
+	      <literal>&lt;p&gt;</literal> tag is permitted.</listitem>
+
+	  </itemizedlist>
+	</para>
+
+      </simplesect>
+      <simplesect><title>Why</title>
+	<para>
+	  Each of those cases is a simple yet common HTML syntax error.
+	</para>
+
+      </simplesect>
+      <simplesect><title>How</title>
+	<para>
+            See the <link linkend="check_ycp_html-check">intro</link> of this section.
+	</para>
+      </simplesect>
+    </section>
+
+    <section><title>No More Than One Paragraph per Message</title>
+
+      <simplesect><title>What</title>
+	<para>
+	  Each single portion of HTML text may contain exactly one paragraph, i.e. one
+	  <literal>&lt;</literal>p<literal>&gt;</literal> ... <literal>&lt;</literal>/p<literal>&gt;</literal>
+	  pair.
+	</para>
+      </simplesect>
+
+      <simplesect><title>Why</title>
+	<para>
+	  This is a convention to make life easier for the translators.
+	</para>
+
+	<para>
+	  The tools used for extracting translatable texts from the sources (GNU
+	  <literal>gettext</literal>) detect differences between the last translated version of a
+	  message and the current message from the latest source. They mark such messages
+	  as <emphasis>fuzzy</emphasis>, i.e. the (human) translator is asked to have a good look at
+	  it and decide whether there has been a real change in the message (thus it
+	  needs to be retranslated) or just a cosmetic change (fixed typo, inserted
+	  whitespace, reformatted the paragraph etc.).
+	</para>
+
+	<para>
+	  This is a tedious task and it gets more tedious the longer each individual
+	  portion of text becomes. Changes from the old to the new version are hard to
+	  find if the portions are very long.
+	</para>
+
+	<para>
+	  Plus, if they are that long it is very likely that always somewhere something
+	  has changed, thus the entire text is marked as <emphasis>fuzzy</emphasis> and needs
+	  careful manual checking which is not really necessary for all the text.
+	</para>
+      </simplesect>
+      <simplesect>
+          <title>Workaround</title>
+
+      <para>
+	Split your help texts and use the YCP string addition operator to put them
+	together.
+      </para>
+
+      <formalpara>
+	<title>Don't:</title>
+
+        <para>
+	  <screen>
+help_text = _("&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;
+&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;");
+	  </screen>
+	</para>
+      </formalpara>
+
+      <formalpara>
+	<title>Instead, do:</title>
+	<para>
+	  <screen>
+// Help text (HTML like)
+help_text = _("&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;");
+
+// Help text (HTML like), continued
+help_text = help_text + _("&lt;p&gt;
+bla blurb bla ...
+blurb bla blurb ...
+bla blurb bla ...
+&lt;/p&gt;");
+	  </screen>
+	</para>
+      </formalpara>
+
+      <para>
+	Please also notice the <emphasis>comments</emphasis> for the translators just above the
+	text. The <literal>gettext</literal> tools will automatically extract them along with the
+	text to translate and put them into the <literal>.po</literal> file. The translators can
+	use them as additional hints what this text is all about.
+      </para>
+    </simplesect>
+
+
+    <simplesect><title>How</title>
+      <para>
+          See the <link linkend="check_ycp_html-check">intro</link> of this section.
+      </para>
+
+    </simplesect>
+    </section>
+    <section>
+      <title>Excess Forced Line Breaks &lt;br&gt; after Paragraphs</title>
+
+      <simplesect><title>What</title>
+	<para>
+	  <emphasis>Forced line break</emphasis> tags <literal>&lt;br&gt;</literal> are discouraged, especially
+	  after a paragraph end tag <literal>&lt;/p&gt;</literal>.
+	</para>
+      </simplesect>
+      <simplesect><title>Why</title>
+	<para>
+	  Such forced line breaks are plain superfluous. The HTML renderer will format
+	  the paragraph automatically - after each paragraph there will be a newline and
+	  some empty space to set each paragraph apart from the next.
+	</para>
+
+	<para>
+	  There is no need nor is it desired to add extra empty space between
+	  paragraphs. This just looks plain ugly, even more so if this results in
+	  different spacings between several paragraphs of the same help text.
+	</para>
+
+	<para>
+	  The most superfluous of those excess line breaks are those at the very end of a
+	  help text - after the last paragraph. Not only are they not good for anything,
+	  they sometimes even cause a vertical scroll bar to be displayed even though
+	  this would not be necessary otherwise.
+	</para>
+
+	<para>
+	  Plus, there have been cases where erstwhile last help text paragraphs had been
+	  rearranged so they now are in the middle of the help text - but unfortunately
+	  the trailing <literal>&lt;br&gt;</literal> tag had been forgotten and moved along with
+	  the paragraph, thus causing different inter-paragraph spacings.
+	</para>
+
+	<para>
+	  To make things even worse, fixing this breaks the translation for the affected
+	  paragraph: It will be marked as <emphasis>fuzzy</emphasis> just because of this even though
+	  it has not really changed.
+	</para>
+
+	<para>
+	  We cannot entirely get rid of the <literal>&lt;br&gt;</literal> tags (but we would like
+	  to). Sometimes they are needed <emphasis>within</emphasis> paragraphs. But at least those
+	  at the end of paragraphs we can do without.
+	</para>
+      </simplesect>
+      <simplesect><title>How</title>
+	<para>
+	  <literal>&lt;br&gt;</literal> after <literal>&lt;/p&gt;</literal> (maybe with anything in
+	  between) is rejected. All other <literal>&lt;br&gt;</literal> tags are silently ignored.
+	</para>
+
+      </simplesect>
+
+  </section>
+    </section>
+  <section id="check_ycp_widget-checks"><title>Widget / UI Function Parameter Checks</title>
+
+    <para>
+      Parameters to YaST2 UI widgets plus some commonly used functions
+      (e.g. <literal>Wizard::SetContents()</literal>, <literal>Popup::Message()</literal> etc.) are checked
+      where possible - if the parameters are simple string constants, maybe
+      surrounded by translation markers ("<literal>_("</literal>...<literal>")</literal>").
+    </para>
+
+    <para>
+      Optional widget parameters like <literal>`opt(...)</literal> or <literal>`id(...)</literal> are
+      ignored.
+    </para>
+
+    <para>
+      The following examples <emphasis>will be checked:</emphasis>
+
+      <programlisting>
+PushButton("OK");
+      </programlisting>
+      <programlisting>
+PushButton( _("Cancel"));
+      </programlisting>
+      <programlisting>
+PushButton(`id(`apply), _("Apply"));
+      </programlisting>
+      <programlisting>
+PushButton(`opt(`default), _("OK"));
+      </programlisting>
+
+    </para>
+
+    <para>
+      More complex parameters like variable contents or YCP terms cannot be checked.
+    </para>
+
+    <para>
+      The parser used in <literal>check_ycp</literal> for that is really dumb. In fact, it only
+      scans for keywords like <literal>PushButton</literal> outside string constants, tries to
+      find the corresponding matching pair of parentheses "<literal>(</literal>...<literal>)</literal>"
+      and splits everything inside into comma-separated subexpressions.
+    </para>
+
+    <para>
+      Only the most basic of those subexpressions are checked - only simple string
+      constants <literal>"</literal>...<literal>"</literal> or string constants marked for
+      translation <literal>_("</literal>...<literal>")</literal>.
+    </para>
+
+    <para>
+      The following examples <emphasis>will not be checked:</emphasis>
+
+      <programlisting>CheckBox( "/dev/"+device );</programlisting>
+      <programlisting>CheckBox( sformat("/dev/%1"), device );</programlisting>
+      <programlisting>CheckBox( GetDevName() );</programlisting>
+      <programlisting>
+	string message = "OK";
+	PushButton( message );
+    </programlisting>
+    </para>
+
+  <section id="check_ycp_widget-shortcut">
+    <title>Keyboard Shortcut Check</title>
+
+    <simplesect><title>What</title>
+
+      <para>
+	Widgets that can have a keyboard shortcut (one character marked with an
+	ampersand "<literal>&amp;</literal>") are checked for presence of a keyboard shortcut.
+      </para>
+
+      <note>
+	<para>
+	  Consistency of the keyboard shortcuts is <emphasis>not</emphasis> checked,
+	  only presence. <literal>check_ycp</literal> cannot know which widgets will be on-screen
+	  at the same time, thus it cannot find out whether the same keyboard shortcut
+	  has been assigned twice to different widgets.
+	</para>
+      </note>
+    </simplesect>
+    <simplesect>
+      <title>Why</title>
+
+      <para>
+	This is for users whose mouse doesn't work (especially during installation
+	time) as well as for experienced users who prefer working with the
+	keyboard. Navigation from one widget to another is much easier when each widget
+	that can get the keyboard focus can be reached with an <emphasis>[Alt]</emphasis> key
+	sequence rather than repeatedly using the <emphasis>[Tab]</emphasis> key and/or the cursor
+	keys.
+      </para>
+
+      <para>
+	There may be a lot more widgets that can have keyboard shortcuts than you
+	expected. Basically, every widget that can somehow be operated with the
+	keyboard (even if it is only scrolling) and that has an associated label
+	(within, above or beside) can have a keyboard shortcut and should get one.
+      </para>
+    </simplesect>
+
+    <simplesect><title>How</title>
+
+      <para>
+	The widget parameter that acts as a label is checked for presence of exactly
+	one ampersand "<literal>&amp;</literal>".
+      </para>
+      <para>
+          See the <link linkend="check_ycp_widget-checks">widget checks</link> of this section for more.
+      </para>
+
+    </simplesect>
+  </section>
+  <section id="check_ycp_widget-trans">
+    <title>Translatable Messages Check</title>
+
+    <simplesect><title>What</title>
+
+      <para>
+	Widget parameters that are displayed literally as text are checked for
+	translation markers ("<literal>_("</literal>...<literal>")</literal>").
+      </para>
+    </simplesect>
+
+    <simplesect><title>Why</title>
+
+      <para>
+	Every text message that ever gets to the end user is to be translated into the
+	user's native language. This can only be made sure if the message is marked for
+	translation.
+      </para>
+    </simplesect>
+
+    <simplesect><title>How</title>
+      <para>
+          See the <link linkend="check_ycp_widget-checks">intro</link> of this section.
+      </para>
+    </simplesect>
+  </section>
+  </section>
+
+  <section><title>Standardized Lib Function Checks</title>
+    <!--
+    <para>TODO update this WRT Label and Popup. mvidner</para>
+    <para>TODO document the import checking. mvidner</para>
+    -->
+
+    <section><title>Duplicate Definitions of Wizard Lib Functions</title>
+
+      <simplesect><title>What</title>
+
+	<para>
+	  Presence of definitions of functions from the <emphasis>wizard lib</emphasis> (Package
+	  <literal>yast2</literal>) outside the <emphasis>wizard library</emphasis> itself is checked
+	  such as <literal>Wizard::SetContents()</literal> etc.
+	</para>
+      </simplesect>
+
+      <simplesect><title>Why</title>
+
+	<para>
+	  At the start of YaST2 develompent there was no other way of sharing code other
+	  than simply copying it. Those days are gone; YCP now supports an
+	  <literal>include</literal> mechanism similar to C or C++.
+	</para>
+      <para>
+	Very general code like how to create the typical YaST2 wizard window layout has
+	now been moved to the <emphasis>wizard lib</emphasis>, a collection of include files that
+	provide such facilities. We want to get rid of duplicate code as soon as
+	possible for obvious reasons (consistency, maintainability, efficiency).
+      </para>
+    </simplesect>
+
+    <simplesect><title>How</title>
+
+      <para>
+	If "<literal>define</literal>" followed by one of the known function names of the
+	<emphasis>wizard lib</emphasis> is found outside the file where this is supposed to be, a
+	warning is issued. Both function names and file names are hardwired within
+	<literal>check_ycp</literal>.
+      </para>
+
+    </simplesect>
+  </section>
+
+  <section><title>Definitions and Usage of Obsolete Functions</title>
+
+    <simplesect><title>What</title>
+
+      <para>
+	Usage or presence of definitions of known obsolete functions is checked,
+	e.g. <literal>Popup::Message()</literal>, <literal>Popup::YesOrNo()</literal> etc.; using an equivalent
+	replacement function from the <emphasis>wizard lib</emphasis>'s <literal>common_popups.ycp</literal>
+	include file is suggested.
+      </para>
+
+    </simplesect>
+    <simplesect><title>Why</title>
+
+      <para>
+	Those functions are now superseded by those from
+	<literal>common_popups.ycp</literal>. The replacement functions usually require less
+	parameters (thus are easier to use) and use a common and consistent widget
+	layout.
+      </para>
+    </simplesect>
+    <simplesect><title>How</title>
+
+      <para>
+	The definitions are checked very much like the wizard function definitions
+	above; function and file names are hardwired here as well.
+      </para>
+
+      <para>
+	Usage of the obsolete functions is checked simply by checking for occurrence of
+	the function name followed by an opening parenthesis (maybe with whitespace in
+	between) somewhere in the code.
+      </para>
+    </simplesect>
+  </section>
+
+  <section><title>Usage of Predefined Messages</title>
+
+    <simplesect><title>What</title>
+
+      <para>
+	Presence of predefined message strings is checked, e.g. "<literal>&amp;Next</literal>",
+	"<literal>&amp;Back</literal>" etc.; using a corresponding function from the <emphasis>wizard
+            lib</emphasis> (<literal>Label</literal> Module) is suggested,
+	e.g. <literal>Label::NextButton()</literal>, <literal>Label::BackButton()</literal> etc.
+      </para>
+
+    </simplesect>
+    <simplesect><title>Why</title>
+
+      <para>
+	<itemizedlist>
+
+	  <listitem><para>
+	      Ease the burden on the translators - with the predefined messages they don't
+	      need to translate the same standard texts over and over again.
+	    </para>
+	  </listitem>
+	  <listitem><para>
+	      Consistent messages for the same type of buttons etc. throughout all of YaST2.
+	    </para>
+	  </listitem>
+
+
+	  <listitem><para>
+	      Consistent keyboard shortcuts for the same button throughout all of YaST2.
+	    </para>
+	  </listitem>
+
+
+	  <listitem><para>
+	      If we ever need to change one of those standard messages, we can do that centralized.
+	    </para>
+	  </listitem>
+
+	</itemizedlist>
+      </para>
+    </simplesect>
+
+
+    <simplesect>
+      <title>How</title>
+
+      <para>
+	The YCP code, stripped of comments, is checked for any one of the predefined
+	messages (including any keyboard shortcuts that may be there), surrounded by
+	translation markers ("<literal>_("</literal>...<literal>")</literal>").
+      </para>
+    </simplesect>
+    <simplesect>Limitations
+
+      <para>
+	Differences in spelling or only in whitespace will not be caught. If there is
+	no or another keyboard shortcut, the message will not be considered the same -
+	so if anybody uses "<literal>Ne&amp;xt</literal>" rather than "<literal>&amp;Next</literal>", this will go
+	undetected.
+      </para>
+
+    </simplesect>
+  </section>
+  </section>
+
+
+      <section><title>Alternative Variable Declarations</title>
+
+      <simplesect><title>What</title>
+
+	<para>
+	  Alternative variable declarations are rejected, e.g.
+	  <screen>
+
+string|void value = anything();
+symbol|term result = UI::UserInput();
+integer|string x = 42;
+
+	  </screen>
+	</para>
+      </simplesect>
+
+      <simplesect>
+          <title>Why</title>
+
+	<para>
+	  Just about the only situation where this made sense was when a variable might
+	  sometimes be <literal>nil</literal> to indicate some error condition. All other variants
+	  of this are of purely academic nature or (more likely) poor programming
+	  style. Since all YCP types can be <literal>nil</literal> now, however, this feature
+	  becomes totally redundant. It will very likely be dropped in the near future.
+	</para>
+      </simplesect>
+      <simplesect>
+          <title>How</title>
+
+	<para>
+	  The entire YCP code, stripped of comments, is checked for occurences of one of
+	  the primitive YCP types (<literal>string</literal>, <literal>integer</literal>, <literal>boolean</literal>,
+	  <literal>map</literal>, <literal>list</literal>, <literal>any</literal>, <literal>void</literal> etc.) followed by a
+	  pipe sign <literal>|</literal> (maybe with whitespace before or after it) and
+	  another primitive YCP type.
+	</para>
+
+
+      </simplesect>
+  </section>
+      <section><title>Checking YCP Examples</title>
+
+	<para>
+	  You probably don't want to perform all of the available checks for simple YCP
+	  examples. Those should be concise and written for legibility rather than for
+	  completeness. They will usually not contain a standard format file header with
+	  all bells and whistles, no translation markers etc. - you don't want to bloat
+	  <literal>HelloWorld.ycp</literal> with all that stuff.
+	</para>
+
+	<para>
+            <literal>check_ycp</literal> has a special <emphasis>example mode</emphasis> for just this purpose: It
+	    turns off all checks that don't make sense for simple examples, yet allows you
+	    to use <literal>check_ycp</literal> anyway. If you think <emphasis>"well, what's left
+	      then?"</emphasis> think about the future. <literal>check_ycp</literal> can and will be expanded
+	    to cover more and more checks, and even your examples can benefit from it.
+	</para>
+
+	<para>
+	  For simple YCP examples (and only for them, please!) invoke <literal>check_ycp</literal> with
+	  the <literal>-x</literal> command line option:
+
+	  <screen>
+check_ycp -x HelloWorld.ycp
+	  </screen>
+	</para>
+
+	<para>
+	  This turns off all checks that don't make sense for examples.
+	</para>
+
+      </section>
+
+
+  <section id="check_ycp_emacs">
+      <title><literal>check_ycp</literal> and Emacs</title>
+
+    <para>
+      <literal>check_ycp</literal> and Emacs go together well:
+
+      <itemizedlist>
+
+	<listitem>Load a YCP file into Emacs.</listitem>
+
+	  <listitem><para>Invoke the Emacs compile command:</para>
+	    <programlisting>
+M-x compile
+	    </programlisting>
+	  </listitem>
+
+	    <listitem><para>Edit the compile command ("<literal>make -k</literal>" by default) in the
+		minibuffer; change it to the <literal>check_ycp</literal> command you wish to invoke (you only need to do this once for each Emacs session):
+
+		<programlisting>
+check_ycp *.ycp
+		</programlisting>
+	      </para>
+          </listitem>
+
+	      <listitem>Hit <emphasis>Return</emphasis></listitem>
+
+	      <listitem><para>Use the <literal>next-error</literal> function to go to the next error
+		  <literal>check_ycp</literal> has reported. The corresponding YCP file will automatically be
+		  loaded into Emacs if needed, and Emacs will jump to the corresponding line
+		  within that file.
+		</para>
+	      </listitem>
+      </itemizedlist>
+    </para>
+
+
+    <para>
+      If you haven't done so already, you might want to bind the <literal>compile</literal> and
+      <literal>next-error</literal> functions to keys in your <literal>~/.emacs</literal> file, e.g.
+
+      <screen>
+(global-set-key "f42" 'compile)
+(global-set-key "f43" 'next-error)
+      </screen>
+
+    </para>
+
+    <para>
+      The real challenge here is to find a key that is not already in use for some
+      other important function.
+    </para>
+
+    <para>
+      If you are a real hardcore YCP hacker, you can even go so far and change the
+      default compile command to <literal>check_ycp</literal> in <literal>~/.emacs</literal>:
+
+      <screen>
+(setq compile-command "check_ycp *.ycp")
+      </screen>
+
+    </para>
+
+
+  </section>
+
+
+
+  <section><title>Extending <literal>check_ycp</literal></title>
+
+      <section><title>Adding new Widgets / UI Functions</title>
+
+      <para>
+	Everybody should be able to add checks for a new widget or a new function that
+	uses keyboard shortcuts (unlikely) or translatable messages (very likely) -
+	even without any knowledge of Perl:
+    </para>
+
+	<orderedlist>
+	  <listitem>
+	    <para>
+	      Locate the <literal>check_widget_params()</literal>
+	      function.</para></listitem>
+
+	  <listitem>
+	    <para>
+	      Add your widget to the list (the large regexp) near the function beginning,
+	      where all the other widgets are. Be careful not to include any whitespace
+	      (blanks or tabs) inside the parentheses.
+	      <emphasis>Wrong:</emphasis>
+	      <programlisting>( MyNewWidget ) |</programlisting>
+
+	      <emphasis>OK:</emphasis>
+	      <programlisting>(MyNewWidget) |</programlisting>
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>Add an <literal>elsif()</literal> branch to the large
+	      <literal>if()</literal>...<literal>elsif()</literal>...<literal>elsif()</literal> construction:
+
+	      <programlisting>
+elsif ( $widget =~ /MyWidget/ )
+{
+    check_keyboard_shortcut ( $widget, $line_no, 1, @args );
+    check_translation       ( $widget, $line_no, 1, @args );
+}
+	      </programlisting>
+	    </para>
+	  </listitem>
+	</orderedlist>
+
+      <para>
+	You might have to change the third parameter according to your widget or
+	function: This is the number of the parameter to be checked (the first one is
+	1) after all <literal>`opt()</literal> and <literal>`id()</literal> parameters have been removed.
+      </para>
+
+      <para>
+          Of course you can omit the <link linkend="check_ycp_widget-shortcut">keyboard
+              shortcut check</link>
+	   (<literal>check_keyboard_shortcut()</literal>) if it doesn't make sense for your
+	  widget or function.
+      </para>
+
+      <para>
+          If there is more than one parameter to be <link linkend="check_ycp_widget-trans">checked for translatable messages</link>, add a call to <literal>check_translation()</literal> for
+	  each.
+      </para>
+    </section>
+
+
+    <section><title>Other Extensions</title>
+
+      <para>
+	Like Linus Torvalds once said: <emphasis>"Use the source, Luke!"</emphasis> ;-)
+      </para>
+
+      <para>
+	<literal>check_ycp</literal>'s sources are extensively commented, even the many regular
+	expressions used there. But changing those regexps really requires some
+	in-depth knowledge of regexps in general and Perl regexps in particular. If you
+	feel unsafe, better not touch them.
+      </para>
+
+      <para>
+	Other than that, use your creativity.
+      </para>
+
+
+    </section>
+  </section>

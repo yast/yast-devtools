@@ -23,6 +23,8 @@ $(BUILD)/index.html: $(xml_files)
 	--xinclude \
 	$(STYLESHEET_HTML) \
 	yast2-devtools.xml
+
+$(BUILD)/susebooks.css:
 	cp ../../docbook/css/susebooks.css $(BUILD)
 	cp -a ../../docbook/images $(BUILD)
 

@@ -1,0 +1,22 @@
+#! /bin/bash
+# $Id$
+# arguments: one or more ycp files
+# output: a dot file (graphviz) and a postscript graph,
+#         named after the first argument
+YXPDIR=`dirname $0`
+
+# $1 ycp file
+# stdout
+function rawdata() {
+    $YXPDIR/yxp < "$1" | xsltproc $YXPDIR/call_graph.xsl -
+}
+
+{
+echo "digraph \"$1\" {"
+for f in "$@"; do
+    rawdata "$f"
+done
+echo "}"
+} > $1.dot
+
+dot -Tps -o $1.ps $1.dot

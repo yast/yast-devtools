@@ -150,8 +150,10 @@ AC_SUBST(desktopdir)
 
     # init: translation
     '@YAST2-INIT-PO@' =>
+'LL=${RPMNAME##-*}
+AC_SUBST(LL)
 
-'AC_ARG_WITH(own_compendium,
+AC_ARG_WITH(own_compendium,
 	    AS_HELP_STRING([--with-own_compendium=FILE],
 			   [Location of compendium file]),
 	    y2compendium=yes, y2compendium=no)

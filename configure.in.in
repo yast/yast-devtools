@@ -55,4 +55,5 @@ fi
 
 ## and generate the output
 AC_OUTPUT(devtools/bin/version)
+AC_CONFIG_COMMANDS(execute, chmod +x devtools/bin/version)
 @YAST2-OUTPUT@

@@ -1,7 +1,5 @@
 #
-# Makefile.am for y2c_XXpkgXX/testsuite
-#
-# $Id$
+# Makefile.am for devtools/devtools/skeletons/config/testsuite
 #
 
 AUTOMAKE_OPTIONS = dejagnu

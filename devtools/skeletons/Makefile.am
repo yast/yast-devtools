@@ -1,7 +1,5 @@
 #
-# Makefile.am for the skeletons.
-#
-# $Id$
+# Makefile.am for devtools/devtools/skeletons
 #
 
 skeletonsdir = @YAST2DEVTOOLS@/skeletons

@@ -1,5 +1,5 @@
 #
-# Makefile.am for scrdoc/scr
+# Makefile.am for devtools/scrdoc/src
 #
 
 ybin_SCRIPTS = scrdoc

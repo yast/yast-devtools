@@ -1,5 +1,5 @@
 #
-# Makefile.am for yast2-devtools/admin
+# Makefile.am for devtools/devtools/admin
 #
 
 SUBDIRS = po copyright

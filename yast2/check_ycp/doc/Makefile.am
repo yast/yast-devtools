@@ -1,5 +1,5 @@
 #
-# Makefile.am for check_ycp-doc/doc
+# Makefile.am for devtools/yast2/check_ycp/doc
 #
 
 docdir	= 	@YAST2DOC@

@@ -1,7 +1,5 @@
 #
-# Makefile.am for y2a_XXpkgXX/doc
-#
-# $Id$
+# Makefile.am for devtools/devtools/skeletons/agent/doc
 #
 
 SUBDIRS = autodocs

@@ -1,5 +1,5 @@
 #
-# Makefile.am for ydoc/po-tools
+# Makefile.am for devtools/ydoc/po-tools
 #
 
 ybin_SCRIPTS = installmo makemo makepot updatepo \

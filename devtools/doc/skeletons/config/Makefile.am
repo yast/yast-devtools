@@ -1,7 +1,5 @@
 #
-# Makefile.am for doc/skeleton-config/autodocs
-#
-# $Id$
+# Makefile.am for devtools/devtools/doc/skeletons/config
 #
 
 htmldir = $(docdir)/skeletons/config

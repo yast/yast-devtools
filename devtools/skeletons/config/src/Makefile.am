@@ -1,7 +1,5 @@
 #
-# Makefile.am for y2c_XXpkgXX/src
-#
-# $Id$
+# Makefile.am for devtools/devtools/skeletons/config/src
 #
 
 clients_DATA =			\

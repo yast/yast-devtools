@@ -1,7 +1,5 @@
 #
-# Makefile.am for y2c_XXpkgXX/agents
-#
-# $Id$
+# Makefile.am for devtools/devtools/skeletons/config/agents
 #
 
 agentdir = $(YAST2DIR)/servers_non_y2

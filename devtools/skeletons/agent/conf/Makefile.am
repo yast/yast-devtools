@@ -1,5 +1,5 @@
 #
-# Makefile.am for y2a_XXpkgXX/conf
+# Makefile.am for devtools/devtools/skeletons/agent/conf
 #
 
 scrconf_DATA = XXpkgXX.scr

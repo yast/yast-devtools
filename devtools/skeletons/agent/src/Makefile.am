@@ -1,5 +1,5 @@
 #
-# Makefile.am for y2a_XXpkgXX/src
+# Makefile.am for devtools/devtools/skeletons/agent/src
 #
 
 plugin_LTLIBRARIES = libpy2ag_XXpkgXX.la

@@ -1,5 +1,5 @@
 #
-# Makefile.am for ydoc
+# Makefile.am for devtools/ycpdoc/src
 #
 
 ybin_SCRIPTS = ycpdoc

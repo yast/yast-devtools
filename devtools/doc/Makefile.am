@@ -1,5 +1,5 @@
 #
-# Makefile.am for devtools/doc
+# Makefile.am for devtools/devtools/doc
 #
 
 SUBDIRS = skeletons

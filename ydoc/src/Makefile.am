@@ -1,5 +1,5 @@
 #
-# Makefile.am for ydoc/src
+# Makefile.am for devtools/ydoc/src
 #
 
 ybin_SCRIPTS = ydoc \

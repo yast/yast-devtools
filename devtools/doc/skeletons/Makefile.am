@@ -1,7 +1,5 @@
 #
-# Makefile.am for doc/skeleton-config
-#
-# $Id$
+# Makefile.am for devtools/devtools/doc/skeletons
 #
 
 SUBDIRS = config

@@ -1,7 +1,5 @@
 #
-# Makefile.am for y2c_XXpkgXX/doc/autodocs
-#
-# $Id$
+# Makefile.am for devtools/devtools/skeletons/config/doc/autodocs
 #
 
 htmldir = $(docdir)/autodocs

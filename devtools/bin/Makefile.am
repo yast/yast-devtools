@@ -1,5 +1,5 @@
 #
-# Makefile.am for yast2-devtools/bin
+# Makefile.am for devtools/devtools/bin
 #
 
 pkgdatadir = @YAST2DEVTOOLS@/bin

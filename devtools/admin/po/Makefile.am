@@ -1,5 +1,5 @@
 #
-# Makefile.am for yast2-devtools/admin/po
+# Makefile.am for devtools/devtools/admin/po
 #
 
 adminpodir = @YAST2DEVTOOLS@/admin/po

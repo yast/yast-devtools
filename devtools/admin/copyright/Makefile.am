@@ -1,5 +1,5 @@
 #
-# Makefile.am for yast2-devtools/admin/copyright
+# Makefile.am for devtools/devtools/admin/copyright
 #
 
 copyrightdir = @YAST2DEVTOOLS@/admin/copyright

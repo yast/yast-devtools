@@ -781,9 +781,15 @@ sub do_shipout ($$$$$@)
 	}
 	else
 	{
-	    if ($documented_type && $documented_type ne $declared_type)
+	    if ($documented_type)
 	    {
-		warning ("Declared and documented return types do not match ($declared_type != $documented_type).");
+		# remove wehitespace before comparing
+		$documented_type =~ s/\s//g;
+		$declared_type   =~ s/\s//g;
+		if ($documented_type ne $declared_type)
+		{
+		    warning ("Declared and documented return types do not match ($declared_type != $documented_type).");
+		}
 	    }
 	}
 

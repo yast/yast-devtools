@@ -1,0 +1,3 @@
+Parsing qualified.ycp
+qualified.ycp: 14: Warning: Parameter f declared in function header but not documented.
+qualified.ycp: 14: Warning: Return value not documented.

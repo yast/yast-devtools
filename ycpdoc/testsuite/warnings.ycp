@@ -1,0 +1,10 @@
+//
+{
+    /**
+     * Do not warn if the types differ only in whitespace
+     * @return list <string> my friends
+     */
+    list<string> Friends () {
+	return ["Tux", "Linus"];
+    }
+}

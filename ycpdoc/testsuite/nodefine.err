@@ -1,0 +1,3 @@
+Parsing nodefine.ycp
+nodefine.ycp: 20: Warning: Function WhatDoesItDo has no comment.
+nodefine.ycp: 24: Warning: Function IDontKnow has no comment.

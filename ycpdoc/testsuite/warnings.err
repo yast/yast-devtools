@@ -1,0 +1,2 @@
+Parsing warnings.ycp
+warnings.ycp: 5: Warning: Declared and documented return types do not match (list<string> != list <string>).

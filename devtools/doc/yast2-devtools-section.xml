@@ -77,7 +77,7 @@ targets, this toplevel <filename>Makefile.am</filename> is now automatically gen
 <para>
 The only thing that is (or, rather, "should be") different in all those
 toplevel <filename>Makefile.am</filename> files is the "<literal remap="tt">SUBDIRS =</literal>" line. This line is
-moved to a <link linkend="devtools_subdirs">SUBDIRS</link>  in the
+moved to a <filename>SUBDIRS</filename>  in the
 package's toplevel directory, much like <literal remap="tt">RPMNAME</literal>, <literal remap="tt">VERSION</literal>,
 <literal remap="tt">MAINTAINER</literal> etc. - the rest of <filename>Makefile.am</filename> is copied from a common
 path <filename>/usr/share/YaST2/data/devtools/admin</filename>. Thus, changes that should affect
@@ -144,7 +144,7 @@ cd yast2/modules/mypackage
 </listitem>
 <listitem>
 <para>
-    Create a <link linkend="devtools_subdirs">SUBDIRS</link> file from your existing
+    Create a <filename>SUBDIRS</filename> file from your existing
     <filename>Makefile.am</filename>.</para>
     <note><para>You can do without that <literal remap="tt">SUBDIRS</literal> file if you want
 to include all subdirectories that have a <filename>Makefile.am</filename> in alphabetical
@@ -817,7 +817,7 @@ Just an alias for "<literal remap="tt">make checkin-stable</literal>".
 </section>
 
 <section>
-<title>Troubleshooting</title>
+<title>Troubleshooting and FAQ</title>
 
 <qandaset defaultlabel='qanda'>
 <qandaentry>
@@ -944,7 +944,7 @@ then use "<literal remap="tt">make package</literal>".
 </qandaentry>
 
 <qandaentry>
-<question id="devtools_subdirs">
+<question>
 <para>Do I really need a <literal remap="tt">SUBDIRS</literal> file?</para>
 </question>
 

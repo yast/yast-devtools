@@ -187,7 +187,7 @@ sub mf_imports ($$)
 	elsif (m/^\s*include\s*"(.*)";/)
 	{
 	    my $inc = find_file ("INCLUDE", $1);
-	    push (@result, mf_imports ($inc, $r_includes));
+	    push (@result, $inc, mf_imports ($inc, $r_includes));
 	}
     }
     $F->close ();

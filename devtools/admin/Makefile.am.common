@@ -1,8 +1,9 @@
 # Makefile.am.common					-*- Makefile -*-
 # Generated file, do not edit!
 
-# suffix mapping
-%.ybc: %.ycp $(ycpchook)
+# suffix mapping: info '(make)Static Usage'
+# apply only to our modules, not external ones
+${modulebin_DATA}: %.ybc: %.ycp $(ycpchook)
 	$(bindir)/ycpc -c -M. -I. -q $(YCPCFLAGS) $<
 
 modulebin_DATA = $(patsubst %.ycp,%.ybc,$(module_DATA))
@@ -13,8 +14,9 @@ CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 
 # generate dependencies
 # two steps not to lose the file if the command fails
-.dep: $(wildcard *.ycp)
-	${YCPMAKEDEP} ${YCPCFLAGS} > .new.dep
+# hook: create the links before we look for files
+.dep: $(wildcard *.ycp) ${ycpchook}
+	${YCPMAKEDEP} --prefix=${prefix} ${YCPCFLAGS} > .new.dep
 	mv .new.dep .dep
 
 dist-hook: check-syntax

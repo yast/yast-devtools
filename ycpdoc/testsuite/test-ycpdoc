@@ -2,12 +2,17 @@
 # for each FOO.out, parse FOO*.ycp
 YCPDOC=../src/ycpdoc
 
+echo
+echo $0
+
 FAIL=""
 for OUT in *.out; do
     CASE=${OUT%.out}
+    echo
     echo Running $CASE:
     $YCPDOC -f xml $CASE*.ycp
-    diff -u $OUT ycpdoc.xml || FAIL=1
+    mv ycpdoc.xml $CASE.out.tmp
+    diff -u $OUT $CASE.out.tmp || FAIL=1
 done
 
 if [ $FAIL ]; then

@@ -1,6 +1,4 @@
-#
-# Makefile.am for devtools/devtools/skeletons/config/src
-#
+# Makefile.am for XXpkgXX/src
 
 yncludedir = @yncludedir@/XXpkgXX
 
@@ -26,3 +24,5 @@ module_DATA =			\
 	XXPkgXX.ycp
 
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA) $(desktop_DATA)
+
+include $(top_srcdir)/Makefile.am.common

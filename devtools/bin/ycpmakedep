@@ -175,8 +175,20 @@ sub mf_imports ($$)
     # we have seen it already
     $r_includes->{$pathname} = 1;
 
+    my $in_comment = 0;
     while (defined ($_ = <$F>))
     {
+	# /* */ comment handling, still line oriented
+	if (m{/\*})
+	{
+	    $in_comment = 1;
+	}
+	if ($in_comment)
+	{
+	    $in_comment = ! m{\*/};
+	    next;
+	}
+
 	# import
 	# what if the module is not in YCP?
 	if (m/^\s*import\s*"(.*)";/)

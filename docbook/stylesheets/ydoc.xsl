@@ -53,6 +53,10 @@
             </xsl:choose>
             <refmeta>
                     <refentrytitle>
+                        <xsl:if test="namespace != ''">
+                            <xsl:value-of select="namespace"/>
+                            <xsl:text>::</xsl:text>
+                        </xsl:if>
                         <xsl:value-of select="names/names_item"/>
                     </refentrytitle>
                     <manvolnum>3</manvolnum>
@@ -60,6 +64,10 @@
                 <refnamediv>
                     <xsl:for-each select="names/names_item">
                         <refname>
+                            <xsl:if test="../../namespace != ''">
+                                <xsl:value-of select="../../namespace"/>
+                                <xsl:text>::</xsl:text>
+                            </xsl:if>
                             <xsl:value-of select="."/>
                         </refname>
                     </xsl:for-each>

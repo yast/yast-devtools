@@ -23,7 +23,7 @@ else
         CAT_ENTRY_END='-->'
 fi
 
-AC_PATH_PROG(XSLTPROC,xsltproc,false)
+AC_PATH_PROG(XSLTPROC,xsltproc)
 XSLTPROC_WORKS=no
 if test -n "$XSLTPROC"; then
         AC_MSG_CHECKING([whether xsltproc works])
@@ -44,6 +44,8 @@ END
                 XSLTPROC_WORKS=yes
         fi
         AC_MSG_RESULT($XSLTPROC_WORKS)
+else
+    AC_MSG_ERROR([xsltproc required but not found])
 fi
 AM_CONDITIONAL(have_xsltproc, test "$XSLTPROC_WORKS" = "yes")
 

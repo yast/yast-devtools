@@ -67,9 +67,11 @@
   <xsl:include href="header.xsl" />
   -->
 
+  <!--
   <xsl:param name="funcsynopsis.style">kr</xsl:param>
   <xsl:param name="funcsynopsis.decoration">1</xsl:param>
   <xsl:param name="funcsynopsis.tabular.threshold" select="40"></xsl:param>
+  -->
   <xsl:variable name="arg.choice.def.open.str"></xsl:variable>
   <xsl:variable name="arg.choice.def.close.str"></xsl:variable>
 

@@ -1,5 +1,5 @@
-@HEADER-COMMENT@
-# neededforbuild gpp libgpp sgmltool opensp perl-XML-Writer
+@HEADER-COMMENT@ 
+# neededforbuild gpp libgpp sgmltool opensp perl-XML-Writer libxml2 libxslt docbook-xsl-stylesheets docbook_4
 
 @HEADER@
 Requires:	yast2 perl

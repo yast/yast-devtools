@@ -4,57 +4,35 @@
 
 SUBDIRS = skeletons
 
-sgmldir	= $(docdir)
-ghtmldir	= $(docdir)/html
-nhtmldir	= $(docdir)/html
+htmldir = $(docdir)/devtools
 
-sgml_DATA =	\
-	yast2-devtools.sgml
+XSLTPROC="/usr/bin/xsltproc"
+BUILD=html
+STYLESHEET_HTML=../../docbook/stylesheets/customize-html.xsl
 
-ghtml_DATA =					\
-	index.html				\
-	yast2-devtools.html			\
-	yast2-devtools-1.html			\
-	yast2-devtools-2.html			\
-	yast2-devtools-3.html			\
-	yast2-devtools-4.html			\
-	yast2-devtools-5.html			\
-	yast2-devtools-6.html			\
-	yast2-devtools-7.html			\
-	yast2-devtools-8.html			\
-	yast2-devtools-9.html
+xml_files =  $(wildcard *.xml) 
 
-$(ghtml_DATA): $(sgml_DATA)
-	$(SGML2HTML) $^
-	ln -sf yast2-devtools.html index.html
+html_DATA = $(wildcard html/*.html) \
+	    $(BUILD)/index.html \
+	    $(BUILD)/susebooks.css
 
+$(BUILD)/index.html: $(xml_files) 
+	xsltproc \
+	-stringparam base.dir "$(BUILD)/" \
+	--xinclude \
+	$(STYLESHEET_HTML) \
+	yast2-devtools.xml
+	cp ../../docbook/css/susebooks.css $(BUILD)
+	cp -a ../../docbook/images $(BUILD)
 
-nhtml_DATA = \
-	rny2rnc.html 
+clean-local:
+	rm -rf $(BUILD)/*.html
+	rm -rf $(BUILD)/images
+	rm -rf $(BUILD)/susebooks.css
 
-html: $(ghtml_DATA)
+install-data-local:
+	mkdir -p $(htmldir)
+	cp -a $(BUILD)/images $(htmldir)
 
-
-text:
-	$(SGML2TXT) $(sgml_DATA)
-
-info:
-	$(SGML2INFO) $(sgml_DATA)
-
-latex:
-	$(SGML2LATEX) $(sgml_DATA)
-
-ps: latex
-	dvips yast2-devtools.dvi
-
-
-EXTRA_DIST = $(sgml_DATA) $(nhtml_DATA)
-# Intentionally omitting generated $(html_DATA)
-
-
-CLEANFILES = $(ghtml_DATA) 			\
-	yast2-devtools.dvi			\
-	yast2-devtools.ps			\
-	yast2-devtools.txt			\
-	yast2-devtools.info
+EXTRA_DIST =  $(xml_files)
 

@@ -1,49 +1,39 @@
 #
 # Makefile.am for devtools/yast2/check_ycp/doc
 #
+#
+htmldir = $(docdir)/check_ycp
 
-sgmldir	=	$(docdir)
-htmldir	=	$(docdir)/html
+XSLTPROC="/usr/bin/xsltproc"
+BUILD=html
+STYLESHEET_HTML=../../../docbook/stylesheets/customize-html.xsl
+IMAGES=$(wildcard $(BUILD)/images/* $(BUILD)/images/navig/* $(BUILD)/images/admon/*)
 
-sgml_DATA =	\
-	check_ycp.sgml
+xml_files =  $(wildcard *.xml) 
 
+html_DATA = $(wildcard html/*.html)  \
+	    html/index.html  \
+	    html/susebooks.css
 
-html_DATA =	\
-	index.html		\
-	check_ycp.html		\
-	check_ycp-1.html	\
-	check_ycp-2.html	\
-	check_ycp-3.html	\
-	check_ycp-4.html	\
-	check_ycp-5.html	\
-	check_ycp-6.html	\
-	check_ycp-7.html	\
-	check_ycp-8.html	\
-	check_ycp-9.html	\
-	check_ycp-10.html	\
-	check_ycp-11.html
-
-$(html_DATA): $(sgml_DATA)
-	$(SGML2HTML) $(sgml_DATA)
-	ln -sf check_ycp.html index.html
-
-html: $(html_DATA)
+html/index.html: check_ycp-section.xml check_ycp.xml  
+	xsltproc \
+	-stringparam base.dir "$(BUILD)/" \
+	--xinclude \
+	$(STYLESHEET_HTML)  check_ycp.xml
+	cp ../../../docbook/css/susebooks.css $(BUILD)
+	cp -a ../../../docbook/images $(BUILD)
 
 
-text:
-	$(SGML2TXT) $(sgml_DATA)
+validate:
+	xmllint --dropdtd --loaddtd check_ycp-section.xml
+clean-local:
+	rm -rf $(BUILD)/*.html
+	rm -rf $(BUILD)/images
+	rm -rf $(BUILD)/susebooks.css
 
-info:
-	$(SGML2INFO) $(sgml_DATA)
+install-data-local:
+	mkdir -p $(htmldir)
+	cp -a $(BUILD)/images $(htmldir)
 
-latex:
-	$(SGML2LATEX) $(sgml_DATA)
-
-
-EXTRA_DIST = $(sgml_DATA)
-# Intentionally omitting generated $(html_DATA)
-
-
-CLEANFILES = $(html_DATA)
-
+	
+EXTRA_DIST =  $(xml_files)

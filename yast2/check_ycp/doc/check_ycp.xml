@@ -3,7 +3,7 @@
 "/usr/share/xml/docbook/schema/dtd/4.2/docbookx.dtd"[
 
 
-<!ENTITY  checkycp-section  SYSTEM "check_ycp-section.xml">
+<!ENTITY  checkycp-contents  SYSTEM "check_ycp-contents.xml">
 
 
 
@@ -32,5 +32,5 @@
     <toc>
     </toc>
 
-    &checkycp-section;
+    &checkycp-contents;
 </book>

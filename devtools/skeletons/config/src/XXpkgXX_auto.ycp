@@ -63,6 +63,13 @@ else if (func == "Import") {
 else if (func == "Result") {
     ret = XXPkgXX::Export();
 }
+/* Read current state */
+else if (func == "Read") {
+    import "Progress";
+    Progress::off();
+    ret = XXPkgXX::Read();
+    Progress::on();
+}
 /* Write givven settings */
 else if (func == "Write") {
     import "Progress";

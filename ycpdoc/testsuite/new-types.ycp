@@ -11,6 +11,14 @@
     }
 
     /**
+     * @param l foo
+     * @return	bar
+     */
+    define map<integer,string>NoSpaces(list<string>l) ``{
+	//...
+    }
+
+    /**
      * @param m foo
      * @return	bar
      */

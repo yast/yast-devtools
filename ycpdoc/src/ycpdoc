@@ -392,7 +392,7 @@ sub parse_file ($)
 		}
 	    }
 	    # variable declaration
-	    elsif (/^\s*(global\s+)?($ycp_typedecl)\s+($ycp_qualified_symbol)\s*=/o)
+	    elsif (/^\s*(global\s+)?($ycp_typedecl)\s*($ycp_qualified_symbol)\s*=/o)
 	    {
 		  $isglobal = defined $1;
 		  $declared_type = $2;
@@ -565,7 +565,7 @@ sub do_shipout ($$$$$@)
 	warn "No parentheses? '$params'" unless $ok;
 
 	my $last_comma = ',';
-	while ($params =~ m/\G\s*($ycp_typedecl)\s+($ycp_symbol)\s*(,?)/ogc)
+	while ($params =~ m/\G\s*($ycp_typedecl)\s*($ycp_symbol)\s*(,?)/ogc)
 	{
 	    warn "Missing comma before '$1 $2'" unless $last_comma;
 	    $last_comma = $3;

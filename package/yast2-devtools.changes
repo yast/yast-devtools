@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep  6 16:25:09 CEST 2004 - mvidner@suse.cz
+
+- ycpdoc: Allow zero space between type and identifier (list<string>a).
+
+-------------------------------------------------------------------
 Tue Aug 31 13:55:44 CEST 2004 - sh@suse.de
 
 - Added yast2-firstboot to all-packages 

@@ -216,14 +216,14 @@ fi
 
     # check: qt
     "\@YAST2-CHECKS-TESTSUITE\@" =>
-"dnl Check runtest and expect
-AC_PATH_PROG(MYRUNTEST, runtest, false)
-if test \"\$MYRUNTEST\" = \"false\"; then
-        AC_MSG_ERROR([runtest not installed])
-fi
+"dnl Check packages expect and dejagnu
 AC_PATH_PROG(MYEXPECT, expect, false)
 if test \"\$MYEXPECT\" = \"false\"; then
         AC_MSG_ERROR([expect not installed])
+fi
+AC_PATH_PROG(MYRUNTEST, runtest, false)
+if test \"\$MYRUNTEST\" = \"false\"; then
+        AC_MSG_ERROR([dejagnu not installed])
 fi
 ",
 

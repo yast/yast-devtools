@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
-Tue Jan 27 10:18:37 CET 2004 - mvidner@suse.cz
+Thu Jan 29 12:16:37 CET 2004 - kkaempf@suse.de
 
-- 
+- test for expect prior to runtest, complain about missing
+  dejagnu if runtest not found.
 
 -------------------------------------------------------------------
 Tue Jan 27 10:14:57 CET 2004 - mvidner@suse.cz

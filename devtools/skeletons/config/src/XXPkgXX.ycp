@@ -33,6 +33,11 @@ global block AbortFunction = nil;
 global boolean modified = false;
 
 global boolean proposal_valid = false;
+
+/**
+ * Write only, used during autoinstallation.
+ * Don't run services and SuSEconfig, it's all done at one place.
+ */
 global boolean write_only = false;
 
 /**

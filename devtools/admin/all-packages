@@ -11,109 +11,74 @@
 # - firewall	Firewall CD
 # - internal	internal package
 #
-# package			where			when
+# package		where			when
 # ------------------------------------------------------------------------------
-libpkg				inst-sys,default	all
-libscr				inst-sys,default	all
-liby2				inst-sys,default	all
-libycp				inst-sys,default	all
-libyui				inst-sys,default	all
-yast2				default			all
-yast2-agent-any			inst-sys,default	all
-yast2-agent-audio		default			soundcard
-yast2-agent-cups		default			printer+cups
-yast2-agent-fdisk		inst-sys,default	all
-yast2-agent-ftp			inst-sys,default	ftp-install,you
-yast2-agent-http		default			http-install,you
-yast2-agent-ini			inst-sys,default	all
-yast2-agent-isax		default			x11config
-yast2-agent-ldap		?
-yast2-agent-liloconf		default			lilo.conf
-yast2-agent-modules		inst-sys,default	all
-yast2-agent-package		inst-sys,default	all
-yast2-agent-pam			inst-sys,default	user config
-yast2-agent-printerdb		default			printer+cups
-yast2-agent-probe		inst-sys,default	all
-yast2-agent-prom		inst-sys,default	sparc-only
-yast2-agent-rcconfig		-			all
-yast2-agent-system		inst-sys,default	all
-yast2-agent-targetpkg		inst-sys,default	all
-yast2-agent-tftp		inst-sys			tftp-install, you
-yast2-agent-xml			inst-sys			autoinstall
-yast2-agent-curl		inst-sys			autoinstall,you
-yast2-agent-you			default			you
-yast2-base			inst-sys,default	all
-yast2-config-autoinst		-			autoinstall
-yast2-config-bootfloppy		default			boot floppy preparation
-yast2-config-cups		default			printer+cups
-yast2-config-disk		default			partitioning
-yast2-config-firewall		default			firewall configuration
-yast2-config-fwcdadmin		firewall		firewall CD configuration
-yast2-config-hwinfo		default			hwinfo viewer
-yast2-config-imap		email			IMAP configuration
-yast2-config-inet		default			inetd editor
-yast2-config-keyboard		default			keyboard configuration
-yast2-config-language		default			language configuration
-yast2-config-ldap_client	default			ldap client configuration
-yast2-config-lilo		default			lilo configuration
-yast2-config-lvm_config		default			lvm configuration
-yast2-config-mail		default			mail configuration
-yast2-config-mouse		default			mouse configuration
-yast2-config-network		default			network configuration
-yast2-config-newmodule		-			development
-yast2-config-nfs		default			nfs client
-yast2-config-nfs-server		default			nfs server
-yast2-config-nis		default			nis client
-yast2-config-nis-server		default			nis server
-yast2-config-nisplus		default			nis+ client
-yast2-config-online-update	default			YOU
-yast2-config-package-manager	default			runtime rpm manager
-yast2-config-printer		default			(bsd) printer configuration
-yast2-config-runlevel		default			runlevel editor
-yast2-config-samba		slcs			initial samba config
-yast2-config-scanner		default			scanner configuration
-yast2-config-security		default			security configuration
-yast2-config-soho-lan		slcs			slcs network configuration
-yast2-config-sound		default			sound configuration
-yast2-config-suse		internal		SuSE workstation setup
-yast2-config-sysconfig		default			sysconfig editor
-yast2-config-timezone		default			timezone configuration
-yast2-config-tv			default			TV-Card configuration
-yast2-config-update		default			runtime update starter
-yast2-config-users		default			users configuration
-yast2-config-vpn_ncp		vpnncp			vpn/ncp configuration
-yast2-config-x11		default			runtime x11 configuration
-yast2-core-clients		inst-sys,default	all
-yast2-core-scr			inst-sys,default	all
-yast2-core-wfm			inst-sys,default	all
-yast2-db-country		default			trans: countries
-yast2-db-groups			default			trans: rpm groups
-yast2-db-keyboard		inst-sys,default	trans: keyboard
-yast2-db-mouse			inst-sys,default	trans: mouse
-yast2-db-sound			default			trans: sound
-yast2-db-timezone		inst-sys,default	trans: timezone
-yast2-db-tv			default			trans: tv cards
-yast2-devtools			-			development
-yast2-instsys			inst-sys		all
-yast2-lib-devel			-
-yast2-lib-hardware		inst-sys,default	all
-yast2-lib-network		default			all,network
-yast2-lib-printer		default			all,printer
-yast2-lib-sequencer		inst-sys,default	all
-yast2-lib-wizard		inst-sys,default	all
-yast2-lib-xml			inst-sys,default	all
-yast2-menu			default			all
-yast2-module-autoinst	inst-sys,default		all,autoinstall
-yast2-module-backup		default			all
-yast2-module-certify		-			certification
-yast2-module-os-repair		-
-yast2-module-support		default			all,support
-yast2-storage			inst-sys,default	all
-yast2-testsuite			-
-yast2-trans-de			inst-sys		all
-yast2-tune-idedma		default			all
-yast2-ui-ncurses		inst-sys,default	all
-yast2-ui-qt			inst-sys,default	all
-ycpdoc				-			development
-ydoc				-			development
-yast2-debugger			-			development
+#
+# core packages
+yast2			inst-sys,default	all
+yast2-core		inst-sys,default	all
+yast2-installation	inst-sys		install
+yast2-autoinstallation	inst-sys,default	all,autoinstall
+yast2-control-center	default			all
+yast2-ncurses		inst-sys,default	all
+yast2-qt		inst-sys,default	all
+
+# development
+yast2-debugger		-			development
+yast2-devtools		-			development
+yast2-testsuite		-
+
+# agents
+yast2-pam		inst-sys,default	pam agent (user)
+yast2-xml		inst-sys		xml agent (autoinst)
+
+# config packages
+yast2-backup		default			backup
+yast2-bootloader	default			bootloader
+yast2-country		default			keyboard,language,timezone
+yast2-firewall		default			firewall
+yast2-firewall-cd	firewall		firewall CD
+yast2-imap-server	email			IMAP server
+yast2-inet		default			inetd editor
+yast2-ldap-client	default			ldap client
+yast2-mail		default			mail
+yast2-mouse		default			mouse
+yast2-network		default			network
+yast2-nfs-client	default			nfs client
+yast2-nfs-server	default			nfs server
+yast2-nis-client	default			nis client
+yast2-nis-server	default			nis server
+yast2-nisplus-client	default			nis+ client
+yast2-online-update	default			YOU
+yast2-printer		default			printer
+yast2-restore		default			restore
+yast2-runlevel		default			runlevel editor
+yast2-samba		slcs			samba
+yast2-scanner		default			scanner
+yast2-security		default			security
+yast2-sound		default			sound
+yast2-storage		inst-sys,default	storage
+yast2-support		default			support
+yast2-sysconfig		default			sysconfig editor
+yast2-tune		default			hardware info and tune
+yast2-tv		default			TV card
+yast2-users		default			users
+yast2-x11		default			runtime x11
+
+# translations
+yast2-trans-de		inst-sys		all
+
+# old stuff
+#yast2-agent-ftp		inst-sys,default	ftp-install,you
+#yast2-agent-http	default			http-install,you
+#yast2-agent-ldap	?
+#yast2-agent-prom	inst-sys,default	sparc-only
+#yast2-agent-tftp	inst-sys		tftp-install, you
+#yast2-agent-curl	inst-sys		autoinstall,you
+#yast2-agent-you		default			you
+#yast2-lib-devel		-
+#yast2-newmodule		-			development
+#yast2-package-manager	default			runtime rpm manager
+#yast2-soho-lan		slcs			slcs network configuration
+#yast2-update		default			runtime update starter
+#yast2-vpn_ncp		vpnncp			vpn/ncp configuration

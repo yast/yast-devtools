@@ -525,7 +525,7 @@ sub make()
     if ( $do_make_makefile_cvs )
     {
 
-	log_progress( "\trm -rf autom4te.cache" );
+	log_info( "\trm -rf autom4te.cache" );
 	system_int( "rm -rf autom4te.cache >>$make_log 2>&1" );
 
 	log_progress( "\tmake -f Makefile.cvs" );

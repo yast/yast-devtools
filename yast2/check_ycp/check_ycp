@@ -610,9 +610,10 @@ sub check_imports()
 						# "g": enable repeated matches in while() loop
 	    )
     {
-	if (! defined ($imported{$1}))
+	my $p = pos( $ycp_code );
+	if (outside_literal_string ($ycp_code, $p) && !defined ($imported{$1}))
 	{
-	    my $line_no = count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+	    my $line_no = count_lines( $ycp_code, $p ) + 1;
 	    error( $line_no, "Used but not imported: $1" );
 	}
     }
@@ -1624,6 +1625,7 @@ sub outside_literal_string()
 {
     my ( $text, $pos ) = @_;
     my $count = count_unescaped( substr( $text, 0, $pos), '"' );
+    deb ("Quote count: $count");
 
     return ( $count % 2 == 0 ); # $pos is outside literal string,
 				# if even number of unescaped double quotes
@@ -1793,18 +1795,40 @@ sub count_unescaped()
     my ( $text, $search_char ) = @_;
     my $count = 0;
 
-    while ( $text =~ m{			# match
-			(		# either
-			    ^		#	beginning of substring (since last match)
-			|		# or
-			    [^\\]	#	something else than a backslash
-			)?		# followed by
-			$search_char	#	the character we are looking for
-		      }gx		# "g": search repeatedly in while() loop
-	    )				# "x": enable regexp comments
+    for (;;)
     {
-	$count++;
-	# print "\ncount_unescaped():\n" . substr( $text, 0, pos( $text ) ). "\n*****\ncount: $count\n\n";
+        # m/\G.../cg
+        # see perlop, Regexp Quote-Like Operators
+        # \G, start where last match left off,
+        # c: don't reset last match if this one failed
+        # g:match multiple times in loop
+	# s: dot matches newline
+
+	# distinguish $search_char, backslash and the rest
+
+	# always match something, otherwise exit loop
+	if    ($text =~ m{\G[^\\$search_char]+}cgs)
+	{
+	    # uninteresting
+	}
+	elsif ($text =~ m{\G\\.}cgs)
+	{
+	    # escaped anything is uninteresting,
+	    # including $search_char and bksl
+	}
+	elsif ($text =~ m{\G$search_char}cgs)
+	{
+	    # got it
+	    $count++;
+	}
+	elsif ($text =~ m{\G\\}cgs)
+	{
+	    dbg ("lonely backslash at end of matched text");
+	}
+	else
+	{
+	    last;
+	}
     }
 
     # print "\ncount_unescaped():\n$text\ncount: $count\n\n";

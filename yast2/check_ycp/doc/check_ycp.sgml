@@ -660,6 +660,8 @@ See the <ref id="widget-checks" name="intro"> of this section.
 
 <sect>Standardized Lib Function Checks
 
+<p>TODO update this WRT Label and Popup. --mvidner</p>
+
 <sect1>Duplicate Definitions of Wizard Lib Functions
 
 <sect2>What

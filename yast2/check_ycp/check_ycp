@@ -1180,9 +1180,11 @@ sub check_obsolete_function()
 {
     my ( $ycp_code, $obsolete_function, $replacement_function ) = @_;
 
+    # Assume no function in a Module:: is obsolete
+    # Otherwise it complains about Popup::ContinueCancel
     while ( $ycp_code =~
 	    m{
-		\W				# non-word character
+		[^:[:word:]]			# non-(qualified-word) char
 		$obsolete_function		# function name
 		\s*				# maybe followed by some whitespace
 		\(				# literal (

@@ -9,6 +9,7 @@ use Tie::Hash;
 use Tie::Array;
 use Getopt::Std;
 use File::Basename;
+use FileHandle;
 
 
 my $xml_output = "output.xml";
@@ -17,6 +18,7 @@ my $supported = "builtin|widget";
 my $prog;
 my ($filename,$filepath,$filesuffix);
 my $file_summary;
+my $screenshot_dir = "examples/screenshots";
 
 my $f = {};
 
@@ -61,6 +63,7 @@ sub scan_file ($)
             if ( /Summary:(.*)/ )
             {
                 $file_summary=$1;
+                $file_summary=~ s/^\s+//;
             }
             elsif( /\@(widget|builtin)(.*)/)
             {
@@ -100,6 +103,10 @@ sub parse_comments (@)
 
     my $lastwas = "";
 
+    my $oex = {};
+    $oex->{"example"} = "";
+    $oex->{"screenshot"} = "";
+
     my $oentry = {};
     $oentry->{"type"} = "";
     $oentry->{"name"} = "";
@@ -131,11 +138,17 @@ sub parse_comments (@)
     $entry->{"options"} = [$oentry];
     tie @{$entry->{"options"}}, "options";
 
+    $entry->{"properties"} = [$oentry];
+    tie @{$entry->{"properties"}}, "properties";
+
     $entry->{"examples"} = [];
     tie @{$entry->{"examples"}}, "examples";
     $entry->{"see"} = [];
     tie @{$entry->{"see"}}, "see";
     $entry->{"short"} = "";
+    $entry->{"note"} = [];
+    tie @{$entry->{"note"}}, "note";
+
     $entry->{"description"} = [];
     tie @{$entry->{"description"}}, "description";
     $entry->{"deprecated"} = "";
@@ -144,8 +157,10 @@ sub parse_comments (@)
     my @param_incomment = ();	# parameter descriptions
     my @option_incomment = ();	# option descriptions
     my @optarg_incomment = ();	# optarg descriptions
+    my @properties_collect = ();	# optarg descriptions
 
     my @description = ();
+    my @note = ();
     my @examples = ();
 
 
@@ -156,6 +171,7 @@ sub parse_comments (@)
     my $param_para = "";
     my $keepformat = 0;
     my $newpara = 0;
+    my $widget_name = "";
 
     my ($pre, $post);
 
@@ -226,8 +242,9 @@ sub parse_comments (@)
 	elsif ($line =~ /\@(widget|widgets)\s+(.*)/)
 	{
 	    $lastwas = "widget";
+            $widget_name = $2;
             my @w = ();
-            (@w) =  split( '\s+', $2);
+            (@w) =  split( '\s+', $widget_name);
             push @{$entry->{"names"}}, @w;
 	    $entry->{"type"} = "widget";
 	}
@@ -252,12 +269,48 @@ sub parse_comments (@)
 	elsif ($line =~ /\@class\s+(.*)/)
 	{
 	    $lastwas = "class";
-	    $entry->{"class"} = $1;
+            my $c = $1;
+            my @props;
+            if ( $c =~ '\(.*\)' )       # don't read Y(class-file).cc
+            {
+                # If we found a @class keyword with its contents in parentheses,
+                # this means we are not supposed to read a
+                # corresponding C++ source file (because there isn't one).
+
+                @props = ();
+                $c =~ s:\( *([^ ]*) *\):$1:
+            }
+            else        # read Yclass-file.cc
+            {
+                # Read the C++ source file corresponding to the widget class.
+                # Assume a file name Y*.cc for it.
+
+                @props = read_class_file ( $widget_name, $c );
+                foreach my $property ( @props )
+                {
+                    $oentry = {};     
+                    my @prop = split ( '\s+', $property, 3 );
+                    $oentry->{type} = $prop[0]; shift @prop;
+                    $oentry->{name} = $prop[0]; shift @prop;
+                    $oentry->{description} = $prop[0]; 
+                    push @properties_collect, $oentry;
+                }
+                push @{$entry->{"properties"}}, $oentry
+
+            }
+            $entry->{"class"} = $c;
+
 	}
 	elsif ($line =~ /\@short\s+(.*)/)
 	{
 	    $lastwas = "short";
 	    $entry->{"short"} = $1;
+	}
+	elsif ($line =~ /\@note\s+(.*)/)
+	{
+            $para = "";
+	    $lastwas = "note";
+            $para .= $1;
 	}
 	elsif ($line =~ /\@description\s+(.*)/ || $line =~ /\@description$/)
 	{
@@ -281,7 +334,18 @@ sub parse_comments (@)
             foreach my $e (split(/ /, $line)) {
                 if ($e ne '')
                 {
-                    push @examples, $e;
+                    $oex = ();
+                    my $screenshot = $e;
+                    $screenshot =~ s/\.ycp$/.png/;
+                    if ( -s "$screenshot_dir/$screenshot" )   # exists and non-zero size
+                    {
+                        $oex->{'example'} = $e;
+                        $oex->{'screenshot'} = $screenshot;
+                    } else {
+                        $oex->{'example'} = $e;
+                    }
+
+                    push @examples, $oex;
                 }
             }
 	}
@@ -339,6 +403,7 @@ sub parse_comments (@)
                     $newpara = 0;
                 } else {
                     $newpara = 1;
+                    push @optarg_incomment, $oentry;
                 }
             }
             else 
@@ -368,8 +433,6 @@ sub parse_comments (@)
             }
             my @a = ();
             my @b = ();
-
-
             if ($line eq "" || $newpara == 1 ) 
             { 
                 if ($newpara == 1)
@@ -380,6 +443,7 @@ sub parse_comments (@)
                     $newpara = 0;
                 } else {
                     $newpara = 1;
+                    push @option_incomment, $oentry;
                 }
             }
             else 
@@ -409,6 +473,7 @@ sub parse_comments (@)
                     $newpara = 0;
                 } else {
                     $newpara = 1;
+                    push @param_incomment, $oentry;
                 }
             }
             else 
@@ -436,11 +501,22 @@ sub parse_comments (@)
 	elsif($lastwas eq "examples")
         {
             $lastwas = "examples";
+            $oex = ();
 	    $line =~ s/\s+/ /; # remove empty spaces
             foreach my $e (split(/ /, $line)) {
                 if ($e ne '')
                 {
-                    push @examples, $e;
+                    my $screenshot = $e;
+                    $screenshot =~ s/\.ycp$/.png/;
+                    if ( -s "$screenshot_dir/$screenshot" )   # exists and non-zero size
+                    {
+                        $oex->{'example'} = $e;
+                        $oex->{'screenshot'} = $screenshot;
+                    } else {
+                        $oex->{'example'} = $e;
+                    }
+
+                    push @examples, $oex;
                 }
             }
         }
@@ -449,6 +525,32 @@ sub parse_comments (@)
             $lastwas = "short";
 	    $entry->{"short"} .= $line;
         }
+	elsif($lastwas eq "note")
+	{
+            $lastwas = "note";
+            if ($empty_line eq "")
+            { 
+                if ($para ne "")
+                {
+	            push @note, $para;
+                }
+                $para = "";
+            }
+            else 
+            {
+                if ($keepformat == 0)
+                {
+                    $line =~ s/^\s+//;
+                    if ($line ne '') {
+                        $para .= " $line";
+                    }
+                } 
+                else 
+                {
+                    $para .= "\n$line";
+                }
+            }
+	}
 	elsif($lastwas eq "short" || $lastwas eq "description")
 	{
             $lastwas = "description";
@@ -462,7 +564,17 @@ sub parse_comments (@)
             }
             else 
             {
-                $para .= " $line";
+                if ($keepformat == 0)
+                {
+                    $line =~ s/^\s+//;
+                    if ($line ne '') {
+                        $para .= " $line";
+                    }
+                } 
+                else 
+                {
+                    $para .= "\n$line";
+                }
             }
 	}
 	elsif ($lastwas == '')
@@ -477,6 +589,7 @@ sub parse_comments (@)
 
 
     push @{$entry->{"description"}}, @description;
+    push @{$entry->{"note"}}, @note;
     push @{$entry->{"examples"}}, @examples;
 
 
@@ -494,6 +607,119 @@ sub parse_comments (@)
 
     return @entries;
 }
+
+
+# Log a message to stderr.
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub warning()
+{
+    my $msg;
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+    }
+
+    print STDERR "\n";
+}
+
+# Read the widget class file.
+# Search through it for '@property' or '@properties' lines.
+#
+# Parameters:
+#	$widget_name	The widget name(s).
+#	$class_name	Widget C++ class name.
+#
+# Return value:
+#	A list of properties for the widget.
+
+sub read_class_file()
+{
+    my ( $widget_name, $class_name ) = @_;
+    my $line;
+    my $line_no = 0;
+    my $keyword;
+    my $contents;
+    my @prop;
+
+    if ( $class_name eq "" )
+    {
+        #warning ( "ERROR: Empty \@class specified for $widget_name" );
+	return @prop;
+    }
+
+    my $class_file = FileHandle->new();
+
+    my $class_file_name = $class_name . ".cc";
+    $class_file_name	= $filepath . "/" . $class_file_name unless $filepath eq "";
+
+    if ( ! open ( $class_file, $class_file_name ) )
+    {
+        #warning ( "ERROR: Can't open $class_file_name required for $widget_name" );
+	return @prop;
+    }
+
+
+    $line = <$class_file>;
+    $line_no++;
+
+    while ( $line )
+    {
+	# Check for '@xyz' keywords
+
+	if ( $line =~ '^\s*\*?\s*@.*' )
+	{
+	    # '@xyz' keyword found
+
+	    $line =~ s/^\s*\*?\s*@//;	# remove '  * @' at beginning of line
+	    ( $keyword, $contents ) = split ( '\s+', $line, 2 );
+
+
+	    # Read follow-up lines for contents
+
+	    $line = <$class_file>;
+	    $line_no++;
+
+	    while ( $line &&				# have one more line
+		    ! ( $line =~ '^\s*\*?\s*@.*' ) &&	# no '@xyz' line
+		    ! ( $line =~ '\s*\*/' ) )		# no */ line
+	    {
+		$line =~ s/^\s*\*?\s*//;	# remove '  * ' at beginning of line
+		$contents .= $line;
+		$line = <$class_file>;
+		$line_no++;
+	    }
+
+	    chomp ( $contents );
+
+	    if ( $keyword eq 'property'  ||
+		 $keyword eq 'properties'   )
+	    {
+		push @prop, $contents;
+	    }
+	    else
+	    {
+                #warning ( "$class_file_name:$line_no: " .
+                #	  "WARNING: Undefined keyword \@$keyword - ignored" );
+	    }
+        }
+        else
+        {
+	    # no keyword found
+
+	    $line = <$class_file>;
+        }
+    }
+
+    # $class_file will be closed automatically by its destructor.
+
+    return @prop;
+}
+
+
 
 sub main () 
 {
@@ -585,17 +811,24 @@ package entries;
 package description;
 @description::ISA = ("Tie::StdArray");
 
+package note;
+@note::ISA = ("Tie::StdArray");
+
 package odescription;
 @odescription::ISA = ("Tie::StdArray");
 
 package examples;
 @examples::ISA = ("Tie::StdArray");
 
+
 package parameters;
 @parameters::ISA = ("Tie::StdArray");
 
 package optargs;
 @optargs::ISA = ("Tie::StdArray");
+
+package properties;
+@properties::ISA = ("Tie::StdArray");
 
 package see;
 @see::ISA = ("Tie::StdArray");

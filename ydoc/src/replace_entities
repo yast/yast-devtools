@@ -6,6 +6,10 @@ sed -e "s@&lt;tt&gt;@<replaceable>@ig"  \
     -e "s@&lt;b&gt;@<emphasis>@ig" \
     -e "s@&lt;i&gt;@<emphasis>@ig" \
     -e "s@&lt;/i&gt;@</emphasis>@ig" \
+    -e "s@&lt;em&gt;@<emphasis>@ig" \
+    -e "s@&lt;/em&gt;@</emphasis>@ig" \
+    -e "s@&lt;/code&gt;@@ig" \
+    -e "s@&lt;code&gt;@@ig" \
     -e "s@&lt;/b&gt;@</emphasis>@ig" $1 > $tmpfile
 cp $tmpfile $1
 rm $tmpfile

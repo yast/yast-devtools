@@ -789,14 +789,14 @@ my $intro = "<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n"
     . "<BODY bgcolor=\"#c8c8c8\">\n"
     . "<TABLE WIDTH=\"100%%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation:</i>\n"
     . "<a href=\"index.html\"><b>%s</b></a></TD>\n"
-    . "<TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/ydoc/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
+    . "<TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
     . "<hr>\n<TABLE><TR><td valign=top align=center>\n"
-    . "<img src=\"/usr/share/doc/packages/ydoc/images/yast2-half.png\"><br><br>\n"
+    . "<img src=\"/usr/share/doc/packages/yast2-devtools/images/yast2-half.png\"><br><br>\n"
     . "%s<br>\n%s<br>\n%s\n</td>\n"
     . "<TD VALIGN=TOP><TD VALIGN=TOP>\n";
 
 my $outro = "</td></tr></table><HR>\n"
-    . "<TABLE WIDTH=\"100%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation </i></TD><TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/ydoc/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
+    . "<TABLE WIDTH=\"100%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation </i></TD><TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
     . "</BODY>\n</HTML>\n";
 
 my $infohead = "<p>\n"

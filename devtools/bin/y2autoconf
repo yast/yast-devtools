@@ -122,10 +122,7 @@ AC_SUBST(configdir)
 
     # init: prog
     "\@YAST2-INIT-PROGRAM\@" =>
-"# YAST2INC is obsolete
-YAST2INC=/usr/include/YaST2
-AC_SUBST(YAST2INC)
-",
+"",
 
     # init: translation
     "\@YAST2-INIT-PO\@" =>

@@ -42,9 +42,8 @@ if(size(Args()) > 0 && is(Args(0), string)) {
 y2debug("func=%1", func);
 y2debug("param=%1", param);
 
-/* Create a  summary*/
+/* Create a summary*/
 if(func == "Summary") {
-    XXPkgXX::Import(param);
     ret = select(XXPkgXX::Summary(), 0, "");
 }
 /* Reset configuration */
@@ -54,8 +53,11 @@ else if (func == "Reset") {
 }
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
-    XXPkgXX::Import(param);
     ret = XXPkgXXAutoSequence();
+}
+/* Import configuration */
+else if (func == "Import") {
+    ret = XXPkgXX::Import(param);
 }
 /* Return actual state */
 else if (func == "Result") {
@@ -64,9 +66,8 @@ else if (func == "Result") {
 /* Write givven settings */
 else if (func == "Write") {
     import "Progress";
-    XXPkgXX::write_only = true;
-    XXPkgXX::Import(param);
     Progress::off();
+    XXPkgXX::write_only = true;
     ret = XXPkgXX::Write();
     Progress::on();
 }

@@ -33,6 +33,9 @@ extra_COPYRIGHT_files =  $(if $(HAS_GPL_LICENSE), $(COPYRIGHT_files_gpl), $(COPY
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 
+Makefile.am.common: $(DEVTOOLS_DIR)/admin/Makefile.am.common
+	cmp -s $< $@ || cp -f $< $@
+
 # create bzip2ed tar and make some sanity checks
 $(RPMNAME)-$(VERSION).tar.bz2: checkpo dist-bzip2
 	@if [ `bunzip2 -c $(RPMNAME)-$(VERSION).tar.bz2 | wc --bytes` = 0 ] ; then \

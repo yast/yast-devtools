@@ -46,6 +46,7 @@ fi
 #
 
 template=$y2adminpath/Makefile.am.toplevel
+common=$y2adminpath/Makefile.am.common
 
 RPMNAME=`cat ./RPMNAME`
 
@@ -76,8 +77,12 @@ fi
 #     mv Makefile.am ${result}.old
 # fi
 
+echo "${self}: Creating common Makefile.am"
+cp -f $common Makefile.am.common
+chmod u+w Makefile.am.common
+
 echo "${self}: Generating toplevel Makefile.am"
-cp $template Makefile.am
+cp -f $template Makefile.am
 chmod u+w Makefile.am
 
 test -z "$comment" || echo "# $comment" >>Makefile.am

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Dec  3 11:17:50 CET 2003 - msvec@suse.cz
+
+- added placeholder for common Makefile.am
+- 2.9.2
+
+-------------------------------------------------------------------
 Fri Nov 28 10:30:03 CET 2003 - ma@suse.de
 
 - builtindoc: allow comment end to contain more than one '*';

@@ -153,7 +153,7 @@ install-data-local: $(if $(IS_DEVTOOLS),,install-pot)
 
 # TODO "if which y2tool" will be improved when we will have a generated
 #      configure.in...
-package-local: $(RPMNAME)-$(VERSION).tar.bz2
+package-local: check-parse $(RPMNAME)-$(VERSION).tar.bz2
 	rm -f package/$(RPMNAME)-*.tar.bz2
 	rm -f package/*~
 	rm -f package/*.bak
@@ -161,7 +161,7 @@ package-local: $(RPMNAME)-$(VERSION).tar.bz2
 	mv $(RPMNAME)-$(VERSION).tar.bz2 package
 	if which y2tool 2>/dev/null ; then here=`pwd`; cd $(srcdir) && y2tool create-spec < $(RPMNAME).spec.in > $$here/package/$(RPMNAME).spec ; fi
 
-package: check-cvs-up-to-date check-tagversion check-parse check-all-packages package-local
+package: check-cvs-up-to-date check-tagversion check-all-packages package-local
 
 TAGVERSION	 = y2tool tagversion
 CHECKIN_BASE_DIR = /work/src/done
@@ -173,8 +173,11 @@ check-tagversion:
 	@cd $(srcdir) && cvs -q up -p -r `$(TAGVERSION) -n` VERSION >/dev/null || ( echo "ERROR: Please run 'tagversion' first"; false )
 
 check-parse:
-	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "yast2-core" ]; then	\
-		parseycp -q -R;	\
+	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "yast2-core" ] ; then \
+		echo "Running parseycp..." ; \
+		parseycp -q -R ; \
+	else \
+		echo "Not running parseycp." ; \
 	fi
 
 check-all-packages:

@@ -104,7 +104,7 @@ autoreconf --force --install
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir}
+./configure --libdir=%{_libdir} --mandir=%{_mandir}
 make",
 
     "\@BUILD-QT\@" =>
@@ -116,7 +116,7 @@ autoreconf --force --install
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib}
+./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
 make",
 
     "\@BUILD-PO\@" =>
@@ -173,6 +173,7 @@ make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
     "\@docdir\@" => "/usr/share/doc/packages/$RPMNAME",
     "\@logdir\@" => "/var/log/YaST2",
     "\@vardir\@" => "/var/lib/YaST2",
+    "\@mandir\@" => "%{_mandir}",
 
     "\@execcompdir\@" => "/usr/lib/YaST2",
     "\@agentdir\@" => "${execcompdir}/servers_non_y2",

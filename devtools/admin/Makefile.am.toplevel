@@ -83,6 +83,23 @@ EXTRA_DIST = \
 show-extra-dist:
 	@echo $(EXTRA_DIST)
 
+# info '(automake)Conditionals'
+if CREATE_PKGCONFIG
+# pkg-config
+# if a package does not have its own pc, copy the generic one
+$(RPMNAME).pc.in: $(DEVTOOLS_DIR)/admin/generic.pc.in
+	test -f $@ || cp -p $< $@
+# create the file here instead of by configure
+# because the prerequisite is made here
+# and we don't want any paths in y2autoconf
+# info '(autoconf)config.status Invocation'
+$(RPMNAME).pc: $(RPMNAME).pc.in
+	./config.status --file=$@:$<
+
+pkgconfig_DATA = $(RPMNAME).pc
+EXTRA_DIST += $(RPMNAME).pc.in
+endif
+
 dist-hook:
 	@for I in $(extra_COPYRIGHT_files) ;					\
 	do									\
@@ -189,7 +206,6 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(PACKAGE_TARNAME)-$
 package: check-cvs-up-to-date check-tagversion check-all-packages package-local
 
 TAGVERSION	 = $(PREFIX)/bin/y2tool tagversion
-CHECKIN_BASE_DIR = /work/src/done
 
 check-cvs-up-to-date:
 	cd $(srcdir) && ! cvs -q -n up 2>/dev/null | grep '^[MCAR] '

@@ -44,5 +44,6 @@ EOF
 @ybindir@
 %dir %{prefix}/share/YaST2
 @ydatadir@
-/usr/share/aclocal/*.m4
+%{prefix}/share/aclocal/*.m4
+@pkgconfigdir@/@RPMNAME@.pc
 %doc @docdir@

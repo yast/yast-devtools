@@ -1,5 +1,5 @@
 #! /usr/bin/perl -w
-#####
+my $message = << 'END';
 #y2autoconf [-h|--help]
 #
 #Create YaST2 configure.in from configure.in.in
@@ -22,7 +22,7 @@
 #  @YAST2-CHECKS-TESTSUITE@ - Checks for expect and dejagnu
 #
 #  @YAST2-OUTPUT@           - Creates list of Makefiles to be generated
-#####
+END
 #Authors:
 #  Jan Holesovsky <kendy@suse.cz>, 2001
 #  Michal Svec <msvec@suse.cz>
@@ -31,9 +31,8 @@
 
 if ($#ARGV >= 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help"))
 {
-    # Isn't the following too anti-perl? :-)
-    my $message = `sed -e '/^#####/,/^#####/!d' -e 's/^#*//' $0`;
-    die "$message";
+    $message =~ s/^#//gm;	# there used to be sed here
+    die $message;
 }
 
 $RPMNAME = `cat RPMNAME`;
@@ -65,7 +64,7 @@ dnl Check for presence of file 'RPMNAME'
 AC_CONFIG_SRCDIR([RPMNAME])
 
 dnl Checking host/target/build systems, for make, install etc.
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 dnl Perform program name transformation
 AC_ARG_PROGRAM
 
@@ -78,9 +77,12 @@ VERSION=\"$VERSION\"
 RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
 ". '
+dnl pkgconfig honors lib64
+pkgconfigdir=\${libdir}/pkgconfig
 yast2dir=\${prefix}/share/YaST2
 
 ybindir=\${prefix}/lib/YaST2/bin
+# FIXME duplicates execcompdir
 ystartupdir=\${prefix}/lib/YaST2
 plugindir=\${libdir}/YaST2/plugin
 includedir=\${prefix}/include/YaST2
@@ -114,6 +116,8 @@ AC_SUBST(STYLESHEET_HTML)
 AC_SUBST(STYLESHEET_PDF)
 AC_SUBST(STYLESHEET_CSS)
 AC_SUBST(STYLESHEET_YDOC)
+
+AC_SUBST(pkgconfigdir)
 
 AC_SUBST(yast2dir)
 
@@ -151,8 +155,10 @@ dnl Y2TEXTDOMAIN=`cat ${srcdir}/Y2TEXTDOMAIN`
 dnl AC_SUBST(ALL_LINGUAS)
 dnl AC_SUBST(Y2TEXTDOMAIN)
 
-AC_ARG_WITH(own_compendium, [  --with-own_compendium=FILE  Location of compendium file],
-   y2compendium=yes, y2compendium=no)
+AC_ARG_WITH(own_compendium,
+	    AS_HELP_STRING([--with-own_compendium=FILE],
+			   [Location of compendium file]),
+	    y2compendium=yes, y2compendium=no)
 if test "x$with_own_compendium" = "x" ; then
   COMPENDIUM=\'../../memory/yast2.$(LL).po\'
 else
@@ -173,16 +179,32 @@ INSTALL="${INSTALL} -p"
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-AC_PROGRAM_PATH(XGETTEXT, xgettext)
+dnl pkgconfig
+AC_ARG_VAR([PKG_CONFIG_PATH], [where to search for pkg-config files])
+dnl devtools
+dnl ...
+
+dnl no need for AC_ARG_VAR
+AC_PATH_PROG(XGETTEXT, xgettext)
 if test -z "$XGETTEXT" ; then
     AC_MSG_ERROR(xgettext is missing; please install gettext.)
 fi
-AC_SUBST(XGETTEXT)
+
+devtools_ybindir=`pkg-config --variable=ybindir yast2-devtools`
+
+dnl producing pkg-config for others?
+AM_CONDITIONAL(CREATE_PKGCONFIG, test x${CREATE_PKGCONFIG} = xtrue)
 ',
 
     # check: program
     '@YAST2-CHECKS-PROGRAM@' =>
-'AC_PROG_CXX
+'
+AC_PATH_PROG(YDOXYGEN, ydoxygen, false, $PATH:$devtools_ybindir)
+if test "$YDOXYGEN" = "false"; then
+    AC_MSG_ERROR([ydoxygen is not installed])
+fi
+
+AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
@@ -198,7 +220,7 @@ AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL dnl for libraries
 
 dnl generate the config header
-AM_CONFIG_HEADER(config.h) dnl at the distribution this done
+AC_CONFIG_HEADERS([config.h]) dnl at the distribution this done
 
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
@@ -210,10 +232,12 @@ AC_HEADER_STDC
 QTDIR="/usr/lib/qt3"
 QTLIBDIR="/usr/lib/qt3/lib"
 AC_ARG_WITH(qt-dir,
-    [ --with-qt-dir=DIR       where the root of Qt is installed.],
+    AS_HELP_STRING([--with-qt-dir=DIR],
+		   [where the root of Qt is installed.]),
     [ QTDIR="$withval" ])
 AC_ARG_WITH(qt-libdir,
-    [ --with-qt-libdir=DIR    where the Qt library is installed.],
+    AS_HELP_STRING([--with-qt-libdir=DIR],
+		   [where the Qt library is installed.]),
     [ QTLIBDIR="$withval" ])
 AC_SUBST(QTDIR)
 AC_SUBST(QTLIBDIR)
@@ -221,10 +245,10 @@ AC_SUBST(QTLIBDIR)
 dnl Try to find the X includes and libraries
 AC_PATH_X
 if test -n "$x_includes"; then
-        CPPFLAGS="$CPPFLAGS -I$x_includes"
+	CPPFLAGS="$CPPFLAGS -I$x_includes"
 fi
 if test -n "$x_libraries"; then
-        LDFLAGS="$LDFLAGS -L$x_libraries"
+	LDFLAGS="$LDFLAGS -L$x_libraries"
 fi
 ',
 
@@ -233,35 +257,32 @@ fi
 'dnl Check packages expect and dejagnu
 AC_PATH_PROG(MYEXPECT, expect, false)
 if test "$MYEXPECT" = "false"; then
-        AC_MSG_ERROR([expect not installed])
+	AC_MSG_ERROR([expect not installed])
 fi
 AC_PATH_PROG(MYRUNTEST, runtest, false)
 if test "$MYRUNTEST" = "false"; then
-        AC_MSG_ERROR([dejagnu not installed])
+	AC_MSG_ERROR([dejagnu not installed])
 fi
 ',
 
     # check: translations
     '@YAST2-CHECKS-PO@' =>
 'dnl searches for some needed programs
-AC_PROGRAM_PATH(MSGFMT, msgfmt, no, /usr/bin)
+AC_PATH_PROG(MSGFMT, msgfmt, no, /usr/bin)
 if test x$MSGFMT != x"/usr/bin/msgfmt"; then
   AC_MSG_ERROR(msgfmt is missing; please install gettext.)
 fi
-AC_SUBST(MSGFMT)
-AC_PROGRAMS_PATH(MSGCAT, msgcat pmsgcat, no)
+AC_PATH_PROGS(MSGCAT, msgcat pmsgcat, no)
 if test x$MSGCAT = xno; then
   AC_MSG_ERROR(msgcat is missing; please install gettext-0.11pre or better.)
 fi
-AC_SUBST(MSGCAT)
 
-AC_PROGRAM_PATH(MSGMERGE, msgmerge, no, /usr/bin)
+AC_PATH_PROG(MSGMERGE, msgmerge, no, /usr/bin)
 if test x$MSGMERGE != x"/usr/bin/msgmerge"; then
   AC_MSG_ERROR(msgmerge is missing; please install gettext.)
 fi
-AC_SUBST(MSGMERGE)
 
-AC_PROGRAM_PATH(MSGCONV, msgconv, no, /usr/bin)
+AC_PATH_PROG(MSGCONV, msgconv, no, /usr/bin)
 if test x$MSGCONV != x"/usr/bin/msgconv"; then
   AC_MSG_ERROR(msgconv is missing; please install gettext.)
 fi
@@ -269,9 +290,13 @@ fi
 
     # check: YCP sources
     '@YAST2-CHECKS-YCP@' =>
-'AC_PATH_PROG(YCPDOC, ycpdoc, false, $PATH:/usr/lib/YaST2/bin)
+'AC_PATH_PROG(YCPDOC, ycpdoc, false, $PATH:$devtools_ybindir)
 if test "$YCPDOC" = "false"; then
     AC_MSG_ERROR([ycpdoc is not installed])
+fi
+AC_PATH_PROG(YCPMAKEDEP, makedep.sh, false, $PATH:$devtools_ybindir)
+if test "$YCPMAKEDEP" = "false"; then
+    AC_MSG_ERROR([ycp makedep.sh is not installed])
 fi
 ',
 

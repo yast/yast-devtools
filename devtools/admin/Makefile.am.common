@@ -13,7 +13,7 @@ CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 
 # generate dependencies
 .dep: $(wildcard *.ycp)
-	$(ybindir)/makedep.sh > .new.dep
+	${YCPMAKEDEP} > .new.dep
 	mv .new.dep .dep
 
 dist-hook: check-syntax

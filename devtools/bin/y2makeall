@@ -520,7 +520,7 @@ sub make()
 
     # Check if "make -f Makefile.cvs" must be performed.
     # Even if command line option "-f" (fast mode - sets $disable_make_makefile_cvs)
-    # is given , it still needs to be done if there is no toplevel Makefile.
+    # is given, it still needs to be done if there is no toplevel Makefile.
 
     my $do_make_makefile_cvs = 1;
     $do_make_makefile_cvs = 0 if $disable_make_makefile_cvs;

@@ -158,7 +158,7 @@ package-local: check-parse $(RPMNAME)-$(VERSION).tar.bz2
 	rm -f package/*~
 	rm -f package/*.bak
 	rm -f package/*.auto
-	mv $(RPMNAME)-$(VERSION).tar.bz2 package
+	mv $(RPMNAME)-$(VERSION).tar.bz2 package/
 	if which y2tool 2>/dev/null ; then \
 	    here=`pwd`; \
 	    cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \

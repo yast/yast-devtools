@@ -34,7 +34,7 @@ function append_lines()
 #
 
 self=`basename $0`
-y2adminpath=/usr/share/YaST2/devtools/admin
+y2adminpath=/usr/share/YaST2/data/devtools/admin
 
 if [ "$1" == "--bootstrap" ]; then
     y2adminpath=$2

@@ -7,7 +7,7 @@
 #
 
 self=`basename $0`
-y2toolpath=/usr/share/YaST2/devtools/bin
+y2toolpath=/usr/share/YaST2/data/devtools/bin
 cmd=$1
 shift
 

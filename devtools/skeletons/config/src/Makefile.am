@@ -2,21 +2,21 @@
 # Makefile.am for devtools/devtools/skeletons/config/src
 #
 
-clients_DATA =			\
+client_DATA =			\
 	XXpkgXX.ycp		\
 	XXpkgXX_auto.ycp	\
 	XXpkgXX_proposal.ycp	\
 	XXpkgXX_write.ycp
 
-include_DATA =			\
+ynclude_DATA =			\
 	helps.ycp		\
 	misc.ycp		\
 	ui.ycp
 
-condig_DATA =			\
+config_DATA =			\
 	XXpkgXX.y2cc
 
-modules_DATA =			\
+module_DATA =			\
 	XXPkgXX.ycp
 
-EXTRA_DIST = $(clients_DATA) $(include_DATA) $(config_DATA) $(modules_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA)

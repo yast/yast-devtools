@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jul  3 18:00:42 CEST 2002 - msvec@suse.cz
+
+- use /usr/share
+- 2.6.4
+
+-------------------------------------------------------------------
 Wed Jul  3 10:55:44 CEST 2002 - ke@suse.de
 
 - For trans modules use @localedir@ instead of @YAST2DIR@/locale.

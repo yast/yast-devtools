@@ -219,7 +219,7 @@ Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check",
 [ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\""
 );
 
-my $yast2dir = "/usr/lib/YaST2";
+my $yast2dir = "/usr/share/YaST2";
 my $execcompdir = "/usr/lib/YaST2";
 
 # And some tiny macros. Must be separate since the big macros contain them.

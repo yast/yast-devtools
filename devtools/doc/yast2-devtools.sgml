@@ -71,7 +71,7 @@ toplevel <tt/Makefile.am/ files is the "<tt/SUBDIRS =/" line. This line is
 moved to a <ref id="subdirs" name="separate file SUBDIRS"> in the
 package's toplevel directory, much like <tt/RPMNAME/, <tt/VERSION/,
 <tt/MAINTAINER/ etc. - the rest of <tt/Makefile.am/ is copied from a common
-path <tt>/usr/share/YaST2/devtools/admin</tt>. Thus, changes that should affect
+path <tt>/usr/share/YaST2/data/devtools/admin</tt>. Thus, changes that should affect
 all of YaST2's toplevel <tt/Makefile.am/ files are much easier to do and all
 YaST2 modules can benefit from them without the need to change (i.e. <tt/cvs
 up/, edit, <tt/cvs ci/) all of over 85 individual files.
@@ -100,7 +100,7 @@ If you haven't done that yet, install the devtools - see the
 </p>
 
 <p>
-If you are not sure, check <tt>/usr/share/YaST2/devtools</tt> - if you don't
+If you are not sure, check <tt>/usr/share/YaST2/data/devtools</tt> - if you don't
 have that directory, the devtools are not installed.
 </p>
 
@@ -306,7 +306,7 @@ for that is slightly different, though: The resulting <tt/Makefile.am/ is
 combined from <tt/Makefile.am.top/, <tt/Makefile.am.center/, and
 <tt/Makefile.am.bottom/. The top and bottom files are used from the current
 project, if there is such a file; otherwise, all files are taken from
-<tt>/usr/share/YasT2/devtools/admin/po</tt>. The center part is <bf>always</bf>
+<tt>/usr/share/YaST2/data/devtools/admin/po</tt>. The center part is <bf>always</bf>
 taken from there.
 </p>
 
@@ -790,7 +790,7 @@ want to change the execution order.
 <p>
 This is just a workaround to avoid cluttering the system namespace. This
 <tt/y2tool/ script is a simple wrapper that calls a script or program from
-<tt>/usr/share/YaST2/devtools/bin</tt> - you might as well extend your
+<tt>/usr/share/YaST2/data/devtools/bin</tt> - you might as well extend your
 <tt/$PATH/ environment variable to include that path.
 </p>
 

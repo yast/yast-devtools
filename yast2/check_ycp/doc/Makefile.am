@@ -2,7 +2,6 @@
 # Makefile.am for devtools/yast2/check_ycp/doc
 #
 
-docdir	= 	@YAST2DOC@
 sgmldir	=	$(docdir)
 htmldir	=	$(docdir)/html
 

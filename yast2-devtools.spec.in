@@ -1,78 +1,57 @@
-#
-# spec file for package @RPMNAME@
-#
-# Copyright  (c)  2001  SuSE GmbH  Nuernberg, Germany.
-#
-# please send bugfixes or comments to @MAINTAINER@
+@HEADER-COMMENT@
+# neededforbuild sgmltool gpp libgpp
 
-# neededforbuild  autoconf automake sgmltool
+@HEADER@
+Requires:	yast2
 
-Vendor:       SuSE GmbH, Nuernberg, Germany
-Distribution: SuSE Linux 8.0 (i386)
-Name:         @RPMNAME@
-Release:      1
-Copyright:    (c) 2001 SuSE GmbH
-Group:	      System Environment/YaST
+Summary:	YaST2 development tools
 
-Packager:     @MAINTAINER@
-
-Summary:      YaST2 Develompent tools
-Version:      @VERSION@
-Source:       @RPMNAME@-@VERSION@.tar.bz2
 BuildArchitectures: noarch
 
 %description
 -
 
-%prep
+@PREP@
 
-%setup -n @RPMNAME@-@VERSION@
+@BUILD@
 
-%build
+#%build
+#./devtools/bin/y2automake --bootstrap ./devtools/admin
+#autoreconf --force --install
+#%{?suse_update_config:%{suse_update_config -f}}
+#./configure
+#make
 
-./devtools/bin/y2automake --bootstrap ./devtools/admin
-autoreconf --force --install
-
-%{?suse_update_config:%{suse_update_config -f}}
-./configure
-make
-
-%install
-
-make install-strip
-
-# devtools
+@INSTALL@
 
 %files
 %defattr(-,root,root)
 /usr/bin/y2tool
-/usr/share/YaST2/devtools
-%doc /usr/share/doc/packages/yast2-devtools
+%doc @docdir@
 
-# ycpdoc
-
-/usr/lib/YaST2/bin/ycpdoc
+%dir @ydatadir@/devtools
+@ydatadir@/devtools/*
 
 # ydoc
-#%doc @docdir@/images/*.png
-/usr/lib/YaST2/bin/ydoc
-/usr/lib/YaST2/bin/builtindoc
-/usr/lib/YaST2/bin/makehtml
-/usr/lib/YaST2/bin/makedocs
-/usr/lib/YaST2/bin/makebuiltindocs
-/usr/lib/YaST2/bin/ydocHTML.pm
-/usr/lib/YaST2/bin/Ast.pm
-/usr/lib/YaST2/bin/installmo
-/usr/lib/YaST2/bin/makemo
-/usr/lib/YaST2/bin/makepot
-/usr/lib/YaST2/bin/updatepo
-/usr/lib/YaST2/bin/po-insert
-/usr/lib/YaST2/bin/recode_po_file_to_utf
-/usr/lib/YaST2/bin/recode_subdir_po_to_po_utf
-/usr/lib/YaST2/bin/ycp_puttext
-/usr/lib/YaST2/bin/y2_localize
+@ybindir@/ydoc
+@ybindir@/builtindoc
+@ybindir@/makehtml
+@ybindir@/makedocs
+@ybindir@/makebuiltindocs
+@ybindir@/ydocHTML.pm
+@ybindir@/Ast.pm
+@ybindir@/installmo
+@ybindir@/makemo
+@ybindir@/makepot
+@ybindir@/updatepo
+@ybindir@/po-insert
+@ybindir@/recode_po_file_to_utf
+@ybindir@/recode_subdir_po_to_po_utf
+@ybindir@/ycp_puttext
+@ybindir@/y2_localize
+
+# ycpdoc
+@ybindir@/ycpdoc
 
 # scrdoc
-
-/usr/lib/YaST2/bin/scrdoc
-
+@ybindir@/scrdoc

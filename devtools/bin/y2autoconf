@@ -77,7 +77,7 @@ VERSION=\"$VERSION\"
 RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
 
-yast2dir=\\\${prefix}/lib/YaST2
+yast2dir=\\\${prefix}/share/YaST2
 
 ybindir=\\\${prefix}/lib/YaST2/bin
 plugindir=\\\${libdir}/YaST2/plugin

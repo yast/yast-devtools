@@ -5,6 +5,7 @@ configure: all
 	./configure
 
 all:
+	./devtools/bin/y2autoconf --bootstrap ./devtools/admin
 	./devtools/bin/y2automake --bootstrap ./devtools/admin
 	autoreconf --force --install
 

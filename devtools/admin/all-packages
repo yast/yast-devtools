@@ -48,6 +48,7 @@ yast2-country		default			keyboard,language,timezone
 yast2-firewall		default			firewall
 yast2-firewall-cd	firewall		firewall CD
 yast2-imap-server	email			IMAP server
+yast2-openteam-server	email			SuSE Linux Openteam Server
 yast2-inetd		default			inetd editor
 yast2-ldap-client	default			ldap client
 yast2-mail		default			mail

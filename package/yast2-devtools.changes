@@ -2,6 +2,7 @@
 Wed Jan 12 19:09:54 CET 2005 - nashif@suse.de
 
 - Updated testsuite and fixed ycpdoc to not add <pre> in xml output
+- 2.11.5
 
 -------------------------------------------------------------------
 Wed Jan 12 16:49:37 CET 2005 - mvidner@suse.cz
@@ -9,7 +10,6 @@ Wed Jan 12 16:49:37 CET 2005 - mvidner@suse.cz
 - Added ycpmakedep to replace makedep.sh (#42675).
   It considers includes (even with -I, -M options).
 - Updated stylesheets and stuff (nashif).
-- 2.11.5
 
 -------------------------------------------------------------------
 Fri Jan 07 11:40:01 CET 2005 - arvin@suse.de

@@ -1224,7 +1224,9 @@ sub check_obsolete_definition()
 						# "g": enable repeated matches in while() loop
 	    )
     {
-	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+	my $p = pos( $ycp_code );
+	next unless outside_literal_string( $ycp_code, $p );
+	my $line_no	= count_lines( $ycp_code, $p ) + 1;
 
 	warning( $line_no, "\'define $function_name()\' probably obsolete" );
     }
@@ -1259,7 +1261,9 @@ sub check_obsolete_function()
 						# "g": enable repeated matches in while() loop
 	    )
     {
-	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+	my $p = pos( $ycp_code );
+	next unless outside_literal_string( $ycp_code, $p );
+	my $line_no	= count_lines( $ycp_code, $p ) + 1;
 
 	my $msg = "Obsolete function \'$obsolete_function()\'";
 
@@ -1345,6 +1349,7 @@ sub check_predefined_message()
 						# "g": enable repeated matches in while() loop
 	    )
     {
+	# no outside_literal_string necessary
 	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
 
 	warning( $line_no, "Found predefined message: \"$message\" - replace with \'$replacement_function\'" );

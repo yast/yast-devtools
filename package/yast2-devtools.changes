@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan 30 11:33:02 CET 2004 - visnov@suse.cz
+
+- use "install -p" for installing files to preserve modification time
+  (fixes perl modules timestamps) 
+
+-------------------------------------------------------------------
 Thu Jan 29 18:09:51 CET 2004 - mvidner@suse.cz
 
 - create-spec: set DESTDIR also for "make check",

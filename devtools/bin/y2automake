@@ -78,6 +78,7 @@ fi
 
 echo "${self}: Generating toplevel Makefile.am"
 cp $template Makefile.am
+chmod u+w Makefile.am
 
 test -z "$comment" || echo "# $comment" >>Makefile.am
 echo "SUBDIRS = $subdirs" >>Makefile.am

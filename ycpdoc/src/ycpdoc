@@ -243,7 +243,7 @@ my $g;
 #   return (description) @ref expanded
 #   type   (variable type or return type)
 #   parameters: list of maps
-#   signature => formatted name (and parameters)
+#   signature => formatted name (and parameters) FIXME: filled only by html
 #   since => version
 #   see => list of "see" strings
 #   scruple => [ name, "blahblah...\nblahhy" ] # will be <pre>'d, @ref expanded
@@ -1360,6 +1360,7 @@ sub dump_data
 	my $t = tied(%{$node});
 	foreach (sort keys %{$node})
 	{
+	    next if (!defined $node->{$_} || $node->{$_} eq "");
 	    if (defined ($t))
 	    {
 		$writer->startTag (ref ($t)."_item", "key" => $_);

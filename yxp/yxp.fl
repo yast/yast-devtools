@@ -1,0 +1,458 @@
+%{
+/* $Id$ */
+#include <stdlib.h>
+#include <string.h>
+#include <libxml/tree.h>
+#define YYSTYPE xmlNodePtr
+extern xmlDocPtr thedoc;
+xmlNodePtr ignore=0, strsrc=0, strval=0;
+int ignore_ws = 0;
+#include "yxp.tab.h"
+
+int yylineno = 1;
+
+ void /*YYLTYPE*/ make_node (const char *tag, const char *content) {
+     static char linebuf[20];
+     yylval = xmlNewDocNode (thedoc, NULL, tag, NULL);
+     snprintf (linebuf, 20, "%d", yylineno);
+     xmlNewProp (yylval, "line", linebuf);
+     if (ignore) {
+	 xmlAddChild(yylval, (xmlNodePtr)ignore);
+	 ignore = 0;
+     }
+     xmlNodeAddContent(yylval, content);
+ }
+
+#define LEXXML(TOKEN) \
+	make_node (#TOKEN, yytext); \
+	return TOKEN;
+#define LEXXMLTEXT(TOKEN,TEXT) \
+	make_node (#TOKEN, TEXT); \
+	return TOKEN;
+#define LEXXMLCHAR \
+	make_node ("CHAR", yytext); \
+	return *yytext;
+#define IGNORE \
+	do { \
+	  if (! ignore_ws) \
+	  { \
+	    if (ignore) \
+	        xmlNodeAddContent (ignore, yytext); \
+	    else \
+		ignore = xmlNewDocNode(thedoc, NULL, "IGNORE", strdup(yytext)); \
+	  } \
+	} while (0) \
+	/**/
+
+    char *scandata_buffer_ptr;
+
+    /**
+     * Used for string constant scanning
+     */
+    char *scandata_buffer;
+
+    /**
+     * Used for string constant scanning
+     */
+    int scandata_buffer_size;
+
+#define STRING_HUNK 1024
+
+    char *extend_scanbuffer(int addsize)
+{
+    if (scandata_buffer_size == 0)
+	scandata_buffer = 0;
+
+    if (addsize > scandata_buffer_size)
+	addsize = scandata_buffer_size;
+
+    if (addsize < STRING_HUNK)
+	addsize = STRING_HUNK;
+
+    scandata_buffer = (char *)realloc (scandata_buffer, scandata_buffer_size + addsize);
+    if (scandata_buffer == 0)
+    {
+/*
+	y2error ("Scanner: no memory, bailing out");
+*/
+	return 0;
+    }
+    scandata_buffer_size += addsize;
+    return scandata_buffer;
+}
+
+/*
+//#define DEBUG_SCANNER
+#ifndef DEBUG_SCANNER
+#define debug_scanner nix
+#else
+#define debug_scanner printf
+#endif
+
+static void nix(...) { }
+
+static inline unsigned
+fromhex(char hex)
+{
+    if      (isdigit(hex)) return (unsigned)(hex - '0');
+    else if (islower(hex)) return (unsigned)(hex - 'a' + 10);
+    else                   return (unsigned)(hex - 'A' + 10);
+}
+
+#include "YCPScanner.h"
+
+static char *scanner_token;
+
+#define RESULT(val,type) setScannedValue(val, yylineno); scanner_token = yytext; return type
+*/
+%}
+
+%option noyywrap
+%x bybl str comment
+
+LETTER	[a-z][A-Z]
+ODIGIT	[0-7]
+DIGIT	[0-9]
+HDIGIT	[0-9][a-f][A-F]
+SYMBOL [[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*
+PATHSEGMENT [[:alnum:]_-]+|\"([^\\"]*(\\.)*)+\"
+		/* " */
+
+%%
+
+^[\t ]*#.*$			{ IGNORE; /* Ignore Unix style Comments */ }
+\/\*				{ BEGIN (comment); IGNORE;}
+<comment>\n			{ yylineno++; IGNORE; }
+<comment>\*\/			{ BEGIN (INITIAL); IGNORE; }
+<comment>[^\n*]+		{ IGNORE; }
+<comment>.			{ IGNORE; }
+
+\/\/.*$				{ IGNORE; /* Ignore C++ style comments */ }
+\n				{ /* Ignore newlines  */
+				  IGNORE;
+				  yylineno++; }
+[\f\t\r\v ]+			{ IGNORE; /* Ignore Whitespaces */ }
+
+  /* -- constants  */
+
+	/* floating point constant  */
+
+[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?|[0-9]+[eE][+-]?[0-9]+ {
+    LEXXML(YCP_FLOAT)
+	}
+
+	/* integer constant  */
+
+[1-9][0-9]* {
+    LEXXML(YCP_INTEGER)
+	}
+
+	/* octal constant  */
+
+0[0-7]* {
+    LEXXML(YCP_INTEGER)
+	}
+
+	/* hexadecimal constant  */
+
+0x[0-9A-Fa-f]+ {
+    LEXXML(YCP_INTEGER)
+	}
+
+	/* -- double colon  */
+
+::	{     LEXXML(DCOLON) }
+
+
+	/* -- byteblock  */
+
+	/* byteblock prefix  */
+
+\#\[    {
+	  BEGIN (bybl);
+	}
+
+	/* byteblock suffix  */
+
+<bybl>\] {
+	  BEGIN (INITIAL);
+	  /* byteblocks are boring, ignore them */
+	  LEXXMLTEXT(YCP_BYTEBLOCK,"foo");
+	}
+
+	/* byteblock data  */
+
+<bybl>([0123456789ABCDEFabcdef][0123456789ABCDEFabcdef])+ {
+	};
+
+<bybl>[\t\r ]+ {
+	  /* Ignore Whitespaces */
+	}
+
+<bybl>\n {
+	  /* Ignore Newline */
+	  yylineno++;
+	}
+
+<bybl>. {
+/*          logError("bad character in byteblock constant", yylineno);*/
+	  return 0;
+	}
+
+	/* -- string  */
+
+	/* string prefix  */
+
+\"      {
+	  strsrc = xmlNewDocNode (thedoc, NULL, "YCP_STRING", NULL);
+	  if (ignore) {
+	      xmlAddChild(strsrc, (xmlNodePtr)ignore);
+	      ignore = 0;
+	  }
+	  xmlNodeAddContent(strsrc, yytext);
+	  if (scandata_buffer == 0)
+	    scandata_buffer = extend_scanbuffer (1);
+	  if (scandata_buffer == 0)
+	    return 0;
+
+	  scandata_buffer_ptr = scandata_buffer;
+	  BEGIN (str);
+	}
+
+	/* string suffix  */
+
+<str>\" {
+	  BEGIN (INITIAL);
+	  xmlNodeAddContent (strsrc, yytext);
+	  yylval = strsrc;
+	  *scandata_buffer_ptr = '\0';
+	  /*
+	    This does not encode & into &amp;!
+	  xmlAddChild (yylval, xmlNewDocNode (
+	      thedoc, NULL, "STRINGVALUE", strdup (scandata_buffer)));
+	  */
+	  strval = xmlNewDocNode (thedoc, NULL, "STRINGVALUE", NULL);
+	  xmlNodeAddContent (strval, strdup (scandata_buffer));
+	  xmlAddChild (yylval, strval);
+	  return YCP_STRING;
+	}
+
+	/* string octal character  */
+
+<str>\\[0-7]{1,3} {
+	  /* octal escape sequence */
+	  /* mis-use result as scandata_buffer offset  */
+	  int result = scandata_buffer_ptr - scandata_buffer;
+	  if (result >= scandata_buffer_size) {
+	      if (extend_scanbuffer (1) == 0)
+		  return 0;
+	      scandata_buffer_ptr = scandata_buffer + result;
+	  }
+	  (void) sscanf( yytext + 1, "%o", &result );
+	  if (( result > 0xff ) || (result == 0))
+	      /*
+	      logError("bad octal constant", yylineno);
+	      */
+	      ;
+	  else
+	      *scandata_buffer_ptr++ = result;
+	  xmlNodeAddContent (strsrc, yytext);
+	}
+
+	/* string escaped character  */
+
+<str>\\(.|\n) {
+	  int offset = scandata_buffer_ptr - scandata_buffer;
+	  if (offset >= scandata_buffer_size) {
+	    if (extend_scanbuffer (1) == 0)
+	      return 0;
+	    scandata_buffer_ptr = scandata_buffer + offset;
+	  }
+	  switch (yytext[1]) {
+	    case 'n': *scandata_buffer_ptr++ = '\n'; break;
+	    case 't': *scandata_buffer_ptr++ = '\t'; break;
+	    case 'r': *scandata_buffer_ptr++ = '\r'; break;
+	    case 'b': *scandata_buffer_ptr++ = '\b'; break;
+	    case 'f': *scandata_buffer_ptr++ = '\f'; break;
+	    case '\n': yylineno++; break;
+	    default:  *scandata_buffer_ptr++ = yytext[1]; break;
+	  }
+	  xmlNodeAddContent (strsrc, yytext);
+   }
+
+	/* string escaped " char  */
+
+<str>[^\\\"\n]+ {
+	  char *yptr = yytext;
+	  int ylen = strlen (yptr);
+	  int offset = scandata_buffer_ptr - scandata_buffer;
+	  if (offset + ylen >= scandata_buffer_size) {
+	    if (extend_scanbuffer (ylen) == 0)
+	      return 0;
+	    scandata_buffer_ptr = scandata_buffer + offset;
+	  }
+	  strcpy (scandata_buffer_ptr, yptr);
+	  scandata_buffer_ptr += ylen;
+	  xmlNodeAddContent (strsrc, yytext);
+	}
+
+	/* \n in string */
+
+<str>\n {
+	  int offset = scandata_buffer_ptr - scandata_buffer;
+	  if (offset >= scandata_buffer_size) {
+	    if (extend_scanbuffer (1) == 0)
+	      return 0;
+	    scandata_buffer_ptr = scandata_buffer + offset;
+	  }
+	  *scandata_buffer_ptr++ = '\n';
+	  yylineno++;
+	  xmlNodeAddContent (strsrc, yytext);
+	}
+
+<str>. {
+/* TODO not in original grammar! */
+/*          logError("bad character in byteblock constant", yylineno);*/
+	  return 0;
+	}
+nil|nilboolean|nilinteger|nilfloat|nilstring|nillocale|nilbyteblock|nilpath|nillist|nilmap|nilsymbol|nilterm         {	LEXXML(YCP_VOID); };
+true|false  {	LEXXML(YCP_BOOLEAN);		};
+
+
+ /* -- statement keywords  */
+
+return		{ LEXXML(RETURN);	};
+define		{ LEXXML(DEFINE);	};
+undefine	{ LEXXML(UNDEFINE);	};
+continue	{ LEXXML(CONTINUE);	};
+break		{ LEXXML(BREAK);		};
+if		{ LEXXML(IF);		};
+is		{ LEXXML(IS);		};
+else		{ LEXXML(ELSE);		};
+do		{ LEXXML(DO);		};
+while		{ LEXXML(WHILE);		};
+repeat		{ LEXXML(REPEAT);	};
+until		{ LEXXML(UNTIL);		};
+empty		{ LEXXML(EMPTY);		};
+list		{ LEXXML(LIST);		};
+include		{ LEXXML(INCLUDE);	};
+import		{ LEXXML(IMPORT);	};
+export		{ LEXXML(EXPORT);	};
+global		{ LEXXML(GLOBAL);	};
+_fullname	{ LEXXML(FULLNAME);	};
+ /* foreach		{ LEXXML(FOREACH);	}; */
+module		{ LEXXML(MODULE);	};
+textdomain	{ LEXXML(TEXTDOMAIN);	};
+const		{ LEXXML(CONST);		};
+
+  /* -- basetype  */
+
+any         { LEXXML(ANY);			};
+void        { LEXXML(YCP_DECLTYPE);	};
+boolean     { LEXXML(YCP_DECLTYPE);	};
+integer     { LEXXML(YCP_DECLTYPE);	};
+float       { LEXXML(YCP_DECLTYPE);	};
+string      { LEXXML(YCP_DECLTYPE);	};
+byteblock   { LEXXML(YCP_DECLTYPE);	};
+ /* list is a keyword and done by parser.yy  */
+map         { LEXXML(YCP_DECLTYPE);	};
+locale      { LEXXML(YCP_DECLTYPE);	};
+term        { LEXXML(YCP_DECLTYPE);	};
+path        { LEXXML(YCP_DECLTYPE);	};
+block       { LEXXML(YCP_DECLTYPE);	};
+declaration { LEXXML(YCP_DECLTYPE); };
+symbol      { LEXXML(YCP_DECLTYPE);	};
+
+ /* common mistyped names  */
+int	    { /*logError ("Seen 'int', use 'integer' instead", yylineno);*/ return 0; };
+char	    { /*logError ("Seen 'char', use 'string' instead", yylineno);*/ return 0; };
+bool	    { /*logError ("Seen 'bool', use 'boolean' instead", yylineno);*/ return 0; };
+
+UI	{ LEXXML(UI); }
+WFM	{ LEXXML(WFM); }
+SCR	{ LEXXML(SCR); }
+
+ /* -- path  */
+
+\.|(\.{PATHSEGMENT})+ {
+    LEXXML(YCP_PATH);
+	}
+
+ /* -- quoted symbol  */
+
+\`([[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*) {
+/*TODO: this is a single quoted syumbol - must distinguish */
+		LEXXML(SYMBOL);
+	}
+
+ /* -- double quoted symbol  */
+
+\`\`([[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*) {
+		LEXXML(QUOTED_SYMBOL);
+	}
+
+  /* -- symbol  */
+
+{SYMBOL} {
+		LEXXML(SYMBOL);
+	}
+
+  /* -- locale  */
+_\(	{ LEXXML(I18N);		}
+
+  /* -- map expression  */
+\$\[	{ LEXXML(MAPEXPR);	}
+
+  /* -- comparison operators  */
+==	{ LEXXML(EQUALS);	}
+\<	{ LEXXML(ST);		}
+\>	{ LEXXML(GT);		}
+\<=	{ LEXXML(SE);		}
+\>=	{ LEXXML(GE);		}
+\!=	{ LEXXML(NEQ);		}
+
+  /* -- boolean operators  */
+&&	{ LEXXML(AND);		}
+\|\|	{ LEXXML(OR);		}
+\!	{ LEXXML(NOT);		}
+\<\<	{ LEXXML(LEFT);		}
+\>\>	{ LEXXML(RIGHT);		}
+
+  /* -- quotes  */
+
+\`\`\{	{ LEXXML(QUOTED_BLOCK);		}
+\`\`\(	{ LEXXML(QUOTED_EXPRESSION);	}
+\`\`	{ /*logError ("Lonely doubleqoute", yylineno);*/ return 0; }
+\`	{ /*logError ("Lonely qoute", yylineno);*/ return 0; }
+
+
+  /* -- bit operators  */
+\||\&|~	{     LEXXMLCHAR }
+
+
+  /* -- math operators  */
+\+|\-|\*|\/|\% {
+    LEXXMLCHAR
+	}
+
+\]\:   {
+    LEXXML(CLOSEBRACKET)
+       }
+
+\[|\]|\(|\)|,|\{|\}|:|\;|\=|\? {
+    LEXXMLCHAR
+	}
+
+.	{
+/*
+		debug_scanner("?%s?", yytext);
+		logError ("Unexpected char '%s'", yylineno, yytext);
+*/
+		return 0;
+	}
+%%
+/*
+Local Variables:
+mode: c
+End:
+*/

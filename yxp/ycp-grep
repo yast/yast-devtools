@@ -1,0 +1,106 @@
+#! /bin/bash
+# $Id$
+# make use of the yxp converter (ycp -> xml of the parse tree)
+function usage() {
+    echo "usage: $0 xslt-pattern foo.ycp"
+    echo "Prints lines of nodes matching the pattern."
+    echo "foo.yxp may be empty or a dash to mean stdin."
+    echo "Example: $0 'CHAR[child::text()=\"&\"]' bitand.ycp"
+    echo "Example: $0 vardecl bitand.ycp"
+    exit 1
+}
+
+
+# usage: $0 [-d] [-x] xslt-pattern <foo.yxp
+# prints line numbers of nodes matching the pattern
+# gren stands for "Grep printing line numbers only"
+function yxp-gren() {
+    # -d: debug
+    if [ "x$1" = "x-d" ]; then
+	DEBUG=1
+	shift
+    fi
+
+    # -x: don't convert special characters (<>&'") to xml
+    if [ "x$1" = "x-x" ]; then
+	NOCONVERT=1
+	shift
+    fi
+
+    PATTERN="$1"
+    if [ -z $NOCONVERT ]; then
+	PATTERN="${PATTERN//</&lt;}"
+	PATTERN="${PATTERN//>/&gt;}"
+	PATTERN="${PATTERN//&/&amp;}"
+	PATTERN="${PATTERN//\'/&apos;}"
+	PATTERN="${PATTERN//\"/&quot;}"
+    fi
+
+    # escape ampersands
+    # so that sed does not interpret them as the matched string
+    PATTERN="${PATTERN//&/\&}"
+    STYLESHEET=`mktemp /tmp/yxp-gren.XXXXXX` || exit 2
+    # delimit by "<", a character that cannot(?)
+    # occur literally in a XSLT pattern
+    sed "s<&PATTERN;<$PATTERN<" query-n.xsl > $STYLESHEET
+    xsltproc $STYLESHEET -
+    E=$?
+    if [ $DEBUG ]; then
+	echo $E >&2
+	echo $STYLESHEET >&2
+    else
+	rm -f $STYLESHEET
+    fi
+    return $E
+}
+
+if [ "x$1" = "x-d" ]; then
+    DEBUG=1
+    DEBUGOPT="-d"
+    shift
+fi
+
+if [ "x$1" = "x-i" ]; then
+    IGNORE_WS=""
+    shift
+else
+    IGNORE_WS="--nows"
+fi
+
+YXP="./yxp"
+YXP_GREN="yxp-gren"
+PATTERN="$1"
+FILE="${2:--}" # use "-" if not set
+SEDPROG=`mktemp /tmp/ycp-grep.XXXXXX` || exit 2
+
+if [ $DEBUG ]; then
+    echo "$FILE" >&2
+fi
+
+# This is tricky. We will have a file with line numbers and want to
+# print the actual lines, each preceded by the file and line number.
+# So we use sed to make a sed script to do that.
+# 12
+# 34
+# ->
+# 12s/^/$FILE:12:/p
+# 34s/^/$FILE:34:/p
+METASEDPROG="s@\([[:digit:]]\+\)@\1s,\^,$FILE:\1:,p@"
+
+cat "$FILE" \
+    |iconv -f l1 -t UTF-8 \
+    |{ "$YXP" $IGNORE_WS || echo "$FILE: $?" >&2; } \
+    |{ "$YXP_GREN" $DEBUGOPT "$PATTERN" || echo "$FILE: $?" >&2; } \
+    |uniq \
+    |sed -e "$METASEDPROG" \
+    >"$SEDPROG"
+if [ $? -ne 0 ]; then
+    echo "$FILE: $?" >&2
+fi
+sed -n -f "$SEDPROG" "$FILE"
+
+if [ $DEBUG ]; then
+    echo "$SEDPROG" >&2
+else
+    rm -f "$SEDPROG"
+fi

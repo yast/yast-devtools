@@ -14,17 +14,20 @@ fi
 
 here=`pwd`
 
-for dir in *; do
+function ctrl_c_handler
+{
+    echo "Caught ctrl-c"
+    exit 2
+}
 
+trap ctrl_c_handler INT
+
+
+for dir in *; do
     cd $here
     if [ -d $dir -a -d $dir/.svn ] ; then
         echo "cd $dir; svn $*"
         cd $dir
         svn $*
-        if [ "$?" -gt 255 ]; then
-            echo "svn $* caught signal"
-            exit 2
-        fi
     fi
-
 done

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jul 30 09:05:30 CEST 2003 - visnov@suse.de
+
+- added translator comments for all skeleton messages
+
+-------------------------------------------------------------------
 Tue Jul 22 15:54:09 CEST 2003 - mvidner@suse.cz
 
 - check_ycp: obsolete functions are not checked inside strings.

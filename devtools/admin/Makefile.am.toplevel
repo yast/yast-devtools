@@ -66,7 +66,8 @@ POT_DST = $(addprefix $(srcdir)/,$(addsuffix .pot,$(POT_DOMAINS)))
 EXTRA_DIST = \
 	VERSION RPMNAME MAINTAINER configure.in.in		\
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
-	$(Y2TEXTDOMAIN_FILE)  $(POTFILES_FILE) $(POT_DST)
+	$(Y2TEXTDOMAIN_FILE) $(POTFILES_FILE)			\
+	$(if $(IS_DEVTOOLS),,$(POT_DST))
 
 show-extra-dist:
 	@echo $(EXTRA_DIST)

@@ -198,8 +198,8 @@ sub main()
     # All remaining command line parameters go to "make".
     #
 
-    $make_target = join( @ARGV );
-
+    $make_target = join( " ", @ARGV );
+    
 
     #
     # Read user configuration from ~/.yast2/y2makeallrc (if present)

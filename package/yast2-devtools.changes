@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jul  8 16:22:38 CEST 2002 - mvidner@suse.cz
+
+- Provide/Obsolete ycpdoc and ydoc.
+
+-------------------------------------------------------------------
 Mon Jul 08 13:06:45 CEST 2002 - arvin@suse.de
 
 - added checks for expect and dejagnu (bug #16835)

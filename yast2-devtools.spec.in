@@ -3,6 +3,8 @@
 
 @HEADER@
 Requires:	yast2
+Provides:	ycpdoc ydoc
+Obsoletes:	ycpdoc ydoc
 
 Summary:	YaST2 development tools
 

@@ -37,6 +37,7 @@ yast2-theme-UnitedLinux	inst-sys,default	all (subpackage of yast2-theme)
 
 # installation
 yast2-installation	inst-sys,default	install
+yast2-firstboot 	default	                firstboot
 yast2-slide-show	inst-sys		install
 yast2-slide-show-SLES	inst-sys		install
 
@@ -61,6 +62,7 @@ yast2-xml		inst-sys		xml agent (autoinst)
 yast2-backup		default			backup
 yast2-bluetooth		default			bluetooth
 yast2-bootloader	default			bootloader
+yast2-boot-server	default			boot server
 yast2-ca-management	default			CA management
 yast2-cd-creator	default			create installation CDs
 yast2-country		default			keyboard,language,timezone

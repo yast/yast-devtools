@@ -1,0 +1,647 @@
+#!/usr/bin/perl
+#
+#
+
+use strict;
+use Data::Dumper;
+use XML::Writer;
+use Tie::Hash;
+use Tie::Array;
+
+
+my $xml_output = "output.xml";
+my $debug = 10;
+my $supported = "builtin|widget";
+my $prog;
+my $ycp_symbol = "(?:[[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*)";
+my $ycp_quad = "(?:::)";
+my $ycp_qualified_symbol = "(?:$ycp_quad?$ycp_symbol(?:$ycp_quad$ycp_symbol)*)";
+
+my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock"
+    . "|list|map"		# _syntactically_ simple types
+    . "|${ycp_symbol}_t"	# if it ends with _t, it is a type
+    . "|locale|term|path|block|declaration|symbol)";
+sub recursive_type ($)
+{
+    my $t = shift;
+    return qr{(?:
+     list  \s* <  \s* $t \s* >
+    |block \s* <  \s* $t \s* >
+    |map   \s* <  \s* $t \s* , \s* $t \s* >
+    | $t	# must come last otherwise "list<foo>" would not
+		# be parsed because of "list"
+    )}x;
+}
+
+#3 levels of type nesting
+my $ycp_typedecl =
+    recursive_type (recursive_type (recursive_type ($ycp_simple_type)));
+
+my $f = {};
+
+sub scan_file ($)
+{
+    my ($file) = @_;
+
+    tie @{$f->{"entries"}}, "entries";
+
+    my $in_comment = 0;
+    my $line = '';                      # collected input line
+    my $comment = '';                   # last comment block
+    my $kind;
+    my @comments = ();
+    my $parse = 0;
+
+    print "## processing $file\n" if $debug > 0;
+    open FILE, '<', $file or die "$prog: cannot open $file: $!\n";
+
+    my $valid_comment = 0;
+    while (<FILE>)
+    {
+        while (s/\\\n$//)               # line continuation
+        {
+            last unless defined (my $line = <FILE>);
+            $line =~ s%^\s*//+\s?%% unless $in_comment;
+            $line =~ s/^\s*(?:\*\s|\*$)?// if $in_comment;
+            $_ .= $line;
+        }
+
+        s/^\s+//;                       # trim whitespace
+        s/\s+$//;
+
+        if ($in_comment)                # inside multi-line comment
+        {
+            s/^\*(?:\s|$)//;
+            if (s%\s*\*+/%%)            # end of multi-line comment
+            {
+                $in_comment = 0;
+                $parse = 1;
+            }
+            if( /\@(widget|builtin)(.*)/)
+            {
+                $valid_comment = 1;
+            }
+            push @comments, $_;
+        }
+        elsif (s%^/\*+\s*%%)               # begin of multi-line comment
+        {
+            $in_comment = 1;
+        }             
+
+        if ($parse==1)
+        {
+            if ($valid_comment == 1 )
+            {
+	        push (@{$f->{"entries"}}, parse_comments ( @comments));
+            }
+            $parse = 0;
+            $valid_comment = 0;
+            @comments = ();
+        }
+    }
+
+    print Dumper($f) if $debug > 5;
+
+    close FILE;
+}
+
+
+# parse_entry
+# returns one entry, or, if there are scruples, a list of them!
+sub parse_comments (@)
+{
+    # file name,
+    my ( @comments) = @_;
+
+    my $lastwas = "";
+
+    my $oentry = {};
+    $oentry->{"type"} = "";
+    $oentry->{"name"} = "";
+    $oentry->{"description"} = [];
+    tie @{$oentry->{"description"}}, "odescription";
+
+    my $entry = {};
+    $entry->{"names"} = [];
+    tie @{$entry->{"names"}}, "names";
+
+    $entry->{"return"} = {};
+    tie %{$entry->{"return"}}, "return";
+
+    $entry->{"type"} = "";
+    $entry->{"parameters"} = [$oentry];
+    tie @{$entry->{"parameters"}}, "parameters";
+
+    $entry->{"since"} = "";
+    $entry->{"usage"} = "";
+    $entry->{"class"} = "";
+    $entry->{"screenshot"} = "";
+
+    $entry->{"optargs"} = [$oentry];
+    tie @{$entry->{"optargs"}}, "optargs";
+
+    $entry->{"options"} = [$oentry];
+    tie @{$entry->{"options"}}, "options";
+
+    $entry->{"examples"} = [];
+    tie @{$entry->{"examples"}}, "examples";
+    $entry->{"see"} = [];
+    tie @{$entry->{"see"}}, "see";
+    $entry->{"short"} = "";
+    $entry->{"description"} = [];
+    tie @{$entry->{"description"}}, "description";
+    $entry->{"deprecated"} = "";
+    my @entries = ($entry);
+
+    my %param_infunc;	# (declared) parameter names, keyed by themselves
+    my %param_incomment; # parameter descriptions
+    my %option_incomment; # option descriptions
+    my %optarg_incomment; # optarg descriptions
+
+    my @parameters = ();
+    my @options = ();
+    my @optargs = ();
+    my @description = ();
+    my @examples = ();
+
+
+    my $last_param;
+    my $last_option;
+    my $last_optarg;
+    my $para = "";
+    my $param_para = "";
+    my $keepformat = 0;
+    my $newpara = 0;
+
+    my ($pre, $post);
+
+    foreach my $line (@comments)
+    {
+        my $empty_line = $line;
+        $empty_line =~ s/\s+//;
+
+        if ($line =~ /<code>/ )
+        {
+            $keepformat = 1;
+            $newpara =1 ;
+        }
+        elsif ($line =~ /<\/code>/ )
+        {
+            $keepformat = 0;
+        }
+        
+	if($line =~ /\@(param|arg)\s+(.*)/o)
+	{
+	    $lastwas = "param";
+
+            $oentry = {};
+            my @odescr = ();
+            ( $oentry->{'type'}, $oentry->{'name'}, my $d) = split ( '\s+', $2, 3 );
+	    $last_param =  $oentry->{'name'};
+            print "LASTPARAM " . $last_param . "\n";;
+
+            push @odescr, $d;
+            $oentry->{'description'} = [];
+            push @{$oentry->{'description'}},  @odescr;
+	    $param_incomment{$last_param} = $oentry;
+            print Dumper(%param_incomment);
+	}
+	elsif($line =~ /\@option\s+(.*)/)
+	{
+	    $lastwas = "option";  
+            $oentry = {};
+            my @odescr = ();
+            my $d;
+            ( $oentry->{'name'}, $d) = split ( '\s+', $1, 2 );
+	    $last_option =  $oentry->{'name'};
+            push @odescr, $d;
+            $oentry->{'description'} = [];
+            push @{$oentry->{'description'}}, @odescr;
+	    $option_incomment{$last_option} = $oentry;
+	}
+	elsif($line =~ /\@optarg\s+(.*)/)
+	{
+            $oentry = {};
+	    $lastwas = "optargs";  
+            my @odescr = ();
+            my $d;
+            ( $oentry->{'type'}, $oentry->{'name'},  $d) = split ( '\s+', $1, 3 );
+            $last_optarg = $oentry->{'name'};
+            push @odescr, $d;
+            $oentry->{'description'} = [];
+            push @{$oentry->{'description'}}, @odescr;
+	    $optarg_incomment{$last_optarg} = $oentry;
+	}
+	elsif($line =~ /\@return\s+(.*)/)
+	{
+	    $lastwas = "return";  
+            my ( $type, $descr) = split ( '\s+', $1, 2 );
+            my $r= { "type" => $type, "description" => $descr};
+	    $entry->{"return"} =  $r;
+	}
+	elsif ($line =~ /\@(widget|widgets)\s+(.*)/)
+	{
+	    $lastwas = "widget";
+            my @w = ();
+            (@w) =  split( '\s+', $2);
+            push @{$entry->{"names"}}, @w;
+	    $entry->{"type"} = "widget";
+	}
+	elsif ($line =~ /\@(builtin)\s+(.*)/)
+	{
+	    $lastwas = "builtin";
+            my @w = ();
+            (@w) =  split( '\s+', $2);
+            push @{$entry->{"names"}}, @w;
+	    $entry->{"type"} = "builtin";
+	}
+	elsif ($line =~ /\@since\s+(.*)/)
+	{
+	    $lastwas = "since";
+	    $entry->{"since"} = $1;
+	}
+	elsif ($line =~ /\@class\s+(.*)/)
+	{
+	    $lastwas = "class";
+	    $entry->{"class"} = $1;
+	}
+	elsif ($line =~ /\@short\s+(.*)/)
+	{
+	    $lastwas = "short";
+	    $entry->{"short"} = $1;
+	}
+	elsif ($line =~ /\@description\s+(.*)/ || $line =~ /\@description$/)
+	{
+            $para = "";
+	    $lastwas = "description";
+            $para .= $1;
+	}
+	elsif($line =~ /\@see\s+(.*)/)
+	{
+	    $lastwas = "see";  
+	    $line = $1;
+
+	    push @{$entry->{"see"}}, $line;
+	}
+	elsif($line =~ /\@examples?(.*)/)
+	{
+	    $lastwas = "examples";
+	    $line =~ s/\@examples//; # remove it if it's there
+	    $line =~ s/\@example//; # remove it if it's there
+	    $line =~ s/\s+/ /; # remove empty spaces
+            foreach my $e (split(/ /, $line)) {
+                if ($e ne '')
+                {
+                    push @examples, $e;
+                }
+            }
+	}
+	elsif($line =~ /\@screenshot(.*)/)
+	{
+	    $lastwas = "screenshot";
+	    $line =~ s/\@screenshot//; # remove it if it's there
+	    $line =~ s/\s+//; # remove empty spaces
+	    $entry->{"screenshot"} .= $line;
+	}
+	elsif($line =~ /\@usage(.*)/ || $lastwas eq "usage")
+	{
+	    $lastwas = "usage";
+	    $line =~ s/\@usage//; # remove it if it's there
+	    $entry->{"usage"} .= "\n $line";
+	}
+	elsif($line =~ /\@deprecated\s*(.*)/)
+	{
+	    $lastwas = "deprecated";
+	    if( ($1) ne "" )
+	    {
+		$entry->{"deprecated"} .= $1;
+	    }
+	    else
+	    {
+		$entry->{"deprecated"} .= "magicnumber";
+	    }
+	}
+	elsif($lastwas eq "optargs")
+	{
+            $lastwas = "optargs";
+            $oentry = $optarg_incomment{$last_optarg};
+            if ($keepformat == 0)
+            {
+                $line =~ s/^\s+//;
+                if ($line ne '') {
+                    $line = " $line";
+                }
+            } 
+            else 
+            {
+                $line = "\n$line";
+            }
+            my @a = ();
+            my @b = ();
+
+
+            if ($line eq "" || $newpara == 1 ) 
+            { 
+                if ($newpara == 1)
+                {
+                    push  @a, $line;
+                    push @{$oentry->{'description'}} , @a;
+                    $optarg_incomment{$last_optarg} = $oentry;
+                    $newpara = 0;
+                } else {
+                    $newpara = 1;
+                }
+            }
+            else 
+            {
+                my $last =  pop @{$oentry->{'description'}};
+                $last .= " $line";
+                push  @a, $last;
+                push @{$oentry->{'description'}} , @a;
+                $optarg_incomment{$last_optarg} = $oentry;
+                $newpara = 0;
+            }
+	}
+	elsif($lastwas eq "option")
+	{
+            $lastwas ="option";
+            $oentry = $option_incomment{$last_option};
+            if ($keepformat == 0)
+            {
+                $line =~ s/^\s+//;
+                if ($line ne '') {
+                    $line = " $line";
+                }
+            } 
+            else 
+            {
+                $line = "\n$line";
+            }
+            my @a = ();
+            my @b = ();
+
+
+            if ($line eq "" || $newpara == 1 ) 
+            { 
+                if ($newpara == 1)
+                {
+                    push  @a, $line;
+                    push @{$oentry->{'description'}} , @a;
+                    $option_incomment{$last_option} = $oentry;
+                    $newpara = 0;
+                } else {
+                    $newpara = 1;
+                }
+            }
+            else 
+            {
+                my $last =  pop @{$oentry->{'description'}};
+                $last .= " $line";
+                push  @a, $last;
+                push @{$oentry->{'description'}} , @a;
+                $option_incomment{$last_option} = $oentry;
+                $newpara = 0;
+            }
+	}
+	elsif($lastwas eq "param")
+	{
+            $lastwas = "param";
+            $oentry = $param_incomment{$last_param};
+            $line =~ s/^\s+//;
+            my @a = ();
+            # UGLY 
+            if ($line eq "" || $newpara == 1)
+            { 
+                if ($newpara == 1)
+                {
+                    push  @a, $line;
+                    push @{$oentry->{'description'}} , @a;
+                    $param_incomment{$last_param} = $oentry;
+                    $newpara = 0;
+                } else {
+                    $newpara = 1;
+                }
+            }
+            else 
+            {
+                my $last =  pop @{$oentry->{'description'}};
+                $last .= " $line";
+                push  @a, $last;
+                push @{$oentry->{'description'}} , @a;
+                $param_incomment{$last_param} = $oentry;
+                $newpara = 0;
+            }
+	}
+	elsif($lastwas eq "return")
+	{
+            $lastwas = "return";
+            $line =~ s/^\s+//;
+            $entry->{'return'}->{'description'} .= " $line";
+	}
+	elsif($lastwas eq "option")
+	{
+            my $o = $option_incomment{$last_option};
+            $line =~ s/^\s+//;
+            $o->{"description"} .=$line;
+	    $option_incomment{$last_option} = $o;
+	}
+	elsif($lastwas eq "examples")
+        {
+            $lastwas = "examples";
+	    $line =~ s/\s+/ /; # remove empty spaces
+            foreach my $e (split(/ /, $line)) {
+                if ($e ne '')
+                {
+                    push @examples, $e;
+                }
+            }
+        }
+	elsif($lastwas eq "short" && $empty_line ne "")
+        {
+            $lastwas = "short";
+	    $entry->{"short"} .= $line;
+        }
+	elsif($lastwas eq "short" || $lastwas eq "description")
+	{
+            $lastwas = "description";
+            if ($empty_line eq "")
+            { 
+                if ($para ne "")
+                {
+	            push @description, $para;
+                }
+                $para = "";
+            }
+            else 
+            {
+                $para .= " $line";
+            }
+	}
+	elsif ($lastwas == '')
+	{
+            $lastwas = "short";
+	    $entry->{"short"} .= $line;
+	}
+        else {
+        }
+    }
+
+
+
+    push @{$entry->{"description"}}, @description;
+    push @{$entry->{"examples"}}, @examples;
+
+
+    # for commented parameters
+    foreach my $key ( keys %param_incomment)
+    {
+	my $pp = $param_incomment{$key};
+        push @parameters, $pp;
+    }
+
+    push @{$entry->{"parameters"}}, @parameters;
+
+    # for commented options
+    foreach my $key ( keys %option_incomment)
+    {
+        $oentry = {};
+	$oentry = $option_incomment{$key};
+        push @options, $oentry;
+    }
+
+    push @{$entry->{"options"}}, @options;
+
+    # for commented optargs
+    foreach my $key ( keys %optarg_incomment)
+    {
+        $oentry = {};
+	$oentry = $optarg_incomment{$key};
+        push @optargs, $oentry;
+    }
+    print "Final Optargs " . Dumper(@optargs) if $debug > 3;
+
+    push @{$entry->{"optargs"}}, @optargs;
+
+
+    return @entries;
+}
+
+sub main () 
+{
+    #scan_file("/home/nashif/Work/yast2-head/source/core/wfm/src/Y2WFMComponent.cc");
+    scan_file("/home/nashif/Work/yast2-head/source/core/libycp/src/YCPBuiltinList.cc");
+    #scan_file("./y2.cc");
+    yastdoc::XML::write_docs();
+
+}
+
+package yastdoc::XML;
+
+use IO qw(File);
+
+my $writer;
+
+sub write_docs
+{
+    my $output = new IO::File(">$xml_output");
+    $writer = new XML::Writer (OUTPUT => $output, NEWLINES => 1);
+    $writer->xmlDecl ();
+    $writer->startTag ("yast2doc");
+    dump_data ($f);
+    $writer->endTag ();
+    $writer->end ();
+    $output->close ();
+}
+
+sub dump_data
+{
+    my $node = shift;
+
+    if (!ref ($node))
+    {
+	$writer->characters ($node);
+    }
+    elsif (ref ($node) eq "ARRAY")
+    {
+	my $t = tied(@{$node});
+	foreach (@{$node})
+	{
+	    my $end = 1;
+	    if (defined ($t))
+	    {
+		$writer->startTag (ref ($t)."_item");
+	    }
+	    elsif (!ref ($_))
+	    {
+		$writer->startTag ("ITEM");
+	    }
+	    else
+	    {
+		$end = 0;
+	    }
+	    dump_data ($_);
+	    if ($end)
+	    {
+		$writer->endTag ();
+	    }
+	}
+    }
+    elsif (ref ($node) eq "HASH")
+    {
+	my $t = tied(%{$node});
+	foreach (sort keys %{$node})
+	{
+	    next if (!defined $node->{$_} || $node->{$_} eq "");
+	    if (defined ($t))
+	    {
+		$writer->startTag (ref ($t)."_item", "key" => $_);
+	    }
+	    else
+	    {
+		$writer->startTag ($_);
+	    }
+	    dump_data ($node->{$_});
+	    $writer->endTag ();
+	}
+    }
+    else
+    {
+	$writer->comment (ref($node));
+    }
+}
+
+
+package entries;
+@entries::ISA = ("Tie::StdArray");
+
+package description;
+@description::ISA = ("Tie::StdArray");
+
+package odescription;
+@odescription::ISA = ("Tie::StdArray");
+
+package examples;
+@examples::ISA = ("Tie::StdArray");
+
+package parameters;
+@parameters::ISA = ("Tie::StdArray");
+
+package optargs;
+@optargs::ISA = ("Tie::StdArray");
+
+package see;
+@see::ISA = ("Tie::StdArray");
+
+package names;
+@names::ISA = ("Tie::StdArray");
+
+package options;
+@options::ISA = ("Tie::StdArray");
+
+package return;
+@return::ISA = ("Tie::StdHash");
+
+
+package main;
+main ();
+

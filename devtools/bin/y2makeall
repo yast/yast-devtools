@@ -98,13 +98,14 @@ my $make_log  = $work_root . "/make.log";
 # Other global variables.
 #
 
-my $disable_make_makefile_cvs	= 0;	# -f
-my $enable_make_core_binaries	= 0;	# -b
-my $enable_byte_compile_modules	= 0;	# -m
-my $enable_make_ycp_packages	= 0;	# -y
-my $enable_make_all		= 1;	# -a
-my $favourites_only		= 0;	# -u
-my $prefix		= "/usr";	# -p
+my $disable_make_makefile_cvs	= 0;		# -f
+my $enable_make_core_binaries	= 0;		# -b
+my $enable_byte_compile_modules	= 0;		# -m
+my $enable_make_ycp_packages	= 0;		# -y
+my $enable_make_all		= 1;		# -a
+my $favourites_only		= 0;		# -u
+my $prefix			= "/usr";	# -p
+my $enable_print_summary	= 1;
 
 # Verbosity values
 
@@ -144,6 +145,8 @@ my %included_by;
 my %ycp_install_dirs;
 my %exclude_dirs;
 my %done_dirs;
+my @failed_dirs;
+my $successful_dirs = 0;
 
 
 #
@@ -205,9 +208,9 @@ sub main()
     $sudo_cmd = ""				if $opt_n;
     $prefix = $opt_p				if $opt_p;
 
-    $ycpc_cmd = "$prefix/bin/ycpc";
-    $modules_dir = "$prefix/share/YaST2/modules";
-    $ycp_include_dir = "$prefix/share/YaST2/include";
+    $ycpc_cmd		= "$prefix/bin/ycpc";
+    $modules_dir	= "$prefix/share/YaST2/modules";
+    $ycp_include_dir	= "$prefix/share/YaST2/include";
 
     #
     # Check if we are in the right directory
@@ -259,6 +262,7 @@ sub main()
     # Clean up
     #
 
+    print_summary()		if $enable_print_summary;
     close( LOG );
 }
 
@@ -380,7 +384,7 @@ sub byte_compile_modules()
 
     log_progress( "Removing old byte code files in $work_root" );
     system_int( "find $work_root -name '*.ybc' -print0 | xargs -0 $sudo_cmd rm" );
-    
+
 
 
     #
@@ -574,7 +578,20 @@ sub make()
 	}
     }
 
-    log_progress( "\tOK" ) unless $error;
+
+    #
+    # Summary
+    #
+
+    if ( $error )
+    {
+	push( @failed_dirs, basename( $pkg  ) );
+    }
+    else
+    {
+	log_progress( "\tOK" );
+	$successful_dirs++;
+    }
 
     chdir $work_root;
 }
@@ -972,6 +989,32 @@ sub byte_compile()
     }
 
     chdir( $work_root );
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+sub print_summary()
+{
+    log_milestone( "\n$prog_name $make_target summary:\n" );
+    log_milestone( "    Success in $successful_dirs directories" );
+
+    if ( $#failed_dirs >= 0 )
+    {
+	log_milestone( "    Failed  in " . ( $#failed_dirs+1 ) . " directories:\n" );
+
+	my $failed_dir;
+
+	foreach $failed_dir ( sort @failed_dirs )
+	{
+	    log_milestone( "\t$failed_dir" );
+	}
+    }
+    else
+    {
+	log_milestone( "    No failures" );
+    }
 }
 
 

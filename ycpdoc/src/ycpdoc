@@ -23,21 +23,21 @@ ycpdoc - Creates html files based on comments in ycp file.
 
 Show this help screen
 
-=item B<-d> I<dir>
+=item B<-d> I<dir>, B<--outputdir>=I<dir>
 
 Output files are placed to directory I<dir>
 
-=item B<-s> I<dir>
+=item B<-s> I<dir>, B<--strip>=I<dir>
 
 Strip only I<dir> when generating output files (default all).
 Remaining slashes are converted to double underscores.
 
-=item B<-f> I<format>
+=item B<-f> I<format>, B<--format>=I<format>
 
 Produce output in given format, html or xml. The option may be repeated.
 HTML is the default. XML produces ycpdoc.xml, the DTD is not stable yet.
 
-=item B<-i>
+=item B<-i>, B<--noindex>
 
 Do not generate index.html (intro.html, files.html)
 
@@ -47,7 +47,7 @@ Write output to stdout. Do not generate indexes.
 If there are more input files, generate only one
 output html file
 
-=item B<-o>
+=item B<-o>, B<--oldindex>
 
 Old style of index: creates only index.html
 
@@ -145,11 +145,11 @@ sub parse_arguments
     GetOptions (
 		"help|h" => \$help,
 		"man" => \$man,
-		"i" => \$skip_index,
+		"noindex|i" => \$skip_index,
 		"" => \$output_stdout,
-		"d=s" => \$output_dir,
-		"s=s" => \$strip_prefix,
-		"o" => sub { $new_index_style = 0; },
+		"outputdir|d=s" => \$output_dir,
+		"strip|s=s" => \$strip_prefix,
+		"oldindex|o" => sub { $new_index_style = 0; },
 		"w=i" => \$warning_level,
 		"wr" => sub { $warn_return_types = 0; },
 		"format|f=s" => \@formats_wanted,

@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Thu Nov 13 17:07:43 CET 2003 - mvidner@suse.cz
+Thu Nov 13 18:37:16 CET 2003 - mvidner@suse.cz
 
+- ycpdoc can now parse the angle-bracket syntax list<string>, block<string>.
 - Fixed a problem with escaped newlines in ydoxygen (eg. yast2-core)
 - Switched the agent skeleton autodocs to doxygen
 - Updated the template Doxyfile to hush warnings about obsolete options

@@ -315,11 +315,17 @@ my $ycp_symbol = "(?:[[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*)";
 my $ycp_quad = "(?:::)";
 my $ycp_qualified_symbol = "(?:$ycp_quad?$ycp_symbol(?:$ycp_quad$ycp_symbol)*)";
 
-my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock|map"
+my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock"
+    . "|list|map" 		# _syntactically_ simple types
     . "|locale|term|path|block|declaration|symbol)";
-# this should be a sufficient approximation of the real typedecl.
-my $ycp_typedecl = '(?:'. $ycp_simple_type
-    .'|list|list\s*\(\s*'. $ycp_simple_type .'\s*\))';
+
+# Don't bother with deeply nested types yet.
+my $ycp_typedecl = qr{(?: $ycp_simple_type
+    |list  \s* \( \s* $ycp_simple_type \s* \) # old syntax
+    |list  \s* <  \s* $ycp_simple_type \s* >
+    |block \s* <  \s* $ycp_simple_type \s* >
+    |map   \s* <  \s* $ycp_simple_type \s* , \s* $ycp_simple_type \s* >
+    )}x;
 
 # Matches any string not containing '*/'.
 # Helpful for the line-oriented parser not to slurp everything when it
@@ -718,7 +724,7 @@ sub parse_header (@)
     $parsed_header->{"module"} = "";
     $parsed_header->{"authors"} = [];
 
-    my $key = "";
+    my $key = "descr";
     foreach my $a (@lines)
     {
 	#TODO: warn on unknown key, missing field

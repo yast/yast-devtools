@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon May 10 14:16:29 CEST 2004 - mvidner@suse.cz
+
+- Let "make pot" find __ (#40160).
+- Sort file names according to C to have comparable pot files.
+- 2.10.1
+
+-------------------------------------------------------------------
 Wed Apr 14 12:03:48 CEST 2004 - msvec@suse.cz
 
 - dropped removal of buildroot from %install

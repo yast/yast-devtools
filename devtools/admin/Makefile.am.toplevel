@@ -67,7 +67,7 @@ POT_DOMAINS = \
 		        sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[="(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`" ; \
 		    DOMAINS="$$D\n$$DOMAINS" ; \
 		done ; \
-		echo -en $$DOMAINS | sort | uniq ; \
+		echo -en $$DOMAINS | LC_COLLATE=C sort | uniq ; \
 	    fi ; : \) \
 	)
 
@@ -102,6 +102,7 @@ dist-hook:
 xgettext_call = \
 	echo "Creating $(srcdir)/$$MODULE.pot from $$FILES..." ;		\
 	$(XGETTEXT) --no-wrap --add-comments --add-location --keyword=_:1,2	\
+		--keyword=__							\
 		--foreign-user --copyright-holder="SuSE Linux AG, Nuernberg"	\
 		--default-domain=$$MODULE --output=$$MODULE.pot $$FILES
 
@@ -119,7 +120,7 @@ $(POT_DST) pot: $(POT_SRC)
 	    fi ; \
 	    DOMAINS="$$D:$$F\n$$DOMAINS" ; \
 	done ; \
-	DOMAINS=`echo -en $$DOMAINS | sort` ; \
+	DOMAINS=`echo -en $$DOMAINS | LC_COLLATE=C sort` ; \
 	MODULE=$${DOMAINS%%:*} ; \
 	FILES="" ; \
 	for I in $$DOMAINS ; \

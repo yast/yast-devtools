@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar 11 19:28:54 CET 2004 - mvidner@suse.cz
+
+- ycpdoc: really fixed the omission of double backquotes
+
+-------------------------------------------------------------------
 Wed Mar 10 16:43:13 CET 2004 - mvidner@suse.cz
 
 - ycpdoc: handle angle-bracketed types

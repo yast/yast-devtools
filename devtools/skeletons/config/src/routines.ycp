@@ -10,6 +10,7 @@
 {
 
 textdomain "XXpkgXX";
+import "Progress";
 
 /* FIXME: Remove this file if you do not need it! */
 

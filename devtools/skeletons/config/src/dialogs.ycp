@@ -12,6 +12,7 @@
 textdomain "XXpkgXX";
 
 import "XXPkgXX";
+import "Wizard";
 
 include "ui/common_popups.ycp";
 include "ui/common_messages.ycp";

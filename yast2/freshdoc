@@ -32,19 +32,12 @@ date
 CVSUSER=mvidner
 CVSROOT=:pserver:$CVSUSER@yast2-cvs.suse.de:/real-home/CVS/YaST2
 export CVSROOT
-# TEMPWEB will be always rm -rf'd
-# it is for currently built docs.
-TEMPWEB=/local/home2/tempweb
-TARGET=freshdoc.new
-# $WEB/$TARGET will be rm -rf'd if --scratch is given
-# 8.1: /usr/local/httpd -> /srv/www
-WEB=/srv/www/htdocs
-# Where an up to date cvs tree will be kept.
-# Do not use your usual working directory!
-DOC_SANDBOX=/local/home2/yast2-$TARGET
+
+# source configuration variables that are different on CML
+. `dirname $0`/freshdoc.conf
+
 #BRANCH="-r freshdoc-branch"
 HTDIGCONF=/srv/www/htdig/conf/yast2.conf
-SERVERNAME=valkyrie.suse.cz
 
 # kdoc workaround
 PATH=$PATH:/opt/kde3/bin

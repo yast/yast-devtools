@@ -159,7 +159,13 @@ package-local: check-parse $(RPMNAME)-$(VERSION).tar.bz2
 	rm -f package/*.bak
 	rm -f package/*.auto
 	mv $(RPMNAME)-$(VERSION).tar.bz2 package
-	if which y2tool 2>/dev/null ; then here=`pwd`; cd $(srcdir) && y2tool create-spec < $(RPMNAME).spec.in > $$here/package/$(RPMNAME).spec ; fi
+	if which y2tool 2>/dev/null ; then \
+	    here=`pwd`; \
+	    cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \
+		newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
+		y2tool create-spec < $$i > $$here/package/$${newname} ; \
+	    done ; \
+	fi
 
 package: check-cvs-up-to-date check-tagversion check-all-packages package-local
 

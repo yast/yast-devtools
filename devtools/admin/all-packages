@@ -48,6 +48,7 @@ yast2-testsuite		-
 # agents
 yast2-pam		inst-sys,default	pam agent (user)
 yast2-xml		inst-sys		xml agent (autoinst)
+yast2-transfer	inst-sys		transfer/curl agent (autoinst)
 
 # config packages
 yast2-backup		default			backup

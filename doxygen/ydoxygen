@@ -25,7 +25,6 @@ Show this help screen
 =item B<-t> I<file>, B<--template>=I<file>
 
 Use a template file different from <y2datadir>/devtools/Doxyfile
-Output files are placed to directory I<dir>
 
 =item B<-d>, B<--debug>
 
@@ -51,6 +50,11 @@ my $man = 0;
 my $y2datadir = "/usr/share/YaST2/data";
 my $template = "$y2datadir/devtools/Doxyfile";
 my $debug = 0;
+
+sub debug
+{
+    print STDERR @_ if ($debug);
+}
 
 # parse command line
 # - options
@@ -98,24 +102,33 @@ my $single;
 # process input, passing it through, substituting what we want
 while (defined ($single = <IN>))
 {
+    chomp $single;		# strip \n
+
     $_ .= $single;
+    debug "\$s $single\n";
+    debug "\$_ $_\n";
+
     # check if this line continues (by trying to cut the continuation mark off)
     if (s/\\$//)
     {
+	debug "SKIP\n";
 	next;
     }
 
-    if (m/^([A-Z_]+)(\s*)=\s*(.*)\n/)
+    if (m/^([A-Z_]+)(\s*)=\s*(.*)$/)
     {
 	my ($param, $ws, $value) = ($1, $2, $3);
+	debug "MATCH:$param:$ws:$value\n";
+
 	if (defined ($replacements{$param}))
 	{
 	    $value = $replacements{$param};
+	    debug "SUBST:$value\n";
 	}
 
-	$_ = "$param$ws= $value\n";
+	$_ = "$param$ws= $value";
     }
-    print OUT $_;
+    print OUT "$_\n";
     $_ = "";			# this line does not continue
 }
 

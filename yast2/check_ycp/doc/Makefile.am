@@ -4,36 +4,37 @@
 #
 htmldir = $(docdir)/check_ycp
 
-XSLTPROC="/usr/bin/xsltproc"
-BUILD=html
-STYLESHEET_HTML=../../../docbook/stylesheets/customize-html.xsl
-IMAGES=$(wildcard $(BUILD)/images/* $(BUILD)/images/navig/* $(BUILD)/images/admon/*)
+STYLESHEET_HTML=$(srcdir)/../../../docbook/stylesheets/customize-html.xsl
 
+XSLTPROC=@XSLTPROC@
+XSLTPROC_FLAGS=@XSLTPROC_FLAGS@
+DOCBOOK_ROOT=@DOCBOOK_ROOT@
+XML_CATALOG=@XML_CATALOG@
 xml_files =  $(wildcard *.xml) 
 
-html_DATA = $(wildcard html/*.html)  \
-	    html/index.html  \
-	    html/susebooks.css
+html_DATA = $(wildcard html/*.html) \
+	    html/index.html \
+	    html/yast2docs.css
 
-html/index.html: check_ycp-section.xml check_ycp.xml  
-	xsltproc \
-	-stringparam base.dir "$(BUILD)/" \
-	--xinclude \
-	$(STYLESHEET_HTML)  check_ycp.xml
-	cp ../../../docbook/css/susebooks.css $(BUILD)
-	cp -a ../../../docbook/images $(BUILD)
-	find $(BUILD) -name "Makefile*"  | xargs rm
 
-validate:
-	xmllint --dropdtd --loaddtd check_ycp-section.xml
+html/index.html: check_ycp.xml
+	XML_CATALOG_FILES=$(XML_CATALOG)\
+	$(XSLTPROC) $(XSLTPROC_FLAGS) --xinclude \
+	$(STYLESHEET_HTML) $<
+
+
+
+html/yast2docs.css: 
+	cp $(srcdir)/../../../docbook/css/yast2docs.css html
+	cp -a $(srcdir)/../../../docbook/images html
+	find html -name "Makefile*"  | xargs rm
+
 clean-local:
-	rm -rf $(BUILD)/*.html
-	rm -rf $(BUILD)/images
-	rm -rf $(BUILD)/susebooks.css
+	rm -rf html
 
 install-data-local:
 	mkdir -p $(DESTDIR)$(htmldir)
-	cp -a $(srcdir)/$(BUILD)/images $(DESTDIR)$(htmldir)
+	cp -a $(srcdir)/html/images $(DESTDIR)$(htmldir)
 
-	
 EXTRA_DIST =  $(xml_files)
+

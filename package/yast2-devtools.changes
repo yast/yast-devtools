@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Oct 25 13:37:46 CEST 2004 - visnov@suse.cz
+
+- Removed Requires: yast2 
+
+-------------------------------------------------------------------
 Sat Oct 23 06:24:06 CEST 2004 - nashif@suse.de
 
 -  Removed dependency on sgmltoo, sp

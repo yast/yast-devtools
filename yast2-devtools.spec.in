@@ -2,7 +2,7 @@
 # neededforbuild gpp libgpp  perl-XML-Writer libxml2 libxslt docbook-xsl-stylesheets docbook_4 libgcrypt libgpg-error sgml-skel
 
 @HEADER@
-Requires:	yast2 perl
+Requires:	perl
 Requires:	perl-XML-Writer
 Requires:       libxslt
 Provides:	ycpdoc ydoc

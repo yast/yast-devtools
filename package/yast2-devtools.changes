@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb  9 12:08:57 CET 2005 - ke@suse.de
+
+- Generate and install .po file statistics.
+
+-------------------------------------------------------------------
 Tue Feb  8 17:08:57 CET 2005 - mvidner@suse.cz
 
 - Added po-stats to sum up translation file statistics (ke).

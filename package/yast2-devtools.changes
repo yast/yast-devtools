@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep 24 13:47:42 CEST 2004 - arvin@suse.de
+
+- fixed for packages with uppercase characters in their name
+
+-------------------------------------------------------------------
 Tue Sep 21 22:29:14 CEST 2004 - nashif@suse.de
 
 - Use xsl locally, not using http

@@ -22,6 +22,7 @@ yast2-autoinstallation	inst-sys,default	all,autoinstall
 yast2-control-center	default			all
 yast2-ncurses		inst-sys,default	all
 yast2-qt		inst-sys,default	all
+yast2-theme-SuSELinux	inst-sys,default	all
 
 # development
 yast2-debugger		-			development

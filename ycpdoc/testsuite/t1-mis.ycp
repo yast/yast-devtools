@@ -19,7 +19,7 @@
 
 {
     
-    define undocumented (string c) ``{
+    define void undocumented (string c) ``{
         
     }
 
@@ -28,7 +28,7 @@
      * @param a
      * @param c
      */
-    define misdocumented (string a, string b) ``{
+    define void misdocumented (string a, string b) ``{
         
     }
 }

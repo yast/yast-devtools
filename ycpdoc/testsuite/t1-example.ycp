@@ -58,7 +58,7 @@
      * @return string hexadecimal rep. of i starting by 0x
      * @example string hex = tohex(65);
      */
-    define tohex(integer i) ``{
+    define string tohex(integer i) ``{
     }
 
     /**
@@ -71,7 +71,7 @@
      *  can be multiline.
      */
   
-    define another(integer i,
+    define any another(integer i,
     	   	   string j) ``{
     }
   
@@ -79,7 +79,7 @@
      * This function has no return value defined.
      */
   
-    define black_hole() ``{
+    define void black_hole() ``{
     }
 
 }

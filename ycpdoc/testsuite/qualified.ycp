@@ -3,7 +3,7 @@
 {
     
     // undocumented
-    global define UI::foo () ``{ return; }
+    global define void UI::foo () ``{ return; }
 
     // forbidden by the parser
     //boolean UI::show_penguins = true;
@@ -12,7 +12,7 @@
      * This is a documented function
      * @param sdj send data to Japan?
      */
-    global define UI::CallbackCallback (boolean sdj, string f) ``{
+    global define any UI::CallbackCallback (boolean sdj, string f) ``{
 	return;
     }
 }

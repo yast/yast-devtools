@@ -26,6 +26,6 @@
      * I was just too lazy to fabricate some good name of sample function.
      * @param i some value
      */
-    define lazy(integer i) ``{
+    define void lazy(integer i) ``{
     }
 }

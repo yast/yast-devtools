@@ -8,7 +8,7 @@
      *   "program": string,
      * ]
      */
-    global list(map) services = [];
+    global list<map> services = [];
 
     /**
      * Starts the service (@ref struct1#service) specified.

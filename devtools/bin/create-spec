@@ -175,6 +175,7 @@ make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
 
     "\@ydatadir\@" => "${yast2dir}/data",
     "\@imagedir\@" => "${yast2dir}/images",
+    "\@themedir\@" => "${yast2dir}/theme",
     "\@localedir\@" => "${yast2dir}/locale",
     "\@clientdir\@" => "${yast2dir}/clients",
     "\@moduledir\@" => "${yast2dir}/modules",

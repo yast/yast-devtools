@@ -582,6 +582,12 @@ execcompdir=${prefix}/lib/YaST2
 ydatadir=${yast2dir}/data
   for general data
 
+imagedir=${yast2dir}/images
+  for non theme-able images
+
+themedir=${yast2dir}/theme
+  for theme-able images (every theme must provide the same list of images)
+
 </code>
 </p>
 

@@ -12,10 +12,11 @@
  */
 
 /**
- * @param first a map of XXpkgXX settings
- * @return map edited settings or an empty map if canceled
+ * @param function to execute
+ * @param map/list of XXpkgXX settings
+ * @return map edited settings, Summary or boolean on success depending on called function
  * @example map mm = $[ "FAIL_DELAY" : "77" ];
- * @example map ret = WFM::CallModule ("XXpkgXX_auto", [ mm ]);
+ * @example map ret = WFM::CallFunction ("XXpkgXX_auto", [ "Summary", mm ]);
  */
 
 {
@@ -28,29 +29,41 @@ y2milestone("XXPkgXX auto started");
 import "XXPkgXX";
 include "XXpkgXX/ui.ycp";
 
-list args = WFM::Args();
-if(size(args) <= 0) {
-    y2error("Did not get the settings, probably some mistake...");
+string func = WFM::Args(0);
+map param = WFM::Args(1);
+
+/* create a  summary*/
+if(func == "Summary") {
+    XXPkgXX::Import(param);
+    return ( select(XXPkgXX::Summary(),0, ""));
+}
+else if (func == "Reset") {
+    XXPkgXX::Import($[]);
+	return ($[]);
+}
+else if (func == "Change") {
+    XXPkgXX::Import(param);
+    any res = XXPkgXXAutoSequence();
+    return res;
+}
+else if (func == "Result") {
+    return(XXPkgXX::Export());
+}
+else if (func == "Write") {
+    import "Progress";
+	XXPkgXX::write_only = true;
+    XXPkgXX::Import(param);
+    Progress::off();
+    boolean ret = XXPkgXX::Write();
+    Progress::on();
+    return ret;
+}
+/* unknown function */
+else {
+    y2error("unknown function: %1", func);
     return false;
 }
-if(!is(WFM::Args(0), map)) {
-    y2error("Bad argument for XXpkgXX_auto: %1", WFM::Args(0));
-    return false;
-}
 
-/* The settings are in the first argument */
-map settings = select(args, 0, $[]);
-y2milestone("Imported: (%1)", settings);
-
-XXPkgXX::Import(settings);
-symbol ret = XXPkgXXAutoSequence();
-y2debug("ret=%1", ret);
-
-y2milestone("XXPkgXX auto finished");
-y2milestone("----------------------------------------");
-
-if(ret == `next) return XXPkgXX::Export();
-return $[];
 
 /* EOF */
 }

@@ -38,6 +38,6 @@ Textdomain = XXpkgXX
 Autoinst = 
 
 ; Resource in control file
-AutoinstResource = 
+AutoinstResource =  XXpkgXX
 
 ; vim:syntax=dosini

@@ -188,10 +188,6 @@ AM_CONFIG_HEADER(config.h) dnl at the distribution this done
 
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_C_INLINE
 ",
 
     # check: qt

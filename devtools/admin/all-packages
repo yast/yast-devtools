@@ -84,8 +84,8 @@ yast2-repair		inst-sys,default	repair
 yast2-restore		default			restore
 yast2-runlevel		default			runlevel editor
 yast2-samba		slcs			samba
-yast2-samba-client      default                 samba client
-yast2-samba-server      default                 samba server
+yast2-samba-client	default                 samba client
+yast2-samba-server	default                 samba server
 yast2-scanner		default			scanner
 yast2-security		default			security
 yast2-sound		default			sound

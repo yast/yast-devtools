@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Feb  7 17:42:17 CET 2004 - msvec@suse.cz
+
+- drop configdir substitution
+
+-------------------------------------------------------------------
 Thu Feb  5 15:59:48 CET 2004 - msvec@suse.cz
 
 - extract translations also from the Perl files

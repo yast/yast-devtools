@@ -50,25 +50,6 @@ my $proposal_valid = 0;
 my $write_only = 0;
 
 ##
- # Abort function
- # return boolean return true if abort
- #
-my $AbortFunction   = \&Modified;
-
-##
- # Abort function
- # @return blah blah lahjk
- #
-BEGIN { $TYPEINFO {Abort} = ["function", "boolean"]; }
-sub Abort {
-    if(defined $AbortFunction)
-    {
-	return $AbortFunction->();
-    }
-    return Boolean (0);
-}
-
-##
  # Data was modified?
  # @return true if modified
  #
@@ -132,10 +113,6 @@ sub Read {
     );
 
     # read database
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     Progress::NextStage();
     # Error message
     if(0)
@@ -145,10 +122,6 @@ sub Read {
     sleep($sl);
 
     # read another database
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     Progress::NextStep();
     # Error message
     if(0)
@@ -158,10 +131,6 @@ sub Read {
     sleep($sl);
 
     # read current settings
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     Progress::NextStage();
     # Error message
     if(0)
@@ -171,10 +140,6 @@ sub Read {
     sleep($sl);
 
     # detect devices
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     Progress::NextStage();
     # Error message
     if(0)
@@ -183,18 +148,10 @@ sub Read {
     }
     sleep($sl);
 
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     # Progress finished
     Progress::NextStage();
     sleep($sl);
 
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     $modified = 0;
     return Boolean(1);
 }
@@ -234,10 +191,6 @@ sub Write {
     );
 
     # write settings
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     Progress::NextStage();
     # Error message
     if(0)
@@ -247,10 +200,6 @@ sub Write {
     sleep($sl);
 
     # run SuSEconfig
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     Progress::NextStage ();
     # Error message
     if(0)
@@ -259,18 +208,10 @@ sub Write {
     }
     sleep($sl);
 
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     # Progress finished
     Progress::NextStage();
     sleep($sl);
 
-    if(!Abort())
-    {
-	return Boolean(0);
-    }
     return Boolean(1);
 }
 

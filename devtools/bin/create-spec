@@ -199,8 +199,7 @@ make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
     "\@moduledir\@" => "${yast2dir}/modules",
     "\@yncludedir\@" => "${yast2dir}/include",
     "\@scrconfdir\@" => "${yast2dir}/scrconf",
-    "\@configdir\@" => "${yast2dir}/config",
-    "\@desktopdir\@" => "/usr/share/applications/YaST2",
+    "\@desktopdir\@" => "%{prefix}/share/applications/YaST2",
 
 );
 

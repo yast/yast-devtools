@@ -571,8 +571,8 @@ yncludedir=${yast2dir}/include
 scrconfdir=${yast2dir}/scrconf
   for scr files
 
-configdir=${yast2dir}/config
-  for config files (former *.y2cc)
+desktopdir=${prefix}/share/applications/YaST2/modules
+  for .desktop files (former *.y2cc)
 
 execcompdir=${prefix}/lib/YaST2
   for external programs that are yast2 components. here you

@@ -15,7 +15,7 @@ y están protegidos por la legislación correspondiente de derechos de autor.
 El nombre YaST es una marca registrada de SuSE Linux AG. En adelante, SuSE
 Linux AG actuará como concesionista (poseedor del copyright) y cualquier
 usuario o adaptador de YaST 2 o de obras derivadas total o parcialmente de
-YaST2, o cualquier persona que reproduzca, distribuya o archive YaST 2 o
+YaST 2, o cualquier persona que reproduzca, distribuya o archive YaST 2 o
 SuSE Linux, serán consideradas como concesionarios de SuSE Linux AG.
 
 La transformación, utilización, aplicación, almacenamiento, reproducción y
@@ -27,7 +27,7 @@ distribuir, o modificar YaST 2 u obras derivadas del mismo. En caso de que
 no se acepten los términos y condiciones de esta licencia, estas acciones
 quedan prohibidas por la ley de propiedad intelectual. La aceptación y
 observación de los términos de esta licencia en su totalidad conlleva la
-validez de la misma, aún sin el consentimiento por escrito del concesionista.
+validez de la misma, aún sin la conformidad por escrito del concesionario.
 
 1. Utilización
    YaST 2 y SuSE Linux pueden usarse con fines particulares y comerciales siempre
@@ -65,15 +65,15 @@ validez de la misma, aún sin el consentimiento por escrito del concesionista.
    forma gratuita y sin influencia por parte del concesionario.
 
 3. Distribución
-   No se permite la reproducción remunerada de YaST 2 o SuSE Linux o su distribución
+   No se permite la reproducción comercial de YaST 2 o SuSE Linux o su distribución
    en medios de almacenamiento reproducidos de forma ilegal sin previa autorización
-   por escrito de SuSE Linux AG. La distribución remunerada del programa YaST 2,
-   sus fuentes inalteradas o modificadas total o parcialmente, y de obras derivadas
-   de los mismos, necesita el consentimiento previo por escrito de SuSE Linux AG.
+   por escrito de SuSE Linux AG. La distribución comercial del programa YaST 2,
+   de sus fuentes inalteradas o modificadas total o parcialmente, y de obras derivadas
+   del mismo, requiere el consentimiento previo por escrito de SuSE Linux AG.
 
    De acuerdo con la sección 2b), la distribución de todos los programas y obras
-   derivados total o parcialmente de YaST 2 se permite únicamente con las fuentes
-   modificadas y esta licencia. La disponibilidad gratuita de YaST 2 o de obras
+   derivados total o parcialmente de YaST 2 se permite únicamente incluyendo las fuentes
+   modificadas y la presente licencia. La disponibilidad gratuita de YaST 2 o de obras
    derivadas del mismo junto con SuSE Linux en servidores ftp y buzones de correo
    está permitida siempre que se observe la licencia del software.
 
@@ -93,7 +93,7 @@ validez de la misma, aún sin el consentimiento por escrito del concesionista.
 
 5. Derechos
    Los únicos derechos otorgados sobre YaST 2 o SuSE Linux son los incluidos en
-   esta licencia. El incumplimiento de esta licencia anula automáticamente
+   la presente licencia. El incumplimiento de esta licencia anula automáticamente
    los derechos del concesionario. No obstante, los derechos de terceros
    que hayan obtenido del concesionario copias o derechos bajo esta licencia
    se mantendrán, en tanto que esta licencia se observe y reconozca en su totalidad.
@@ -103,7 +103,7 @@ validez de la misma, aún sin el consentimiento por escrito del concesionista.
    esta licencia total o parcialmente, será necesario el consentimiento previo por
    escrito de SuSE para conceder al concesionario la exoneración total o parcial
    de esta licencia y sus condiciones. SuSE se reserva el derecho de denegar su
-   consentimiento sin explicar sus motivos.
+   consentimiento sin explicar los motivos.
 
 6. Restricciones adicionales
    En caso de que la distribución o el uso de YaST 2 y SuSE Linux o partes de SuSE
@@ -112,5 +112,5 @@ validez de la misma, aún sin el consentimiento por escrito del concesionista.
    para la distribución de YaST 2 y SuSE Linux o partes de SuSE Linux, que excluyan total
    o parcialmente a este país de la distribución. En este caso, la licencia incluye
    la restricción total o parcial tal y como si estuviese recogida por escrito en
-   esta licencia.
+   la presente licencia.
 

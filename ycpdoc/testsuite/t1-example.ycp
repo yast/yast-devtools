@@ -71,7 +71,8 @@
      *  can be multiline.
      */
   
-    define another(integer i,string j) ``{
+    define another(integer i,
+    	   	   string j) ``{
     }
   
     /**

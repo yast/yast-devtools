@@ -55,6 +55,10 @@ Old style of index: creates only index.html
 
 Do not warn about undeclared return types
 
+=item B<--state>
+
+For debugging, prints the parsing state for each line.
+
 =back
 
 =head1 DESCRIPTION
@@ -136,6 +140,7 @@ my $strip_prefix = "";		# both with a trailing slash
 my $new_index_style = 1;
 my $warning_level = 2;
 my $warn_return_types = 1;
+my $show_state = 0;		# show which state we are in for each line
 
 sub parse_arguments
 {
@@ -154,6 +159,7 @@ sub parse_arguments
 		"w=i" => \$warning_level,
 		"wr" => sub { $warn_return_types = 0; },
 		"format|f=s" => \@formats_wanted,
+		"state" => \$show_state,
 	       ) or pod2usage (2);
     pod2usage (1) if $help;
     pod2usage (-exitstatus => 0, -verbose => 2) if $man;
@@ -319,7 +325,7 @@ my $no_comment_end = '(?:[^*]|\*[^*/])*';
 sub parse_file ($)
 {
     $pathname = shift;
-    my $state = "firstline"; # aftercomment, fistcomment, firstline, incomment, intro, skip, start,
+    my $state = "firstline"; # aftercomment, fistcomment, firstline, incomment, intro, start,
 
     my $f = {};
     $f->{"requires"} = [];
@@ -341,7 +347,7 @@ sub parse_file ($)
     {
 	$lines_read = $lines_read + 1;
 	chomp;
-#	print STDERR "--$state\n";
+	print STDERR "--$state\n" if ($show_state);
 
 	if ("aftercomment" eq $state)
 	{
@@ -390,7 +396,7 @@ sub parse_file ($)
 	    if (/``\{/)
 	    {
 		s/``\{.*//;
-		$state = "skip";
+		$state = "start";
 		$shipout = 1;
 	    }
 	    $params .= $_;
@@ -1067,14 +1073,23 @@ sub write_onefile ($$)
     #
     # Create variable and function index
     #
-    my @local_variables = (); #um, they might be global...
+    my @global_variables = ();
+    my @global_functions = ();
+    my @local_variables = ();
     my @local_functions = ();
     for my $one ( @{$f->{"provides"}} )
     {
 	if ($one->{"kind"} eq "variable")
 	{
 	    my $n = $one->{"name"};
-	    push (@local_variables, "<a href=\"#$n\">$n</a>");
+	    if ($one->{"global"})
+	    {
+		push (@global_variables, "<a href=\"#$n\">$n</a>");
+	    }
+	    else
+	    {
+		push (@local_variables, "<a href=\"#$n\">$n</a>");
+	    }
 	}
 	elsif ($one->{"kind"} eq "function")
 	{
@@ -1085,12 +1100,21 @@ sub write_onefile ($$)
 		push (@params, $param->{"type"}." ".$param->{"name"});
 	    }
 	    my $sig = $one->{"signature"} = $n ." (". join (", ", @params) .")";
-	    push (@local_functions, "<a href=\"#$n\">$sig</a>");
+	    if ($one->{"global"})
+	    {
+		push (@global_functions, "<a href=\"#$n\">$sig</a>");
+	    }
+	    else
+	    {
+		push (@local_functions, "<a href=\"#$n\">$sig</a>");
+	    }
 	}
     }
 
-    item_index ("Variables", @local_variables);
-    item_index ("Functions", @local_functions);
+    item_index ("Global Variables", @global_variables);
+    item_index ("Global Functions", @global_functions);
+    item_index ("Local Variables", @local_variables);
+    item_index ("Local Functions", @local_functions);
 
     print OUT $headoutro;
 

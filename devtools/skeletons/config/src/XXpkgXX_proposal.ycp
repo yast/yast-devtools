@@ -34,12 +34,12 @@ if(func == "MakeProposal") {
 
     if(force_reset || !XXPkgXX::proposal_valid) {
         XXPkgXX::proposal_valid = true;
-	Progress::off();
+	boolean progress_orig = Progress::set (false);
 	XXPkgXX::Read();
+	Progress::set (progress_orig);
     }
     list sum = XXPkgXX::Summary();
     proposal = sum[0]:"";
-    Progress::on();
 
     ret = $[
 	"preformatted_proposal" : proposal,

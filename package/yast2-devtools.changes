@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Sep  5 12:07:50 CEST 2002
+
+- devtools/devtools/admin/all-packages: add yast2-trans-da.
+
+-------------------------------------------------------------------
 Wed Aug 28 09:34:40 CEST 2002 - jsuchome@suse.cz
 
 - provide/obsolete old translation packages

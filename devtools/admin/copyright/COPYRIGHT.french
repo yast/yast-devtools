@@ -1,8 +1,8 @@
             Licence de YaST 2 et SuSE Linux
             ===============================
 
-YaST 2 -- Copyright (c) 1995-2001 SuSE GmbH, Nuremberg (Allemagne) 
-YaST 2 -- Copyright (c) 2002 SuSE Linux AG, Nuremberg (Allemagne) 
+YaST 2 -- Copyright (c) 1995-2001 SuSE GmbH, Nuremberg (Allemagne)
+YaST 2 -- Copyright (c) 2002-2003 SuSE Linux AG, Nuremberg (Allemagne)
 
 
 L'objet de la présente licence est le programme YaST 2 (Yet another
@@ -20,18 +20,18 @@ licence".  Tout utilisateur ou toute personne procédant au
 traitement de YaST 2 ou des ouvrages qui en sont dérivés totalement ou
 partiellement ainsi que toute personne qui archive, reproduit et
 diffuse YaST 2 ou SuSE Linux est "bénéficiaire de licence" de SuSE
-AG. 
- 
+AG.
+
 Par le traitement, l'utilisation, l'application, l'archivage, la
 reproduction et la diffusion de YaST 2, l'utilisateur reconnait
-implicitement les termes de la présente licence. 
+implicitement les termes de la présente licence.
 
 Seule la présente licence donne au bénéficiaire de licence le droit
 d'utiliser, de reproduire, de distribuer ou de modifier YaST 2 ou les
 ouvrages qui en sont dérivés. Ces actions sont interdites par la loi
 sur les droits d'auteurs si la présente licence n'est pas reconnue.
 Si la présente licence est pleinement reconnue et respectée, elle
-est valide même sans le consentement écrit du concédant de licence. 
+est valide même sans le consentement écrit du concédant de licence.
 
 1) Utilisation
 
@@ -41,7 +41,7 @@ paquetages et des programmes installés sont observés. L'utilisation
 de YaST 2, même lorsqu'il s'agit d'une version modifiée, N'EXEMPTE PAS
 en particulier le bénéficiaire de licence de l'obligation d'observer
 les clauses de licence des paquetages installés par l'intermédiaire
-de YaST 2 ou d'ouvrages se basant sur YaST 2. 
+de YaST 2 ou d'ouvrages se basant sur YaST 2.
 
 2) Traitement
 
@@ -56,13 +56,13 @@ et n'ayant pas été réalisée par SuSE Linux AG est considérée comme
 'version modifiée' et se trouve donc exclue de l'assistance
 technique. Le bénéficiaire de licence a le droit de modifier sa
 copie de YaST 2 créant ainsi un ouvrage basé sur le programme YaST 2, si
-les conditions suivantes sont remplies: 
+les conditions suivantes sont remplies:
 
 a) Toute modification doit être indiquée dans les sources avec la
 date et le nom du programmeur ayant réalisé cette modification. Les
 sources modifiées doivent être mises à la disposition de l'utilisateur
 conformément au paragraphe 3), accompagnées de la présente licence
-non modifiée. 
+non modifiée.
 
 b) Le bénéficiaire de licence a l'obligation de mettre tout ouvrage
 qu'il diffuse et qui est dérivé totalement ou partiellement de YaST 2
@@ -71,7 +71,7 @@ aux conditions fixées par la présente licence, sans percevoir de
 droits de licence.
 
 c) La modification, même partielle, de la présente licence par un
-bénéficiaire de licence est interdite. 
+bénéficiaire de licence est interdite.
 
 SuSE se réserve le droit d'inclure dans la version officielle de
 YaST 2 tout ou partie des modifications apportées à YaST 2 sans avoir à
@@ -82,7 +82,7 @@ opposer.
 
 Il est interdit, sans accord préalable donné par écrit par SuSE
 AG, de reproduire, à titre onéreux, YaST 2 ou SuSE Linux ou de
-diffuser des supports de programmes reproduits sans autorisation. 
+diffuser des supports de programmes reproduits sans autorisation.
 La distribution à titre onéreux du programme YaST 2 et de ses
 sources, qu'il s'agisse d'une version modifiée totalement,
 partiellement ou ne comportant aucune modification, ainsi que la
@@ -111,7 +111,7 @@ responsable de pertes de bénéfices, d'économies non réalisées ni de
 dommages résultant de revendications formulées par des tiers à
 l'encontre du bénéficiaire de licence. SuSE Linux AG n'est pas non plus
 responsable de dommages directs ou indirects, en particulier de
-perte ou de création de données enregistrées. 
+perte ou de création de données enregistrées.
 
 L'observation des licences respectives, des copyrights et des règles
 d'utilisation des logiciels installés incombe entièrement à
@@ -148,5 +148,5 @@ distribution de YaST 2 et de SuSE Linux ou parties de SuSE Linux,
 excluant ces pays partiellement ou totalement de la distribution. La
 présente licence inclut, dans un tel cas, la restriction totale ou
 partielle comme si elle avait été spécifiée par écrit dans le texte
-de la présente licence. 
-   
+de la présente licence.
+

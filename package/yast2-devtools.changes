@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Mar 07 15:28:09 CET 2003 - arvin@suse.de
+
+- updated date in copyright files
+
+-------------------------------------------------------------------
 Thu Mar 06 17:04:21 CET 2003 - arvin@suse.de
 
 - added configure test for perl xml writer (bug #24429)

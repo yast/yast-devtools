@@ -44,12 +44,13 @@ autoyast2-installation	inst-sys,default	all,autoinstall
 # development
 yast2-debugger		-			development
 yast2-devtools		-			development
-yast2-testsuite		-
+yast2-testsuite		-			development
 
 # agents
-yast2-pam		inst-sys,default	pam agent (user)
+yast2-ldap		inst-sys,default	ldap agent (users)
+yast2-pam		inst-sys,default	pam agent (users)
+yast2-transfer		inst-sys		transfer/curl agent (autoinst)
 yast2-xml		inst-sys		xml agent (autoinst)
-yast2-transfer	inst-sys		transfer/curl agent (autoinst)
 
 # config packages
 yast2-backup		default			backup
@@ -62,6 +63,7 @@ yast2-firewall-cd	firewall		firewall CD
 yast2-http-server	default			HTTP server
 yast2-imap-server	email			IMAP server
 yast2-inetd		default			inetd editor
+yast2-kerberos-client	default			kerberos client
 yast2-ldap-client	default			ldap client
 yast2-mail		default			mail
 yast2-mouse		default			mouse
@@ -69,10 +71,9 @@ yast2-network		default			network
 yast2-nfs-client	default			nfs client
 yast2-nfs-server	default			nfs server
 yast2-nis-client	default			nis client
-yast2-ntp-client	default			NTP client 
-yast2-kerberos-client	default			kerberos client
 yast2-nis-server	default			nis server
 yast2-nisplus-client	default			nis+ client
+yast2-ntp-client	default			NTP client 
 yast2-online-update	default			YOU
 yast2-openteam-server	email			SuSE Linux Openteam Server
 yast2-phone-services	default			isdn

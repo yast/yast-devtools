@@ -1,6 +1,6 @@
 {
 
-// regex: XXPkgXX\.ycp
+// testedfiles: XXPkgXX.ycp
 
 include "testsuite.ycp";
 TESTSUITE_INIT([], nil);

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb  5 15:59:48 CET 2004 - msvec@suse.cz
+
+- extract translations also from the Perl files
+- skeleton improvements
+- 2.9.10
+
+-------------------------------------------------------------------
 Fri Jan 30 11:33:02 CET 2004 - visnov@suse.cz
 
 - use "install -p" for installing files to preserve modification time

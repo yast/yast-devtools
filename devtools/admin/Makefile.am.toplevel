@@ -50,7 +50,7 @@ MAINTAINERCLEANFILES = package/$(RPMNAME)-$(VERSION).tar.bz2 package/$(RPMNAME).
 
 # all the .ycp and .y2cc files, we should separate texts from (exclude testsuite directory)
 POT_SRC = $(shell find $(srcdir) -type d -name testsuite -prune , \
-	-type f -name "*.ycp" -o -name "*.y2cc" | xargs grep -l '^[[:space:]]*[Tt]extdomain') \
+	-type f -name "*.ycp" -o -name "*.pm" | xargs grep -l '^[[:space:]]*[Tt]extdomain') \
 	$(POTFILES)
 
 # all the textdomains for .pot creation
@@ -62,12 +62,12 @@ POT_DOMAINS = \
 		DOMAINS="" ; \
 		for F in $$PSRC ; \
 		do \
-		    D=`grep '^[[:space:]]*[Tt]extdomain' $$F | head -n 1 | \
-		       sed 's/^[[:space:]]*[Tt]extdomain[[:space:]]*[="][[:space:]]*\([-_a-zA-Z0-9]*\).*/\1'/` ; \
+		    D="`grep '^[[:space:]]*[Tt]extdomain' $$F | head -n 1 | \
+		       sed 's/^[[:space:]]*[Tt]extdomain[[:space:]]*[="(]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1'/`" ; \
 		    DOMAINS="$$D\n$$DOMAINS" ; \
 		done ; \
 		echo -en $$DOMAINS | sort | uniq ; \
-	    fi \
+	    fi ; : \) \
 	)
 
 # the names of the actual .pot files
@@ -110,7 +110,7 @@ $(POT_DST) pot: $(POT_SRC)
 	for F in $^ ; \
 	do \
 	    D=`grep '^[[:space:]]*[Tt]extdomain' $$F | head -n 1 | \
-	       sed 's/^[[:space:]]*[Tt]extdomain[[:space:]]*[="][[:space:]]*\([-_a-zA-Z0-9]*\).*/\1'/` ; \
+	       sed 's/^[[:space:]]*[Tt]extdomain[[:space:]]*[="(]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1'/` ; \
 	    if [ -z $$D ] ; \
 	    then \
 		echo "Error: empty textdomain in $$F" ; \

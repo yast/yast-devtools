@@ -415,9 +415,9 @@ sub parse_file ($)
 	}
 	elsif ($state eq "longdefine")
 	{
-	    if (/``\{/)
+	    if (/(``)?\{/)
 	    {
-		s/``\{.*//;
+		s/(``)?\{.*//;
 		$state = "start";
 		$shipout = 1;
 	    }

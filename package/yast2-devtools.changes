@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct 26 16:05:05 CEST 2004 - mvidner@suse.cz
+
+- Create acinclude.m4 in Makefile.cvs instead of having a redundant
+  copy in cvs.
+- 2.11.0
+
+-------------------------------------------------------------------
 Tue Oct 26 09:40:40 CEST 2004 - locilka@suse.cz
 
 - Changed config-skeleton to use Message module

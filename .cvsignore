@@ -2,6 +2,7 @@ Makefile
 Makefile.am
 Makefile.am.common
 Makefile.in
+acinclude.m4
 aclocal.m4
 autom4te.cache
 config.cache

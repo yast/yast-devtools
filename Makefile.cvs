@@ -11,7 +11,9 @@ configure: all
 all:
 	./devtools/bin/y2autoconf --bootstrap ./devtools/admin
 	./devtools/bin/y2automake --bootstrap ./devtools/admin
-	autoreconf --force --install
+	#ACLOCAL_AMFLAGS is recommended but we have a common Makefile.am
+	cat ./devtools/admin/aclocal/*.m4 > acinclude.m4
+	autoreconf -v --force --install
 
 install: configure
 	make

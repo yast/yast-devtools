@@ -1,7 +1,9 @@
 -------------------------------------------------------------------
 Fri Feb 18 09:57:22 CET 2005 - ke@suse.de
 
-- Fix translation related intallation target.
+- Fix translation related intallation target (reported by Stefan
+  Schubert).
+- Calculate percent of translated messages (proposed by Jiri Suchomel).
 
 -------------------------------------------------------------------
 Wed Feb  9 12:08:57 CET 2005 - ke@suse.de

@@ -1,0 +1,4 @@
+Common used style sheets and images in YaST documentation. 
+
+Use the installed files instead of adding them localy into the doc directories.
+This should give YaST documentation a unified look.

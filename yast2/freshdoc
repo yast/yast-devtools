@@ -110,8 +110,8 @@ function docdir() {
 		eecho "Error making clean in `pwd`/$J"
 	    fi
 	fi
-	if ! make -C $J DESTDIR=$TEMPWEB install; then
-	    eecho "Error making install in `pwd`/$J"
+	if ! make -C $J DESTDIR=$TEMPWEB all install; then
+	    eecho "Error making all install in `pwd`/$J"
 	fi
     fi
 }

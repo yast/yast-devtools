@@ -1,6 +1,5 @@
 @HEADER-COMMENT@
 
-# norootforbuild
 # neededforbuild yast2-devel-packages
 
 @HEADER@

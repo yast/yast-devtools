@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Mar 15 14:46:15 CET 2004 - mvidner@suse.cz
+
+- ycpdoc: handle function declarations
+- pmdoc: process typeinfo
+- y2makeall: make clean
+- fixed AbortFunction in skeleton
+- 2.9.14
+
+-------------------------------------------------------------------
 Thu Mar 11 19:28:54 CET 2004 - mvidner@suse.cz
 
 - ycpdoc: really fixed the omission of double backquotes

@@ -1,8 +1,14 @@
 ------------------------------------------------------------------------
-Thu Sep 11 09:24:47 CEST 2002 - ke@suse.de
+Wed Sep 11 16:24:47 CEST 2002 - ke@suse.de
+
+- Update to version 2.6.14.
+- Add ydoc/po-tools/cleanuppo.awk.
+
+-------------------------------------------------------------------
+Wed Sep 11 09:24:47 CEST 2002 - ke@suse.de
 
 - Update to version 2.6.13.
-- devtools/devtools/admin/all-packages: add yast2-trans-ko and
+- devtools/admin/all-packages: add yast2-trans-ko and
   yast2-trans-zh_TW.
 
 -------------------------------------------------------------------

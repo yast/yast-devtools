@@ -1,4 +1,17 @@
 -------------------------------------------------------------------
+Thu Dec  5 11:16:01 CET 2002 - mvidner@suse.cz
+
+- ycpdoc:
+   Eliminated a false warning about an undocumented function (msvec)
+   Handle qualified function names (UI::, Pkg::)
+   Removed the "skip" parsing state.
+- ycp-mode.el: added new UI builtins (sh)
+- skeletons/config: better Back handling (msvec)
+- skeletons/trans: remove locale dirs on deinstall, #20846 (ke)
+- freshdoc: updated for 8.1
+- 2.7.1
+
+-------------------------------------------------------------------
 Tue Oct 22 19:16:06 CEST 2002 - mvidner@suse.cz
 
 - Added testsuite for ycpdoc.

@@ -26,11 +26,11 @@ all-local: $(GENERATED)
 
 make-pox pox: Makefile $(POXFILES)
 $(POXFILES): %.pox: %.po
-	-[ -f $@ ] && mv --backup=numbered $@ $@.bak || po=/dev/null; \
+	-[ -f $@ ] && mv --backup=numbered $@ $@.bak; \
 	pot=$$(echo $< | sed "s:$(LL).po:pot:"); \
 	  compendium=$(compendium); \
 	  [ -f $$compendium ] || compendium=/dev/null ; \
-	  $(MSGMERGE) -C $$compendium -o $$po $< $(POTDIR)/$$pot
+	  $(MSGMERGE) -C $$compendium -o $@ $< $(POTDIR)/$$pot
 
 # update or init PO file
 update-po: Makefile $(POTFILES)
@@ -52,6 +52,9 @@ update-po: Makefile $(POTFILES)
 	  fi; \
 	done
 
+update-po-with-compendium:
+	$(MAKE) update-po with_c="-C $(compendium)"
+
 update-mo: $(MOFILES)
 	@:
 
@@ -69,7 +72,8 @@ showmo:
 
 checkpo:
 	for f in $(POFILES); do \
-	  echo $$f; \
+	  mypot=../../pot/pot/$${f/$(LL).po/pot}; echo $$f $$mypot; \
+	  [ -f $$mypot ] && { LANG=C $(MSGMERGE) --verbose --output=/dev/null $$f $$mypot || exit 1; }; \
 	  LANG=C $(MSGFMT) --output=/dev/null --check --statistics --verbose $$f \
                  || exit 1; \
 	done

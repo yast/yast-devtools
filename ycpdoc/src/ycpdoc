@@ -489,7 +489,7 @@ sub do_shipout ($$$$$@)
 	    warn "Bad parameter? '$p'" unless $ok;
 	    # later: "description"
 	    push @parameters, { "name" => $2, "type" => $1 };
-	    %param_infunc->{$2} = $2;
+	    $param_infunc{$2} = $2;
 	}
     }
 
@@ -502,7 +502,7 @@ sub do_shipout ($$$$$@)
 	    $lastwas = "param";
 
 	    $last_param = $1;
-	    %param_incomment->{$last_param} = almost_html ($2);
+	    $param_incomment{$last_param} = almost_html ($2);
 	}
 	elsif($line =~ /\@return\s+($ycp_typedecl)?\s*(.*)/o)
 	{
@@ -550,7 +550,7 @@ sub do_shipout ($$$$$@)
 	}
 	elsif($lastwas eq "param")
 	{
-	    %param_incomment->{$last_param} .= almost_html ("\n$line");
+	    $param_incomment{$last_param} .= almost_html ("\n$line");
 	}
 	else
 	{
@@ -579,7 +579,7 @@ sub do_shipout ($$$$$@)
 	}
     # for commented parameters: warn if no such actual parameter
     while ( my ($key, $descr) = each %param_incomment) {
-	if (!defined (%param_infunc->{$key})) {
+	if (!defined ($param_infunc{$key})) {
 	    if ($entry->{"kind"} eq "function")
 	    {
 		warning ("Parameter $key documented but not declared in function header.");

@@ -45,7 +45,8 @@ ps: latex
 	dvips yast2-devtools.dvi
 
 
-EXTRA_DIST = $(html_DATA) $(sgml_DATA)
+EXTRA_DIST = $(sgml_DATA)
+# Intentionally omitting generated $(html_DATA)
 
 
 CLEANFILES = $(html_DATA) 			\

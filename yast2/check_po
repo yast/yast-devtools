@@ -1,0 +1,642 @@
+#!/usr/bin/perl -w
+#
+# check_po  -	check a .po file for consistency.
+#		See "sub usage()" for command line options.
+#
+# License:	GPL
+# Author:	Stefan Hundhammer <sh@suse.de>
+#
+
+use strict;
+use English;
+use Getopt::Std;
+use vars qw( $opt_v $opt_s $opt_d $opt_h $opt_i $opt_w $opt_f $opt_t $opt_p $opt_k $opt_n );
+
+
+# Global variables.
+
+my $verbose					= 1;	# -v / -s
+my $debug					= 0;	# -d
+my $check_identical				= 0;	# -i
+my $check_identical_except_for_whitespace	= 0;	# -w
+my $check_fuzzy					= 0;	# -f
+my $ignore_html_tags				= 0;	# -t
+my $ignore_printf_errors			= 0;	# -p
+my $ignore_keyboard_shortcuts			= 0;	# -k
+my $ignore_newlines				= 0;	# -n
+
+my $warning_count				= 0;
+my $error_count					= 0;
+
+
+# Forward declarations.
+
+sub main();
+
+
+# Call the main function and exit.
+# DO NOT enter any other code outside a sub -
+# any variables would otherwise be global.
+
+
+main();
+exit 0;
+
+
+#-----------------------------------------------------------------------------
+
+
+# Main program.
+
+sub main()
+{
+    my $po_file;
+
+    # Extract command line options.
+    # This will set a variable opt_? for any option,
+    # e.g. opt_v if option '-v' is passed on the command line.
+
+    getopts('vsdhiwftpkn');
+
+    usage() if $opt_h;
+    $verbose					= 1 if $opt_v;
+    $verbose					= 0 if $opt_s;
+    $debug					= 1 if $opt_d;
+    $check_identical				= 1 if $opt_i;
+    $check_identical_except_for_whitespace	= 1 if $opt_w;
+    $check_fuzzy				= 1 if $opt_f;
+    $ignore_html_tags				= 1 if $opt_t;
+    $ignore_printf_errors			= 1 if $opt_p;
+    $ignore_keyboard_shortcuts			= 1 if $opt_k;
+    $ignore_newlines				= 1 if $opt_n;
+
+    usage() if ( $#ARGV < 0 );
+
+    # All other arguments are treated as names of input files.
+
+    foreach $po_file ( @ARGV )
+    {
+	check_po( $po_file );
+    }
+
+    if ( $warning_count + $error_count > 0 )
+    {
+	logf( "$error_count errors, $warning_count warnings total" );
+	exit 1;
+    }
+    else
+    {
+	logf( "OK." );
+	exit 0;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Check one .po file
+#
+# Parameters:
+#	$po_file	name of the .po file to check
+
+sub check_po()
+{
+    my ( $po_file ) = @_;
+    my @line_numbers;
+    my $msgid;
+    my $msgstr;
+    my $msgid_line	= 0;
+    my $msgstr_line	= 0;
+    my $in_msgid	= 0;
+    my $in_msgstr	= 0;
+    my $multi_line	= 0;
+    my $line;
+    my @line_no_infos;
+    my $line_no_info;
+    my $fuzzy = 0;
+    my $trans_count = 0;
+
+    open ( PO, $po_file ) or die "FATAL: Can't open $po_file";
+
+
+    while ( $line = <PO> )
+    {
+	if ( $line =~ '^#:' )	# line number info:
+	{			#   #: xy/abc.ycp:123 xy/abc.ycp:456
+	    $in_msgid  = 0;
+	    $in_msgstr = 0;
+
+	    # Check the previous translation, if there is any.
+	    # Since there is no real end-of-record delimiter
+	    # in gettext format, the next occurence of line number infos
+	    # is the loop end condition.
+
+	    if ( defined $msgstr )
+	    {
+		if ( length ( normalize( $msgstr ) ) > 0 )
+		{
+		    $trans_count = check_translation ( $po_file,
+						       $msgid,  $msgid_line,
+						       $msgstr, $msgstr_line,
+						       $fuzzy, $trans_count, @line_numbers );
+		}
+
+		undef @line_numbers;
+		undef $msgid;
+		undef $msgstr;
+		$msgid_line	= 0;
+		$msgstr_line	= 0;
+		$multi_line	= 0;
+		$fuzzy		= 0;
+	    }
+
+	    $line =~ s/^#://;	# remove line header
+	    $line =~ s/^\s+//;	# remove leading  whitespace
+	    $line =~ s/\s+$//;	# remove trailing whitespace
+	    @line_no_infos = split ( '\s+', $line );
+
+	    foreach $line_no_info ( @line_no_infos )
+	    {
+		my ( $filename, $line_no ) = split ( ':', $line_no_info, 2 );
+		push @line_numbers, $line_no;
+	    }
+	}
+	elsif ( $line =~ /^#, fuzzy/ && $check_fuzzy )	# fuzzy marker?
+	{
+	    error( $po_file, $NR, "Message marked as \"fuzzy\"" );
+	    $fuzzy = 1;
+	}
+	elsif ( $line =~ /^#/ )		# comment line?
+	{
+	    next;			# -> skip
+	}
+	elsif ( $line =~ /^msgid/ )
+	{
+	    $msgid_line	= $NR;
+	    $in_msgid	= 1;
+	    $in_msgstr	= 0;
+
+	    if ( $line =~ /^msgid ""/ )
+	    {
+		$multi_line = 1
+	    }
+	}
+	elsif ( $line =~ /^msgstr/ )
+	{
+	    $msgstr_line	= $NR;
+	    $in_msgid		= 0;
+	    $in_msgstr		= 1;
+	}
+
+	my $quoted_string = $line;
+	chomp $quoted_string;
+	$quoted_string =~ s:^[^"]*"(.*)".*$:$1:;	# "] (for emacs)
+
+	if ( $in_msgid )
+	{
+	    $msgid .= $quoted_string;
+	    $msgid  =~ s/\\n$/\n/;
+	}
+        if ( $in_msgstr )
+	{
+	    $msgstr .= $quoted_string;
+	    $msgstr =~ s/\\n$/\n/;
+	}
+    }
+
+    # process the last translation
+
+    if ( length ( normalize( $msgstr ) ) > 0 )
+    {
+	$trans_count = check_translation ( $po_file,
+					   $msgid,  $msgid_line,
+					   $msgstr, $msgstr_line,
+					   $fuzzy, $trans_count, @line_numbers );
+    }
+
+    if ( $trans_count < 1 )
+    {
+	warning( $po_file, $NR, "Not one single valid translation in this file!" );
+    }
+
+    close( PO );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check one translation.
+# Empty translations will be silently ignored.
+#
+# Parameters:
+#	$po_file	filename of the .po file
+#	$msgid		the original message
+#	$msgid_line	line number of the msgid
+#	$msgstr		the translated message
+#	$msgstr_line	line number of the msgstr
+#	$fuzzy		flag: fuzzy marker set for this translation?
+#	$trans_count	number of (valid) translations so far
+#	@line_numbers	the line numbers where this translation occurs
+#
+# Return value:
+#	$trans_count	new number of (valid) translations so far
+
+sub check_translation()
+{
+    my ( $po_file,
+	 $msgid,  $msgid_line,
+	 $msgstr, $msgstr_line,
+	 $fuzzy, $trans_count, @line_numbers ) = @_;
+
+
+    # Check for more than one keyboard shortcut in msgstr
+
+    if ( $msgid =~ /&.*&/ )
+    {
+	warning( $po_file, $msgid_line, "More than one keyboard shortcut in original!" )
+	    unless $ignore_keyboard_shortcuts;
+    }
+
+    my $original_msgid = $msgid;
+    $msgid  = normalize ( $msgid  );
+
+    if ( length ( $msgid  ) > 0 && length ( $msgstr ) > 0 )
+    {
+	if ( $msgid eq $msgstr )	# Check for identical translation and original
+	{
+	    error( $po_file, $msgid_line, "Original and translation are identical!" )
+		if $check_identical;
+	}
+	elsif ( normalize( $msgid )  eq normalize( $msgstr ) ) # Check for whitespace-only differences
+	{
+	    error( $po_file, $msgid_line, "Original and translation differ only in whitespace!" )
+		if $check_identical_except_for_whitespace;
+	}
+
+	if ( ! $ignore_keyboard_shortcuts )
+	{
+	    if (     $msgid  =~ /&/   &&	# Original has keyboard shortcut
+		     ! ( $msgstr =~ /&/ )   )	# while translation has none
+	    {
+		error( $po_file, $msgstr_line, "Missing keyboard shortcut in translation!" );
+	    }
+
+	    if ( $msgstr =~ /&.*&/ )	# Check for more than one keyboard shortcuts in translation
+	    {
+		error( $po_file, $msgstr_line, "More than one keyboard shortcut in translation!" );
+	    }
+
+	    if (     $msgstr  =~ /&/   &&	# Translation has keyboard shortcut
+		     ! ( $msgid   =~ /&/ )   )	# while original has none
+	    {
+		error( $po_file, $msgstr_line, "Keyboard shortcut in translation, but not in original!" );
+	    }
+	}
+
+	if ( ! $ignore_printf_errors )
+	{
+	    if ( count_sformat_substitutions( $msgid  ) !=	# sformat() substitutions in original
+		 count_sformat_substitutions( $msgstr )   )	# don't match those in translation?
+	    {
+		error( $po_file, $msgstr_line, "Numbers of sformat() substitutions (%1, %2 etc.) don't match!" );
+	    }
+
+	    if ( count_printf_substitutions( $msgid  ) !=	# (number of) printf() substitutions in original
+		 count_printf_substitutions( $msgstr )   )	# don't match those in translation?
+	    {
+		error( $po_file, $msgstr_line, "Numbers of printf() substitutions (%s, %d etc.) don't match!" );
+	    }
+	}
+
+	if ( $msgid =~ "</?p>" && ! $ignore_html_tags )
+	{
+	    if ( count_tags( $msgid,  "<p>" ) !=
+		 count_tags( $msgstr, "<p>" )   )
+	    {
+		error( $po_file, $msgstr_line, "Numbers of <p> tags don't match!" );
+	    }
+
+	    if ( count_tags( $msgid,  "</p>" ) !=
+		 count_tags( $msgstr, "</p>" )   )
+	    {
+		error( $po_file, $msgstr_line, "Numbers of </p> tags don't match!" );
+	    }
+	}
+
+	if ( count_trailing_newlines( $original_msgid  ) !=
+	     count_trailing_newlines( $msgstr          )    )
+	{
+	    error( $po_file, $msgstr_line, "Number of trailing newlines don't match!" )
+		unless $ignore_newlines;
+	    # print "orig: \n\n\"$original_msgid\"\n\ntrans:\n\n\"$msgstr\"\n\n";
+	}
+
+	$trans_count++ unless $fuzzy;
+    }
+
+    return $trans_count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Count number of sformat() substitutions (%1, %2 etc.) in a string
+#
+# Parameters:
+#	$msg	string to check
+#
+# Return value:
+#	number of occurences of %1, %2 etc.
+
+sub count_sformat_substitutions()
+{
+    my ( $msg ) = @_;
+    my $count = 0;
+
+    while ( $msg =~ /%\d+/g )
+    {
+	$count++;
+    }
+
+    return $count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Count number of printf() substitutions (%1, %2 etc.) in a string
+# - this may not be 100% fool proof.
+#
+# Parameters:
+#	$msg	string to check
+#
+# Return value:
+#	number of occurences of %s, %d etc.
+
+sub count_printf_substitutions()
+{
+    my ( $msg ) = @_;
+    my $count = 0;
+
+    return 0 if ( $msg =~ /%\d+/ );	# %1, %2 etc.? YCP/sformat() syntax!
+
+    # while ( $msg =~ /%[#0\-+]?\d*\*?\.?\d*\*?[hlLZ]?[^%][diouxXDOUeEfgcspn]/g )
+    while ( $msg =~ 
+	    m{
+		%			# A literal percent sign
+		[#0\-+]?		# maybe a prefix flag: one of # 0 - +
+		\d*			# maybe a numerical width specification
+		\*?			# or maybe a literal asterisk
+		\.?			# maybe a literal period
+		\d*			# maybe a numerical precision specification
+		\*?			# or maybe another literal asterisk
+		[hlLZ]?			# maybe a type modifier
+		[diouxXDOUeEfgcspn]	# exactly one type specification
+	    }xg
+	  )
+    {
+	$count++;
+    }
+
+    return $count;
+}
+
+
+
+#-----------------------------------------------------------------------------
+
+
+# Count number of HTML tags ( <p>, <P>, ...) in a string - case-insensitive!
+#
+# Parameters:
+#	$msg	string to check
+#	$tag	tag to check for
+#
+# Return value:
+#	number of occurences of the tag
+
+sub count_tags()
+{
+    my ( $msg, $tag ) = @_;
+    my $count = 0;
+
+    while ( $msg =~ /$tag/gi )
+    {
+	$count++;
+    }
+
+    # print "\n\nfound tag $tag $count times in\n\n\"$msg\"\n";
+    return $count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Count number of newlines at the end of a string
+#
+# Parameters:
+#	$msg	string to check
+#
+# Return value:
+#	number of newlines at the end of the string
+
+sub count_trailing_newlines()
+{
+    my ( $msg ) = @_;
+    my $count = 0;
+
+    while ( $msg =~ /\n$/ )
+    {
+	$count++;
+	chomp $msg;
+    }
+
+    # print "\n\nfound $count newlines at the end of\n\n\"$msg\"\n"
+    return $count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Normalize a string used as msgid
+#
+# Parametes:
+#	$str	string to normalize
+#
+# Return value:
+#	normalized string
+
+sub normalize()
+{
+    my ( $str ) = @_;
+
+    $str =~ s/\\"//g;	# [" for emacs] remove embedded escaped quotes
+    $str =~ s/\\\n/ /g; # replace escaped newline with one blank
+    $str =~ s/\\n/ /g;	# replace embedded newline symbols '\n' with one blank
+    $str =~ s/\s+/ /g;  # replace all whitespace (including newline) with one blank
+    $str =~ s/^\s+//;	# remove all leading whitespace
+    $str =~ s/\s+$//;	# remove all trailing whitespace
+
+    return $str;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Shorten a message to max $len characters
+#
+# Return value: Shortened message
+
+sub shorten()
+{
+    my ( $msg, $len ) = @_;
+    $msg  = substr ( $msg, 0, $len ) . "..." if ( length ( $msg ) > $len );
+
+    return $msg;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stderr.
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub warning()
+{
+    my $filename = shift @_;
+    my $line_no  = shift @_;
+    my $msg;
+
+    print STDERR "$filename:$line_no: Warning: ";
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+    }
+
+    print STDERR "\n";
+    $warning_count++;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stderr.
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub error()
+{
+    my $filename = shift @_;
+    my $line_no  = shift @_;
+    my $msg;
+
+    print STDERR "$filename:$line_no: Error: ";
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+    }
+
+    print STDERR "\n";
+    $error_count++;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stdout if verbose mode is set
+# (command line option '-v').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub logf()
+{
+    my $msg;
+
+    if ( $verbose )
+    {
+	foreach $msg ( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a debugging message to stdout if debug mode is set
+# (command line option '-d').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub deb()
+{
+    my $msg;
+
+    if ( $debug )
+    {
+	print '   DEB> ';
+
+	foreach $msg ( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Print usage message and abort program.
+#
+# Parameters:
+#	---
+
+sub usage()
+{
+    die "\n"
+	. "Usage: $0 [-dhsv] <po-file> <po-file> [<po-file> ...]\n"
+	. "\n"
+	. "\t-d debug\n"
+	. "\t-h help (this message)\n"
+	. "\t-s silent (turn verbose off)\n"
+	. "\t-v verbose (default)\n"
+	. "\t-w check of whitespace only differences\n"
+	. "\t-i check of identical original and translation\n"
+	. "\t-f check for fuzzy messages\n"
+	. "\t-t ignore HTML tags\n"
+	. "\t-p ignore printf() and sformat() errors\n"
+	. "\t-k ignore keyboard shortcuts\n"
+	. "\t-n ignore newline differences at message end\n"
+	. "\n"
+	. "Checks .po files for common errors.\n"
+	. "\n"
+	. "Example:\n"
+	. "\t$0 *.po\n"
+	. "\n";
+}
+
+
+
+# EOF

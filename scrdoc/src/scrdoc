@@ -1,0 +1,555 @@
+#!/usr/bin/perl -w
+#----------------------------------------------------------------------
+# File:
+#   scrdoc
+#
+# Module:
+#   Documentation generation for SCR-Agents
+#
+# Summary:
+#   Generates documentation for SCR files base on comments.
+#
+# Authors:
+#   Gregor Fischer <fischer@suse.de>
+#
+# $Id$
+#
+#----------------------------------------------------------------------
+use strict;
+use Getopt::Std;
+use File::Find;
+
+use vars ('$VERSION','$Options');
+my $VERSION = "0.2.0";
+my $Options = {};
+
+main();
+exit(0);
+
+#----------------------------------------------------------------------
+# main
+#----------------------------------------------------------------------
+
+sub main {
+    #my $Options = {};
+    getopts("o:d:hp:vVD:", $Options) || usage() || exit(1);
+
+    if ($Options->{h}) {
+	usage();
+	exit(0);
+    }
+
+    if ($Options->{V}) {
+	print STDERR "$0 $VERSION\n";
+	exit(0);
+    }
+
+    if ($Options->{d}) {
+	push @ARGV, findFiles();
+    }
+
+    my $FileInfo = {};
+    foreach my $FileName (@ARGV) {
+	my $SingleFileInfo = parseFile($FileName);
+	$FileInfo->{$FileName} = $SingleFileInfo;
+    }
+
+    #generateIndex($FileInfo, $Options);
+    #generateDoc($FileInfo);
+    generateSCRDoc($FileInfo);
+}
+
+#----------------------------------------------------------------------
+sub usage {
+    print STDERR <<EOT;
+Usage: $0 [OPTION] [FILE [FILE [...]]]
+
+  -o DIR                 all generated files go in the specified
+			 directory (instead of the current)
+  -d DIR                 look for input files in DIR
+  -p PATTERN             when searching directories (with -d) use the
+			 specified pattern (RegExp) instead of the
+			 default (.*\\.scr)
+  -h                     show this help page
+  -v                     be verbose
+  -V                     show version
+  -D PATH                path to the YaST2 documentation. This should
+			 be a relative path from the place the generated
+			 files go to. Or you can specify an absolute path.
+			 (Default: "file:/usr/share/doc/packages")
+
+EOT
+}
+#----------------------------------------------------------------------
+sub findFiles {
+    my $Dir = $Options->{d};
+    my $Pattern = $Options->{p} || ".*\\.scr";
+
+    my @List = ();
+
+    find( sub {
+	$File::Find::prune = 1 if (-d && /^CVS$/);
+	$File::Find::prune = 1 if (-d && /^testsuite$/);
+	if (-f && -r && -s && /^$Pattern$/o) {
+	    print STDERR "Found: $File::Find::name\n" if ($Options->{v});
+	    push(@List, $File::Find::name);
+	}
+    } , $Dir );
+    return @List;
+}
+#----------------------------------------------------------------------
+sub parseFile {
+    my $FileName = shift;
+
+    # Analyse Filename
+    my $Info = {};
+    $Info->{FileName} = $FileName;
+    $FileName =~ /^(.*)\/(.*)\.(.*)$/i;
+    $Info->{FileNamePath} = $1;
+    $Info->{FileNameBase} = $2;
+    $Info->{FileNameExt}  = $3;
+
+    # Read whole File
+    my $File = "";
+    open(FILE, "<$FileName") || die "Cannot open $FileName.";
+    while (my $Line = <FILE>) {
+	$File .= $Line;
+    }
+    close(FILE);
+
+    # Analyse File
+    my $Blocks = extractBlocksFromFile($File);
+
+    # Extract Info from Blocks
+    my $FileInfo = extractInfoFromBlock($Blocks,$Info);
+
+    return $Info->{Comments} = $Info;
+
+    return $Info;
+}
+#----------------------------------------------------------------------
+sub extractBlocksFromFile {
+    my $File = shift;
+
+    # Get every comment and possibly next line if special
+    my @Blocks = ($File =~ m{/\*.*?\*/(?:[^\n]*\n(?:\s*\n)*^(?:[^\n]*define|\.)[^\n]*$)?}gsm);
+
+    # If file starts with "." on first position, it's an old style scr file
+    if ($File =~ /^(\..*?)[ \t]*\n/) {
+	unshift @Blocks, "/**\n * $1\n */\n$1\n";
+    }
+
+    return \@Blocks;
+}
+#----------------------------------------------------------------------
+
+#----------------------------------------------------------------------
+sub extractInfoFromBlock {
+    my $Blocks = shift;
+    my $Info = shift;
+
+    $Info->{Intro}    = [];
+    $Info->{Module}   = [];
+    $Info->{Mount}    = [];
+    $Info->{Function} = [];
+    $Info->{General}  = [];
+
+    for (my $BlockNumber = 0; $BlockNumber <= $#$Blocks; ++$BlockNumber) {
+	my $Block = $Blocks->[$BlockNumber];
+
+	# Split up Comment and Rest
+	$Block =~ /(\/\*.*?\*\/)[^\n]*\n(?:\s*\n)*^(.*)\Z/ms;
+	my $Comment = $1;
+	my $Rest = $2;
+
+	# Analyse Rest
+	my $Type  = "";
+	my $Value = "";
+	if ($Rest =~ /^(\.\S+)/) {
+	    $Type  = "mountpoint";
+	    $Value = $1;
+	} elsif ($Rest =~ /define\s*`*(\S+)/) { #`
+	    $Type  = "function";
+	    $Value = $1;
+	} else {
+	    $Type = "unknown";
+	}
+
+	my $BlockInfo = analyseComment($Comment);
+	# Categorize Comment
+	if ($Block =~ /\/\*[^*]/) {
+	    #print STDERR "SKIP: $BlockNumber\n";
+	    next;
+	} elsif ($Block =~ /\/\*\*\*/) {
+	    #print STDERR "INTRO: $BlockNumber\n";
+	    push @{$Info->{Intro}}, $BlockInfo;
+	} elsif ($Type eq "function") {
+	    #print STDERR "FUNTION: $BlockNumber ($Value)\n";
+	    $BlockInfo->{FunctionName} = $Value;
+	    push @{$Info->{Function}}, $BlockInfo;
+	} elsif ($Type eq "mountpoint") {
+	    #print STDERR "MOUNTPOINT: $BlockNumber ($Value)\n";
+	    $BlockInfo->{MountPoint} = $Value;
+	    push @{$Info->{Mount}}, $BlockInfo;
+	} elsif (@{$Info->{Module}} == 0) {
+	    #print STDERR "MODULE: $BlockNumber\n";
+	    push @{$Info->{Module}}, $BlockInfo;
+	} else {
+	    #print STDERR "GENERAL: $BlockNumber ($Type,$Value)\n";
+	    push @{$Info->{General}}, $BlockInfo;
+	}
+    }
+
+    return $Info;
+
+
+
+
+}
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+sub analyseComment {
+    my $Comment = shift;
+
+    my $Info = {};
+
+    # Collect @xxx lines
+    while ($Comment =~ s/^\s*\**\s*\@(\S+)(?:[\t ](.*?)\s*)?(\n|\z)//m) {
+	$Info->{$1} = [] unless (defined $Info->{$1});
+	push @{ $Info->{$1} }, $2;
+    }
+
+    # Get Id
+    if ($Comment =~ s/^\s*\**\s*(\$Id\:.*?\$)\s*\n//mi) {
+	$Info->{ID} = $1;
+    }
+
+    # Collect Areas
+    while ($Comment =~ s/^\s*\**(\s*)([a-zA-Z]+):.*?\n(.*?\n)(?=(\s*\*?\s*|\s*\**\s*[a-zA-Z]+:)\n)//ms) {
+	my $Indent = $1;
+	my $Name = $2;
+	my $Text = $3;
+	$Text =~ s/^\s*\**(\Q$Indent\E)?//mg;
+	$Info->{$Name} = $Text;
+    }
+
+    # General
+    $Comment =~ s/^.*?\/\*+\s*\n?//;
+    $Comment =~ s/\s*\*+\/.*\n?$//;
+    $Comment =~ s/^\s*\**[ \t]?//gm;
+    $Info->{General} = $Comment;
+
+    return $Info;
+}
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+sub generateIndex {
+    my $FileInfos = shift;
+
+    foreach my $FileName (sort keys %$FileInfos) {
+	my $FileInfo = $FileInfos->{$FileName};
+	print "----------------------------------------------------\n";
+	print $FileInfo->{FileNameBase}. "\n";
+	my $MountInfo = $FileInfo->{Mount};
+	foreach my $MountBlock (@$MountInfo) {
+	    print $MountBlock->{MountPoint} . "\n";
+	    #print $FileInfo->{FileNameBase} . "\n";
+	    foreach my $Key (sort keys %$MountBlock) {
+		print "$Key: $MountBlock->{$Key}\n";
+	    }
+	    print "\n";
+	}
+	print "====================================================\n";
+
+
+    }
+
+}
+#----------------------------------------------------------------------
+sub generateSCRDoc {
+    my $FileInfos = shift;
+    my $OutputDir = $Options->{o} || ".";
+
+    open (SCRINDEX, ">$OutputDir/index.scr.html");
+    open (SCROVERVIEW, ">$OutputDir/overview.scr.html");
+
+    printHTMLHeader(OUT   => \*SCRINDEX,
+	    Title => "YaST2 Documentation - SCR Index",
+	    OverviewLink => 1
+	    );
+    print SCRINDEX "<h1>SCR Index</h1>\n";
+    print SCRINDEX "<table>\n";
+    print SCRINDEX "<tr><th>Mount Point</th><th>Summary</th></tr>";
+
+    printHTMLHeader(OUT   => \*SCROVERVIEW,
+	    Title => "YaST2 Documentation - SCR Overview",
+	    IndexLink => 1,
+	    );
+    print SCROVERVIEW "<h1>SCR Overview</h1>\n";
+
+    foreach my $FileName (sort {
+	    $FileInfos->{$a}->{Mount}->[0]->{MountPoint}
+	    cmp
+	    $FileInfos->{$b}->{Mount}->[0]->{MountPoint};
+	} keys %$FileInfos) {
+	my $FileInfo = $FileInfos->{$FileName};
+	open (SCRDETAIL, ">$OutputDir/" .
+	    $FileInfo->{FileNameBase} . ".html");
+	printHTMLHeader(
+		OUT   => \*SCRDETAIL,
+		Title => "YaST2 Documentation - SCR - "
+		    . $FileInfo->{FileNameBase} . $FileInfo->{FileNameExt},
+		IndexLink => 1,
+		OverviewLink => 1,
+		);
+
+	my $MountInfo = $FileInfo->{Mount};
+	foreach my $MountBlock
+	    (sort {$a->{MountPoint} cmp $b->{MountPoint}} @$MountInfo) {
+
+	    # Index
+	    printHTMLMountPoint(OUT => \*SCRINDEX,
+		Style => "short",
+		BaseDir => $OutputDir,
+		FileNameBase => $FileInfo->{FileNameBase},
+		Info => $MountBlock,
+		);
+
+	    # Overview
+	    printHTMLMountPoint(OUT => \*SCROVERVIEW,
+		Style => "normal",
+		BaseDir => $OutputDir,
+		FileNameBase => $FileInfo->{FileNameBase},
+		Info => $MountBlock,
+		);
+
+	    # Detailed View
+	    printHTMLMountPoint(OUT => \*SCRDETAIL,
+		Style => "long",
+		BaseDir => $OutputDir,
+		FileNameBase => $FileInfo->{FileNameBase},
+		Info => $MountBlock,
+		);
+	}
+	printHTMLFooter(
+	    OUT => \*SCRDETAIL,
+	    GeneratedFrom => $FileName,
+	    );
+	close(SCRDETAIL);
+    }
+
+    print SCRINDEX "</table>\n";
+    printHTMLFooter(OUT => \*SCRINDEX);
+    close(SCRINDEX);
+
+    printHTMLFooter(OUT => \*SCROVERVIEW);
+    close(SCROVERVIEW);
+
+}
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+sub printHTMLHeader {
+    my %Param = @_;
+
+    my $OUT = $Param{OUT} || \*STDOUT;
+    $Param{Title} ||= "YaST2 Documentation";
+
+    print $OUT "<html><head><title>";
+    print $OUT $Param{Title};
+    print $OUT "</title></head>\n<body>\n";
+    if ($Param{IndexLink} || $Param{OverviewLink}) {
+	print $OUT "<a href=\"index.scr.html\">Index</a> " if $Param{IndexLink};
+	print $OUT "<a href=\"overview.scr.html\">Overview</a> " if $Param{OverviewLink};
+	print $OUT "<hr>\n";
+    }
+}
+#----------------------------------------------------------------------
+sub printHTMLFooter {
+    my %Param = @_;
+
+    my $OUT = $Param{OUT} || \*STDOUT;
+
+    my $Login = getlogin || getpwuid($<) || "unknown";
+
+    print $OUT "<hr><font size=\"-1\">\n";
+    print $OUT "Generated at " . scalar localtime() . " <br>\n";
+    print $OUT "by $Login <br>\n";
+    print $OUT "from " . $Param{GeneratedFrom} . " <br>\n"
+	if $Param{GeneratedFrom};
+    print $OUT "with $0 ($VERSION)<br>\n";
+    print $OUT "</font></body></html>\n";
+}
+#----------------------------------------------------------------------
+sub printHTMLMountPoint {
+    my %Param = @_;
+
+    my $OUT = $Param{OUT} || \*STDOUT;
+    $Param{Style} ||= "normal";
+    my $MountPoint = $Param{Info}->{MountPoint};
+    my $Link = $Param{BaseDir} . "/" . $Param{FileNameBase} . ".html";
+
+    if ($Param{Style} eq "short") {
+	# Short
+	print $OUT "<tr>";
+	print $OUT "<td><a href=\"$Link\">$MountPoint</a></td>";
+	print $OUT "<td>";
+	print $OUT ($Param{Info}->{Summary} || "&nbsp;");
+	print $OUT "</td>";
+	print $OUT "</tr>\n";
+    } elsif ($Param{Style} eq "normal") {
+	# Normal
+	print $OUT "<table border=\"0\" cellspacing=\"0\" width=\"100%\" bgcolor=\"#f96500\" cellpadding=1>";
+	print $OUT "<tr><td>";
+	print $OUT "<table width=\"100%\" bgcolor=\"#ffc080\" cellspacing=\"0\" cellpadding=\"3\" border=\"0\">";
+	print $OUT "<tr><td>";
+	print $OUT "<font size=\"+1\"><tt><b>";
+	print $OUT "<a href=\"$Link\" name=\"$MountPoint\">$MountPoint</a>";
+	print $OUT "</b></tt></font>";
+	print $OUT "</td></tr></table>";
+	print $OUT "</td></tr></table>";
+
+	if ($Param{Info}->{General}) {
+	    print $OUT "<p>" . $Param{Info}->{General} . "</p>";
+	}
+
+	if ($Param{Info}->{Example}) {
+	    print $OUT "<b>Example:</b>";
+	    print $OUT "<pre>\n" . $Param{Info}->{Example} . "\n</pre>\n";
+	}
+    } elsif ($Param{Style} eq "long") {
+	# Long
+	print $OUT "<table border=\"0\" cellspacing=\"0\" width=\"100%\" bgcolor=\"#f96500\" cellpadding=1>";
+	print $OUT "<tr><td>";
+	print $OUT "<table width=\"100%\" bgcolor=\"#ffc080\" cellspacing=\"0\" cellpadding=\"3\" border=\"0\">";
+	print $OUT "<tr><td>";
+	print $OUT "<font size=\"+1\"><tt><b>";
+	print $OUT "<a href=\"overview.scr.html#$MountPoint\" name=\"$MountPoint\">$MountPoint</a>";
+	print $OUT "</b></tt></font>";
+	print $OUT "</td></tr></table>";
+	print $OUT "</td></tr></table>";
+
+	my %Skip = ();
+	$Skip{MountPoint} = 1;
+	if ($Param{Info}->{Summary}) {
+	    print $OUT "<p><b>" . $Param{Info}->{Summary} . "</b></p>";
+	    $Skip{Summary} = 1;
+	}
+
+	if ($Param{Info}->{General}) {
+	    print $OUT "<p>" . $Param{Info}->{General} . "</p>";
+	    $Skip{General} = 1;
+	}
+
+	if ($Param{Info}->{Access}) {
+	    print $OUT "<p><b>Access:</b> ";
+	    print $OUT $Param{Info}->{Access};
+	    print $OUT "</p>";
+	    $Skip{Access} = 1;
+	}
+
+	if ($Param{Info}->{Example}) {
+	    print $OUT "<b>Example:</b>";
+	    print $OUT "<pre>\n" . $Param{Info}->{Example} . "\n</pre>\n";
+	    $Skip{Example} = 1;
+	}
+
+	if ($Param{Info}->{See}) {
+	    print $OUT "<b>See:</b><ul>";
+	    my @See = split(/\n\s*/, $Param{Info}->{See});
+	    foreach my $See (@See) {
+		print $OUT "<li>" . expandSeeToLink($See) . "</li>";
+	    }
+	    print $OUT "</ul>\n";
+	    $Skip{See} = 1;
+	}
+
+	if ($Param{Info}->{Authors}) {
+	    print $OUT "<b>Authors:</b><p>";
+	    my $Authors = $Param{Info}->{Authors};
+	    $Authors =~ s/\((\S+\@(\S+\.)+\S+)\)/<a href="(mailto:$1">$1<\/a>)/g;
+	    $Authors =~ s/<(\S+\@(\S+\.)+\S+)>/&lt;<a href="mailto:$1">$1<\/a>&gt;/g;
+	    $Authors =~ s/\n/<br>\n/g;
+	    print $OUT $Authors;
+	    print $OUT "</p>";
+	    $Skip{Authors} = 1;
+	}
+
+	if ($Param{Info}->{File}) {
+	    print $OUT "<b>File:</b>" . $Param{Info}->{File} . "<br>\n";
+	    $Skip{File} = 1;
+	}
+
+	if ($Param{Info}->{Module}) {
+	    print $OUT "<b>Module:</b>" . $Param{Info}->{Module} . "<br>\n";
+	    $Skip{Module} = 1;
+	}
+
+	if ($Param{Info}->{ID}) {
+	    print $OUT "<p>" . $Param{Info}->{ID} . "</p>";
+	    $Skip{ID} = 1;
+	}
+
+	print $OUT "<pre>\n";
+	foreach my $Key (sort keys %{$Param{Info}}) {
+	    next if $Skip{$Key};
+	    print $OUT "$Key: " . $Param{Info}->{$Key} . "\n";
+	}
+	print $OUT "</pre>\n";
+    } else {
+	print $OUT "Unknown Style: $Param{Style}\n";
+    }
+
+    print $OUT "\n</body></html>\n";
+}
+#----------------------------------------------------------------------
+sub expandSeeToLink {
+    my $See = shift;
+
+    if ($See =~ /<a/i) {
+	# Link
+	return $See;
+    } elsif ($See =~ /^\s*MountPoint:?\s+(.*?)\s*$/i) {
+	# Mountpoint
+	return "<a href=\"overview.scr.html#$1\">$1</a>";
+    } elsif ($See =~ /^\s*man:?\s+(.*?)\s*$/i) {
+	# man page
+	return "<a href=\"man:/$1\">man $1</a>";
+    } elsif ($See =~ /^\s*info:?\s+(.*?)\s*$/i) {
+	# info page
+	return "<a href=\"info:/$1\">info $1</a>";
+    } elsif ($See =~ /^\s*((http|ftp):\/\/.*?)\s*$/i) {
+	# Ext reference
+	return "<a href=\"$1\">$1</a>";
+    } else {
+	return expandNameToLink($See);
+    }
+}
+#----------------------------------------------------------------------
+sub expandNameToLink {
+    my $Name = shift;
+    $Name =~ s/^\s*//;
+    $Name =~ s/\s*$//;
+
+    #my $YaST2DocHome = "../..";
+    my $YaST2DocHome = $Options->{D} || "file:/usr/share/doc/packages";
+    my %ExplicitLinks = (
+	libscr => "$YaST2DocHome/libscr/autodocs/index.html",
+	anyagent => "$YaST2DocHome/yast2-agent-any/anyagent.html",
+    );
+
+    if (exists $ExplicitLinks{$Name}) {
+	return "<a href=\"$ExplicitLinks{$Name}\">$Name</a>";
+    } elsif ($Name =~ m|^[^/].*/|) {
+	return "<a href=\"$YaST2DocHome/$Name\">$Name</a>";
+    } else {
+	my $FileName = $Name;
+	$FileName =~ s/\s/_/g;
+	$FileName .= ".html" unless ($FileName =~ /\.html?$/);
+	return "<a href=\"$FileName\">$Name</a>";
+    }
+
+}
+#----------------------------------------------------------------------

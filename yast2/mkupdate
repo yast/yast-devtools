@@ -1,0 +1,125 @@
+#!/bin/bash
+#
+# Author: Mathias Kettner <kettner@suse.de>
+#
+# Copyright SuSE GmbH 1999
+#
+# Creates a compressed filesystem that can be put onto a
+# floppy in order to create a y2 update disk.
+#
+#
+# Usage:  mkupdate SOURCEDIR OUTPUTDIR
+#
+# The SOURCEDIR contains a Y2 file hierarchy, to OUTPUTDIR
+# a file y2update.gz is copied.
+# ----------------------------------------------------------------------
+
+cat <<EOF
+mkupdate - Create a YaST2 update filesystem named y2update.gz.
+
+EOF
+
+if [ $UID != 0 ] ; then
+    echo "Sorry, you have to be root to run this script." >&2
+    exit 5
+fi
+
+if [ $# != 2 ] ; then
+    echo "Usage: $0 SOURCEDIR OUTPUTDIR" >&2
+    exit 5
+fi
+
+SOURCEDIR="$1"
+OUTPUTDIR="$2"
+
+if [ ! -d "$SOURCEDIR" ] ; then
+    echo "Directory $SOURCEDIR not existing." >&2
+    exit 5
+fi
+
+if [ ! -d "$OUTPUTDIR" ] ; then
+    echo "Directory $OUTPUTDIR not existing." >&2
+    exit 5
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+#
+# Determine size
+# 
+size=$(du -ck $SOURCEDIR | tail -1 | sed 's/[^0-9]*//g')
+fssize=$(( 98 + (size * 12) / 10 ))
+echo -n "-> Your files are $size KB in size. Creating a file of $fssize KB..."
+FS=$OUTPUTDIR/y2update
+
+#
+# Create file of size big enough to hold a filesystem with all files
+# 
+dd if=/dev/zero of=$FS bs=$fssize count=1024 2>/dev/null || { \
+    echo failed.
+    echo "Couldn't create file $FS. Check your permissions." >&2
+    exit 5
+}
+echo success.
+
+#
+# Determine number of needed inodes
+#
+numinodes=$(( 32 + $(find $SOURCEDIR | wc -l | sed 's/ //g') ))
+
+#
+# Create a filesystem in this file
+#
+echo -n "-> Creating an ext2 filesystem in $FS with $numinodes inodes..."
+/sbin/mke2fs -F -b 1024 -m 0 -N $numinodes -q -L y2update $FS 2>/dev/null || { \
+    echo failed.
+    echo "Couldn't create a filesystem in $FS."
+    rm -f $FS
+    exit 5
+}
+echo success.
+
+#
+# Mount it loopback
+#
+MP=$(mktemp -d /tmp/mkupdateXXXXXX)
+if [ $? != 0 -o ! -d "$MP" -o -z "$MP" ] ; then
+    echo "Can't create temporary mountpoint $MP" >&2
+    rm -f $FS
+    exit 5
+fi
+
+echo -n "-> Mounting it loopback..."
+mount -o loop $FS $MP || { \
+    echo "failed."
+    rm -f $FS
+    rm -rf $MP
+    exit 5
+}
+echo success.
+
+#
+# Copy files to it using tar (this preserved ownerships and permissions)
+#
+echo -n "-> Copying files into mounted fs..."
+tar cf - -C "$SOURCEDIR" . | tar xf - -C "$MP" || { \
+    echo failed.
+    echo "Did I make this darn thing to small??"
+    rm -rf $FS
+    umount $MP
+    rm -rf $MP
+    exit 5
+}
+echo success.
+
+#
+# Unmount the thing and gzip the file
+#
+echo -n "-> Unmounting, creating $FS.gz..."
+umount $MP
+rm -f $FS.gz
+gzip $FS
+echo "$(cat $FS.gz | wc --bytes | sed 's/ //g') Bytes"
+
+echo 
+echo "Success!"

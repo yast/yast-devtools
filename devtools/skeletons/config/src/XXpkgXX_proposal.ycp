@@ -1,0 +1,102 @@
+/**
+ * File:
+ *   clients/proposal_XXpkgXX.ycp
+ *
+ * Package:
+ *   Configuration of XXpkgXX
+ *
+ * Summary:
+ *   Proposal function dispatcher.
+ *
+ * Authors:
+ *   XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
+ *
+ * Proposal function dispatcher for XXpkgXX configuration.
+ *
+ */
+
+{
+    textdomain "XXpkgXX";
+
+    import "XXPkgXX";
+    import "Progress";
+
+    string func  = Args(0);
+    map    param = Args(1);
+    map    ret   = $[];
+
+    // Make proposal for installation/configuration...
+    if ( func == "MakeProposal" )
+    {
+	boolean force_reset = param["force_reset"]:false;
+
+	// TODO FIXME Call some function that makes a proposal here:
+	// TODO FIXME For example:
+
+	// Do not show any progress during Read()
+	Progress::off ();
+	boolean success = XXPkgXX::Read ( ``{ return false; } );
+	Progress::on ();
+
+	string proposal = XXPkgXX::Summary ();
+
+	// Fill return map
+	// TODO FIXME Write the real values here
+	ret =
+	    $[ "preformatted_proposal" : proposal, // TODO FIXME
+	       "warning"               : _("This is just a XXpkgXX proposal!"), // TODO FIXME
+	       "warning_level"         : `blocker // TODO FIXME
+	    ];
+    }
+    // Run an interactive workflow
+    else if ( func == "AskUser" )
+    {
+	boolean has_next = param["has_next"]:false;
+
+	// Store current settings
+	any settings = XXPkgXX::Export ();
+
+	// TODO FIXME Call a function that displays a user dialog
+	// TODO FIXME or a sequence of dialogs here:
+	any sequence = CallFunction ( `XXpkgXX ( .noio ) );
+
+	// Fill return map
+	// TODO FIXME Write the real values here
+	ret =
+	    $[ "workflow_sequence" : sequence // TODO FIXME
+	    ];
+
+	if ( sequence != `next )	// restore previous settings
+	{
+	    XXPkgXX::Import ( settings );
+	}
+    }
+    // Return human readable titles for the proposal
+    else if ( func == "Description" )
+    {
+	// Fill return map
+	// TODO FIXME Usually just static values. Write them here.
+	ret =
+	    $[ "rich_text_title" : _( "XXPkgXX" ),  // TODO FIXME
+	       "menu_title"      : _( "&XXPkgXX" ), // TODO FIXME
+	       "id"              : "XXpkgXX_conf"   // TODO FIXME
+	    ];
+    }
+    // Write the proposed settings
+    else if ( func == "Write" )
+    {
+	// Write settings
+	boolean result = XXPkgXX::Write ();
+
+	ret =
+	    $[ "success" : result ];
+    }
+    else
+    {
+	y2error("Unknown function: %1", func);
+    }
+
+    return ret;
+}

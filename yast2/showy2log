@@ -1,0 +1,310 @@
+#! /bin/bash
+# ########################################################################
+#
+# 'cat' a y2log file and pipe the output through a filter that coloures
+# messages according to their loglevel.
+#
+# Author: Michael Andres <ma@suse.de>
+#
+# ########################################################################
+
+PROGNAME=$(basename $0)
+
+function Err() {
+	echo "$PROGNAME: $*" >&2
+}
+
+function ErrExit() {
+	test -z "$1" || Err "$*"
+	exit 1
+}
+
+# ########################################################################
+# filter function
+# ########################################################################
+
+function ShowLog() {
+awk "$@" '
+BEGIN {
+	black	= "\033[30m";	debug	 = 0;	normal	= "\033[0m";
+	red	= "\033[31m";	milestone= 1;	bold	= "\033[1m";
+	green	= "\033[32m";	warning	 = 2;
+	yellow	= "\033[33m";	error	 = 3;
+	blue	= "\033[34m";	security = 4;
+	magenta	= "\033[35m";	internal = 5;
+	cyan	= "\033[36m";
+	white	= "\033[37m";
+
+	color[debug	,0]	= blue;
+	color[milestone	,0]	= cyan;
+	color[warning	,0]	= yellow;
+	color[error	,0]	= red;
+	color[security	,0]	= magenta;
+	color[internal	,0]	= green;
+
+	color[debug	,1]	= white;
+	color[milestone	,1]	= bold color[milestone	,0];
+	color[warning	,1]	= bold color[warning	,0];
+	color[error	,1]	= bold color[error	,0];
+	color[security	,1]	= bold color[security	,0];
+	color[internal	,1]	= bold color[internal	,0];
+
+	if ( DEMO == 1 ) {
+		print normal "Level 0: debug:     " color[debug,    0] "default  " color[debug,    1] "highlight"
+		print normal "Level 1: milestone: " color[milestone,0] "default  " color[milestone,1] "highlight"
+		print normal "Level 2: warning:   " color[warning,  0] "default  " color[warning,  1] "highlight"
+		print normal "Level 3: error:     " color[error,    0] "default  " color[error,    1] "highlight"
+		print normal "Level 4: security:  " color[security, 0] "default  " color[security, 1] "highlight"
+		print normal "Level 5: internal:  " color[internal, 0] "default  " color[internal, 1] "highlight"
+		exit 0
+	}
+
+	SEP = "@"
+
+	AcceptComponent = split( c, ACCEPTCOMPONENT, SEP )
+	RejectComponent = split( C, REJECTCOMPONENT, SEP )
+	AcceptLevel     = split( l, ACCEPTLEVEL, SEP )
+	RejectLevel     = split( L, REJECTLEVEL, SEP )
+	AcceptFilter    = split( p, ACCEPTFILTER, SEP )
+	RejectFilter    = split( P, REJECTFILTER, SEP )
+
+	BoldComponent   = split( b, BOLDCOMPONENT, SEP )
+	BoldFilter      = split( B, BOLDFILTER, SEP )
+
+	AcceptLine = 0
+}
+!/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ {
+	# this is a follow up line
+	if ( AcceptLine )
+		print
+	next
+}
+{
+	level = $3;
+	gsub( "[^0-9]", "", level );
+
+	component = $4;
+	gsub( ".*:", "", component );
+	gsub( "\\[.*", "", component );
+
+	AcceptLine = -1
+
+	if ( AcceptLine != 1 && AcceptLevel ) {
+		AcceptLine = 0
+		for ( p in ACCEPTLEVEL )
+			if ( match( level, ACCEPTLEVEL[p] ) ) {
+				AcceptLine = 1
+				break
+			}
+	}
+
+	if ( AcceptLine != 1 && AcceptComponent ) {
+		AcceptLine = 0
+		for ( p in ACCEPTCOMPONENT )
+			if ( match( component, ACCEPTCOMPONENT[p] ) ) {
+				AcceptLine = 1
+				break
+			}
+	}
+
+	if ( AcceptLine != -1 && AcceptFilter ) {
+		AcceptLine = 0
+		for ( p in ACCEPTFILTER )
+			if ( match( $0, ACCEPTFILTER[p] ) ) {
+				AcceptLine = 1
+				break
+			}
+	}
+
+	if ( AcceptLine && RejectLevel ) {
+		for ( p in REJECTLEVEL ) {
+			if ( match( level, REJECTLEVEL[p] ) ) {
+				AcceptLine = 0
+				break
+			}
+		}
+	}
+
+	if ( AcceptLine && RejectComponent ) {
+		for ( p in REJECTCOMPONENT ) {
+			if ( match( component, REJECTCOMPONENT[p] ) ) {
+				AcceptLine = 0
+				break
+			}
+		}
+	}
+
+	if ( AcceptLine && RejectFilter ) {
+		for ( p in REJECTFILTER ) {
+			if ( match( $0, REJECTFILTER[p] ) ) {
+				AcceptLine = 0
+				break
+			}
+		}
+	}
+
+	if ( !AcceptLine )
+		next
+}
+{
+	bold = 0
+	if ( !bold && BoldComponent ) {
+		for ( p in BOLDCOMPONENT ) {
+			if ( match( component, BOLDCOMPONENT[p] ) ) {
+				bold = 1
+				break
+			}
+		}
+	}
+
+	if ( !bold && BoldFILTER ) {
+		for ( p in BOLDFILTER ) {
+			if ( match( $0, BOLDFILTER[p] ) ) {
+				bold = 1
+				break
+			}
+		}
+	}
+
+	print normal color[level,bold] $0
+}
+END {
+	print normal
+}
+'
+}
+
+# ########################################################################
+# setup and options
+# ########################################################################
+
+OPTSTR="?hc:C:l:L:p:P:b:B:f:"
+
+function ChkArg() {
+	case "$1" in
+        -*)
+        	Usage "Illegal argument to -$OPTNAME '$1'"
+        	return 1
+                ;;
+        esac
+        return 0
+}
+
+function Usage() {
+	test -z "$1" || Err "$*"
+	cat <<- EOF >&2
+	Usage: $PROGNAME [OPTION]... [COMMAND [args]...]
+	'cat' a y2log file and pipe the output through a filter that coloures
+	messages according to their loglevel.
+
+	$(ShowLog -vDEMO=1)
+	Command:
+	Specify an alternate command to use instead of 'cat'. Everything that
+	follows is passed as argument to COMMAND. The name of the y2log file
+	is appended automagically.
+
+	  $PROGNAME tail -f
+
+	File selection:
+	By default /var/log/y2log is processed, unless you're not root
+	and ~/.y2log exists.
+
+	  -f FILE	use FILE as y2log file
+
+	Filter options:
+	Those options allow to select which message lines are actually printed
+	and which should be suppressed. Each option takes a '@' separated list
+	of regular expressions as argument. A message line is selecetd if there
+	is a match for at least one of the regular expressions found in the line.
+
+	  -p PATTERN	print only messages matching PATTERN
+	  -l PATTERN	as -p, but match PATTERN against loglevel
+	  -c PATTERN	as -p, but match PATTERN against componentname
+
+	  -P PATTERN	suppress messages matching PATTERN
+	  -L PATTERN	as -P, but match PATTERN against loglevel
+	  -C PATTERN	as -P, but match PATTERN against componentname
+
+	If you combine these options, those supressing messages take precedence
+	over those printing messages.
+
+	  $PROGNAME -L 0		everything except debug messages
+	  $PROGNAME -c lib		print messages of all components with
+	  				a 'lib' in their name
+	  $PROGNAME -c '^ui$' -L 0	all messages except debug from
+	  				component ui.
+
+	Highlighting:
+	  -B PATTERN	highlight printed message if PATTERN matches
+	  -b PATTERN	as -B, but match PATTERN against componentname
+
+	EOF
+	exit 1
+}
+
+c=""
+C=""
+l=""
+L=""
+p=""
+P=""
+b=""
+B=""
+Y2LOG=/var/log/y2log
+if [ $(id -u) != 0 -a -f ~/.y2log ]; then
+	Y2LOG=~/.y2log
+fi
+
+if [ -n "$OPTSTR" ]; then
+	while getopts "$OPTSTR" OPTNAME; do
+		ChkArg $OPTARG $OPTNAME
+		case $OPTNAME in
+		[?h])
+			Usage
+			;;
+		c)
+			c="$OPTARG"
+			;;
+		C)
+			C="$OPTARG"
+			;;
+		l)
+			l="$OPTARG"
+			;;
+		L)
+			L="$OPTARG"
+			;;
+		p)
+			p="$OPTARG"
+			;;
+		P)
+			P="$OPTARG"
+			;;
+		b)
+			b="$OPTARG"
+			;;
+		B)
+			B="$OPTARG"
+			;;
+		f)
+			Y2LOG="$OPTARG"
+			;;
+		*)
+			Err "unhandled option $OPTNAME($OPTARG)"
+			;;
+		esac
+	done
+	shift $(($OPTIND-1))
+fi
+
+# ########################################################################
+# main
+# ########################################################################
+
+test -r "$Y2LOG" || ErrExit "Can't read file '$Y2LOG'"
+
+${@:-cat} $Y2LOG | ShowLog \
+	-vc="$c" -vC="$C" \
+	-vl="$l" -vL="$L" \
+	-vp="$P" -vP="$P" \
+	-vb="$b" -vB="$B"

@@ -1,0 +1,219 @@
+#!/bin/bash
+# automatically update yast2 docs on the web
+# Martin Vidner <mvidner@suse.cz>
+#  based on a script by Jan Holesovsky <kendy@suse.cz>
+# $Id$
+
+# How to set up a freshdoc server:
+# Requires (in addition to yast2 development environment):
+#  apache (WWWSERVER?) htdig
+#  yast2-devtools scrdoc ydoc ycpdoc
+# Set TEMPWEB, DOC_SANDBOX, CVSUSER, HTDIGCONF, SERVERNAME
+# Edit $HTDIGCONF (TODO: commit a sample (diff))
+# Allow symlinks in htdocs
+# insserv apache; /etc/init.d/apache start
+# ln -s /local/home2/yast2/tools/yast2/freshdoc /etc/cron.daily
+# As root: freshdoc --login
+
+# set up logging:
+# the voluminous output of make and cvs will go to a log file,
+# overall status messages will go to stderr via fd 3
+if [ -d /var/log -a -w /var/log ]; then
+    LOGDIR=/var/log
+else
+    LOGDIR=~
+fi
+exec 3>&2 &> $LOGDIR/freshdoc.log
+
+echo ' -*- outline -*-'
+set -x
+date
+
+CVSUSER=mvidner
+CVSROOT=:pserver:$CVSUSER@yast2-cvs.suse.de:/suse/yast2/cvs
+export CVSROOT
+# TEMPWEB will be always rm -rf'd
+# it is for currently built docs.
+TEMPWEB=/local/home2/tempweb
+# WEB/freshdoc will be rm -rf'd if --scratch is given
+WEB=/usr/local/httpd/htdocs
+# Where an up to date cvs tree will be kept.
+# Do not use your usual working directory!
+DOC_SANDBOX=/local/home2/yast2fresh
+#BRANCH="-r freshdoc-branch"
+HTDIGCONF=/opt/www/htdig/conf/yast2.conf
+SERVERNAME=valkyrie.suse.cz
+
+mkdir --parents $DOC_SANDBOX
+cd $DOC_SANDBOX
+
+# if we log an error, remember to exit with an error so that cron sends a mail
+EXITC=0
+function eecho() {
+    echo "$@" >&3
+    EXITC=1
+}
+
+function usage() {
+    eecho "usage: $0 [options...]"
+    eecho "options:"
+    eecho "	--scratch	remove \$WEB/freshdoc"
+    eecho "	--clean		always \"make clean\" first"
+    eecho "	--login		invoke \"cvs login\" before updating"
+    eecho "	--no-update	do not update from cvs"
+    eecho "	--no-index	do not call htdig"
+    eecho "	--only  modules	only these cvs modules (eg. modules/y2c_mail)"
+    exit $EXITC
+}
+
+DOLOGIN=""
+# checkout or update the CVS
+function update() {
+    echo \* $FUNCNAME "$@"
+    if [ $DOLOGIN ]; then
+	cvs login
+    fi
+    for I in devtools doc modules source tools; do # 'po' is not interesting
+	if [ -d $I ]; then
+	    {
+		echo \*\* $I
+		pushd $I
+		cvs update -d
+		popd
+	    }
+	else
+	    cvs checkout $BRANCH $I
+	fi
+	if [ $? != 0 ]; then
+	    eecho "Error updating $I"
+	fi
+    done
+}
+
+function findmodules() {
+    find . -name Makefile.cvs -exec dirname '{}' \;
+}
+
+function docdir() {
+    J=$1
+    MAKECLEAN=$2
+
+    echo \*\*\* $J
+    if [ -d $J -a -f $J/Makefile ]; then
+	if [ $MAKECLEAN ]; then
+	    if ! make -C $J DESTDIR=$TEMPWEB clean; then
+		eecho "Error making clean in `pwd`/$J"
+	    fi
+	fi
+	if ! make -C $J DESTDIR=$TEMPWEB install; then
+	    eecho "Error making install in `pwd`/$J"
+	fi
+    fi
+}
+
+function modules_index() {
+    DOCDIR=/usr/share/doc/packages
+    INDEX=yast2-doc/module-index.html
+    mkdir --parents $TEMPWEB$DOCDIR/${INDEX%/*}
+    echo '<base href="http://'$SERVERNAME$DOCDIR'/">' > $TEMPWEB$DOCDIR/$INDEX
+    find $TEMPWEB -name '*.mod.html' | while read MOD; do
+	DIR=${MOD#$TEMPWEB$DOCDIR/}
+	DIR=${DIR%/*}
+	sed -e 's,<a href="\([^"]*\)">\([^<]*\)</a>,<!-- \2 --><a href="'$DIR'/\1">\2</a><br>,' <$MOD
+    done | sort >> $TEMPWEB$DOCDIR/$INDEX
+}
+
+function newmain() {
+    CVSMODULES=""
+    SCRATCH=""
+    MAKECLEAN=""
+    DOUPDATE=1
+    DOINDEX=1
+    while [ $1 ]; do
+	case $1 in
+	    --scratch)
+		SCRATCH=1
+		shift
+		;;
+	    --clean)
+		MAKECLEAN=1
+		shift
+		;;
+	    --no-update)
+		DOUPDATE=""
+		shift
+		;;
+	    --login)
+		DOLOGIN=1
+		shift
+		;;
+	    --no-index)
+		DOINDEX=""
+		shift
+		;;
+	    --only)
+		shift
+		CVSMODULES="$@"
+		break
+		;;
+	    *)
+		usage
+	esac
+    done
+
+    if [ $DOUPDATE ]; then
+	update
+    fi
+
+    if [ -z "$CVSMODULES" ]; then
+	CVSMODULES=`findmodules`
+    fi
+    rm -f $DOC_SANDBOX/config.cache
+    mkdir --parents $TEMPWEB
+    rm -rf $TEMPWEB
+    for I in $CVSMODULES; do
+	{
+	    echo \*\* $I
+	    pushd $I
+
+	    make -f Makefile.cvs all && \
+	    ./configure --cache-file=$DOC_SANDBOX/config.cache
+	    if [ $? != 0 ]; then
+		eecho "Error creating makefiles in $I"
+	    fi
+
+	    DOCDIRS=`find . -name doc`
+	    if [ ${I##*/} = doc ]; then
+		DOCDIRS=". $DOCDIRS"
+	    fi
+	    for J in $DOCDIRS; do
+		docdir $J $MAKECLEAN
+	    done
+	    popd
+	}
+    done
+
+    # postprocess: Module:: index, TODO scr index
+    # probably should do yast2/doc last and take care of it there
+    modules_index
+
+    mkdir --parents $WEB/freshdoc
+    # scratch the web if requested
+    if [ $SCRATCH ]; then
+	rm -rf $WEB/freshdoc/*
+    fi
+    # move in the fresh doc
+    cp -a $TEMPWEB/usr/share/doc/packages/* $WEB/freshdoc
+
+    # pretend /usr/share/doc
+    mkdir -p $WEB/usr/share/doc
+    ( cd $WEB/usr/share/doc; [ -L packages ] || ln -s ../../../freshdoc packages )
+
+    if [ $DOINDEX ]; then
+	echo \* htdig
+	/opt/www/htdig/bin/rundig -v -c $HTDIGCONF
+    fi
+}
+
+newmain "$@"
+exit $EXITC

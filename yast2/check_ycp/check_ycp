@@ -1,0 +1,1922 @@
+#!/usr/bin/perl -w
+#
+# check_ycp -	YCP checker utility.
+#
+# This can check one or more YaST2 YCP scripts for common errors.
+# Checked YCP scripts are required to be syntactically correct.
+# Check with "parseycp" if you are unsure about this.
+#
+# Usage:
+#	check_ycp [-options] <ycp-file> [<ycp-file> ...]
+#
+#	See sub usage() for command line options.
+#
+# Author:  Stefan Hundhammer <sh@suse.de>
+# Updated: 2001-10-08
+#
+# $Id$
+#
+
+use strict;
+use English;
+use Getopt::Std;
+use File::Basename;
+
+use vars qw(
+	    $opt_a
+	    $opt_b
+	    $opt_c
+	    $opt_d
+	    $opt_h
+	    $opt_k
+	    $opt_m
+	    $opt_o
+	    $opt_p
+	    $opt_r
+	    $opt_s
+	    $opt_t
+	    $opt_v
+	    $opt_x
+	    );
+
+
+#
+# Global variables
+#
+
+# Command line switches
+
+my $verbose				= 1;	# -v
+my $debug				= 0;	# -d
+
+my $dont_check_alternate_declarations	= 0;	# -a (alternate decls)
+my $dont_force_textdomain		= 0;	# -o (textdOmain)
+my $dont_check_html_tags		= 0;	# -r (RichText)
+my $multiple_paragraphs_ok		= 0;	# -p (<p>)
+my $dont_check_header			= 0;	# -c (comments in header)
+my $dont_check_keyboard_shortcuts	= 0;	# -k (keyboard)
+my $dont_force_translations		= 0;	# -t (translations)
+my $dont_check_obsolete_functions	= 0;	# -b (oBsolete)
+my $dont_check_predefined_messages	= 0;	# -m (messages)
+
+
+# Other command line switches:
+# -h	Help
+# -s	silent - turn off verbose
+# -x	eXample mode
+
+
+# Error reporting and statistics
+
+my $current_filename	= "";
+my $warning_count	= 0;
+my $error_count		= 0;
+
+
+#
+# Forward declarations
+#
+
+sub main();
+
+
+#
+# Main program
+#
+
+# Call the main function and exit.
+# DO NOT enter any other code outside a sub -
+# any variables would otherwise be global.
+
+main();
+exit 0;
+
+
+#-----------------------------------------------------------------------------
+
+sub main()
+{
+    # Extract command line options.
+    # This will set a variable opt_? for any option,
+    # e.g. opt_v if option '-v' is passed on the command line.
+
+    getopts('abcdhkmoprstvx');
+
+    #
+    # Set flags according to the command line options.
+    #
+
+    usage()					if $opt_h;
+    $verbose				= 1 	if $opt_v;
+    $verbose				= 0 	if $opt_s;
+    $debug				= 1 	if $opt_d;
+
+    $dont_check_alternate_declarations	= 1	if $opt_a;
+    $dont_check_obsolete_functions	= 1	if $opt_b;
+    $dont_check_header			= 1	if $opt_c;
+    $dont_check_keyboard_shortcuts	= 1	if $opt_k;
+    $dont_check_predefined_messages	= 1	if $opt_m;
+    $dont_force_textdomain		= 1	if $opt_o;
+    $multiple_paragraphs_ok		= 1	if $opt_p;
+    $dont_check_html_tags		= 1	if $opt_r;
+    $dont_force_translations		= 1	if $opt_t;
+
+    if ( $opt_x )	# example mode - relaxed checking for YCP examples
+    {
+	$dont_check_header		= 1;
+	$dont_check_keyboard_shortcuts	= 1;
+	$multiple_paragraphs_ok		= 1;
+	$dont_force_translations	= 1;
+	$dont_check_predefined_messages	= 1;
+    }
+
+    usage() if $#ARGV < 0;	# At least one file arg is required
+
+
+    #
+    # Check all specified YCP files
+    #
+
+    my $infile;
+
+    foreach $infile ( @ARGV )
+    {
+	logf( "Checking $infile" ) if $#ARGV > 0;
+	check_ycp_file( $infile );
+    }
+
+
+    #
+    # Summary
+    #
+
+    if ( $warning_count + $error_count > 0 )
+    {
+	logf( "$error_count errors, $warning_count warnings total" );
+	exit 1;
+    }
+    else
+    {
+	logf( "OK." );
+	exit 0;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# check one YCP file
+#
+# Parameters:
+#	infile	name+path of the file to check
+#
+
+sub check_ycp_file()
+{
+    my ( $infile ) = @_;
+
+    #
+    # Read the YCP file.
+    #
+
+    open( YCP, $infile ) or die "Can't open $infile";
+    undef $RS;				# prepare to read entire file a once
+    my $ycp_code  = <YCP>;		# read the entire file into $ycp_code
+    close( YCP );
+
+    #
+    # Initialize some stuff prior to the real checks.
+    #
+
+    $current_filename = $infile;	# global for easier error reporting
+
+    my $commented_ycp = $ycp_code;
+    $ycp_code = strip_comments( $ycp_code );
+
+
+    #
+    # Perform checks.
+    #
+
+    if ( ! $dont_check_header )
+    {
+	my $header = extract_header( $commented_ycp, $ycp_code );
+	check_header( $header );
+    }
+
+    my $has_translations = check_for_translations( $ycp_code );
+    check_translations( $ycp_code )		if $has_translations;
+    check_widget_params( $ycp_code )		unless $dont_check_keyboard_shortcuts && $dont_force_translations;
+    check_alternate_declarations( $ycp_code )	unless $dont_check_alternate_declarations;
+    check_obsolete_functions( $ycp_code )	unless $dont_check_obsolete_functions;
+    check_predefined_messages( $ycp_code )	unless $dont_check_predefined_messages;
+
+    # print count_lines( $ycp_code ) . "\n" ;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Strip all comments from the YCP code. Multi-line comments will be
+# replaced with the same number of newlines so the number of lines
+# still matches with the original for error reporting.
+#
+# Parameters:
+#	$commented_code		Original (multi line) ycp source code
+#				that may include comments
+#
+# Return value:
+#	(multi line) ycp source code without any comments
+
+sub strip_comments()
+{
+    my ( $ycp ) = @_;
+
+    $ycp =~ s://[^\n]*::gms;		# delete one-line comments: // ...
+					# regexp flags used:
+					# "g"	global - replace all occurences
+					# "m"	multi-line input string
+					# "s"	"." matches newlines
+
+    # delete /* ... */ comments (maybe multi line)
+
+    while ( $ycp =~
+		s{                             # substitute
+		       (                       # this will be reference $1
+			       /\*             # literal  /*
+				       (.*?)   # anything (non-greedy - thus "?") - ref $2
+			       \*/             # literal  */
+		       )                       # ref $1 end
+		       (                       # ref $3 start
+			       .*$             # anything until the very end
+		       )                       # ref $3 end
+		}
+		{                              # replacement is an expression (thus flag "e" below)
+		    my $comment = $1;
+		    my $rest    = $3;
+	
+		    $comment =~ s/[^\n]*//gms;  # delete everything but the newlines
+		    $comment . $rest;           # the replacement string
+	       }gmsxe
+	    )
+    {
+	# NOP
+
+	# As I understood the doc, this loop around the replacement shouldn't
+	# be necessary (since the "g" flag is specified), but it is. Strange.
+	# Can somebody tell me why?
+	#
+	# sh@suse.de 2001-05-04
+    }
+
+
+    # Debugging: dump the stripped YCP code to a file
+
+    if ( 0 )
+    {
+	open( DEBUG, ">/tmp/stripped.ycp" ) or die "Can't write debug file";
+	print DEBUG $ycp;
+	close( DEBUG );
+    }
+
+    return $ycp;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Extract the header comments from $commented_ycp, i.e. evertyhing up to the
+# first opening '{' outside a comment. Strip this header of comment signs, i.e.
+# get rid of '/*', '*/', '//' or leading '*'.
+#
+# Parameters:
+#	$commented_ycp		The original YCP code with comments.
+#	$stripped_ycp		The same YCP code stripped of comments.
+#
+# Return value:
+#	The comment header as multi line string.
+
+sub extract_header()
+{
+    my ( $commented_ycp, $stripped_ycp ) = @_;
+
+    # Delete everything in in the stripped code from the first line on
+    # that contains something else than whitespace,
+    # i.e. from the beginning of the real code on.
+
+    $stripped_ycp =~ s/{.*//ms;
+
+
+    # Count the number of lines left - there must be this many header lines.
+
+    my $header_lines = count_lines( $stripped_ycp );
+
+
+    # Copy this many lines from the commented code.
+    # This must be the header, maybe followed by some whitespace-only lines
+    # which won't hurt.
+
+    my $header = "";
+
+    while ( $commented_ycp =~ /(.*)\n/mg && $header_lines-- > 0 )
+    {
+	$header .= $1 . "\n";
+    }
+
+
+    #
+    # Strip comment markers from the header to simplify parsing.
+    # The comments themselves of course will be left alone.
+    #
+
+
+    # Delete leading /*
+
+    $header =~ s{		# substitute
+			^	# beginning of line
+			\s*	# maybe some whitespace
+			/\*	# literal /*
+		}{}xgm;		# with nothing
+
+
+    # Delete trailing */
+
+    $header =~ s{		# substitute
+			\*/	# literal */
+			\s*	# maybe some whitespace
+			$	# end of line
+		}{}xgm;		# with nothing
+
+
+    # Delete leading //
+
+    $header =~ s{		# substitute
+			^	# beginning of line
+			\s*	# maybe some whitespace
+			//	# literal //
+		}{}xgm;		# with nothing
+
+
+    # Delete leading *
+
+    $header =~ s{		# substitute
+			^	# beginning of line
+			\s*	# maybe some whitespace
+			\*+	# one or more literal *
+		}{}xgm;		# with nothing
+
+
+    return $header;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check the file header comments.
+#
+# Parameters:
+#	$header		file header as multi line string
+
+sub check_header()
+{
+    my ( $header) = @_;
+    my $line_no = count_lines( $header ) + 1;
+
+
+    # Check for $ Id $ marker
+
+    if ( $header !~ m{[\$]Id.*[\$]}m )
+    {
+	warning( $line_no, "No \$" . "Id" . "\$ CVS marker in header" );
+
+    }
+
+
+    # Check for "Author(s)" or "Maintainer(s)" entries
+
+    my $author_count = 0;
+
+    while ( $header =~
+	 m{
+		((Maintainers?)|(Authors?))	# Maintainer or Author (maybe plural)
+		\s*				# maybe whitespace
+		:				# literal :
+		\s*				# maybe whitespace
+		(				# $4 start
+			[^\n]+			# anything other than newline
+		 )				# $4 end
+	 }xgmsi
+	 )
+    {
+	$author_count++;
+
+	my $field_name	= $1;			# Author or Maintainer
+	my $author	= $4;			# field contents
+	my $author_line_no = count_lines( $header, pos( $header) ) + 1;
+
+	if ( ! defined $author )		# field contents empty
+	{
+	    error( $author_line_no, "No author or maintainer specified" );
+	}
+	# Check for something that looks like an e-mail address
+	elsif ( $author !~
+		m{
+			\S+			# non-whitespace
+			\@			# literal @
+			\S+			# non-whitespace
+			\.			# literal .
+			\S+			# non-whitespace
+		}xms
+		)
+	{
+	    error( $author_line_no,
+		   "No valid mail address for \"$field_name\"" );
+	}
+    }
+
+    if ( $author_count == 0 )
+    {
+	error( $line_no, "No valid 'Author' or 'Maintainer' field in header" );
+    }
+
+
+    # Check filename in "Module" entry - must match the actual filename
+
+    if ( $header =~
+	 m{
+		(Module)			# literal Module
+		\s*				# maybe whitespace
+		:				# literal :
+		\s*				# maybe whitespace
+		(				# $1 start
+		    \S+				# non-whitespace
+		    \.				# literal .
+		    ycp				# literal ycp
+		)				# $1 end
+	 }xgmsi
+	 )
+    {
+	my $field_name	= $1;			# Author or Maintainer
+	my $filename	= $2;			# field contents
+	my $filename_line_no = count_lines( $header, pos( $header) ) + 1;
+
+	if ( ! defined $filename )		# field contents empty
+	{
+	    error( $filename_line_no, "No filename specified in '$field_name' field in header" );
+	}
+	elsif ( basename( $filename ) ne basename( $current_filename ) )
+	{
+	    error( $filename_line_no, "Wrong filename in '$field_name' in header" );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check wheter or not the YCP code has any indication of translations,
+# i.e. either a "textdomain" statement is found or there are
+# _("???") quoted strings.
+#
+# Parameters:
+#	$ycp_code	The YCP code to check (without comments!)
+#
+# Return value:
+#	1 if there are translations, 0 if not.
+
+sub check_for_translations()
+{
+    my ( $ycp_code ) = @_;
+    my $has_translations = 0;
+
+
+    if ( $ycp_code =~ /textdomain/m )
+    {
+	$has_translations = 1;
+    }
+
+    if ( $ycp_code =~ m{	# matches
+			 _\(	# literal _(
+			 \s*	# followed by zero or more whitespace
+			"	# followed by a " quote
+		       }xmsg )	# "x": enable comments
+				# "m": multi line input string
+				# "s": "." matches newlines (unnecessary here?)
+				# "g": hold pos() at position of match
+    {
+	if ( ! $has_translations )
+	{
+	    my $line_no = count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+	    warning( $line_no, "Messages to translate, but no \"textdomain\" statement!" )
+		unless $dont_force_textdomain;
+	}
+
+	$has_translations = 1;
+    }
+
+    return $has_translations;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Sanity check for all all translateable messages, i.e. literal strings
+# marked with _("???")
+#
+# Parameters:
+#	$ycp_code	code to check
+
+sub check_translations()
+{
+    my ( $ycp_code ) = @_;
+
+    while ( $ycp_code =~
+	    m{
+		_\(				# literal _(
+			\s*			# maybe followed by any amount of whitespace
+			"			# followed by a single " quote
+			    (			# this (the message contents) will be $1
+				(		#    message contents:
+				    \\"		#	escaped " quote
+				    |		#		or
+				    [^"]	#	anything but a " quote     ] (sync emacs)
+				)*		#    any number
+			    )			# $1 end
+			"			# the ending " quote
+			\s*			# maybe followed by any amount of whitespace
+		  \)				# followed by a literal )
+		}xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	my $translation = $1;
+	my $line_no = count_lines( $ycp_code, pos( $ycp_code ) ) - count_lines( $translation ) + 1;
+	check_html_tags( $line_no, $translation ) unless $dont_check_html_tags;
+
+	if ( $translation =~ /^\s*$/s )
+	{
+	    error( $line_no, "Empty string marked for translation" );
+	}
+
+	# warning( $line_no, "Translation:\n\n\"" . $translation . "\"\n\n" );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check one tranlation for valid HTML tags:
+#
+# If a translation contains any tags, make sure:
+# - it begins with <p>
+# - it ends with </p>
+# no more <p> / </p> tags are contained
+#
+# Parameters:
+#	$line_no	line number (for error reporting)
+#	$msg		translatable message (without quotes etc.)
+
+sub check_html_tags()
+{
+    my ( $line_no, $msg ) = @_;
+
+    if ( $msg =~ m{</?[a-zA-Z]>}m )	# Any HTML tag included in the text?
+    {
+	# Debug
+	# warning( $line_no, "Checking HTML text:\n\n\"" . $msg . "\"\n\n" );
+
+
+	# Check for at least one <p> tag.
+	#
+	# One <p> tag is required if this is HTML text (RichText).
+
+	error( $line_no, "No <p> tag in HTML message" )		unless ( $msg =~ m{<p>}mi );
+
+
+	# Check for at least one </p> tag
+	#
+	# One </p> tag is required if this is HTML text (RichText).
+
+	error( $line_no, "No </p> tag in HTML message" )	unless ( $msg =~ m{</p>}mi );
+
+
+	# Count the numbers of opening and closing paragraph tags -
+	# we'll need this more than once.
+
+	my $open_para_tags  = count_occurences( $msg, "<p>"  );
+	my $close_para_tags = count_occurences( $msg, "</p>" );
+
+
+	# Check for multiple <p> tags.
+	#
+	# Multiple paragraphs in one message are discouraged to make life a bit
+	# easier for the translators: Each message should contain one paragraph
+	# that can be translated as a standalone entity.
+
+	if ( $open_para_tags > 1 && ! $multiple_paragraphs_ok )
+	{
+	    warning( $line_no, "More than one <p> tag in HTML message" )
+	}
+
+
+	# Check for multiple </p> tags.
+
+	if ( $close_para_tags > 1 && ! $multiple_paragraphs_ok )
+	{
+	    warning( $line_no, "More than one </p> tag in HTML message" )
+	}
+
+
+	# If there are multiple paragraphs (which is bad enough - see above),
+	# at least the number of <p> and </p> must match.
+
+	if ( $open_para_tags +  $close_para_tags > 2 &&
+	     $open_para_tags != $close_para_tags )
+	{
+	    error( $line_no, "Numbers of <p> and </p> tags don't match" );
+	}
+
+
+	# Check for <br> after </p>
+	#
+	# This is discouraged. It either causes excessive margins between
+	# paragraphs or absolutely useless empty space at the end of the text -
+	# which may even be harmful if a scroll bar is needed just because of
+	# this.
+
+	if ( $msg =~ m{</p>.*<br>}si )
+	{
+	    warning( $line_no, "Use of <br> tag discouraged after </p>" );
+	}
+
+	# Get rid of all backslashes of escaped newlines.
+	# This could be considered an error, but it is quite common,
+	# so let's silently ignore it.
+
+	$msg =~ s:\\\n:\n:m;
+
+
+	# Check for text before the opening <p> tag.
+
+	my $first_para = $msg;
+	$first_para =~ s:<p>.*:<p>:msi;		# forget anything after the first <p>
+
+	if ( $first_para =~ m{
+				\S+		# at least one non-whitespace
+				\s*		# maybe some whitespace
+				<p>		# followed by literal <p>
+			      }xmsi
+	     )
+	{
+	    error( $line_no, "Text before <p> tag in HTML message" );
+	}
+
+	# Check for text after the closing </p> tag.
+
+	my $last_para = $msg;
+	$last_para =~ s:.*</p>:</p>:msi;	# forget anything before the last </p>
+	$last_para =~ s:<br>::msg;		# </p><br> errors have already been reported - forget it
+	# The following is a local fix for a common annoyance
+	# when texts come back from proofreading. Generalize!
+	$last_para =~ s:\\n:\n:msg; # translate \n so that it is whitespace
+
+	if ( $last_para =~ m{
+				</p>	# literal </p>
+				\s*	# maybe some whitespace
+				\S+	# at least one non-whitespace
+			    }xsi
+	     )
+	{
+	    error( $line_no, "Text after </p> tag in HTML message" );
+	}
+
+
+	# Check for text between paragraphs, i.e. between </p> and <p>
+
+	if ( $msg =~	m{
+				</p>	# literal </p>
+				\s*	# maybe some whitespace
+				\S+	# at least one non-whitespace
+				\s*	# maybe some whitespace
+				<p>	# literal <p>
+			 }xsi
+	     )
+	{
+	    error( $line_no, "Text between </p> and <p> tags in HTML message" );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check widget parameters for consistency
+#
+# Parameters:
+#	$ycp_code	code to check
+#
+# Return value:
+#	---
+
+sub check_widget_params()
+{
+    my ( $ycp_code ) = @_;
+
+    while ( $ycp_code =~
+	    m{
+			\W					# non-word character
+		(						# $1 start
+			(CheckBox)			|
+			(ComboBox)			|
+			(DownloadProgress)		|
+			(DummySpecialWidget)		|
+			(Frame)				|
+			(Heading)			|
+			(IntField)			|
+			(Label)				|
+			(LogView)			|
+			(MultiLineEdit)			|
+			(PartitionSplitter)		|
+			(Password)			|
+			(ProgressBar)			|
+			(PushButton)			|
+			(RadioButton)			|
+			(RichText)			|
+			(SelectionBox)			|
+			(Slider)			|
+			(TextEntry)			|
+			(Tree)				|
+			(SetWizardContents)		|	# obsolete
+			(DisplayMessage)		|	# obsolete
+			(DisplayTimedMessage)		|	# obsolete
+			(YesOrNo)			|	# obsolete
+			(YesOrNoOpt)			|	# obsolete
+			(ContinueCancel)		|	# obsolete
+			(ContinueCancelHeadlinePopup)	|
+			(ContinueCancelPopup)		|
+			(YesNoHeadlinePopup)		|
+			(YesNoPopup)			|
+			(LongTextPopup)			|
+			(MessagePopup)			|
+			(WarningPopup)			|
+			(NotifyPopup)			|
+			(ErrorPopup)			|
+			(AnyMessagePopup)		|
+			(TimedMessagePopup)		|
+			(AnyQuestionPopup)
+
+		 )
+			\s*				# maybe whitespace
+			\(				# literal "("
+		}xgm
+	    )
+    {
+	my $pos = pos( $ycp_code ) - 1;		# compensate for the opening paren (
+	my $line_no = count_lines( $ycp_code, $pos ) + 1;
+	my $widget= $1;
+
+	if ( outside_literal_string( $ycp_code, $pos ) )
+	{
+	    #
+	    # Extract and parse the arguments in parentheses "(...)" to what we found.
+	    #
+
+	    my ( $expr, $dummy ) = extract_paren_expr( substr( $ycp_code, $pos ) );
+
+	    $expr =~ s/^\s*\(//m;		# get rid of opening paren "("
+	    $expr =~ s/\)\s*$//m;		# get rid of closing paren ")"
+
+	    my @args = split_ycp_expr( $expr );
+
+	    if ( $debug )
+	    {
+		deb( "$current_filename:$line_no: Found $widget" );
+
+		foreach $expr ( @args )
+		{
+		    deb( "\targ: \"" . $expr . "\"" );
+		}
+	    }
+
+	    #
+	    # Get rid of optional standard parameters - they are just in the way.
+	    #
+
+	    while ( defined( $args[0] ) &&
+		    ( $args[0] =~ /\`opt(.*)/s ||
+		      $args[0] =~ /\`id(.*)/s    ) )
+	    {
+		shift @args;
+	    }
+
+
+	    #
+	    # Now do some real checking.
+	    #
+
+	    if ( $widget =~ /PushButton/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /Label/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /CheckBox/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /ComboBox/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /DownloadProgress/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /Frame/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /Heading/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /IntField/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /LogView/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /MultiLineEdit/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /PartitionSplitter/ )
+	    {
+		check_translation	( $widget, $line_no, 6, @args );
+		check_translation	( $widget, $line_no, 7, @args );
+		check_translation	( $widget, $line_no, 8, @args );
+		check_translation	( $widget, $line_no, 9, @args );
+		check_translation	( $widget, $line_no,10, @args );
+	    }
+	    elsif ( $widget =~ /Password/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /ProgressBar/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /RichText/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /SelectionBox/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /Slider/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /TextEntry/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /Tree/ )
+	    {
+		check_keyboard_shortcut	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /SetWizardContents/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 3, @args );
+	    }
+	    elsif ( $widget =~ /DisplayMessage/ )	# obsolete
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /DisplayTimedMessage/ )	# obsolete
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /YesOrNo$/ )		# obsolete
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+		check_translation	( $widget, $line_no, 3, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 2, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 3, @args );
+	    }
+	    elsif ( $widget =~ /YesOrNoOpt/ )		# obsolete
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+		check_translation	( $widget, $line_no, 3, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 2, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 3, @args );
+	    }
+	    elsif ( $widget =~ /ContinueCancel$/ )	# obsolete
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+		check_translation	( $widget, $line_no, 3, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 2, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 3, @args );
+	    }
+
+	    elsif ( $widget =~ /ContinueCancelHeadlinePopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+	    }
+	    elsif ( $widget =~ /ContinueCancelPopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /YesNoHeadlinePopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+	    }
+	    elsif ( $widget =~ /YesNoPopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /LongTextPopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+	    }
+	    elsif ( $widget =~ /MessagePopup/	||
+		    $widget =~ /WarningPopup/	||	# just an alias
+		    $widget =~ /NotifyPopup/	||	# just another alias
+		    $widget =~ /ErrorPopup/	  )	# just one more alias
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /AnyMessagePopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+	    }
+	    elsif ( $widget =~ /TimedMessagePopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+	    }
+	    elsif ( $widget =~ /AnyQuestionPopup/ )
+	    {
+		check_translation	( $widget, $line_no, 1, @args );
+		check_translation	( $widget, $line_no, 2, @args );
+		check_translation	( $widget, $line_no, 3, @args );
+		check_translation	( $widget, $line_no, 4, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 3, @args );
+		check_keyboard_shortcut	( $widget, $line_no, 4, @args );
+	    }
+
+
+	    #
+	    # Cleanup
+	    #
+
+	    deb( "" );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check old style alternate YCP variable declarations which are now obsolete,
+# e.g.
+#	string|any  xy  = "hello";	# now invalid
+#	symbol|void sym = `abc;		# now superfluous - all types can be nil
+#
+# Parameters:
+#	$ycp_code	The YCP code to check (without comments!)
+#
+
+sub check_alternate_declarations()
+{
+    my ( $ycp_code ) = @_;
+
+    while ( $ycp_code =~
+	    m{
+		(				# any YCP primitive type
+			(?:string)	|	# "?:": don't store match in $1, $2, ...
+			(?:integer)	|
+			(?:float)	|
+			(?:boolean)	|
+			(?:term)	|
+			(?:symbol)	|
+			(?:list)	|
+			(?:map)		|
+			(?:locale)	|
+			(?:byteblock)	|
+			(?:path)	|
+			(?:void)	|
+			(?:any)
+		)
+			\s*			# maybe whitespace
+			\|			# literal pipe character "|"
+			\s*			# maybe whitespace
+		(				#
+			(?:string)	|
+			(?:integer)	|
+			(?:float)	|
+			(?:boolean)	|
+			(?:term)	|
+			(?:symbol)	|
+			(?:list)	|
+			(?:map)		|
+			(?:locale)	|
+			(?:byteblock)	|
+			(?:path)	|
+			(?:void)	|
+			(?:any)
+		)
+	    }xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+
+	warning( $line_no, "Obsolete alternative declaration: \"$1|$2\"" )
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check for obsolete functions that should be replaced
+#
+# Parameters:
+#	$ycp_code	The YCP code to check (without comments!)
+#
+
+sub check_obsolete_functions()
+{
+    my ( $ycp_code ) = @_;
+
+    if ( basename( $current_filename ) ne "wizard_dialog.ycp" )
+    {
+	check_obsolete_definition( $ycp_code, "ClearWizardContents"	);
+	check_obsolete_definition( $ycp_code, "CreateWizardDialog"	);
+	check_obsolete_definition( $ycp_code, "ReplaceWizardAbortButton");
+	check_obsolete_definition( $ycp_code, "ReplaceWizardBackButton"	);
+	check_obsolete_definition( $ycp_code, "ReplaceWizardHelp"	);
+	check_obsolete_definition( $ycp_code, "ReplaceWizardNextButton"	);
+	check_obsolete_definition( $ycp_code, "RestoreWizardAbortButton");
+	check_obsolete_definition( $ycp_code, "RestoreWizardBackButton"	);
+	check_obsolete_definition( $ycp_code, "RestoreWizardHelp"	);
+	check_obsolete_definition( $ycp_code, "RestoreWizardNextButton"	);
+	check_obsolete_definition( $ycp_code, "SetWizardContents"	);
+	check_obsolete_definition( $ycp_code, "SetWizardContentsButtons");
+	check_obsolete_definition( $ycp_code, "SetWizardImage"		);
+	check_obsolete_definition( $ycp_code, "SetWizardStage"		);
+    }
+
+    if ( basename( $current_filename ) ne "common_popups.ycp" )
+    {
+	check_obsolete_definition( $ycp_code, "ContinueCancel"		);
+	check_obsolete_definition( $ycp_code, "YesOrNo"			);
+	check_obsolete_definition( $ycp_code, "YesNoOpt"		);
+	check_obsolete_definition( $ycp_code, "DisplayMessage"		);
+	check_obsolete_definition( $ycp_code, "DisplayTimedMessage"	);
+	check_obsolete_definition( $ycp_code, "ModuleError"		);
+    }
+
+    if ( basename( $current_filename ) ne "common_functions.ycp" )
+    {
+	check_obsolete_definition( $ycp_code, "size_text"		);
+    }
+
+
+    check_obsolete_function( $ycp_code, "ContinueCancel"	, "ContinueCancelPopup"	);
+    check_obsolete_function( $ycp_code, "DisplayMessage"	, "MessagePopup"	);
+    check_obsolete_function( $ycp_code, "DisplayTimedMessage"	, "TimedMessagePopup"	);
+    check_obsolete_function( $ycp_code, "YesOrNo"		, "YesNoPopup"		);
+    check_obsolete_function( $ycp_code, "YesNoOpt"		, "AnyQuestionPopup"	);
+
+    check_obsolete_function( $ycp_code, "isnil"	 );
+    #check_obsolete_function( $ycp_code, "Read",	"SCR(`Read(.target.ycp, ...))"		);
+    check_obsolete_function( $ycp_code, "ReadY2",	"SCR(`Read(.target.yast2, ...))"	);
+    check_obsolete_function( $ycp_code, "ReadString",	"SCR(`Read(.target.string, ...))"	);
+    #check_obsolete_function( $ycp_code, "Write",	"SCR(`Write(.target.ycp, ...))"		);
+    check_obsolete_function( $ycp_code, "WriteY2",	"SCR(`Write(.target.yast2, ...))"	);
+    check_obsolete_function( $ycp_code, "WriteString",	"SCR(`Write(.target.string, ...))"	);
+    check_obsolete_function( $ycp_code, "Shell",	"SCR(`Execute(.target.*, ...))"		);
+    check_obsolete_function( $ycp_code, "MkDir",	"SCR(`Execute(.target.mkdir, ...))"	);
+    #check_obsolete_function( $ycp_code, "Dir",		"SCR(`Read(.target.dir, ...))"		);
+    check_obsolete_function( $ycp_code, "Symlink",	"SCR(`Execute(.target.symlink, ...))"	);
+    check_obsolete_function( $ycp_code, "Include",	"include \"your/file.ycp\";"		);
+    check_obsolete_function( $ycp_code, "fileexist",	"SCR(`Read(.target.size, ...)!=-1)"	);
+    check_obsolete_function( $ycp_code, "_debug",	"y2debug()"				);
+    
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check for definition of an obsoleted function
+#
+# Parameters:
+#	$ycp_code		The YCP code to check (without comments!)
+#	$function_name		The function to check for
+#
+
+sub check_obsolete_definition()
+{
+    my ( $ycp_code, $function_name ) = @_;
+
+    while ( $ycp_code =~
+	    m{
+		define				# literal "define"
+		\s+				# followed by whitespace
+		$function_name			# followed by the function name
+		\s*				# maybe followed by some whitespace
+		\(				# literal (
+		}xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+
+	warning( $line_no, "\'define $function_name()\' probably obsolete" );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check for usage of obsolete functions that can be replaced
+#
+# Parameters:
+#	$ycp_code		The YCP code to check (without comments!)
+#	$obsolete_function
+#	$replacement_function	(optional)
+#
+
+sub check_obsolete_function()
+{
+    my ( $ycp_code, $obsolete_function, $replacement_function ) = @_;
+
+    while ( $ycp_code =~
+	    m{
+		\W				# non-word character
+		$obsolete_function		# function name
+		\s*				# maybe followed by some whitespace
+		\(				# literal (
+		}xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+
+	my $msg = "Obsolete function \'$obsolete_function()\'";
+
+	if ( defined $replacement_function )
+	{
+	    $replacement_function .= "()" unless $replacement_function =~ /\(/ ;
+	    $msg .= " - replace with \'$replacement_function\'" ;
+	}
+
+	warning( $line_no, $msg );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check for predefined messages,
+# e.g. "&Next" -> NextButtonLabel()
+#
+# Parameters:
+#	$ycp_code	The YCP code to check (without comments!)
+#
+
+sub check_predefined_messages()
+{
+    my ( $ycp_code ) = @_;
+
+    if ( basename( $current_filename ) ne "common_messages.ycp" )
+    {
+	check_predefined_message( $ycp_code, "&Cancel"		, "CancelButtonLabel()"		);
+	check_predefined_message( $ycp_code, "C&ontinue"	, "ContinueButtonLabel()"	);
+	check_predefined_message( $ycp_code, "&Yes"		, "YesButtonLabel()"		);
+	check_predefined_message( $ycp_code, "&No"		, "NoButtonLabel()"		);
+	check_predefined_message( $ycp_code, "&Finish"		, "FinishButtonLabel()"		);
+	check_predefined_message( $ycp_code, "&OK"		, "OKButtonLabel()"		);
+	check_predefined_message( $ycp_code, "C&lose"		, "CloseButtonLabel()"		);
+	check_predefined_message( $ycp_code, "&Close"		, "CloseButtonLabel()"		);
+	check_predefined_message( $ycp_code, "&Help"		, "HelpButtonLabel()"		);
+	check_predefined_message( $ycp_code, "&Abort"		, "AbortButtonLabel()"	   	);
+	check_predefined_message( $ycp_code, "&Next"		, "NextButtonLabel()"	   	);
+	check_predefined_message( $ycp_code, "&Back"		, "BackButtonLabel()"	   	);
+	check_predefined_message( $ycp_code, "&Quit"		, "QuitButtonLabel()"	   	);
+	check_predefined_message( $ycp_code, "&Retry"		, "RetryButtonLabel()"	   	);
+	check_predefined_message( $ycp_code, "&Install"		, "InstallButtonLabel()"	);
+	check_predefined_message( $ycp_code, "&Don't install"	, "DontInstallButtonLabel()"	);
+	check_predefined_message( $ycp_code, "&Download"	, "DownloadButtonLabel()"	);
+	check_predefined_message( $ycp_code, "&Stop"		, "StopButtonLabel()"		);
+	check_predefined_message( $ycp_code, "Notify"		, "NotifyMsg()"			);
+	check_predefined_message( $ycp_code, "Warning"		, "WarningMsg()"		);
+	check_predefined_message( $ycp_code, "Error"		, "ErrorMsg()"			);
+	check_predefined_message( $ycp_code, "Please wait..."	, "PleaseWaitMsg()"		);
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check for one predefined messages,
+# e.g. "&Next" -> NextButtonLabel()
+#
+# Parameters:
+#	$ycp_code		The YCP code to check (without comments!)
+#	$message		The message to check for
+#	$replacement_function	The YCP function to use instead
+#
+
+sub check_predefined_message()
+{
+    my ( $ycp_code, $message, $replacement_function ) = @_;
+
+    while ( $ycp_code =~
+	    m{
+		_\(				# literal _(
+			\s*			# maybe followed by any amount of whitespace
+			"			# followed by a single " quote
+			$message		# the message itself
+			"			# the ending " quote
+			\s*			# maybe followed by any amount of whitespace
+			    \)			# followed by a literal )
+		}xmsg				# "x": enable regexp comments
+						# "m": multi line input string
+						# "s": "." matches newline
+						# "g": enable repeated matches in while() loop
+	    )
+    {
+	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
+
+	warning( $line_no, "Found predefined message: \"$message\" - replace with \'$replacement_function\'" );
+    }
+
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Split a comma-delimited YCP expression in parenteses into individual
+# subexpressions, i.e. "(a, (b1, b2), c)" -> ["a", "(b1, b2)", "c"]
+#
+# Parameters:
+#	$src	The source expression
+#
+# Return value:
+#	An array of subexpressions (as strings)
+
+sub split_ycp_expr()
+{
+    my ( $src ) = @_;
+    my @expr = ();
+    my $expr = "";
+
+    while ( length ( $src ) > 0 )
+    {
+	# deb( "split_ycp_expr():\n\n\"$src\"\n\n" );
+
+	#
+	# Extract any quoted literal string - "..."
+	#
+	if ( $src =~
+	     m{
+		^			# at the beginning
+		\s*			# maybe whitespace
+		(			# quoted string - $1
+		    "			#     opening literal "
+			(		#         string literal contents
+			    \\"		#	      escaped " quote
+				|	#	          or
+			    [^"]	#	      anything but a " quote     ] (sync emacs)
+			)*		#         any number
+		    "			#     closing literal "
+		)			# quoted string end
+		(
+		    .*
+		)
+		}xs
+	     )
+	{
+	    # deb( "Found literal string:\n$1\n" );
+	    $expr .= $1;	# add the literal string to $expr
+	    $src   = $3;	# and skip it for future iterations
+	}
+	#
+	# Extract any expression in parentheses - "(...)"
+	#
+	elsif ( $src =~ m{^\s*\(}s )
+	{
+	    # deb( "Extracting subexpr:\n\n\"$src\"\n\n" );
+	    my ( $subexpr, $tail ) = extract_paren_expr( $src );
+	    $expr .= $subexpr;	# add the paren expression to $expr
+	    $src   = $tail;
+	}
+	#
+	# Extract anything else that is not a comma
+	# or the beginning of one of the above.
+	#
+	elsif ( $src =~
+		m{
+			^			# at the beginning
+			\s*			# maybe whitespace
+			(			# prefix - $1
+				[^,\("]+	#     at least one other than  ,("    ]
+			)			# prefix end
+			(			# tail - $2
+				.*		#     followed by anything
+			)			# tail end
+		}xs
+	     )
+	{
+	    # deb( "Found other stuff:\n\"$1\"\n" );
+	    my $head	= $1;
+	    my $tail	= $2;
+
+	    $expr .= $head;
+	    $src   = $tail;
+	}
+	#
+	# Split if a "real" comma is encountered,
+	# i.e. one not contained in one of the above -
+	# within a literal string constant or an expression in parentheses.
+	#
+	elsif ( $src =~
+		m{
+			^			# at the beginning
+			\s*			# maybe whitespace
+			,			# a literal comma ,
+			(			# the rest - $1
+				.*		# anything
+			)
+		}xs
+		)
+	{
+	    $src = $1;				# skip the comma itself
+	    # deb( "Found comma - expr:\n\"$expr\"\nsrc:\n\"$src\"\n\n" );
+
+	    # Finish the current subexpression and add it to the array (if non-empty)
+
+	    if ( defined( $expr ) )
+	    {
+		$expr =~ s/^\s+//m;		# get rid of leading  whitespace
+		$expr =~ s/\s+$//m;		# get rid of trailing whitespace
+		push @expr, $expr if ( length( $expr ) > 0 );
+		$expr = "";
+	    }
+	}
+	else
+	{
+	    deb( "Funny. I thought we would never come here." );
+
+	    # Oops - something has badly run out of sync.
+	    # At least prevent an endless loop; the worst thing that can happen
+	    # is that some YCP code remains unchecked. So be it.
+
+	    $src = "";		# prevent endless loop
+	    $expr = "";		# forget everything parsed so far
+	    @expr = ();
+	}
+    }
+
+
+    #
+    # Finish the last leftover subexpression and add it to the array (if non-empty)
+    #
+
+    if ( defined( $expr ) )
+    {
+	$expr =~ s/^\s+//m;			# get rid of leading  whitespace
+	$expr =~ s/\s+$//m;			# get rid of trailing whitespace
+	push @expr, $expr if ( length( $expr ) > 0 );
+    }
+
+    return @expr;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Extract an expression in parentheses "(...)" from $src.
+#
+# Find everything from an opening parenthesis "(" to the corresponding
+# closing parenthesis ")". Take literal strings "..." into account.
+#
+# Parameters:
+#	$src	The (YCP) code to search in, including the opening "("
+#
+# Return value:
+# A list of two values:
+#	$expr	The subexpression as string, including opening and closing "(...)"
+#	$tail	the rest of $src
+
+sub extract_paren_expr()
+{
+    my ( $src ) = @_;
+    my $expr = "()";
+    my $tail = $src;
+
+    # deb( "extract_paren_expr():\n\n\"$src\"\n\n" );
+
+    $src =~ s/^\s+//m;		# get rid of leading whitespace
+
+    if ( $src =~ m{\(}gms )
+    {
+	# This first match does little more than move pos($src) to the first
+	# character after the opening paren. If there is no opening paren, this
+	# sub should not have been called in the first place, but we return the
+	# initial value of $expr so the caller gets something reasonable to
+	# continue with.
+
+	my $paren_count = 1;
+
+
+	# Scan $src for opening and closing parens.
+	#
+	# Skip quoted strings: They might contain parens, too, but those may not
+	# be taken into account for paren matching.
+
+	while ( $src =~
+		m{
+			(			# $1 start
+			    (
+				[^\(\)"]*	# any number of anything other than one of ()"    ]
+			    )
+				|		#	or
+			    (			# quoted string:
+				"		#     opening literal "
+				    (		#         string literal contents
+					\\"	#	      escaped " quote
+					    |	#	          or
+					[^"]	#	      anything but a " quote     ] (sync emacs)
+				    )*		#         any number
+				"		#     closing literal "
+			    )			# quoted string end
+				|		#     or
+			    \(			# literal (
+				|		#     or
+			    \)			# literal )
+		     )				# $1 end
+		}xgms
+		)
+	{
+	    my $paren = $1;
+
+	    if ( defined( $paren ) )
+	    {
+		if ( $paren eq "(" )
+		{
+		    $paren_count++;
+		}
+
+		if ( $paren eq ")" )
+		{
+		    $paren_count--;
+
+		    if ( $paren_count == 0 )
+		    {
+			$expr = substr( $src, 0, pos( $src ) );
+			$tail = substr( $src, pos( $src ) );
+
+			# deb( "Returning:\n\n\"$expr\"\n\ntail:\n\"$tail\"\n\n" );
+			return ( $expr, $tail );
+		    }
+		}
+
+	    }
+	}
+
+	# error( 0, "Can't parse () expression: \n\"$src\"\n\n" );
+	$tail = "";
+    }
+
+    return ( $expr, $tail );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Count the number of lines in a string.
+#
+# Parameters:
+#	$text	The text to count lines in
+#	$pos	(optional) count up to this position
+#
+# Return value:
+#	The number of newlines in $text.
+
+sub count_lines()
+{
+    my ( $text, $pos ) = @_;
+
+    if ( defined( $pos ) )
+    {
+	$text = substr( $text, 0, $pos );
+    }
+
+    my $count = $text =~ tr:\n:\n: ;
+
+    return $count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Return whether or not position "pos" of "text" is outside a literal string,
+# i.e. outside (double) quotes - with respect to escaped (backslashed) quotes.
+#
+# Parameters:
+#	$text		text to search in
+#	$pos		position within this text
+#
+# Return value:
+#	true if $pos is outside quotes,
+#	false if inside quotes.
+
+sub outside_literal_string()
+{
+    my ( $text, $pos ) = @_;
+    my $count = count_unescaped( substr( $text, 0, $pos), '"' );
+
+    return ( $count % 2 == 0 ); # $pos is outside literal string,
+				# if even number of unescaped double quotes
+				# up to this point.
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check widget arguments for one keyboard shortcut unless this check is
+# globally disabled.
+#
+# Parameters:
+#	$widget		name of the widget for error reporting
+#	$line_no	source code line of the widget for error reporting
+#	$arg_no		number of the argument to check (1..n)
+#	@args		array of widget arguments
+#
+# Return value:
+#	---		(only error reporting to stderr)
+
+sub check_keyboard_shortcut()
+{
+    my $widget	= shift;
+    my $line_no	= shift;
+    my $arg_no	= shift;
+    my @arg	= @_;
+    $arg_no--;		# beginning from 1 is easier for most users
+
+    if ( ! $dont_check_keyboard_shortcuts )
+    {
+	if ( defined( $arg[ $arg_no ] ) )	# we might not have this many args!
+	{
+	    if ( $arg[ $arg_no ] =~
+		 m{
+			^			# beginning
+			\s*			# maybe whitespace
+			(
+				_\(		#     _( translation marker		)
+			)?			# - maybe
+			\s*			# maybe whitespace
+			"			# followed by a single " quote
+			    (			# this (the message contents) will be $2
+				(		#    message contents:
+				    \\"		#	escaped " quote
+				    |		#		or
+				    [^"]	#	anything but a " quote     ] (sync emacs)
+				)+		#    any number, at least one
+			    )			# $1 end
+			"			# the ending " quote
+			\s*			# maybe whitespace
+			\)?			# maybe a closing paren
+			$			# end
+		 }xs
+		 )
+	    {
+		my $literal = $2;
+		deb( "\tChecking for $widget keyboard shortcut: \"$literal\"" );
+
+		if ( $literal !~ /&/ )
+		{
+		    error( $line_no, "No \"&\" keyboard shortcut for $widget" );
+		}
+		elsif ( $literal =~ /&.*&/ )
+		{
+		    error( $line_no, "More than one \"&\" keyboard shortcuts for $widget" );
+		}
+	    }
+	    else
+	    {
+		deb( "Can't check for $widget keyboard shortcut: \"" . $arg[ $arg_no ] . "\"" );
+	    }
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check widget arguments for presence of _("...") translation marker
+# unless this check is globally disabled.
+#
+# Parameters:
+#	$widget		name of the widget for error reporting
+#	$line_no	source code line of the widget for error reporting
+#	$arg_no		number of the argument to check (1..n)
+#	@args		array of widget arguments
+#
+# Return value:
+#	---		(only error reporting to stderr)
+
+sub check_translation()
+{
+    my $widget	= shift;
+    my $line_no	= shift;
+    my $arg_no	= shift;
+    my @arg	= @_;
+    $arg_no--;		# beginning from 1 is easier for most users
+
+    if ( ! $dont_force_translations )
+    {
+	if ( defined( $arg[ $arg_no ] ) )	# we might not have this many args!
+	{
+	    if ( $arg[ $arg_no ] =~
+		 m{
+			^			# beginning
+			\s*			# maybe whitespace
+			(
+				_\(		#     _( translation marker		)
+			)?			# - maybe
+			\s*			# maybe whitespace
+			"			# followed by a single " quote
+			    (			# this (the message contents) will be $2
+				(		#    message contents:
+				    \\"		#	escaped " quote
+				    |		#		or
+				    [^"]	#	anything but a " quote     ] (sync emacs)
+				)+		#    any number, at least one
+			    )			# $1 end
+			"			# the ending " quote
+			\s*			# maybe whitespace
+			\)?			# maybe a closing paren
+			$			# end
+		 }xs
+		 )
+	    {
+		my $marker  = $1;
+		my $literal = $2;
+
+		if ( $literal =~ /\S+/ )
+		{
+		    deb( "\tChecking for translation marker: \"$literal\"" );
+
+		    if ( ! defined( $marker ) )
+		    {
+			error( $line_no, "Text not marked for translation - insert \"_(...)\"" );
+		    }
+		}
+		else
+		{
+		    deb( "Skipping empty string" );
+		}
+	    }
+	    else
+	    {
+		deb( "Can't check for translation marker: \"" . $arg[ $arg_no ] . "\"" );
+	    }
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Count the number of occurences of one specific character that is not escaped,
+# i.e. immediately preceded by a backslash.
+#
+# Parameters:
+#	$text		the text to search in
+#	$search_char	the character to search for
+#
+# Return value:
+#	The number of unescaped characters of this kind
+
+sub count_unescaped()
+{
+    my ( $text, $search_char ) = @_;
+    my $count = 0;
+
+    while ( $text =~ m{			# match
+			(		# either
+			    ^		#	beginning of substring (since last match)
+			|		# or
+			    [^\\]	#	something else than a backslash
+			)?		# followed by
+			$search_char	#	the character we are looking for
+		      }gx		# "g": search repeatedly in while() loop
+	    )				# "x": enable regexp comments
+    {
+	$count++;
+	# print "\ncount_unescaped():\n" . substr( $text, 0, pos( $text ) ). "\n*****\ncount: $count\n\n";
+    }
+
+    # print "\ncount_unescaped():\n$text\ncount: $count\n\n";
+    return $count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Count the number of occurences of $search_for in $search_in.
+#
+# Parameters:
+#	$search_in	the text to search in
+#	$search_for	the text to search for
+#
+# Return value:
+#	The number of occurences.
+
+sub count_occurences()
+{
+    my ( $search_in, $search_for ) = @_;
+    my $count = 0;
+
+    while ( $search_in =~ m/$search_for/g )
+    {
+	$count++;
+    }
+
+    return $count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Log a message to stderr.
+#
+# Parameters:
+#	$line_no	line number
+#	Messages to write (any number).
+
+sub warning()
+{
+    my $filename = $current_filename;
+    my $line_no  = shift @_;
+    my $msg;
+
+    print STDERR "$filename:$line_no: Warning: ";
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+    }
+
+    print STDERR "\n";
+    $warning_count++;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stderr.
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub error()
+{
+    my $filename = $current_filename;
+    my $line_no  = shift @_;
+    my $msg;
+
+    print STDERR "$filename:$line_no: Error: ";
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+    }
+
+    print STDERR "\n";
+    $error_count++;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stdout if verbose mode is set
+# (command line option '-v').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub logf()
+{
+    my $msg;
+
+    if ( $verbose )
+    {
+	foreach $msg( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	$OUTPUT_AUTOFLUSH = 1;	# prevent buffering
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a debugging message to stdout if debug mode is set
+# (command line option '-d').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub deb()
+{
+    my $msg;
+
+    if ( $debug )
+    {
+	foreach $msg( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Print usage message and abort program.
+#
+# Parameters:
+#	---
+
+sub usage()
+{
+    die "\nUsage: $0 [-cdhkprstvx] <ycp-file> [ycp-file> ...]\n"		.
+	"\n"									.
+	"Check one or more YaST2 YCP scripts for common errors.\n"		.
+	"\n"									.
+	"\t-a don't check alternate declarations (map|any x, map|void x)\n"	.
+	"\t-b don't check for obsolete functions\n"				.
+	"\t-c don't check file header comments\n"				.
+	"\t-d debug\n"								.
+	"\t-h help (this message)\n"						.
+	"\t-k don't check keyboard shortcuts\n"					.
+	"\t-o don't enforce textdomain statement\n"				.
+	"\t-p multiple <p> / </p> paragraphs are OK in HTML messages\n"		.
+	"\t-r don't check RichText / HTML tags\n"				.
+	"\t-s silent (turn verbose off)\n"					.
+	"\t-t don't enforce translations where possible\n"			.
+	"\t-v verbose (on by default)\n"					.
+	"\t-x example mode - relaxed checking for YCP examples: -ckmpt\n"	.
+	"\n"									.
+	"Checked YCP scripts are required to be syntactically correct.\n"	.
+	"Check with \"parseycp\" if you are unsure about this.\n"		.
+	"\n";
+}
+
+
+
+# EOF

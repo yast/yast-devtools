@@ -1,0 +1,111 @@
+"update_logconf" is a Perl script that can initialize and update a user's
+"logconf.ycp" file.
+
+YaST2 performs extensive logging when the Y2DEBUG environment variable is set
+(Bash: export Y2DEBUG=1 , Csh/Tcsh: setenv Y2DEBUG). Each component of YaST2
+performs its own logging which can produce huge masses of log messages.
+
+The YaST2 logging mechanism interprets a file "logconf.ycp" in a subdirectory
+".yast2" (notice the leading dot!) in the user's home directory to fine-tune
+the amount of logging. A sample "logconf.ycp" file looks like this:
+
+//   component         debug   mile    warn    error   secu    inter
+//                             stone   ing             rity    nal
+[
+  [ "Builtin"      , [ false,  true,   true,   true,   true,   true    ] ],
+  [ "translator"   , [ false,  true,   true,   true,   true,   true    ] ],
+  [ "ui"           , [ false,  true,   true,   true,   true,   true    ] ],
+  [ "ycp"          , [ false,  true,   true,   true,   true,   true    ] ]
+]
+
+The first column indicates the logging "component", i.e. which subsystem of
+YaST2 performs the respective logging, the flags toggle each log level (debug
+messages, warnings, errors, ...).
+
+You can edit this file manually, but it's tedious and error-prone and you are
+likely to miss components - i.e. if there is too much logging in your log
+file(s) (i.e. in ~/.y2log or in ~/.y2log-1, ~/.y2log-2 etc.) you'll have to
+create "logconf.ycp" entries for the undesired components as well and set the
+respective logging flags to "false" (usually disabling the "debug" logging will
+be enough - beware of turning off real error logging!).
+
+This is exactly what update_logconf does: It reads your current logfile and
+looks what components are there that don't have a "logconf.ycp" entry yet - and
+creates one with a reasonable default (like above).
+
+The default is to read just ~/.y2log, but you can add the "-a" command line
+option to read all the others, too (~/.y2log-1, ~/.y2log-2 etc.). This takes
+considerably longer and isn't really necessary: You can invoke "update_logconf"
+again at any time when new undesired messages show up in your log.
+
+Edit the logging flags in "logconf.ycp" as you like; "update_logconf" will
+leave them alone when you call it again.
+
+If you are unsure about your current "logconf.ycp" you can safely delete it and
+recreate it with "update_logconf":
+
+	[sh @ snell] ~  1 % cd .yast2
+	[sh @ snell] ~/.yast2  2 % rm logconf.ycp
+	[sh @ snell] ~/.yast2  3 % update_logconf
+	Processing log file /suse/sh/.y2log
+	No previous /suse/sh/.yast2/logconf.ycp
+	Adding new component "YCP"
+	Adding new component "ag_anyagent"
+	Adding new component "scr"
+	Adding new component "ui"
+
+You can safely invoke it at any time without doing any harm:
+
+	[sh @ snell] ~/.yast2  4 % update_logconf
+	Processing log file /suse/sh/.y2log
+	No new components - /suse/sh/.yast2/logconf.ycp was up to date.  
+
+Whenever you get swamped by undesired log messages, just call it again:
+
+	[sh @ snell] ~/.yast2  5 % update_logconf
+	Processing log file /suse/sh/.y2log
+	Adding new component "BasicInterpreter::evaluate"
+	Adding new component "BasicInterpreter::evaluateBuiltin"
+	Adding new component "BasicInterpreter::evaluateTerm"
+	Adding new component "BasicInterpreter::result"
+	Adding new component "Block"
+	Adding new component "Builtin"
+	Adding new component "List"
+	Adding new component "Symbol"
+	Adding new component "Term"
+	Adding new component "ag_target"
+	Adding new component "gf"
+	Adding new component "liby2"
+	Adding new component "probe"
+	Adding new component "scope"
+	Adding new component "translator"
+	Adding new component "y2"
+	Adding new component "ycp"          
+
+You can also use any existing old ("wrapped around") log files:
+
+	[sh @ snell] ~/.yast2  6 % update_logconf -a
+	Processing log file /suse/sh/.y2log
+	Processing log file /suse/sh/.y2log-1
+	Processing log file /suse/sh/.y2log-2
+	Adding new component "Scanner"
+	Adding new component "libycp"   
+
+Other command line options:
+
+	[sh @ snell] ~/.yast2  7 % update_logconf -h
+	Usage: /suse/sh/perl/update_logconf [-lvdah]
+		-v verbose (default)
+		-s silent (turn verbose off)
+		-d debug
+		-a scan all logfiles, i.e. ~/.y2log-* , not just ~/.y2log
+		-h help (this message)                                                  
+
+
+You might want to create a symlink from /usr/local/bin to "update_logconf" in
+your CVS working directory so you automatially get the latest updates (in your
+command search path!) whenever doing a "cvs up".
+
+
+                                                
+Stefan Hundhammer <sh@suse.de>

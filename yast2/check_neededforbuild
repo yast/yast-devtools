@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# This script checks whether or not you have everything installed you need
+# to compile a YaST2 module. Go to the module's top level directory
+# (where the .spec.in file should be) and invoke this script.
+# If RPM complains about something not installed, install it.
+#
+# Author:  Stefan Hundhammer <sh@suse.de>
+# Updated: 2001-01-30
+#
+
+rpm -q `sed -ne '/neededforbuild/s/# neededforbuild//p' *.spec.in`

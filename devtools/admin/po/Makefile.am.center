@@ -1,0 +1,118 @@
+## Emacs: -*- makefile -*-
+##
+## Makefile.am.center for a YaST2 translation (po/) subproject
+
+POTDIR = ../../y2t_pot/pot
+POTFILES = $(wildcard $(POTDIR)/*.pot)
+GENERATED = $(MOFILES)
+CLEANFILES = $(GENERATED)
+EXTRA_DIST = $(POFILES)
+POFILES = $(wildcard *.po)
+MOFILES = $(POFILES:%.po=%.mo)
+POXFILES = $(POFILES:%.po=%.pox)
+YAST2DIR = @YAST2DIR@
+LL = $(shell sed 's:.*-::' ../RPMNAME)
+compendium = @COMPENDIUM@
+
+MSGMERGE = @MSGMERGE@ --no-wrap --force-po
+MSGFMT = @MSGFMT@
+MSGCAT = @MSGCAT@ --no-wrap --force-po
+MSGCONV = @MSGCONV@ --no-wrap --force-po
+XGETTEXT = @XGETTEXT@ --no-wrap
+
+SUFFIXES = .po .pox .gmo .mo
+
+all-local: $(GENERATED)
+
+make-pox pox: Makefile $(POXFILES)
+$(POXFILES): %.pox: %.po
+	-[ -f $@ ] && mv --backup=numbered $@ $@.bak || po=/dev/null; \
+	pot=$$(echo $< | sed "s:$(LL).po:pot:"); \
+	  compendium=$(compendium); \
+	  [ -f $$compendium ] || compendium=/dev/null ; \
+	  $(MSGMERGE) -C $$compendium -o $$po $< $(POTDIR)/$$pot
+
+# update or init PO file
+update-po: Makefile $(POTFILES)
+	for p in $(POTFILES); do \
+	  q=$${p##*/}; \
+	  po=$${q%pot}$(LL).po; \
+	  echo $$po; \
+	  if [ -f $$po ]; then \
+	    $(MSGMERGE) -o $$po.tmp $$po $$p; \
+	  else \
+	    $(MSGMERGE) -o $$po.tmp -C $(compendium) \
+	       --verbose /dev/null $$p; \
+	  fi || { echo "$(MSGMERGE) for \"$$po\" failed" ; \
+	          rm -f $$po.tmp ; }; \
+	  if cmp $$po.tmp $$po >/dev/null 2>&1; then \
+	    rm -vf $$po.tmp; \
+	  else \
+	    mv -vf $$po.tmp $$po; \
+	  fi; \
+	done
+
+update-mo: $(MOFILES)
+	@:
+
+%.mo: %.po
+	file=$(srcdir)/`echo $* | sed 's,.*/,,'`.mo \
+	  && rm -f $$file \
+          && $(MSGCONV) --to UTF-8 $< \
+             | $(MSGFMT) -c --statistics -o $$file -
+
+showpo:
+	echo $(POFILES)
+
+showmo:
+	echo $(MOFILES)
+
+checkpo:
+	for f in $(POFILES); do \
+	  echo $$f; \
+	  LANG=C $(MSGFMT) --output=/dev/null --check --statistics --verbose $$f \
+                 || exit 1; \
+	done
+
+# Try to checkin a .pox file
+# FIXME make sure msgcat doesn't weird things with "" and comments
+checkin:
+	p=$(MODULE).$(ci_ll); \
+	cp --backup=numbered $(ci_opt) $$p.po $$p.po.bak; \
+	cvs -n update $$p.po | grep -q -v '^[UPMC]'; \
+        if [ $$? = 0 ]; then \
+	  echo "CVS mismatch; trying to merge..."; \
+	  rm -f $$p.po; \
+          cvs -q update $$p.po; \
+	  cp $$p.pox $$p.pox.new; \
+	  $(MSGCAT) $$p.po $$p.pox.new -o $$p.pox; \
+	  echo -e "\nCheck \"$$p.pox\" for fuzzy entries.  Status:"; \
+	  $(MSGFMT) --check --statistics $$p.pox; \
+	  echo -e "Then try again to checkin \"$$p.pox\"."; \
+	else \
+	  cp $(ci_opt) $$p.pox $$p.po; \
+	  if cvs -n ci $$p.po; then \
+	    cvs ci -m "$(ci_msg)" $$p.po; \
+	  else \
+	    rm -f $$p.po; \
+            cvs -q update $$p.po; \
+	    cp $$p.pox $$p.pox.new; \
+	    $(MSGCAT) $$p.po $$p.pox.new -o $$p.pox; \
+	    echo -e "\nCheck \"$$p.pox\" for fuzzy entries.  Status:"; \
+	    $(MSGFMT) --check --statistics $$p.pox; \
+	    echo "Then try to checkin \"$$p.pox\"."; \
+	  fi; \
+	fi
+
+install-data-local: $(MOFILES)
+	for l in $(MOFILES); do \
+          m=$${l/$(LL).mo/mo}; \
+	  localedir=$(DESTDIR)$(YAST2DIR)/locale; \
+	  locale_lang_msg_dir=$$localedir/$(LL)/LC_MESSAGES; \
+	  [ -d $$locale_lang_msg_dir ] \
+	    || install -d -m 755 $$locale_lang_msg_dir; \
+	  install -m 644 $$l $$locale_lang_msg_dir/$$m; \
+	done
+
+## Makefile.am.center ends here
+

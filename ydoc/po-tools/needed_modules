@@ -1,0 +1,42 @@
+#!/bin/bash
+# (c) 2000, SuSE GmbH
+# Author: Karl Eichwalder <ke@suse.de>
+# 
+# Add needed modules.
+# All valid modules are listed in ../modules/NEEDED_MODULES.
+
+LANGUAGE=C; export LANGUAGE
+LC_ALL=C; export LC_ALL
+
+pwd=`pwd |sed -e 's:.*/::'`
+# echo $pwd
+# exit 1
+
+if [ "x$pwd" != "xpo" ] ; then
+  echo "error: wrong directory; cd \`to yast2/source/po' and try again."
+  echo exit 1
+  exit 1
+fi
+
+# look for new modules
+:> new_modules.tmp
+for m in `cat ../modules/NEEDED_MODULES`; do
+  dir=${m%.ycp}                      # remove .ycp 
+  [ -d $dir ] || {\
+    mkdir $dir ;
+    echo $dir >> new_modules.tmp
+    echo modules/$m > $dir/POTFILES ;
+    cvs add -m"new module; added by needed_modules" $dir ;
+    cvs add -m"new module; added by needed_modules" $dir/POTFILES ;
+    cvs commit -m"new module; added by needed_modules" $dir/POTFILES ;
+  }
+done
+
+# if a new module directory is added, 
+[ -s new_modules.tmp ] && {\
+  cat MODULES >> new_modules.tmp ;
+  cat new_modules.tmp | sort > MODULES ;
+  cvs commit -m"update by needed_modules" MODULES ;
+}
+
+# eof

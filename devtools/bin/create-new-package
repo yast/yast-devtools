@@ -1,0 +1,286 @@
+#!/usr/bin/perl -w
+#####
+#Usage:   
+#   create-new-package [-dsv] <skeleton> <name> <maintainer> <email>
+#
+#   -v	verbose
+#   -d	debug
+#   -s	list of available skeletons
+#
+#   skeleton   - the one which should be used (config, trans, ...)
+#   name       - of the component. A package name will be constructed
+#                like yast2-skeleton-name
+#   maintainer - his name
+#   email      - maintainer's, of course :-)
+#####
+# Author: Michael Hager <mike@suse.de>
+#         Jan Holesovsky <kendy@suse.cz>
+
+use strict;
+use English;
+use Getopt::Std;
+use vars qw( $opt_v $opt_d $opt_s );
+
+
+# Global variables.
+
+my $verbose		= 0;
+my $debug		= 0;
+my $tmp			= "$PID.tmp";
+my $base_dir            = ".";
+my $skeletons_dir	= "/usr/share/YaST2/devtools/skeletons";
+my $target_dir          = "../dummy";
+my $skeleton		= "config";
+my $new_name            = "y2c_noname";
+my $raw_name            = "noname";
+my $Raw_name            = "Noname";
+my $maintainer          = "nobody";   
+my $email               = "nobody\@nowhere.org";
+my $date                = "1.1.1900";
+
+# Call the main function and exit.
+# DO NOT enter any other code outside a sub!
+#
+# This is not just to satisfy C programmers - rather, this is intended
+# to keep global things like the variables above apart from main
+# program (local) variables. It is just too easy to mix things up; one
+# simple 'i' variable in the main program might too easily be mixed up
+# with a function's forgotten 'i' declaration.
+
+sub main();
+
+main();
+exit 0;
+
+
+#-----------------------------------------------------------------------------
+
+
+# Main program.
+
+sub main()
+{
+    my $file;
+    my $ls_skeletons = `ls $skeletons_dir | tr '\n' ' ' | sed 's/ \\</, /g'`;
+
+    # Extract command line options.
+    # This will set a variable opt_? for any option,
+    # e.g. opt_v if option '-v' is passed on the command line.
+
+    getopts('vds');
+
+    $verbose	= 1 if $opt_v;
+    $debug	= 1 if $opt_d;
+    if ($opt_s)
+    {
+	print "Available skeletons: $ls_skeletons\n";
+	exit 0;
+    }
+
+    usage() unless $#ARGV == 3;
+
+    # set globale variables:
+    # - new packagename
+    # - maintainer
+    # - email adress from maintainer
+    # - the target dir and create it
+    # - the date
+ 
+    ($skeleton, $new_name, $maintainer, $email) = @ARGV;
+
+    if (! -d "$skeletons_dir/$skeleton")
+    {
+	die "EXITING cause:: '$skeleton' is not a valid skeleton! " .
+	    "Use -s to get a list.\n";
+    }
+
+    $raw_name = $new_name;
+    $Raw_name = $new_name;
+    $Raw_name =~ s/^(.)/\u$1/;
+
+    my $skel_first_letter = $skeleton;
+    $skel_first_letter =~ s/^(.).*/$1/;
+    $new_name = "y2" . $skel_first_letter . "_" . $new_name;
+
+    $target_dir = $base_dir . "/" . $new_name;
+    deb( "target_dir: ", $target_dir );  
+    die "EXITING cause:: '$target_dir' already exists!\n" if (-d $target_dir);
+
+    $date = localtime();
+    deb( "date: ", $date );  
+
+    # now change each file
+ 
+    foreach $file ( `find $skeletons_dir/$skeleton -not -path "*CVS*"`  )
+    {
+	$file =~ s/\n*$//;
+	my $target = $file;
+	$target =~ s:^$skeletons_dir/$skeleton::;
+
+	print qx(mkdir --parent $target_dir/$target) if (-d "$file");
+	change_single ( $file, $target_dir . "/" . $target ) if (-f "$file");
+    }
+
+    # delete unnecessary files
+
+    if ( chdir ( $target_dir ) )
+    {
+
+       unlink <*.bak>;
+       unlink <*~>;
+       unlink <src/*.bak>; 
+       unlink <src/*~>;
+       
+       unlink ("aclocal.m4", "configure", "Makefile.in", "config.log", "config.cache",
+       	       "config.status", "Makefile", "doc/Makefile.in", "doc/Makefile",
+       	       "package/y2c_XXpkgXX.spec", "src/Makefile.in", "src/Makefile",
+       	       "README_skeleton"
+	       );
+    }
+    else
+    {
+	print ("\n\nWarning: cannot change to $target_dir\n\n");
+    }
+
+    print ("\n\n Your package '$new_name' was successfully created\n\n");
+    print ("(To work with, do not forget:    cd $target_dir)\n\n");
+}
+
+#-----------------------------------------------------------------------------
+
+
+# Process one single file
+#
+# Parameters:
+#	file name to process (  )
+
+
+sub change_single ()
+{
+    my ( $src, $target ) = @_;
+    my $line;
+    #my $target;
+
+    #  check if the filname has to be changed
+
+    $target =~ s:XXpkgXX:$raw_name:g;
+    $target =~ s:XXPkgXX:$Raw_name:g;
+    $target =~ s:XXmaintainerXX:$maintainer:g;
+    $target =~ s:XXemailXX:$email:g;
+
+    deb( "SRC",        $src);
+    deb( "TARGET", $target);
+
+    open ( SRC,     $src      ) or die "EXITING cause:: Can't open $src";
+    open ( TARGET, ">$target" ) or die "EXITING cause:: Can't open $target";
+
+    logf ( $src );
+    logf ( $target );
+
+    while ( $line = <SRC> )
+    {
+	$line =~ s:XXpkgXX:$raw_name:g;
+	$line =~ s:XXPkgXX:$Raw_name:g;
+	$line =~ s:XXmaintainerXX:$maintainer:g;
+	$line =~ s:XXemailXX:$email:g;
+	$line =~ s:XXdateXX:$date:g;
+	print TARGET $line;
+    }
+
+
+    close ( TARGET );
+    close ( SRC );
+}
+
+
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stderr.
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub warning()
+{
+    my $msg;
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+    }
+
+    print STDERR "\n";
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stdout if verbose mode is set
+# (command line option '-v').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub logf()
+{
+    my $msg;
+
+    if ( $verbose )
+    {
+	foreach $msg ( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a debugging message to stdout if debug mode is set
+# (command line option '-d').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub deb()
+{
+    my $msg;
+
+    if ( $debug )
+    {
+	print '   DEB> ';
+
+	foreach $msg ( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Print usage message and abort program.
+#
+# Parameters:
+#	---
+
+sub usage()
+{
+    # Isn't the following too anti-perl? :-)
+    my $message = `sed -e '/^#####/,/^#####/!d' -e 's/^#*//' $0`;
+    die "$message";
+}
+
+# EOF

@@ -1,0 +1,24 @@
+scrdoc: Documentation Tool for YaST2 *.scr files.
+        
+Usage: ../src/scrdoc [OPTION] [FILE [FILE [...]]]
+
+  -o DIR                 all generated files go in the specified
+                         directory (instead of the current)
+  -d DIR                 look for input files in DIR
+  -p PATTERN             when searching directories (with -d) use the
+                         specified pattern (RegExp) instead of the
+                         default (.*\.scr)
+  -h                     show this help page
+  -v                     be verbose
+  -V                     show version
+  -D PATH                path to the YaST2 documentation. This should
+                         be a relative path from the place the generated
+                         files go to. Or you can specify an absolute path.
+                         (Default: "file:/usr/share/doc/packages/yast2")    
+
+
+Examples:
+    yast2> tools/scrdoc/src/scrdoc -o doc/public/autodoc/scr/ -d ./source/
+
+For an example on how to comment the *.scr files have a look at example.scr
+

@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+#
+# Replaces _(xxx) values with localised maps
+# Usage:
+#   $0 xxx.<lang1>.po.utf xxx.<lang2>.po.utf ... < file.noloc > file.loc
+#
+# by Jan Holesovsky <kendy@suse.cz>, 2000
+# $Id$
+
+use File::Basename;
+
+my %messages = ();
+my $po_file;
+
+# Read localised messages and store it into $messages
+foreach $po_file (@ARGV) {
+  $lang = basename($po_file, ".po.utf");
+  $lang =~ s/.*\.//;
+
+  if (open(PO, $po_file)) {
+    my $original_msg = "";
+    my $translated_msg = "";
+    my $getting_orig = 1; # Getting msgid or msgstr?
+    my $is_fuzzy = 0;
+    
+    while (<PO>) {
+      if (!/^#[^,]/ && !/^\s*$/) {
+        if (/^msgid/) {
+          if ($original_msg ne "" &&
+	      !exists($messages{$original_msg}) ) {
+            $messages{$original_msg} = "\"default\" : \"$original_msg\"";
+          }
+          if ($translated_msg ne "" &&
+	      exists($messages{$original_msg}) ) {
+            $messages{$original_msg} .= ", \"$lang\" : \"$translated_msg\"";
+          }
+	  $original_msg = "";
+	  $translated_msg = "";
+	  $getting_orig = 1;
+	}
+	if (/^msgstr/) {
+	  $getting_orig = 0;
+	  $is_fuzzy = 0;
+	}
+        $is_fuzzy = 1 if (/^#,/ && /fuzzy/);
+
+	if (/"(.*)"/) {
+	  $original_msg .= $1 if ($getting_orig != 0 && $is_fuzzy == 0);
+	  $translated_msg .= $1 if ($getting_orig == 0);
+	}
+      }
+    }
+  }
+}
+
+my $line = "";
+my $msg = "";
+
+# Read the standard input and write localised file to the standard output
+while (<STDIN>) {
+  s/\/\* xgettext:no-c-format \*\///g;
+  
+  if ($line =~ /([^_]*)_\(\s*"([^"]*)$/) {
+    $line =~ s/\n$//;
+    $line .= "\\n".$_;
+  } else {
+    $line = $_;
+  }
+  
+  if ($line !~ /([^_]*)_\(\s*"([^"]*)$/) {
+    while ( $line =~ /([^_]*)_\(\s*"([^"]*)"\s*\)(.*)$/ ) {
+      if ( defined($messages{$2}) ) {
+        $msg = $messages{$2};
+      } else {
+        $msg = "\"default\" : \"$2\"";
+      }
+      $line =~ s/([^_]*)_\(\s*"([^"]*)"\s*\)(.*)$/$1\$[ $msg ]$3/;
+    }
+    print $line;
+  }
+}

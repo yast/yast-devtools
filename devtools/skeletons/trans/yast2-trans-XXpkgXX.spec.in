@@ -1,0 +1,23 @@
+@HEADER-COMMENT@
+# neededforbuild  autoconf automake gettext ydoc yast2-devtools
+
+@HEADER@
+# Requires:	yast2-config-XXpkgXX
+BuildArchitectures:	noarch
+
+Summary:	YaST2 translations for XXpkgXX localization
+
+%description
+-
+
+@PREP@
+
+@BUILD-PO@
+
+@INSTALL-PO@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+@YAST2DIR@/locale/*/*/*

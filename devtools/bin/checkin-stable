@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# check in package to /work/src/done/STABLE or NOARCH
+#
+# Originally written by		Klaus Kaempf <kkaempf@suse.de>,
+# modified / beautified by	Stefan Hundhammer <sh@suse.de>
+#
+# $Id$
+
+branch=`cvs status VERSION | grep branch`
+self=`basename $0`
+force=0
+
+if [ "$1" == "-f" -o "$1" == "--force" ]; then
+    force=1
+fi
+
+if [ ! -f RPMNAME ]; then
+    echo "${self}: FATAL: ./RPMNAME not found" >&2
+    exit 1
+fi
+
+
+if grep -q "2.7" VERSION; then
+    echo "${self}: FATAL: Trying to check in a post-8.1 version into STABLE." >&2
+    echo ""
+    echo "If you get this after the 8.1 master, your yast2-devtools are outdated." >&2
+
+    exit 1
+fi
+
+
+pkg_name=`cat RPMNAME`
+src_dir=package
+spec_file=$src_dir/${pkg_name}.spec
+
+dist=NOARCH
+if [ -z "`grep BuildArchitectures package/${pkg_name}.spec | grep noarch`" ]; then
+    dist=STABLE
+fi
+
+target_dir=/work/src/done/$dist/$pkg_name
+# target_dir=/tmp/done/$dist/$pkg_name	# DEBUG
+
+if [ -d $target_dir ]; then
+
+    if [ $force -ne 0 ]; then
+	echo "Force mode - deleting old $target_dir"
+	rm -rf $target_dir
+    else
+	echo "${self}: FATAL: Directory $target_dir already exists - use "--force" to override" >&2
+	exit 2
+    fi
+fi
+
+
+mkdir $target_dir
+cp $spec_file			$target_dir
+cp $src_dir/${pkg_name}.changes	$target_dir
+
+sources=`gawk -F : '/^Source/ || /^Patch/ { print $2; }' $spec_file | sed -e 's/^[[:space:]]*/package\//'`
+
+for source in $sources; do
+
+    if [ -f $source ]; then
+	cp $source $target_dir
+    else
+	echo "${self}: FATAL: Can't find $source"
+	rm -rf $target_dir	# Don't leave junk behind!
+	exit 42
+    fi
+done
+
+echo ""
+echo ""
+echo "Package \"$pkg_name\" checked into $dist:"
+echo ""
+echo "ls -l $target_dir" 
+echo ""
+( cd $target_dir; LANG=C ls -l )
+echo ""
+
+
+# EOF

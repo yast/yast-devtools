@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for po in $(ls *.po 2>/dev/null) ; do
+   ${0%/*}/recode_po_file_to_utf $po > $po.utf
+done

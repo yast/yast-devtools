@@ -1,0 +1,36 @@
+#!/bin/bash
+# 
+# Author: Mathias Kettner <kettner@suse.de>
+#
+# Copyright SuSE GmbH 1999
+#
+# Usage: findlogid component
+#
+# Searches all source file in the current directory and
+# all subdirectories for call to y2log with a certain
+# component and print all log messages sorted by their
+# id. This way you can 
+#
+# - find a new unique id for a new log message
+# - check, if now ids are duplicate
+
+if [ $# != 1 ] ; then
+	cat <<EOF >&2
+Looks for log entry id's of a certain component.
+
+Usage: $0 component
+For example: $0 libycp
+
+Be sure that you are in the correct directory. On the current
+directory and its subdirectories will be scanned.
+EOF
+    exit 5
+fi
+
+component=$1
+
+find -type f -name '*.cc' -o -name "*.h" -o -name "*.c" -o -name "*.ll" -o -name "*.yy" \
+    | xargs grep 'y2log[[:space:]]*([[:space:]]*' \
+    | grep '"'"$component"'"' \
+    | sed 's/^.*"'"$component"'", *\([0-9]*\), *\(".*"\).*/\1: \2/g' \
+    | sort -n 

@@ -1,0 +1,140 @@
+/**
+ * File:
+ *   include/XXpkgXX/helps.ycp
+ *
+ * Package:
+ *   Configuration of XXpkgXX
+ *
+ * Summary:
+ *   Help texts of all the dialogs.
+ *
+ * Authors:
+ *   XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
+ *
+ * The help texts.
+ *
+ */
+
+{
+    textdomain "XXpkgXX";
+
+    /**
+     * Help for the ReadDialog () dialog.
+     * @return string The help text.
+     */
+    global define string ReadDialogHelp () ``{
+	// TODO FIXME: Modify it to your needs!
+	return
+	    // For translators: XXpkgXX read dialog help, part 1 of 2
+_("<P><B><BIG>Initializing XXpkgXX</BIG></B><BR>
+Please wait for a while...
+<BR></P>") +
+	    // For translators: XXpkgXX read dialog help, part 2 of 2
+_("<P><B><BIG>Aborting the initialization:</BIG></B><BR>
+You can safely abort the configuration utility by pressing the <B>Abort</B>
+button now.
+</P>");
+    }
+
+    /**
+     * Help for the WriteDialog () dialog.
+     * @return string The help text.
+     */
+    global define string WriteDialogHelp () ``{
+	// TODO FIXME: Modify it to your needs!
+	return
+	    // For translators: XXpkgXX write dialog help, part 1 of 2
+_("<P><B><BIG>Saving XXpkgXX configuration</BIG></B><BR>
+Please wait for a while...
+<BR></P>") +
+	    // For translators: XXpkgXX write dialog help, part 2 of 2
+_("<P><B><BIG>Aborting the saving:</BIG></B><BR>
+You can abort the saving by pressing the <B>Abort</B> button.
+An additional dialog will inform you whether it is safe to do so or not.
+</P>");
+    }
+
+    /**
+     * Help for the DetectedDialog () dialog.
+     * @return string The help text.
+     */
+    global define string DetectedDialogHelp () ``{
+	// TODO FIXME: Modify it to your needs!
+	return
+	    // For translators: XXpkgXX detected dialog help, part 1 of 3
+_("<P><B><BIG>XXPkgXX setup</BIG></B><BR>
+Here you can configure your XXpkgXX.
+<BR></P>") +
+	    // For translators: XXpkgXX detected dialog help, part 2 of 3
+_("<P><B><BIG>Adding a XXpkgXX:</BIG></B><BR>
+Choose XXpkgXX from the list of the detected XXpkgXXs. If your XXpkgXX was
+not autodetected, use <B>Other (not detected)</B>. Then press
+<B>Configure</B>.
+</P>") +
+	    // For translators: XXpkgXX detected dialog help, part 3 of 3
+_("<P><B><BIG>Editing or deleting:</BIG></B><BR>
+If you press <B>Edit</B>, an additional dialog (where you
+can change the configuration) will open.
+</P>");
+    }
+
+    /**
+     * Help for the OverviewDialog () dialog.
+     * @return string The help text.
+     */
+    global define string OverviewDialogHelp () ``{
+	// TODO FIXME: Modify it to your needs!
+	return
+	    // For translators: XXpkgXX overview dialog help, part 1 of 3
+_("<P><B><BIG>XXPkgXX overview</BIG></B><BR>
+Here you can get an overview about installed XXpkgXXs. Additionally
+you can edit their configuration.
+<BR></P>") +
+	    // For translators: XXpkgXX overview dialog help, part 2 of 3
+_("<P><B><BIG>Adding a XXpkgXX:</BIG></B><BR>
+If you press <B>Add</B>, you can manually configure a XXpkgXX.
+</P>") +
+	    // For translators: XXpkgXX overview dialog help, part 3 of 3
+_("<P><B><BIG>Editing or deleting:</BIG></B><BR>
+Choose a XXpkgXX, whose configuration you want to change or remove.
+Then press the appropriate button: <B>Edit</B> or <B>Delete</B>.
+</P>");
+    }
+
+    /**
+     * Help for the Configure1Dialog () dialog.
+     * @return string The help text.
+     */
+    global define string Configure1DialogHelp () ``{
+	// TODO FIXME: Modify it to your needs!
+	return
+	    // For translators: XXpkgXX configure1 dialog help, part 1 of 2
+_("<P><B><BIG>Configure, part one</BIG></B><BR>
+Please press the <B>Next</B> button.
+<BR></P>") +
+	    // For translators: XXpkgXX configure1 dialog help, part 2 of 2
+_("<P><B><BIG>Selecting something:</BIG></B><BR>
+It is not possible, you must code it first :-)
+</P>");
+    }
+
+    /**
+     * Help for the Configure2Dialog () dialog.
+     * @return string The help text.
+     */
+    global define string Configure2DialogHelp () ``{
+	// TODO FIXME: Modify it to your needs!
+	return
+	    // For translators: XXpkgXX configure1 dialog help, part 1 of 2
+_("<P><B><BIG>Configure, part two</BIG></B><BR>
+Please press the <B>Next</B> button.
+<BR></P>") +
+	    // For translators: XXpkgXX configure1 dialog help, part 2 of 2
+_("<P><B><BIG>Selecting something:</BIG></B><BR>
+It is not possible, you must code it first :-)
+</P>");
+    }
+
+}

@@ -1,0 +1,429 @@
+#!/usr/bin/perl -w
+#
+# Augment ~/.yast2/logconf with all YaST2 logging components used in the
+# current YaST2 log files
+#
+# Usage:
+#	update_logconf [-dv]
+#
+#	-v	verbose (default)
+#	-s	silent (turn verbose off)
+#	-d	debug
+#	-a	scan all logfiles - ~/.y2log-*, not just ~/.y2log
+#	-r	"root" mode: scan /var/log/y2log*, 
+#		write to /root/.yast2/logconf.ycp
+#
+# Author: Stefan Hundhammer <sh@suse.de>
+
+use strict;
+use English;
+use Getopt::Std;
+use vars qw( $opt_a $opt_d $opt_h $opt_r $opt_s $opt_v );
+
+
+# Global variables.
+
+my $verbose		= 1;
+my $debug		= 0;
+my @logfiles		= <~/.y2log>;
+my @all_logfiles	= <~/.y2log*>;
+my $logconf		= <~/.yast2/logconf.ycp>;
+my $root_logconf	= </root/.yast2/logconf.ycp>;
+my @all_root_logfiles	= </var/log/y2log*>;
+my %components;
+my %old_settings;
+
+
+
+# Forward declarations.
+
+sub main();
+
+
+# Call the main function and exit.
+# DO NOT enter any other code outside a sub -
+# any variables would otherwise be global.
+
+
+main();
+exit 0;
+
+
+#-----------------------------------------------------------------------------
+
+
+sub main()
+{
+    # Extract command line options.
+    # This will set a variable opt_? for any option,
+    # e.g. opt_v if option '-v' is passed on the command line.
+
+    getopts('adhrsv');
+
+    usage()			if $opt_h;
+    $verbose	= 1 		if $opt_v;
+    $verbose	= 0 		if $opt_s;
+    $debug	= 1 		if $opt_d;
+    @logfiles	= @all_logfiles	if $opt_a;
+
+    if ( $opt_r )
+    {
+	@logfiles = @all_root_logfiles;
+	$logconf  = $root_logconf;
+    }
+
+    # No more parameters are accepted.
+
+    usage() unless $#ARGV == -1;
+
+
+    # process all log files
+
+    my $logfile;
+
+    foreach $logfile ( @logfiles )
+    {
+	logf( "Processing log file $logfile" );
+	get_log_components( $logfile );
+    }
+
+    read_logconf();
+    write_logconf();
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Get all unique log components from one log file.
+# Store them in the global %components hash.
+#
+# Parameters:
+#	Name of the log file to parse.
+#
+
+sub get_log_components()
+{
+    my ( $logfile ) = @_;
+    my $line;
+    my %parsed_line;
+
+    open( Y2LOG, $logfile ) or die "Can't open $logfile";
+
+    while ( $line = <Y2LOG> )
+    {
+	%parsed_line = parse_y2log_line( $line );
+
+	if ( defined( $parsed_line{"component"} ) )
+	{
+	    $components{ $parsed_line{"component"} } = 1;
+	}
+    }
+
+    close( Y2LOG );
+}
+
+#-----------------------------------------------------------------------------
+
+# Parse one YaST2 log line, e.g.
+#
+# 2000-11-10 11:31:11 <0> snell(21944) [scr] Y2SCRComponent.cc(parseConfigFiles):69 Can't open ...
+#
+# Parameters:
+#	The line to parse
+#
+# Return value:
+#	A hash with the parsed components of the line
+
+sub parse_y2log_line()
+{
+    my ( $line ) = @_;
+    my %parsed;
+    my $next_part;
+
+    my @parts = split( '\s+', $line );
+
+    if ( $#parts < 1 )
+    {
+	# deb( "Ignoring empty input line" );
+	return %parsed;
+    }
+
+    $parsed{ "date"	} = shift @parts;	# 2000-11-10
+    $parsed{ "time"	} = shift @parts;	# 11:31:11
+
+    if ( $#parts > 0 )
+    {
+	$next_part = shift @parts;		# <0>
+	$next_part =~ s/^\<//;			# remove "<"
+	$next_part =~ s/\>$//;			# remove ">"
+	$parsed{ "level"	} = $next_part;
+    }
+
+    if ( $#parts > 0 )
+    {
+	$next_part = $parts[0];			# snell(21944)
+	if ( $next_part =~ '(.*)\((\d+)\)' )
+	{
+	    $parsed{ "hostname"	} = $1;
+	    $parsed{ "pid"	} = $2;
+	    shift @parts;
+	}
+    }
+
+    if ( $#parts > 0 )
+    {
+	$next_part = $parts[0];			# [scr]
+	if ( $next_part =~ /^\[(.*)\]$/ )
+	{
+	    $parsed{ "component" } = $1;
+	    shift @parts;
+	}
+    }
+
+    if ( $#parts > 0 )
+    {
+	$next_part = $parts[0];			# Y2SCRComponent.cc(parseConfigFiles):69
+	if ( $next_part =~ '(.*)\((.*)\):(\d+)' )
+	{
+	    $parsed{ "source_file"		} = $1;
+	    $parsed{ "function"		} = $2;
+	    $parsed{ "source_line_no"	} = $3;
+	    shift @parts;
+	}
+    }
+
+    $parsed{ "message" } = join( " ", @parts );
+
+    if ( 0 && $debug )
+    {
+	deb( "Parsing line:" );
+	deb( $line );
+	deb( "\n" );
+	deb( "date:\t\t$parsed{'date'}" );
+	deb( "time:\t\t$parsed{'time'}" );
+	deb( "level:\t\t$parsed{'level'}" );
+	deb( "hostname:\t$parsed{'hostname'}" );
+	deb( "pid:\t\t$parsed{'pid'}" );
+	deb( "component:\t$parsed{'component'}" );
+	deb( "source_file:\t$parsed{'source_file'}" );
+	deb( "function:\t$parsed{'function'}" );
+	deb( "source_line_no:\t$parsed{'source_line_no'}" );
+	deb( "message:\t$parsed{'message'}" );
+	deb( "\n\n" );
+    }
+
+    return %parsed;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Read and parse the old logconf.
+# Store its contents (as strings) in the global %old_settings hash.
+#
+# Parameters: ---
+
+sub read_logconf
+{
+    if ( ! open( LOGCONF, $logconf ) )
+    {
+        logf( "No previous $logconf");
+        return;
+    }
+
+    my $line;
+    my $component;
+    my $flags;
+
+    while ( $line = <LOGCONF> )
+    {
+	# [ "ui" , [ false,  true,   true,   true,   true,   true ] ],
+
+	if ( $line =~ '\s*\[\s*"([^"]*)"\s*,\s*\[\s*(.*)\s*\]\s*\].*' )
+	{
+	    $component	= $1;
+	    $flags	= $2;
+	    $flags	=~ s/\s+$//;	# remove trailing whitespace
+	    $old_settings{ $component } = $flags;
+	    $components{ $component } = 1;
+	    deb( "Found settings for $component: \"$flags\"" );
+	}
+    }
+
+    close( LOGCONF );
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Write logconf.
+# Use old settings whenever possible and create entries with
+# default settings for all newly found components.
+#
+# Parameters: ---
+
+sub write_logconf
+{
+    open( LOGCONF, ">" . $logconf ) or die "Can't open $logconf for writing";
+
+    # Write header
+
+    print LOGCONF <<EOF;
+//
+// ~/.yast2/logconf.ycp
+//
+// Automatically generated by update_logconf
+//
+// Edit the flags as you like - update_logconf will leave them as they are.
+// Invoke update_logconf again if there are any new logging components
+// or even if you just suspect there might be some.
+//
+//   component\t\t\t\t\tdebug\tmile\twarn\terror\tsecu\tinter
+//            \t\t\t\t\t     \tstone\ting\t     \trity\tnal
+[
+EOF
+
+
+    # Write entries for all components
+
+    my $first = 1;
+    my $component;
+    my $new_components = 0;
+
+    foreach $component ( sort keys %components )
+    {
+	{
+	    print LOGCONF ",\n" if ! $first;
+	    $first = 0;
+
+	    if ( defined $old_settings{ $component } )
+	    {
+		my @flags = split( ',\s*', $old_settings{ $component } );
+		write_logconf_line( $component, @flags );
+	    }
+	    else
+	    {
+		logf( "Adding new component \"$component\"" );
+		$new_components++;
+		write_logconf_line( $component,
+				    "false",	# debug
+				    "true",	# milestone
+				    "true",	# warning
+				    "true",	# error
+				    "true",	# security
+				    "true" 	# internal
+				    );
+	    }
+	}
+    }
+
+
+    # Cleanup
+
+    if ( $new_components < 1 )
+    {
+        logf( "No new components - $logconf was up to date." );
+    }
+
+    print LOGCONF "\n]\n";
+    close ( LOGCONF );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Write one line to logconf
+#
+# Parameters:
+#	log component
+#	6 * logging flags
+
+sub write_logconf_line()
+{
+    my ( $component,
+	 $log_debug,
+	 $log_milestone,
+	 $log_warning,
+	 $log_error,
+	 $log_security,
+	 $log_internal ) = @_;
+
+    printf LOGCONF "  [ %-40s, [\t$log_debug,\t$log_milestone,\t$log_warning,\t$log_error,\t$log_security,\t$log_internal\t] ]",
+       '"' . $component . '"';
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stdout if verbose mode is set
+# (command line option '-v').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub logf()
+{
+    my $msg;
+
+    if ( $verbose )
+    {
+	foreach $msg( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a debugging message to stdout if debug mode is set
+# (command line option '-d').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub deb()
+{
+    my $msg;
+
+    if ( $debug )
+    {
+	foreach $msg( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Print usage message and abort program.
+#
+# Parameters:
+#	---
+
+sub usage()
+{
+    die "Usage: $0 [-adhrsv]\n"						.
+	"\t-a scan all logfiles, i.e. ~/.y2log-* , not just ~/.y2log\n" .
+	"\t-d debug\n"							.
+	"\t-h help (this message)\n"					.
+	"\t-r \"root\" mode: scan /var/log/y2log*, write to $root_logconf\n" .
+	"\t-s silent (turn verbose off)\n"				.
+	"\t-v verbose (default)\n";
+}
+
+
+
+# EOF

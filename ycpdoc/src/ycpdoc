@@ -1,0 +1,1095 @@
+#!/usr/bin/perl -w
+#
+# File:
+#  ycpdoc
+#
+# Module:
+#  Documentation creation.
+#
+# Summary:
+#  Creates html files based on comments in ycp file.
+#
+# Authors:
+#  Petr Blahos <pblahos@suse.cz>
+#  Martin Vidner <mvidner@suse.cz>
+#
+# $Id$
+#
+# This script reads ycp file. If it finds comment stating /** it processes
+# that comment as function description. It understands to tags
+# @param paramname description
+# @return <type> description
+# It takes function name from  following define command.
+#
+# Additionally it undestands tofile header described in
+# doc/public/Developers/Coding/rules.html
+#
+
+use strict;
+use File::Basename;
+
+sub main
+{
+    parse_arguments ();
+
+    parse_sources ();
+    write_docs ();
+}
+
+
+my @sources = ();
+
+my $skip_index = 0;
+my $output_stdout = 0;
+my $output_dir = "";
+my $strip_prefix = "";		# both with a trailing slash
+my $new_index_style = 1;
+my $warning_level = 2;
+my $warn_return_types = 1;
+
+sub parse_arguments
+{
+##
+## find switches
+##
+
+    foreach my $arg (@ARGV)
+    {
+	if ($arg =~ /^-/)	# switch
+	{
+	    if ( ( $arg eq "-h" ) || ( $arg eq "--help" ) )
+	    {
+		usage();
+	    }
+	    elsif ( $arg eq "-i" )
+	    {
+		$skip_index = 1;
+	    }
+	    elsif ( $arg eq "-" )
+	    {
+		$skip_index = 1;
+		$output_stdout = 1;
+	    }
+	    elsif ( $arg =~ /^-d(.*)/ )
+	    {
+		$output_dir = $1;
+		if ($output_dir !~ /\/$/ )
+		{
+		    $output_dir .= "/";
+		}
+	    }
+	    elsif ( $arg =~ /^-s(.*)/ )
+	    {
+		$strip_prefix = $1;
+		if ($strip_prefix !~ /\/$/ )
+		{
+		    $strip_prefix .= "/";
+		}
+	    }
+	    elsif ( $arg eq "-o" )
+	    {
+		$new_index_style = 0;
+	    }
+	    elsif ($arg =~ /^-w(\d)/)
+	    {
+		$warning_level = $1;
+	    }
+	    elsif ($arg eq "-wr")
+	    {
+		$warn_return_types = 0;
+	    }
+	}
+	else
+	{
+	    push @sources, $arg;
+	}
+    }
+
+    if (@sources == 0)
+    {
+	usage() ;
+    }
+}
+
+
+sub usage
+{
+die<<EOF;
+
+ycpdoc: The YaST2 ycp Documentation Tool.
+	Processes special comments in ycp file and creates
+	html file from them. Uses the same comment syntax as
+	kdoc/ydoc. Supported tags:
+	    \@param name description	html allowed
+	    \@return type description	html allowed
+	    \@since version		html allowed
+	    \@example anything		html allowed, <pre>
+	    \@see function
+	    \@see file\#function
+	    \@see file\#
+	    \@see <a href="uri">text</a>
+
+	Also processes initial comment of file if it starts at the
+	first line, html allowed.
+	Supports intro via /*** , html allowed.
+
+	See YaST2 Documentation public/Developers/Coding/rules.html
+	for example.
+
+Usage:
+	ycpdoc -h
+	ycpdoc [-d<dir>] [-s<dir>] [-i] [-] [-o] [-wr] files.ycp...
+
+	-h      Show this help screen
+	-d<dir> Output files are placed to directory <dir>
+	-s<dir> Strip only <dir> when generating output files (default all).
+		Remaining slashes are converted to double underscores.
+	-i      Do not generate index.html (intro.html, files.html)
+	-       Write output to stdout. Do not generate indexes.
+		If there are more input files, generate only one
+		output html file
+	-o      Old style of index: creates only index.html
+	-wr	Do not warn about undeclared return types
+EOF
+}
+
+###
+### information shared between parsing and writing
+###
+
+my $any_module = "";		# module to be put on index pages
+
+# global map:
+#   intro_html string, concatenated contents of (/*** */), leading * stripped
+#   files map keyed by filenames
+my $g;
+
+# file map:
+#   header map
+#   requires list of maps
+#   provides list of maps
+
+# header map:
+#   module
+#   file
+#   authors: list
+#   descr
+#   summary
+#   depends
+# requires map:
+#   kind: include or import or (yuck! provides!) module
+#   name
+# provides map:
+#   file => "routines"
+#   kind: "function", "variable", ("info")
+#   global: boolean
+#   name
+#   return (description)
+#   type   (variable type or return type)
+#   parameters: list of maps
+#   signature => formatted name (and parameters)
+#   since => version
+#   see => string of html ahref's
+#   example => "<pre>blahblah...</pre>"
+#   body => description text
+
+# parameters map:
+#   name
+#   type
+#   description
+
+
+
+###
+### parsing
+###
+
+
+# quick and dirty: warn about the previous line
+my $pathname;
+my $lines_read;
+# 1:debug 2:hint 3:warning 4:error
+my @kind = ("InTeRnAl", "Debug", "Hint", "Warning", "Error");
+sub warning ($;$)
+{
+    my $text = shift;
+    my $level = shift || 3;
+    if ($level >= $warning_level)
+    {
+	printf(STDERR "$pathname: %d: $kind[$level]: $text\n", $lines_read-1);
+    }
+}
+
+# convert a source file name to a form used as a key
+sub base_source_name ($)
+{
+    my $source = shift;
+    if ($strip_prefix ne "" && $source =~ s/^$strip_prefix//)
+    {
+	return $source;
+    }
+    else
+    {
+	return basename ($source);
+    }
+}
+
+sub parse_sources ()
+{
+    $g->{"intro_html"} = "";
+    foreach my $source (@sources)
+    {
+	print STDERR "Parsing $source\n";
+	my $b = base_source_name ($source);
+	$g->{"files"}->{$b} = parse_file ($source);
+    }
+}
+
+# see scanner.ll and parser.yy in libycp
+# (?:foo) makes a grouping but not a backreference as (foo) does
+
+# like "[[:alpha:]_][[:alnum:]_]*" except a single _
+my $ycp_symbol = "(?:[[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*)";
+
+my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock|map"
+    . "|locale|term|path|block|declaration|symbol)";
+# this should be a sufficient approximation of the real typedecl.
+my $ycp_typedecl = '(?:'. $ycp_simple_type
+    .'|list|list\s*\(\s*'. $ycp_simple_type .'\s*\))';
+
+# Matches any string not containing '*/'.
+# Helpful for the line-oriented parser not to slurp everything when it
+# sees /*****/
+my $no_comment_end = '(?:[^*]|\*[^*/])*';
+
+##
+## read file
+##
+sub parse_file ($)
+{
+    $pathname = shift;
+    my $state = "firstline"; # aftercomment, fistcomment, firstline, incomment, intro, skip, start,
+
+    my $f = {};
+    $f->{"requires"} = [];
+
+    my @header_lines = ();	# list of header lines (first /** */)
+
+    my @comments = (); # list of comment lines (presumably before a define)
+    my $isglobal = 0;
+    my $declared_type = "";
+    my $name = "";
+    my $params = "";
+    my $shipout = 0; # 1 when we got a comment and optionally a define
+
+
+    $lines_read = 0;
+    open(INYCP, $pathname) or die "Cannot open file $pathname: $!";
+    while (<INYCP>)
+    {
+	$lines_read = $lines_read + 1;
+	chomp;
+#	print STDERR "--$state\n";
+
+	if ("aftercomment" eq $state)
+	{
+	    # function definition
+	    if (/(global\s+)?define\s+($ycp_typedecl)?\s*($ycp_symbol)(.*)/o)
+	    {
+		$isglobal = defined $1;
+		$declared_type = $2 || "";
+		$name = $3;
+		$params = $4;
+		if ($params =~ /``\{/)
+		{
+		    $params =~ s/``\{.*//;
+		    $state = "skip";
+		    $shipout = 1;
+		}
+		else
+		{
+		    $state = "longdefine";
+		}
+	    }
+	    # variable declaration
+	    elsif (/(global\s+)?($ycp_typedecl)\s+($ycp_symbol)\s*=/o)
+	    {
+		  $isglobal = defined $1;
+		  $declared_type = $2;
+		  $name = $3;
+
+		  $state = "start";
+		  $shipout = 1;
+	    }
+	    elsif( /^\s*$/ )
+	    {
+		# allow empty lines between comment and declaration
+	    }
+	    else
+	    {
+		#info
+		# ship out
+		$state = "start";
+		$shipout = 1;
+	    }
+	}
+	elsif ($state eq "longdefine")
+	{
+	    if (/``\{/)
+	    {
+		s/``\{.*//;
+		$state = "skip";
+		$shipout = 1;
+	    }
+	    $params .= $_;
+	}
+	elsif ($state eq "skip")
+	{
+	    # but why is skip needed at all?
+	    $state = "start";
+	}
+	elsif ($state eq "firstline")
+	{
+	    # skip empty lines, enter firstcomment or start
+	    if(/^\s*\/\*\*\s*$/)
+	    {
+		$state = "firstcomment";
+	    }
+	    elsif ($_ ne "")
+	    {
+		$state = "start";
+	    }
+	}
+	elsif ($state eq "firstcomment")
+	{
+	    if(/\*\//)
+	    {
+		$state = "start";
+	    }
+	    else
+	    {
+		s/^\s*\*//; # remove leading whitespace with asterisk
+		push (@header_lines, $_);
+	    }
+	}
+	elsif ($state eq "start")
+	{
+	    if(/^\s*\/\*\*\*\s*$/)
+	    {
+		$state = "intro";
+		$g->{"intro_html"} .= "<!-- $pathname -->\n";
+	    }
+
+	    elsif(/^\s*\/\*\*\s*$/)
+	    {
+		$state = "incomment";
+	    }
+	    elsif (/^\s*(include|import)\s*\"([^\"]+)\"/) # "emacs
+	    {
+		my $req = { "kind" => $1, "name" => $2 };
+		push (@{$f->{"requires"}}, $req);
+	    }
+	    elsif (/^\s*(module)\s*\"([^\"]+)\"/)
+	    {
+		my $prov = { "kind" => $1, "name" => $2 };
+		push (@{$f->{"requires"}}, $prov);
+	    }
+
+	    if (/define\s+($ycp_typedecl)?\s*(${ycp_symbol})/o)
+	    {
+		warning ("Function $2 has no comment.");
+	    }
+	}
+	elsif ("incomment" eq $state)
+	{
+	    if (/\*\//)
+	    {
+		$state = "aftercomment";
+	    }
+	    else
+	    {
+		s/^\s*\*//;	# remove leading whitespace with asterisk
+		push @comments, $_;
+	    }
+	}
+	elsif ("intro" eq $state)
+	{
+	    if (/\*\//)
+	    {
+		$state = "start";
+	    }
+	    else
+	    {
+		# remove * from the beg. of line if there is any.
+		s/^\s*\*//;
+		$g->{"intro_html"} .= "$_\n";
+	    }
+	}
+
+	if(0!=$shipout)
+	{
+	    push (@{$f->{"provides"}}, do_shipout (base_source_name ($pathname), $isglobal, $declared_type, $name, $params, @comments));
+	    $shipout = 0;
+	    $isglobal = 0;
+	    $declared_type = "";
+	    $name = "";
+	    $params = "";
+	    @comments = ();
+	}
+    }
+    close(INYCP);
+
+    $f->{"header"} = parse_header (@header_lines);
+    return $f;
+}
+
+# parse_entry
+sub do_shipout ($$$$$@)
+{
+    # file name,
+    my ($file, $isglobal, $declared_type, $name, $params, @comments) = @_;
+
+    my $lastwas = "";
+
+    my $entry = {};
+    $entry->{"file"} = $file;
+    $entry->{"name"} = $name;
+    $entry->{"global"} = $isglobal;
+    $entry->{"return"} = "";
+    $entry->{"type"} = "";
+    $entry->{"signature"} = ""; #TODO better place
+    $entry->{"parameters"} = [];
+    $entry->{"since"} = "";
+    $entry->{"example"} = "";
+    $entry->{"see"} = "";
+    $entry->{"body"} = "";
+
+    my %param_infunc;	# (declared) parameter names, keyed by themselves
+    my %param_incomment; # parameter descriptions
+
+    my @parameters = ();
+    if ($name eq "")
+    {
+	$entry->{"kind"} = "info";
+    }
+    elsif ($params eq "")
+    {
+	$entry->{"kind"} = "variable";
+    }
+    else
+    {
+	my $ok;
+	$entry->{"kind"} = "function";
+	# just the things inside parens
+	$ok = ($params =~ s/^\s*\(\s*(.*)\s*\)\s*$/$1/);
+	warn "No parentheses? '$params'" unless $ok;
+	foreach my $p (split (/,/, $params))
+	{
+	    $ok = ($p =~ m/\s*($ycp_typedecl)\s+($ycp_symbol)/o);
+	    warn "Bad parameter? '$p'" unless $ok;
+	    # later: "description"
+	    push @parameters, { "name" => $2, "type" => $1 };
+	    %param_infunc->{$2} = $2;
+	}
+    }
+
+    my $last_param;
+    my $documented_type = "";
+    foreach my $line (@comments)
+    {
+	if($line =~ /\@param\s+($ycp_symbol)\s+(.*)/o)
+	{
+	    $lastwas = "param";
+
+	    $last_param = $1;
+	    %param_incomment->{$last_param} = almost_html ($2);
+	}
+	elsif($line =~ /\@return\s+($ycp_typedecl)?\s*(.*)/o)
+	{
+	    $lastwas = "return";
+	    $documented_type = $1 || "";
+	    $entry->{"return"} = almost_html ($2);
+	}
+	elsif ($line =~ /\@since\s+(.*)/)
+	{
+	    $lastwas = "since";
+	    $entry->{"since"} = almost_html ($1);
+	}
+	elsif($line =~ /\@see\s+(.*)/)
+	{
+	    $lastwas = "see";  # it is an error, we do not allow multiline see...
+	    # see section
+	    $line = $1;
+	    if( $line =~ /^</ )
+	    { # html code
+		$entry->{"see"} .= "$line\n";
+	    }
+	    elsif ( $line =~ /(.*)\#$/ )
+	    { # ref. to file without function
+		$entry->{"see"} .= "<a href=\"".html_name($1)."\">".$1."</a>\n";
+	    }
+	    elsif ( $line =~ /(.*)\#(.*)/ )
+	    {
+		# file#function
+		$entry->{"see"} .= "<a href=\"".html_name($1)."#".$2."\">".$2." in ".$1."</a>\n";
+	    }
+	    else
+	    {
+		$entry->{"see"} .= "<a href=\"#".$line."\">".$line."</a>\n";
+	    }
+	}
+	elsif($line =~ /\@example(.*)/ || $lastwas eq "example")
+	{
+	    $lastwas = "example";
+	    $line =~ s/\@example//; # remove it if it's there
+	    $entry->{"example"} .= almost_html ("\n$line");
+	}
+	elsif($lastwas eq "return")
+	{
+	    $entry->{"return"}.= almost_html ("\n$line");
+	}
+	elsif($lastwas eq "param")
+	{
+	    %param_incomment->{$last_param} .= almost_html ("\n$line");
+	}
+	else
+	{
+	    $entry->{"body"} .= almost_html ("\n$line");
+	    $lastwas = "";
+	}
+    }
+    $entry->{"type"} = $declared_type || $documented_type;
+    if ($entry->{"example"} ne "")
+    {
+	$entry->{"example"} =~ s:^\n*(.*):<pre>$1</pre>:s;
+    }
+
+    # check arguments
+
+    # for actual parameters: add description or warn
+    foreach my $param_mapref (@parameters)
+    {
+	my $name = $param_mapref->{"name"};
+	my $cmt = $param_incomment{$name} || "";
+	$param_mapref->{"description"} = $cmt;
+	if ($cmt eq "")
+	{
+	    warning ("Parameter $name declared in function header but not documented.");
+	}
+	}
+    # for commented parameters: warn if no such actual parameter
+    while ( my ($key, $descr) = each %param_incomment) {
+	if (!defined (%param_infunc->{$key})) {
+	    if ($entry->{"kind"} eq "function")
+	    {
+		warning ("Parameter $key documented but not declared in function header.");
+	    }
+	    else
+	    {
+		# info (oldmodule parameters (Args)): ad
+		push @parameters, { "name" => $key, "description" => $descr };
+	    }
+	}
+    }
+
+    $entry->{"parameters"} = [ @parameters ];
+
+
+    if ($entry->{"kind"} eq "function")
+    {
+	if ($declared_type eq "")
+	{
+	    if ($warn_return_types)
+	    {
+		if ($documented_type eq "")
+		{
+		    warning ("Return type not specified.");
+		}
+		else
+		{
+		    warning ("It is better to declare the type in the code.", 2);
+		}
+	    }
+	}
+	else
+	{
+	    if ($documented_type && $documented_type ne $declared_type)
+	    {
+		warning ("Declared and documented return types do not match ($declared_type != $documented_type).");
+	    }
+	}
+
+	if ($entry->{"return"} eq "" && $entry->{"type"} !~ /^(void)?$/) #/)
+	{
+	    warning ("Return value not documented.");
+	}
+    }
+
+    return $entry;
+}
+
+##
+## parse header (comment at the beginning of file)
+##
+
+#convert to
+sub parse_header (@)
+{
+    my @lines = @_;
+
+    my $parsed_header = {};
+    $parsed_header->{"module"} = "";
+    $parsed_header->{"authors"} = [];
+
+    my $key = "";
+    foreach my $a (@lines)
+    {
+	#TODO: warn on unknown key, missing field
+	if ($a =~ s/^\s*(Module|Package|File|Summary|Depends|Authors):\s*(.*)/$2/)
+	{
+	    $key = lc $1;
+	    # Module is old style, Package is new style. TODO, define meaning
+	    $key = "module" if $key eq "package";
+	}
+	elsif ($a =~ /^\s*\$Id/)
+	{
+	    $a = "";
+	    $key = "descr";
+	}
+
+	if ( $key eq "authors")
+	{
+	    my $mail = $a;
+	    $mail =~ s/[^<(]*[(<]([^>)]*).*/$1/g;
+	    $a =~ s/[(<][^>)]*[>)]/&lt;<a href=\"mailto:$mail\">$mail<\/a>&gt;/g; # "emacs
+	    if ($a !~ /^\s*$/)
+	    {
+		push @{$parsed_header->{$key}}, $a;
+	    }
+	}
+	else
+	{
+	    if ( $key eq "module" )
+	    {
+		$any_module ||= $a;
+	    }
+
+	    if (defined $parsed_header->{$key})
+	    {
+		$parsed_header->{$key} .= almost_html ("\n$a");
+	    }
+	    else
+	    {
+		$parsed_header->{$key} = almost_html ($a);
+	    }
+	}
+    }
+    return $parsed_header;
+}
+
+sub almost_html ($)
+{
+    my $text = shift;
+    $text =~ s/\&(?![A-Za-z])/\&amp;/g; # negative lookahead
+    $text =~  s:<(?![A-Za-z/]):\&lt;:g;
+    $text =~ s/([[:space:]-])>/$1\&gt;/g;
+    return $text;
+}
+
+
+###
+### writing
+###
+
+
+# substituted strings: 1,2 = Module, 3,4,5 = links to other pages
+my $intro = "<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n"
+    . "<STYLE type=\"text/css\">\n"
+    . "H1 {color: #e00000}\n"
+    . "</STYLE>\n"
+    . "</HEAD>\n"
+    . "<BODY bgcolor=\"#c8c8c8\">\n"
+    . "<TABLE WIDTH=\"100%%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation:</i>\n"
+    . "<a href=\"index.html\"><b>%s</b></a></TD>\n"
+    . "<TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/ydoc/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
+    . "<hr>\n<TABLE><TR><td valign=top align=center>\n"
+    . "<img src=\"/usr/share/doc/packages/ydoc/images/yast2-half.png\"><br><br>\n"
+    . "%s<br>\n%s<br>\n%s\n</td>\n"
+    . "<TD VALIGN=TOP><TD VALIGN=TOP>\n";
+
+my $outro = "</td></tr></table><HR>\n"
+    . "<TABLE WIDTH=\"100%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation </i></TD><TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/ydoc/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
+    . "</BODY>\n</HTML>\n";
+
+# 0: global/local 1:function, 2:anchor 3:-> 4:returntype
+my $functionhead = "<p>\n"
+    . "<table bgcolor=\"#f96500\" cellpadding=1 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
+    . "<table bgcolor=\"#ffc080\" cellpadding=3 cellspacing=0 border=0 width=\"100%%\"><tr><td><font size=\"+1\">\n"
+    . "<tt>%s <b>%s<a name=\"%s\"></a><font color=\"#606060\"> %s </font><font color=\"#c05000\"> %s</font></b></tt>\n"
+    . "</font></td></tr></table>\n"
+    . "</td></tr></table>\n";
+
+my $functiondescintro = "<p>";
+my $functiondescoutro = "</p>\n";
+
+my $functionparamsintro = "<dl><dt><b>Parameters</b>:<dd><table width=\"100%\" border=\"0\">\n";
+my $functionparamsoutro = "</table></dl>\n";
+
+my $functionparamintro = "<tr><td align=\"left\" valign=\"top\" width=\"20%\"><font color=\"#c05000\">\n";
+my $functionparamfil = "</font></td>\n<td align=\"left\" valign=\"top\">";
+my $functionparamoutro = "</td></tr>\n";
+
+my $functionretintro = "<dl><dt><b>Return value</b>:<dd><table width=\"100%\" border=\"0\">\n"
+    . "<tr><td align=\"left\" valign=\"top\" width=\"20%\"><font color=\"#c05000\">\n";
+my $functionretfil = "</font></td>\n<td align=\"left\" valign=\"top\">";
+my $functionretoutro = "</td></tr>\n</table></dl>\n";
+
+# header of a ycp file, with a list of includes and exports
+my $headintro = "\n<table cellspacing=0 BGCOLOR=\"#f96500\" width=\"100%\"><tr><td>\n"
+    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR><TD>\n"
+    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR>\n";
+my $headfil = "</td></tr></table></td></tr></table>\n"
+    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR><td>\n"
+    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR><TD>\n";
+my $headoutro = "\n</td></tr></table></td></tr></table></td></tr></table>\n";
+
+# 1:title
+my $genericintro = "<dl><dt><b>%s:</b><dd>\n"
+    . "<table width=\"100%%\" border=\"0\"><tr><td align=\"left\" valign=\"top\">\n";
+my $genericoutro = "</td></tr></table>\n</dl>\n";
+
+##
+##
+##
+
+##
+## process files, create output files and possibly index.html
+##
+sub write_docs
+{
+    while (my ($file, $f) = each %{$g->{"files"}})
+    {
+	write_onefile ($file, $f);
+    }
+
+    if (!$output_stdout && !$skip_index)
+    {
+	create_index ($new_index_style);
+    }
+}
+
+# make an output file name from a base_source_name, not including output_dir
+sub html_name ($)
+{
+    my $base = shift;
+    $base =~ s/.ycp$//;
+    $base =~ s{/}{__}g;
+    return $base . ".html";
+}
+
+##
+## create index.html
+##
+sub create_index ($)
+{
+    my ($new) = @_;
+
+    my $index = $output_dir."index.html";
+    open(OUT,">$index") or die "Cannot open file index.html: $!";
+
+    if ($new)
+    {
+	printf OUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
+    }
+    else
+    {
+	printf OUT $intro , $any_module  , $any_module , "" , "", "";
+    }
+
+    print OUT "<H3>Function index:</H3>";
+    print OUT "<table><tr><td><b>Function name</b></td><td><b>File name</b></td></tr>";
+
+    my @entries = ();
+    foreach my $f (values %{$g->{"files"}})
+    {
+	push @entries, @{$f->{"provides"}};
+    }
+
+    for my $one ( sort {$a->{"signature"} cmp $b->{"signature"}} @entries )
+    {
+	if($one->{"kind"} ne "info")
+	{
+	    print OUT "<tr><td><a href=\"";
+	    print OUT html_name ($one->{"file"});
+	    print OUT "#";
+	    print OUT $one->{"name"};
+	    print OUT "\">";
+	    print OUT $one->{"signature"};
+	    print OUT "</a></td><td><a href=\"";
+	    print OUT html_name ($one->{"file"});
+	    print OUT "\">";
+	    print OUT $one->{"file"};
+	    print OUT "</a></td></tr>\n";
+	}
+    }
+    print OUT "</table>";
+
+    # files.html, or into index.html
+    if ($new)
+    {
+	$index = $output_dir."files.html";
+
+	open(FOUT,">$index") or die "Cannot open file $index: $!";
+	printf FOUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
+    }
+    else
+    {
+	open (FOUT, ">&OUT");
+    }
+    print FOUT "<H3>File index:</H3>";
+    print FOUT "<table><tr><td><b>File name</b></td></tr>";
+    for my $one ( sort keys %{$g->{"files"}} )
+    {
+	printf FOUT "<tr><td><a href=\"%s\">%s</a></td></tr>", html_name($one), $one;
+    }
+    if ($new)
+    {
+	print FOUT "</table>";
+	print FOUT $outro;
+    }
+    close FOUT;
+
+    print OUT "</table>";
+    print OUT $outro;
+    close OUT;
+
+    # intro.html
+    if ($new)
+    {
+	$index = $output_dir."intro.html";
+
+	open(OUT,">$index") or die "Cannot open file $index: $!";
+
+	printf OUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
+	print OUT "<H3>Introduction:</H3>";
+	print OUT $g->{"intro_html"};
+	print OUT $outro;
+	close OUT;
+    }
+}
+
+sub item_index ($@)
+{
+    my ($title, @items) = @_;
+    if (@items > 0)
+    {
+	print OUT "<H1>$title</H1>\n<ul>\n";
+	for my $one ( sort @items )
+	{
+	    print OUT "<li>$one</li>\n";
+	}
+	print OUT "</ul>\n";
+    }
+}
+
+##
+## write one html file (both header and functions)
+##
+sub write_onefile ($$)
+{
+    my ($file, $f) = @_;
+    my $parsed_header = $f->{"header"};
+    my $htmlfn = $output_dir . html_name ($file);
+
+    if ( $output_stdout )
+    {
+	open(OUT,">>/dev/fd/1");
+    }
+    else
+    {
+	print STDERR "Writing $htmlfn\n";
+	open(OUT,">$htmlfn") or die "Cannot open file $htmlfn: $!";
+    }
+
+    $parsed_header->{"module"} ||= "Unknown YCP Module";
+
+    if($new_index_style)
+    {
+	printf OUT ($intro,
+		    $parsed_header->{"module"}, $parsed_header->{"module"},
+		    "<a href=\"index.html\">functions</a>",
+		    "<a href=\"files.html\">files</a>",
+		    "<a href=\"intro.html\">intro</a>");
+    }
+    else
+    {
+	printf OUT ($intro,
+		    $parsed_header->{"module"} , $parsed_header->{"module"},
+		    "", "", "");
+    }
+
+    #
+    # create header
+    #
+    print OUT $headintro;
+
+    print OUT "<TD><H1>$parsed_header->{\"module\"}</H1></TD>\n";
+    if ( defined $parsed_header->{"file"} )
+    {
+	print OUT "<TD VALIGN=\"top\" ALIGN=\"right\"><TT>$parsed_header->{\"file\"}</TT></TD>\n";
+    }
+    print OUT "</tr>\n<tr><td>";
+    if ( defined $parsed_header->{"summary"} )
+    {
+	print OUT "$parsed_header->{\"summary\"}";
+    }
+    print OUT "</td></tr>\n<tr><td>";
+    if ( @{$parsed_header->{"authors"}} )
+    {
+	print OUT "<ul>\n";
+	foreach ( @{$parsed_header->{"authors"}} )
+	{
+	    print OUT "<li>$_</li>\n";
+	}
+	print OUT "</ul>\n";
+    }
+    print OUT $headfil;
+    if ( defined $parsed_header->{"descr"} )
+    {
+	print OUT "$parsed_header->{\"descr\"}\n";
+    }
+
+    if ( defined $parsed_header->{"depends"} )
+    {
+	print OUT "<H1>Depends on</H1>\n";
+	print OUT "$parsed_header->{\"depends\"}\n";
+    }
+
+    #
+    # Create include index
+    #
+    my @imports = ();
+    my @includes = ();
+
+    for my $one (@{$f->{"requires"}})
+    {
+	if ($one->{"kind"} eq "import")
+	{
+	    push (@imports, $one->{"name"});
+	}
+	elsif ($one->{"kind"} eq "include")
+
+	{
+	    push (@includes, $one->{"name"});
+	}
+	elsif ($one->{"kind"} eq "module" && !$output_stdout)
+	{
+	    my $n = $one->{"name"};
+	    # a hack to write a part of module index:
+	    (my $modhtmlfn = $htmlfn) =~ s/html$/mod.html/;
+	    (my $htmlbase = $htmlfn) =~ s{.*/}{};
+	    print STDERR "Writing $modhtmlfn\n";
+	    open (MOUT,">$modhtmlfn") or die "Cannot open file $modhtmlfn: $!";
+	    print MOUT "<a href=\"$htmlbase\">$n</a>\n";
+	    close (MOUT);
+	}
+    }
+
+
+    item_index ("Imports", @imports);
+    item_index ("Includes", @includes);
+
+    #
+    # Create variable and function index
+    #
+    my @local_variables = (); #um, they might be global...
+    my @local_functions = ();
+    for my $one ( @{$f->{"provides"}} )
+    {
+	if ($one->{"kind"} eq "variable")
+	{
+	    my $n = $one->{"name"};
+	    push (@local_variables, "<a href=\"#$n\">$n</a>");
+	}
+	elsif ($one->{"kind"} eq "function")
+	{
+	    my $n = $one->{"name"};
+	    my @params = ();
+	    foreach my $param (@{$one->{"parameters"}})
+	    {
+		push (@params, $param->{"type"}." ".$param->{"name"});
+	    }
+	    my $sig = $one->{"signature"} = $n ." (". join (", ", @params) .")";
+	    push (@local_functions, "<a href=\"#$n\">$sig</a>");
+	}
+    }
+
+    item_index ("Variables", @local_variables);
+    item_index ("Functions", @local_functions);
+
+    print OUT $headoutro;
+
+    #
+    # for each export...
+    #
+    for my $one ( @{$f->{"provides"}} )
+    {
+	if($one->{"kind"} ne "info")
+	{
+	    my $gl = $one->{"global"} ? "global":"local";
+	    $one->{"signature"} ||= $one->{"name"};
+	    my $sep = $one->{"type"} ? "-&gt;" : "";
+	    printf OUT $functionhead, $gl, $one->{"signature"}, $one->{"name"}, $sep , $one->{"type"};
+	}
+
+	print OUT $functiondescintro;
+	print OUT $one->{"body"};
+	print OUT $functiondescoutro;
+
+	if (@{$one->{"parameters"}} > 0)
+	{
+	    print OUT $functionparamsintro;
+	    foreach my $param (@{$one->{"parameters"}})
+	    {
+		print OUT $functionparamintro;
+		print OUT $param->{"name"};
+		print OUT $functionparamfil;
+		print OUT $param->{"description"};
+		print OUT $functionparamoutro;
+	    }
+	    print OUT $functionparamsoutro;
+	}
+	if ($one->{"return"} ne "")
+	{
+	    print OUT $functionretintro;
+#	    print OUT $one->{"type"}; # uncomment this to see return type in Returns:
+	    print OUT $functionretfil;
+	    print OUT $one->{"return"};
+	    print OUT $functionretoutro;
+	}
+
+	if ($one->{"example"} ne "")
+	{
+	    printf OUT $genericintro, "Example";
+	    print OUT $one->{"example"};
+	    print OUT $genericoutro;
+	}
+	if ($one->{"since"} ne "")
+	{
+	    printf OUT $genericintro, "Since";
+	    print OUT $one->{"since"};
+	    print OUT $genericoutro;
+	}
+	if ($one->{"see"} ne "")
+	{
+	    printf OUT $genericintro, "See";
+	    print OUT $one->{"see"};
+	    print OUT $genericoutro;
+	}
+    }
+    print OUT $outro;
+
+    close(OUT);
+}
+
+main ();

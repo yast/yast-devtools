@@ -1,0 +1,54 @@
+/**
+ * File:
+ *   clients/XXpkgXX.ycp
+ *
+ * Package:
+ *   Configuration of XXpkgXX
+ *
+ * Summary:
+ *   Main file
+ *
+ * Authors:
+ *   XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
+ *
+ * Main file for XXpkgXX configuration. Uses all other files.
+ *
+ */
+
+{
+    /***
+     * <h3>Configuration of the XXpkgXX</h3>
+     */
+
+    textdomain "XXpkgXX";
+
+    include "XXpkgXX/ui.ycp";
+
+    /* The main () */
+    y2milestone ("XXPkgXX module started");
+    y2milestone ("----------------------------------------");
+
+    /**
+     * Should we suppress Read() and Write()? It is necessary in proposals...
+     */
+    boolean no_io = false;
+
+    foreach (`arg, Args(), ``{
+	    if (arg == .noio)
+	    {
+		no_io = true;
+	    }
+	}
+    );
+
+
+    /* main ui function */
+    any ret = (no_io) ? XXPkgXXAutoSequence () : XXPkgXXSequence ();
+    y2debug ("ret == %1", ret);
+
+    /* Finish */
+    y2milestone ("XXPkgXX module finished");
+    return ret;
+}

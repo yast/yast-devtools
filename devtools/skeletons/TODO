@@ -1,0 +1,10 @@
+TODO
+----
+- checks for various YaST2 tools in configure.in
+- consistant usage of YAST2DOC or DOCDIR
+- skeleton for libraries
+- config skeleton:
+  - use Summary:: instead of include "ui/summary.ycp"
+  - add return values to the all functions
+  - XXpkgXX_auto.ycp: - should be possible to call it without previous settings
+                      - fake autodetection

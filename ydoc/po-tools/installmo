@@ -1,0 +1,21 @@
+#!/bin/bash
+
+YAST2DIR=$1
+
+if [ -z "$YAST2DIR" ] ; then
+    echo "Usage: $0 YAST2DIR"
+    exit 5
+fi
+
+localedir=$YAST2DIR/locale
+install -d -m 755 $localedir
+
+for mo in $(find -name "*.mo")
+do
+    modulename=$(echo $mo | sed 's@.*/\(.*\)\.[a-zA-Z_]*\.mo@\1@')
+    withoutmo=${mo%.mo}
+    lang=${withoutmo##*.}
+    [ -d $localedir/$lang ] || install -d -m 755 $localedir/$lang
+    [ -d $localedir/$lang/LC_MESSAGES ] || install -d -m 755 $localedir/$lang/LC_MESSAGES
+    install -m 644 $mo $localedir/$lang/LC_MESSAGES/$modulename.mo
+done

@@ -1,0 +1,102 @@
+#!/bin/bash
+
+# Written by Martin Lohner, Nov, 1999
+
+export LANG=POSIX
+MOD_LANG=$1
+SEARCH_PATH=$2
+MAILTO=ml@suse.de
+SOURCE_DIR=/home/alex/ml/i18n/yast2/yast2/source
+# This should be done more general....
+DUMMY_DIR=a123hu98
+
+if [ -z $SEARCH_PATH ] ; then
+  echo usage: $0 LANGUAGE SEARCH_PATH
+  exit 1
+fi
+
+if [ "(`pwd`)" != "($SOURCE_DIR)" ] ; then
+	echo Please change to the directory $SOURCE_DIR in the CVS-tree
+	exit 1
+fi 
+
+modules=`cat po/MODULES`
+rm -rf $DUMMY_DIR
+mkdir $DUMMY_DIR
+#find out the full path of new po-files
+echo Be sure that no old files are in the given directory!
+echo You have 5 seconds left to stop! \(crtl-c\)
+sleep 6 # just for the slow ones ;-)
+echo beginning....
+  
+for i in $modules timezone keyboard mouse index ; do
+	find $SEARCH_PATH -name $i.$MOD_LANG.po -exec cp {} $DUMMY_DIR \; 
+	
+done
+
+# now lets do some checks on the file; only if the file exist
+for i in $DUMMY_DIR/*.$MOD_LANG.po ; do
+		if [ `grep fuzzy $i` ] ; then 
+			echo $i contains fuzzy entries
+			continue
+		fi 
+	
+		msgfmt -v $i &> $DUMMY_DIR/dummy
+		# grep exits with 1 if nothing is found
+		if grep -iq warning $DUMMY_DIR/dummy ; then 
+			echo $i is not formatted well \(there is some warning\)
+			continue
+		fi	
+		if grep -iq missing $DUMMY_DIR/dummy ; then 
+			echo $i is not formatted well \(something is missing\)
+			continue
+		fi
+		if grep -iq error $DUMMY_DIR/dummy ; then 
+			echo $i is not formatted well \(some error detected\)
+			continue
+		fi	
+		if grep -iq untranslated $DUMMY_DIR/dummy ; then 
+			echo $i contains some untranslated messages.
+			continue
+		fi	
+		
+# testing was fine, copy it to source/po, but check if versions
+# are not identical; this would lead to stupid traffic on mailing list 
+length=`echo $DUMMY_DIR | wc -c`
+tmp_module=${i:$length}
+# echo  $tmp_module
+tmp_module=${tmp_module%%.*}
+# echo $tmp_module
+# check if the file is already committed into the cvs. If not, ask if it should be done.
+
+if grep -iq $tmp_module.$MOD_LANG.po po/$tmp_module/CVS/Entries ; then
+		echo $tmp_module.$MOD_LANG.po already in CVS 
+	else
+
+	echo -n $tmp_module.$MOD_LANG.po is not added to the CVS yet. Shall I do it? [y,N]:
+	read input
+	if [ $input = "y" ] ; then
+		cp $i po/$tmp_module/$tmp_module.$MOD_LANG.po
+		cvs add po/$tmp_module/$tmp_module.$MOD_LANG.po
+		cvs commit -m "Translation; automatically added and committed" \
+        	po/$tmp_module/$tmp_module.$MOD_LANG.po
+	fi
+fi
+# Now commit if file was already in the cvs. 
+
+if ! diff -q $i po/$tmp_module/$tmp_module.$MOD_LANG.po &> /dev/null ; then 
+	cp $i po/$tmp_module/$tmp_module.$MOD_LANG.po
+	echo $i copied
+	cvs commit -m "Translation; automatically committed." \
+	po/$tmp_module/$tmp_module.$MOD_LANG.po
+
+	else
+		echo The $tmp_module.$MOD_LANG.po is identical to the one in CVS\
+		     Not committing! 
+fi
+
+done
+
+rm -rf $DUMMY_DIR
+
+# end of file

@@ -1,0 +1,664 @@
+#!/usr/bin/perl -w
+#
+# ycp_puttext -	reverse xgettext for YCP files.
+#		Takes a (English) .po-file and patches the translated texts
+#		(presumably in better English than the program author's)
+#		into a YCP script.
+#
+# Author: Stefan Hundhammer <sh@suse.de>
+
+use strict;
+use English;
+use Getopt::Std;
+use File::Basename;
+use vars qw( $opt_v $opt_s $opt_d $opt_h $opt_m $opt_l );
+
+
+# Global variables.
+
+my $verbose		= 1;
+my $debug		= 0;
+my $allow_missing_files = 0;
+my $suppress_logfile	= 0;
+my $logfile		= </tmp/ycp_puttext.log>;
+
+
+my %trans;		# translations:		$trans{"orig"} = "translated";
+my %trans_ref_count;	# reference counts:	$trans_ref_count{"orig"} = 4;
+
+# The reference counts will be increased as the .po file is being read
+# in and decreased as the .ycp file is being patched. After all .ycp
+# files are processed, all reference counts should be zero.
+#
+# If they are not - happy bug hunting ;-)
+#
+# If the reference count mechanism complains about invalid reference
+# counts, more often than not the source code contains the texts to be
+# translated in commented-out code. Is this a bug or not? Decide on
+# your own. This script, however, will do its work even in such
+# commented-out code no matter what - even if it complains.
+
+
+my %ycp_files;		# ycp files to patch:
+			# $ycp_files{"installation.ycp"} = "y2m_inst/ycp/general/installation.ycp";
+
+
+
+# Forward declarations.
+
+sub main();
+
+
+# Call the main function and exit.
+# DO NOT enter any other code outside a sub -
+# any variables would otherwise be global.
+
+
+main();
+exit 0;
+
+
+#-----------------------------------------------------------------------------
+
+
+# Main program.
+
+sub main()
+{
+    my $ycp_base_path;
+    my $po_file;
+
+    # Extract command line options.
+    # This will set a variable opt_? for any option,
+    # e.g. opt_v if option '-v' is passed on the command line.
+
+    getopts('vsdhml');
+
+    usage() if $opt_h;
+    $verbose			= 1 if $opt_v;
+    $verbose			= 0 if $opt_s;
+    $debug			= 1 if $opt_d;
+    $allow_missing_files	= 1 if $opt_m;
+    $suppress_logfile		= 1 if $opt_l;
+
+    $po_file		= shift @ARGV or usage();
+    $ycp_base_path	= shift @ARGV or usage();
+
+    open ( LOG, ">$logfile" ) or die "FATAL: Can't open $logfile"
+	unless $suppress_logfile;
+
+    ycp_puttext ( $po_file, $ycp_base_path );
+
+    if ( ! $suppress_logfile )
+    {
+	print "Wrote log to $logfile.\n";
+	close( LOG );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Process one YCP file:
+# Take the translations from $po_file and patch them into $ycp_file.
+#
+# Parameters:
+#	po_file
+#	ycp_base_path
+
+sub ycp_puttext()
+{
+    my ( $po_file, $ycp_base_path ) = @_;
+    my $trans_count;
+
+    open ( PO, $po_file    ) or die "FATAL: Can't open $po_file";
+    $trans_count = read_po();
+    close ( PO );
+
+    if ( $opt_d )
+    {
+	print "Read translations:\n";
+	dump_translations();
+	print "\n--- Translations end ---\n\n\n";
+    }
+
+    die "Only empty translations in $po_file. Aborting." if $trans_count == 0;
+
+    find_ycp_files( $ycp_base_path );
+    my $ycp_file_basename;
+    my $ycp_file;
+
+    foreach $ycp_file_basename ( sort keys %ycp_files )
+    {
+	$ycp_file = $ycp_files{ $ycp_file_basename };
+	open ( IN, $ycp_file )		or die "FATAL: Can't open $ycp_file";
+	open ( OUT, ">$ycp_file.tmp" )	or die "FATAL: Can't open $ycp_file.tmp";
+
+	replace_ycp_messages ( $ycp_file );
+
+	close ( OUT );
+	close ( IN );
+    }
+
+    dump_trans_refs( $po_file, 1 );
+
+
+    foreach $ycp_file_basename ( sort keys %ycp_files )
+    {
+	$ycp_file = $ycp_files{ $ycp_file_basename };
+	rename ( $ycp_file, $ycp_file . ".old" );
+	rename ( $ycp_file . ".tmp", $ycp_file ) or warning ( "Can't rename $ycp_file.tmp to $ycp_file" );
+    }
+
+    undef %trans;
+    undef %trans_ref_count;
+    undef %ycp_files;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Read a gettext .po-file and store its contents in some (global) hashes:
+#	%trans			the translations themselves
+#	%trans_ref_count	reference count for each translation
+#
+# Parameters: ---
+#
+# Return value: The number of non-empty translations
+
+sub read_po()
+{
+    my @line_numbers;
+    my $msgid;
+    my $msgstr;
+    my $in_msgid  = 0;
+    my $in_msgstr = 0;
+    my $multi_line = 0;
+    my $line;
+    my @line_no_infos;
+    my $line_no_info;
+    my $fuzzy = 0;
+    my $trans_count = 0;
+
+    while ( $line = <PO> )
+    {
+	if ( $line =~ '^#:' )	# line number info:
+	{			#   #: xy/abc.ycp:123 xy/abc.ycp:456
+	    $in_msgid  = 0;
+	    $in_msgstr = 0;
+
+	    # process the last translation, if there is any
+	    # since there is no real end-of-record delimiter
+	    # in gettext format, the next occurence of line number infos
+	    # is the loop end condition.
+
+	    if ( defined $msgstr )
+	    {
+		$trans_count = store_translation ( $msgid, $msgstr, $fuzzy, $trans_count, @line_numbers );
+		undef @line_numbers;
+		undef $msgid;
+		undef $msgstr;
+		$multi_line = 0;
+		$fuzzy = 0;
+	    }
+
+	    $line =~ s/^#://;	# remove line header
+	    $line =~ s/^\s+//;	# remove leading  whitespace
+	    $line =~ s/\s+$//;	# remove trailing whitespace
+	    @line_no_infos = split ( '\s+', $line );
+
+	    foreach $line_no_info ( @line_no_infos )
+	    {
+		my ( $filename, $line_no ) = split ( ':', $line_no_info, 2 );
+		$filename = basename( $filename );
+		$ycp_files{ $filename } = "";
+		push @line_numbers, $line_no;
+	    }
+	}
+	elsif ( $line =~ /^#, fuzzy/ )	# fuzzy marker?
+	{
+	    $fuzzy = 1;
+	}
+	elsif ( $line =~ /^#/ )		# comment line?
+	{
+	    next;			# -> skip
+	}
+	elsif ( $line =~ /^msgid/ )
+	{
+	    $in_msgid  = 1;
+	    $in_msgstr = 0;
+
+	    if ( $line =~ /^msgid ""/ )
+	    {
+		$multi_line = 1
+	    }
+	}
+	elsif ( $line =~ /^msgstr/ )
+	{
+	    warning( "Ignoring fuzzy message:\n", shorten ( $msgid, 2*80 ), "\n" ) if ( $fuzzy );
+	    $in_msgid  = 0;
+	    $in_msgstr = 1;
+	}
+
+	my $quoted_string = $line;
+	chomp $quoted_string;
+	$quoted_string =~ s:^[^"]*"(.*)".*$:$1:;	# "] (for emacs)
+
+	if ( $in_msgid )
+	{
+	    $msgid .= $quoted_string;
+	}
+        if ( $in_msgstr )
+	{
+	    if ( $multi_line && defined $msgstr && length ( $msgstr ) > 0 )
+	    {
+		$msgstr =~ s/\\n$//;
+		$msgstr .= "\n";
+	    }
+
+	    $msgstr .= $quoted_string;
+	}
+    }
+
+    # process the last translation
+
+    if ( length ( $msgstr ) > 0 )
+    {
+	$trans_count = store_translation ( $msgid, $msgstr, $fuzzy, $trans_count, @line_numbers );
+    }
+
+    return $trans_count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Store a (non zero) translation in the internal hashes.
+# Empty translations will be silently ignored.
+#
+# Parameters:
+#	$msgid		the original message
+#	$msgstr		the translated message
+#	$fuzzy		fuzzy flag - ignore this message
+#	@line_numbers	the line numbers where this translation occurs
+
+sub store_translation()
+{
+    my ( $msgid, $msgstr, $fuzzy, $trans_count, @line_numbers ) = @_;
+    my $line_no;
+    $msgid  = normalize ( $msgid  );
+
+    if ( length ( $msgid  ) > 0 && 
+	 length ( $msgstr ) > 0 &&
+	 ! $fuzzy &&
+	 $msgid ne normalize( $msgstr ) )
+    {
+	$trans{ $msgid } = $msgstr;
+	$trans_ref_count{ $msgid } = $#line_numbers + 1;
+	$trans_count++;
+    }
+
+    return $trans_count;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Find the actual location of the .ycp files in %ycp_files
+# starting from $ycp_base_path.
+#
+# Parameters:
+#	ycp_base_path
+
+sub find_ycp_files()
+{
+    my ( $ycp_base_path ) = @_;
+    my $ycp_file;
+    my $basename;
+
+    foreach $ycp_file ( `find $ycp_base_path -name "*.ycp" -print` )
+    {
+	chomp $ycp_file;
+	$basename = basename( $ycp_file );
+
+	if ( defined $ycp_files{ $basename } )
+	{
+	    $ycp_files{ $basename } = $ycp_file;
+	    logf( "Found $ycp_file" );
+	}
+    }
+
+    my $leftover = 0;
+
+    foreach $ycp_file ( sort keys %ycp_files )
+    {
+	if ( $ycp_files{ $ycp_file } eq "" )
+	{
+	    $leftover++;
+	    warning( "Warning: Can't find .ycp file $ycp_file" );
+	}
+    }
+
+    if ( $leftover > 0 && ! $allow_missing_files )
+    {
+	die "\nFATAL: Couldn't find all required .ycp files.\n"
+	    . "You can use option -m to override this if you are sure that's OK.\n\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Process one .ycp file:
+# Replace all messages marked for translation - as in _("orig") - with
+# the translated texts from the .po file.
+#
+# Parameters:
+#	$ycp_file_name	file name of the .ycp file (for error logging)
+
+
+sub replace_ycp_messages()
+{
+    my ( $ycp_file ) = @_;
+    my $src;
+    my $head;
+    my $msg;
+    my $norm_msg;
+    my $line;
+
+    # read the entire input file
+
+    while ( $line = <IN> )
+    {
+	$src .= $line;
+    }
+
+    # warn for invalid lines like:
+    #     _(
+    #       // comment
+    #       "bla blurb..."
+    #
+    #     _(
+    #       /* comment */
+    #       "bla blurb..."
+
+    if ( $src =~ m:(_\(\s*//.*)":ms ||
+	 $src =~ m:(_\(\s*/\*.*)":ms )
+    {
+	warning ( "WARNING: $ycp_file contains comments in texts to translate:\n\n",
+		  shorten ( $1, 2*80 ),
+		  "\n\nThis text will most likely be ignored!\n" );
+    }
+
+
+    # parse input file
+
+    while ( defined $src && length ( $src ) > 0 )
+    {
+	# split src at first message beginning: _("
+
+	( $head, $src ) = split ( /_\(\s*"/ms, $src, 2 );	# ") for emacs
+	print OUT $head;
+
+	if ( defined $src && length ( $src ) > 0 )		# any message found?
+	{
+	    # split src at message end: ")
+
+	    ( $msg, $src ) = split ( /"\s*\)/ms, $src, 2 );	# ") for emacs
+	    $norm_msg = normalize ( $msg );
+
+	    if ( defined $trans{ $norm_msg } )
+	    {
+		if ( ! defined $trans_ref_count{ $norm_msg } || $trans_ref_count{ $norm_msg } < 1 )
+		{
+		    warning ( "$ycp_file: WARNING: Invalid reference count for \"" 
+			      .  shorten ( $msg, 50 ) . "\"" );
+		}
+		else
+		{
+		    $trans_ref_count{ $norm_msg }--;
+		}
+
+		if ( length( $trans{ $norm_msg } ) > 0 )
+		{
+		    my $fixed_msg = "";
+		    my $old_msg =  $msg;
+		    $msg = $trans{ $norm_msg };
+
+		    # Avoid over-long lines with embedded "\n" 
+		    # if otherwise formatted in the original
+
+		    if ( $old_msg =~ /.+\n.+/ &&	# old message contained literal newlines
+			 ! ( $msg =~ /.+\n.+/ ) &&	# new message doesn't contain literal newlines
+			 $msg =~ /.+\\n.+/ )		# but escaped newlines - "\n"
+		    {
+			$msg =~ s:\\n:\n:g ;		# Replace escaped with literal newlines
+			$fixed_msg = " (fixed over-long lines)";
+		    }
+
+		    logf ( "*" x 50 . "\n"
+			   . "$ycp_file: Replacing message.\n"
+			   . "Old message:\n"
+			   . "\n"
+			   . "\"$old_msg\"\n"
+			   . "\n"
+			   . "New message" . $fixed_msg . ":\n\n"
+			   . "\"$msg\"\n"
+			   . "\n" );
+
+		}
+		else
+		{
+		    deb ( "$ycp_file: Don't have a translation for \"" . shorten ( $msg, 50 ) . "\"" );
+		}
+	    }
+	    else
+	    {
+		# warning ( "\n$ycp_file: ERROR: Unknown message: \n\"" . $msg . "\"\n" );
+		deb ( "\nNormalized: \n\"" . $norm_msg . "\"\n\n" );
+	    }
+
+	    print OUT '_("' . $msg . '")';
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Normalize a string used as msgid
+#
+# Parametes:
+#	$str	string to normalize
+#
+# Return value:
+#	normalized string
+
+sub normalize()
+{
+    my ( $str ) = @_;
+
+    $str =~ s/\\"//g;	# [" for emacs] remove embedded escaped quotes
+    $str =~ s/\\\n/ /g; # replace escaped newline with one blank
+    $str =~ s/\\n/ /g;	# replace embedded newline symbols '\n' with one blank
+    $str =~ s/\s+/ /g;  # replace all whitespace (including newline) with one blank
+    $str =~ s/^\s+//;	# remove all leading whitespace
+    $str =~ s/\s+$//;	# remove all trailing whitespace
+
+    return $str;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# For debugging: dump internally stored data
+
+sub dump_all()
+{
+    my ( $po_file ) = @_;
+
+    dump_trans_refs( $po_file, 0 );
+    dump_translations();
+}
+
+
+sub dump_translations()
+{
+    my $msgid;
+
+    print "\n\n";
+
+    foreach $msgid ( sort keys %trans )
+    {
+	print "*** msgid: ***\n";
+	print $msgid;
+	print "\n---> msgstr:\n";
+	print $trans{ $msgid };
+	print "\n---\n\n";
+    }
+}
+
+
+sub dump_trans_refs()
+{
+    my ( $po_file, $threshold ) = @_;
+    my $msgid;
+    my $msg;
+
+    foreach $msgid ( sort keys %trans_ref_count )
+    {
+ 	print "$po_file: Reference count for \"" . shorten ( $msgid, 50 ) . "\": $trans_ref_count{ $msgid }\n"
+	    unless $trans_ref_count{ $msgid } <= $threshold;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Shorten a message to max $len characters
+#
+# Return value: Shortened message
+
+sub shorten()
+{
+    my ( $msg, $len ) = @_;
+    $msg  = substr ( $msg, 0, $len ) . "..." if ( length ( $msg ) > $len );
+
+    return $msg;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stderr.
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub warning()
+{
+    my $msg;
+
+    foreach $msg ( @_ )
+    {
+	print STDERR $msg . " ";
+	print LOG $msg . " " unless $suppress_logfile;
+    }
+
+    print STDERR "\n";
+    print LOG "\n" unless $suppress_logfile;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a message to stdout if verbose mode is set
+# (command line option '-v').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub logf()
+{
+    my $msg;
+
+    if ( $verbose )
+    {
+	foreach $msg ( @_ )
+	{
+	    print $msg . " ";
+	    print LOG $msg . " " unless $suppress_logfile;
+	}
+
+	print "\n";
+	print LOG "\n" unless $suppress_logfile;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a debugging message to stdout if debug mode is set
+# (command line option '-d').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub deb()
+{
+    my $msg;
+
+    if ( $debug )
+    {
+	print '   DEB> ';
+
+	foreach $msg ( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Print usage message and abort program.
+#
+# Parameters:
+#	---
+
+sub usage()
+{
+    die "\n"
+	. "Usage: $0 [-dhsvml] <po-file> <ycp-file-base-path>\n"
+	. "\n"
+	. "\t-d debug\n"
+	. "\t-h help (this message)\n"
+	. "\t-s silent (turn verbose off)\n"
+	. "\t-v verbose (default)\n"
+	. "\t-m allow missing .ycp files\n"
+	. "\t-l suppress logging to $logfile\n"    
+	. "\n"
+	. "Patches proof-read English messages from <po-file> back into\n"
+	. "the corresponding .ycp files somewhere below <ycp-file-base-path>.\n"
+	. "The actual names of those .ycp files are taken from the .po file.\n"
+	. "\n"
+	. "Example:\n"
+	. "\t$0 ~/tmp/partitioning.en_US.po ~/yast2/modules/y2m_inst\n"
+	. "\n";
+}
+
+
+
+# EOF

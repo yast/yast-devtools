@@ -1,0 +1,278 @@
+#! /usr/bin/perl -w
+#####
+#create-spec [-h] [YAST2DIR [DOCDIR [YAST2INC [YAST2DOC]]]] \
+#            < xxx.spec.in > package/xxx.spec
+#
+#Create a spec file for YaST2 package
+#
+#Available macros in the xxx.spec.in:
+#  @RPMNAME@        - reads it from file RPMNAME
+#  @VERSION@        - reads it from file VERSION
+#  @MAINTAINER@     - reads it from file MAINTAINER
+#
+#  @YAST2DIR@       - writes the first parameter of create-spec
+#  @DOCDIR@         - writes the second parameter of create-spec
+#  @YAST2INC@       - writes the third parameter of create-spec
+#  @YAST2DOC@       - writes the fourth parameter of create-spec
+#
+#  @HEADER-COMMENT@ - writes the SuSE .spec comment
+#  @HEADER@         - writes the usual header except BuildArch:,
+#                     Requires:, Summary:
+#  @HEADER-DEVEL@   - writes the -devel subpackage header, similar to @HEADER@
+#  @PREP@           - writes %prep with %setup
+#  @BUILD-PROGRAM@  - writes %build with usual make for package with any programs, libaries or plugins.
+#  @BUILD-SCRIPT@   - writes %build with usual make for package with (bash) scripts.
+#  @BUILD-PO@       - writes %build with usual make for package with trans.
+#  @BUILD-YCP@      - writes %build with usual make for package with YCP
+#  @INSTALL-PROGRAM@ - writes %install with usual make install of any programs, libaries or plugins.
+#  @INSTALL-SCRIPT@ - writes %install with usual make install of any (bash) scripts.
+#  @INSTALL-PO@     - writes %install with usual make install of translations
+#  @INSTALL-YCP@    - writes %install with usual YCP make install
+#  @CLEAN@          - writes %clean with removing RPM_BUILD_ROOT
+#####
+# Author: Jan Holesovsky <kendy@suse.cz>, 2001
+
+# Import the content of some files
+$RPMNAME = `cat RPMNAME`;
+$VERSION = `cat VERSION`;
+$MAINTAINER = `cat MAINTAINER`;
+
+# Clean them and check them
+chomp $RPMNAME;
+chomp $VERSION;
+chomp $MAINTAINER;
+if ($VERSION eq "" || $RPMNAME eq "" || $MAINTAINER eq "")
+{
+    die "Start this only in YaST2 toplevel project directories!\n";
+}
+
+# Default values
+$YAST2DIR = "/usr/lib/YaST2";
+$DOCDIR = "/usr/share/doc/packages/$RPMNAME";
+$YAST2INC = "/usr/include/YaST2";
+$YAST2DOC = "/usr/share/doc/packages/$RPMNAME";
+
+# Import the parameters
+($YAST2DIR, $DOCDIR, $YAST2INC, $YAST2DOC) = @ARGV if ($#ARGV == 3);
+($YAST2DIR, $DOCDIR, $YAST2INC) = @ARGV            if ($#ARGV == 2);
+($YAST2DIR, $DOCDIR) = @ARGV                       if ($#ARGV == 1);
+($YAST2DIR) = @ARGV                                if ($#ARGV == 0);
+if ($#ARGV > 3 || $YAST2DIR eq "-h" || $YAST2DIR eq "--help")
+{
+    # Isn't the following too anti-perl? :-)
+    my $message = `sed -e '/^#####/,/^#####/!d' -e 's/^#*//' $0`;
+    die "$message";
+}
+
+# Definition of the macros
+%macros =
+(
+    "\@RPMNAME\@" => "$RPMNAME",
+
+    "\@VERSION\@" => "$VERSION",
+
+    "\@MAINTAINER\@" => "$MAINTAINER",
+
+    "\@YAST2DIR\@" => "$YAST2DIR",
+
+    "\@DOCDIR\@" => "$DOCDIR",
+
+    "\@YAST2INC\@" => "$YAST2INC",
+
+    "\@YAST2DOC\@" => "$YAST2DOC",
+
+    "\@HEADER-COMMENT\@" =>
+"#
+# spec file for package $RPMNAME (Version $VERSION)
+#",
+
+# The group tag is only a dummy entry. The correct one is inserted by
+# prepare_spec.
+
+    "\@HEADER\@" =>
+"Name:		$RPMNAME
+Version:	$VERSION
+Release:	0
+License:	YaST License
+Group:		System/YaST
+BuildRoot:	/var/tmp/%{name}-%{version}-root
+Source0:	$RPMNAME-$VERSION.tar.bz2",
+
+# The group tag is only a dummy entry. The correct one is inserted by
+# prepare_spec.
+
+    "\@HEADER-DEVEL\@" =>
+"\%package devel
+Requires:	$RPMNAME
+Group:		Development/Libraries",
+
+    "\@PREP\@" =>
+"\%prep
+\%setup -n $RPMNAME-$VERSION",
+
+    "\@BUILD-PROGRAM\@" =>
+"\%build
+aclocal
+libtoolize --force --automake --copy
+autoheader
+automake --add-missing --copy
+autoconf
+
+\%ifarch s390x
+export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG -fsigned-char\"
+\%else
+export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
+\%endif
+
+\%{?suse_update_config:\%{suse_update_config -f}}
+./configure --libdir=%{_libdir}
+make
+make check",
+
+    "\@BUILD-QT-PROGRAM\@" =>
+"\%build
+aclocal
+libtoolize --force --automake --copy
+autoheader
+automake --add-missing --copy
+autoconf
+
+\%ifarch s390x
+export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG -fsigned-char\"
+\%else
+export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
+\%endif
+
+\%{?suse_update_config:\%{suse_update_config -f}}
+./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib}
+make
+make check",
+
+    "\@BUILD-SCRIPT\@" =>
+"\%build
+libtoolize --force --automake --copy
+autoreconf --force --install
+
+\%{?suse_update_config:\%{suse_update_config -f}}
+./configure
+make
+make check",
+
+    "\@BUILD-PO\@" =>
+"\%build
+./configure --libdir=%{_libdir}
+make",
+
+    "\@BUILD-YCP\@" =>
+"\%build
+./configure --libdir=%{_libdir}
+make",
+
+    "\@INSTALL-PROGRAM\@" =>
+"\%install
+[ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
+make install-strip DESTDIR=\"\$RPM_BUILD_ROOT\"
+for f in `find \$RPM_BUILD_ROOT -name \"lib*.so.*.*\"` ; do strip --strip-debug \$f ; done",
+
+    "\@INSTALL-SCRIPT\@" =>
+"\%install
+[ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
+make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
+
+    "\@INSTALL-PO\@" =>
+"\%install
+[ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
+make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
+
+    "\@INSTALL-YCP\@" =>
+"\%install
+[ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
+make install DESTDIR=\"\$RPM_BUILD_ROOT\"
+Y2DIR=\"\$RPM_BUILD_ROOT$YAST2DIR\" make check",
+
+    "\@CLEAN\@" =>
+"\%clean
+[ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\""
+);
+
+my $yast2dir = "/usr/lib/YaST2";
+# This is necessary because of changing @agentdir@
+# from "${yast2dir}/agents" to "${execcompdir}/servers_non_y2".
+# This is really a mess!
+my $execcompdir = "/usr/lib/YaST2";
+
+# And some tiny macros. Must be separate since the big macros contain them.
+%tiny_macros =
+(
+    # FIXME: kind of double definition of paths
+    # FIXME: $prefix unfunctional
+    #"\@yast2dir@" => "\\\${prefix}/share/YaST2",
+
+    "\@ybindir\@" => "/usr/lib/YaST2/bin",
+    "\@plugindir\@" => "%{_libdir}/YaST2/plugin",
+    "\@includedir\@" => "/usr/include/YaST2",
+    "\@docdir\@" => "/usr/share/doc/packages/$RPMNAME",
+
+    "\@execcompdir\@" => "/usr/lib/YaST2",
+    "\@agentdir\@" => "${execcompdir}/servers_non_y2",
+
+    "\@ydatadir\@" => "${yast2dir}/data",
+    "\@imagedir\@" => "${yast2dir}/images",
+    "\@localedir\@" => "${yast2dir}/locale",
+    "\@clientdir\@" => "${yast2dir}/clients",
+    "\@moduledir\@" => "${yast2dir}/modules",
+    "\@yncludedir\@" => "${yast2dir}/include",
+    "\@scrconfdir\@" => "${yast2dir}/scrconf",
+    "\@configdir\@" => "${yast2dir}/config"
+
+);
+
+# FIXME: when all packages use create-spec and everything works fine,
+# replace these macros in all sources and remove them here.
+%obsolete_macros =
+(
+    "\@BUILD-AGENT\@" => "\@BUILD-PROGRAM\@",
+    "\@INSTALL-AGENT\@" => "\@INSTALL-PROGRAM\@",
+    "\@BUILD-LIB\@" => "\@BUILD-PROGRAM\@",
+    "\@INSTALL-LIB\@" => "\@INSTALL-PROGRAM\@",
+    "\@BUILD-PROG\@" => "\@BUILD-PROGRAM\@",
+    "\@INSTALL-PROG\@" => "\@INSTALL-PROGRAM\@",
+);
+
+# The main program
+my $warn_defattr = 1;
+my $warn_doc     = 0;
+
+while (<STDIN>)
+{
+    if (! /^##.*/)
+    {
+	foreach $macro_name ( keys %obsolete_macros )
+	{
+	    s/$macro_name/$obsolete_macros{$macro_name}/g;
+	}
+
+	foreach $macro_name ( keys %macros )
+	{
+	    s/$macro_name/$macros{$macro_name}/g;
+	}
+
+	foreach $macro_name ( keys %tiny_macros )
+	{
+	    s/$macro_name/$tiny_macros{$macro_name}/g;
+	}
+
+	$warn_defattr = 0 if (/^\%defattr/);
+	$warn_doc     = 1 if (/\/doc\// && ! /^\%doc/);
+	print;
+    }
+}
+
+if ($warn_defattr)
+{
+    print STDERR "create-spec: WARNING: No \%defattr in the .spec file!\n";
+}
+if ($warn_doc)
+{
+    print STDERR "create-spec: WARNING: Do you use \%doc for documentation?\n";
+}

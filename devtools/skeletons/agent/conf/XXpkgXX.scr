@@ -1,0 +1,26 @@
+/**
+ * File:	XXpkgXX.scr
+ * Summary:	XXPkgXX agent
+ * Author:	XXmaintainerXX <XXemailXX>
+ * Access:	read / write / execute OR read-only OR execute-only
+ * See:		anyagent libscr	MANPAGE(1) file/relative/to/doc_home/file.html
+ *
+ * Example:
+ *   Dir(.XXpkgXX)
+ *   (["WHAT", "EVER", "YOU", "GET"])
+ **
+ *   Read(.XXpkgXX)
+ *   ("WHAT_EVER_YOU_GET")
+ **
+ *   Write(.XXpkgXX, value)
+ *   (true)
+ *
+ * $Id$
+ *
+ * SOME USEFUL INFORMATION ON THE AGENT
+ */
+.XXpkgXX
+
+`ag_XXpkgXX(
+  XXPkgXXAgent()
+)

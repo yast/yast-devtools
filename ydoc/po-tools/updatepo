@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#
+# Usage: updatepo modulename $(CATALOGS)
+#
+
+module=$1
+shift
+catalogs="$*"
+
+if [ -z "$module" -o -z "$catalogs" ] ; then
+    echo "Usage: $0 modulename "'$(ALL_LINGUAS)' >&2
+    exit 5
+fi
+
+# ./makepot $module
+for lang in $catalogs; do
+    cat=$module.$lang
+    if [ -f $cat.po ] ; then
+	echo -n $cat.po
+	mv $cat.po $cat.old.po
+	if msgmerge --width=0 $cat.old.po $module.pot -o $cat.po ; then
+	    rm -f $cat.old.po
+	else
+	    echo "msgmerge failed for $module, language $lang" >&2
+	    mv $cat.old.po $cat.po
+	    # if [ $STARTED_FROM_PO_GEN ] ; then
+	    #     echo $cat.po is broken >> ../$README_DIR/broken_modules
+	    #     # added by ml@suse.de/see ~ml/bin/po-gen, nov, 4, 99
+	    # fi 
+        fi
+    else
+	echo "$cat.po is missing. Skipping..." >&2
+    fi
+done
+
+# updatepo ends here
+

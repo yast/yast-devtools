@@ -1,0 +1,17 @@
+#
+# Makefile.cvs for yast2-devtools
+#
+configure: all
+	./configure
+
+all:
+	./devtools/bin/y2automake --bootstrap ./devtools/admin
+	autoreconf --force --install
+
+install: configure
+	make
+	make install
+
+reconf: all
+	./config.status --recheck
+	./config.status

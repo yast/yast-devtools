@@ -1,0 +1,101 @@
+#!/bin/sh
+#
+# devtools-migration - migrate to yast2-devtools from plain automake / autoconf
+#
+# Author: Stefan Hundhammer <sh@suse.de>
+# (c) SuSE GmbH 2001
+#
+
+self=`basename $0`
+
+if [ ! -e VERSION -o ! -e Makefile.cvs -o ! -e *.spec.in ]; then
+    echo "${self}: FATAL: `pwd` is not a YaST2 project toplevel directory." >&2
+    exit 1;
+fi
+
+if grep -q "y2automake" Makefile.cvs; then
+    echo "${self}: FATAL: This project is already migrated to yast2-devtools." >&2
+    exit 1;
+fi
+
+
+subdirs=`grep 'SUBDIRS' Makefile.am | sed -e 's/SUBDIRS *= *//'`
+
+if [ -z "$subdirs" ]; then
+    echo "${self}: FATAL: No SUBDIRS line in Makefile.am" >&2
+    exit 2;
+fi
+
+echo "$subdirs" >SUBDIRS
+cvs add SUBDIRS
+
+cvs -q rm -f Makefile.am
+cvs -q rm -f COPYING COPYRIGHT.{english,french,german}
+
+
+if ! grep -q "Makefile.am" .cvsignore; then
+    echo "Makefile.am" >>.cvsignore
+else
+    echo "Makefile.am already present in .cvsignore"
+fi
+
+
+if ! grep -q "neededforbuild.*yast2-devtools" *.spec.in ; then
+    perl -p -i -e 's/neededforbuild/neededforbuild yast2-devtools/' *.spec.in
+else
+    echo "yast2-devtools already present in neededforbuild"
+fi
+
+
+if ! grep -q "y2automake" Makefile.cvs; then
+    perl -p -i -e 'print "\ty2tool y2automake\n" if /aclocal/' Makefile.cvs
+else
+    echo "y2automake call already present in Makefile.cvs"
+fi
+
+
+#
+# Migrate po/ subdirectory if this is a translation module
+#
+
+if [ -e Y2TEXTDOMAIN -a -d po ]; then
+    
+    dir=`pwd`
+    module_name=`basename $dir`
+    echo "Translation module detected (${module_name})"
+    cd po
+
+    case "$module_name" in
+	y2d_*)
+	    # Special treatment for y2d_* (data) modules:
+	    # Don't simply delete Makefile.am, it probably contains some stuff
+	    # that is needed for Makefile.am.bottom
+
+	    if [ -e Makefile.am.bottom ]; then
+		mv Makefile.am Makefile.am.old
+	    else
+		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+		echo "Don't forget to edit Makefile.am.bottom!"
+		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+		mv Makefile.am Makefile.am.bottom
+	    fi
+	;;
+
+	*)
+	    rm -f Makefile.am
+	;;
+    esac
+
+
+    cvs -q rm Makefile.am
+    
+    if ! grep -q "Makefile.am" .cvsignore; then
+    	echo "Makefile.am" >>.cvsignore
+    else
+    	echo "Makefile.am already present in po/.cvsignore"
+    fi
+
+fi
+
+cvs -qn up
+echo "`pwd` done - don't forget to check in your changes!"

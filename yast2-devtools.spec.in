@@ -6,6 +6,8 @@
 Requires:	yast2 perl
 Provides:	ycpdoc ydoc
 Obsoletes:	ycpdoc ydoc
+Provides:	yast2-config-newmodule yast2-trans-newmodule
+Obsoletes:	yast2-config-newmodule yast2-trans-newmodule
 
 Summary:	YaST2 development tools
 

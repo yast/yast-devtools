@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Aug 28 09:34:40 CEST 2002 - jsuchome@suse.cz
+
+- provide/obsolete old translation packages
+
+-------------------------------------------------------------------
 Wed Aug 21 11:55:43 CEST 2002 - arvin@suse.de
 
 - run parseycp already for "make package-local"

@@ -21,6 +21,10 @@ textdomain "XXpkgXX";
 y2milestone ("----------------------------------------");
 y2milestone ("XXPkgXX module started");
 
+import "Progress";
+import "Report";
+import "Summary";
+
 import "CommandLine";
 include "XXpkgXX/wizards.ycp";
 

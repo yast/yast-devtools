@@ -17,6 +17,16 @@ use strict;
 use ycp;
 use YaST::YCP qw(Boolean);
 
+use Locale::gettext;
+use POSIX;     # Needed for setlocale()
+
+setlocale(LC_MESSAGES, "");
+textdomain("XXpkgXX");
+
+sub _ {
+    return gettext($_[0]);
+}
+
 our %TYPEINFO;
 
 YaST::YCP::Import ("Progress");
@@ -122,7 +132,7 @@ sub Read {
     );
 
     # read database
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -135,7 +145,7 @@ sub Read {
     sleep($sl);
 
     # read another database
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -148,7 +158,7 @@ sub Read {
     sleep($sl);
 
     # read current settings
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -161,7 +171,7 @@ sub Read {
     sleep($sl);
 
     # detect devices
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -173,7 +183,7 @@ sub Read {
     }
     sleep($sl);
 
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -181,7 +191,7 @@ sub Read {
     Progress::NextStage();
     sleep($sl);
 
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -224,7 +234,7 @@ sub Write {
     );
 
     # write settings
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -237,7 +247,7 @@ sub Write {
     sleep($sl);
 
     # run SuSEconfig
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -249,7 +259,7 @@ sub Write {
     }
     sleep($sl);
 
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }
@@ -257,7 +267,7 @@ sub Write {
     Progress::NextStage();
     sleep($sl);
 
-    if(Abort())
+    if(!Abort())
     {
 	return Boolean(0);
     }

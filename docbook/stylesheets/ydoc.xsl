@@ -9,6 +9,9 @@
     </xsl:template>
     <xsl:template match="entries">
         <reference>
+           <xsl:attribute name="id">
+               <xsl:value-of select="entries_item/filename"/>
+           </xsl:attribute>
             <xsl:apply-templates select="entries_item"/> 
         </reference>
     </xsl:template>
@@ -16,6 +19,20 @@
 
     <xsl:template match="entries_item">
         <refentry>
+                <xsl:attribute name="id">
+                    <xsl:value-of select="filename"/>
+                    <xsl:text>_</xsl:text>
+                    <xsl:value-of select="type"/>
+                    <xsl:text>_</xsl:text>
+                    <xsl:choose>
+                        <xsl:when test="id != ''">
+                            <xsl:value-of select="id"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="names/names_item"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
                 <refmeta>
                     <refentrytitle>
                         <xsl:value-of select="names/names_item"/>

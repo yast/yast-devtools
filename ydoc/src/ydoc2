@@ -7,35 +7,15 @@ use Data::Dumper;
 use XML::Writer;
 use Tie::Hash;
 use Tie::Array;
+use Getopt::Std;
+use File::Basename;
 
 
 my $xml_output = "output.xml";
-my $debug = 10;
+my $debug = 0;
 my $supported = "builtin|widget";
 my $prog;
-my $ycp_symbol = "(?:[[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*)";
-my $ycp_quad = "(?:::)";
-my $ycp_qualified_symbol = "(?:$ycp_quad?$ycp_symbol(?:$ycp_quad$ycp_symbol)*)";
-
-my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock"
-    . "|list|map"		# _syntactically_ simple types
-    . "|${ycp_symbol}_t"	# if it ends with _t, it is a type
-    . "|locale|term|path|block|declaration|symbol)";
-sub recursive_type ($)
-{
-    my $t = shift;
-    return qr{(?:
-     list  \s* <  \s* $t \s* >
-    |block \s* <  \s* $t \s* >
-    |map   \s* <  \s* $t \s* , \s* $t \s* >
-    | $t	# must come last otherwise "list<foo>" would not
-		# be parsed because of "list"
-    )}x;
-}
-
-#3 levels of type nesting
-my $ycp_typedecl =
-    recursive_type (recursive_type (recursive_type ($ycp_simple_type)));
+my ($filename,$filepath,$filesuffix);
 
 my $f = {};
 
@@ -77,7 +57,11 @@ sub scan_file ($)
                 $in_comment = 0;
                 $parse = 1;
             }
-            if( /\@(widget|builtin)(.*)/)
+            if( /\@(builtin_ignore)(.*)/)
+            {
+                $valid_comment = 0;
+            }
+            elsif( /\@(widget|builtin)(.*)/)
             {
                 $valid_comment = 1;
             }
@@ -128,11 +112,13 @@ sub parse_comments (@)
     $entry->{"return"} = {};
     tie %{$entry->{"return"}}, "return";
 
+    $entry->{"filename"} = $filename;
     $entry->{"type"} = "";
     $entry->{"parameters"} = [$oentry];
     tie @{$entry->{"parameters"}}, "parameters";
 
     $entry->{"since"} = "";
+    $entry->{"id"} = "";
     $entry->{"usage"} = "";
     $entry->{"class"} = "";
     $entry->{"screenshot"} = "";
@@ -194,13 +180,13 @@ sub parse_comments (@)
             my @odescr = ();
             ( $oentry->{'type'}, $oentry->{'name'}, my $d) = split ( '\s+', $2, 3 );
 	    $last_param =  $oentry->{'name'};
-            print "LASTPARAM " . $last_param . "\n";;
+            print "LASTPARAM " . $last_param . "\n" if $debug > 5;
 
             push @odescr, $d;
             $oentry->{'description'} = [];
             push @{$oentry->{'description'}},  @odescr;
 	    push @param_incomment, $oentry;
-            print Dumper(@param_incomment);
+            print Dumper(@param_incomment) if $debug > 2;
 	}
 	elsif($line =~ /\@option\s+(.*)/)
 	{
@@ -250,6 +236,11 @@ sub parse_comments (@)
             (@w) =  split( '\s+', $2);
             push @{$entry->{"names"}}, @w;
 	    $entry->{"type"} = "builtin";
+	}
+	elsif ($line =~ /\@id\s+(.*)/)
+	{
+	    $lastwas = "id";
+	    $entry->{"id"} = $1;
 	}
 	elsif ($line =~ /\@since\s+(.*)/)
 	{
@@ -504,6 +495,7 @@ sub parse_comments (@)
 
 sub main () 
 {
+    ($filename,$filepath,$filesuffix) = fileparse($ARGV[0],qr{\.cc});
     scan_file($ARGV[0]);
     yastdoc::XML::write_docs();
 

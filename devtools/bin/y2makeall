@@ -6,7 +6,7 @@
 #
 #
 # Author:  Stefan Hundhammer <sh@suse.de>
-# Updated: 2004-02-24
+# Updated: 2004-02-26
 
 use strict;
 use English;
@@ -486,20 +486,23 @@ sub make()
     # make
     #
 
-    log_progress( "\tmake $make_target" );
-    system( "make $make_target >>$make_log 2>&1" );
-
-    if ( $CHILD_ERROR )
+    if ( ! $error )
     {
-	log_error( "'make $make_target' failed for $pkg" );
-	$error = 1;
+	log_progress( "\tmake $make_target" );
+	system( "make $make_target >>$make_log 2>&1" );
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'make $make_target' failed for $pkg" );
+	    $error = 1;
+	}
     }
 
     #
     # sudo make install
     #
 
-    if ( $make_target eq "" )
+    if ( $make_target eq "" && ! $error )
     {
 	log_progress( "\t$sudo_cmd make install" );
 	system( "$sudo_cmd make install >>$make_log 2>&1" );

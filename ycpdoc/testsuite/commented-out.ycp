@@ -1,0 +1,27 @@
+{
+/***
+ * Commented-out
+ * Example taken from Inetd.ycp
+ */
+
+/**
+ * Holds default configuration for currently edited superserver.
+ */
+global map default_conf          = $[];
+
+/**
+ * This variable holds informations about main package (inetd or xinetd)
+ * This variable is used in autoinstallation mode.
+ */
+//global list service_package      = [];
+
+/**
+ * A useless function
+ */
+/*define void DoNothing () ``{
+  return;
+}*/
+
+//global list required_packages    = [];
+
+}

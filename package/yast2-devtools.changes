@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 14 14:38:16 CEST 2003 - mvidner@suse.cz
+
+- ycpdoc: do not document items commented out by "//";
+  added a simple header for comments without an item
+
+-------------------------------------------------------------------
 Fri Jul 11 10:36:19 CEST 2003 - mvidner@suse.cz
 
 - check_ycp (check_imports): it's not an error to use Foo::

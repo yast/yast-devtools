@@ -359,7 +359,7 @@ sub parse_file ($)
 	if ("aftercomment" eq $state)
 	{
 	    # function definition
-	    if (/(global\s+)?define\s+($ycp_typedecl)?\s*($ycp_qualified_symbol)(.*)/o)
+	    if (/^\s*(global\s+)?define\s+($ycp_typedecl)?\s*($ycp_qualified_symbol)(.*)/o)
 	    {
 		$isglobal = defined $1;
 		$declared_type = $2 || "";
@@ -377,7 +377,7 @@ sub parse_file ($)
 		}
 	    }
 	    # variable declaration
-	    elsif (/(global\s+)?($ycp_typedecl)\s+($ycp_qualified_symbol)\s*=/o)
+	    elsif (/^\s*(global\s+)?($ycp_typedecl)\s+($ycp_qualified_symbol)\s*=/o)
 	    {
 		  $isglobal = defined $1;
 		  $declared_type = $2;
@@ -455,9 +455,9 @@ sub parse_file ($)
 		push (@{$f->{"requires"}}, $prov);
 	    }
 
-	    if (/define\s+($ycp_typedecl)?\s*(${ycp_qualified_symbol})\s*\(/o)
+	    if (/^\s*(?:global\s+)?define\s+(?:$ycp_typedecl)?\s*(${ycp_qualified_symbol})\s*\(/o)
 	    {
-		warning ("Function $2 has no comment.");
+		warning ("Function $1 has no comment.");
 	    }
 	}
 	elsif ("incomment" eq $state)
@@ -797,6 +797,12 @@ my $outro = "</td></tr></table><HR>\n"
     . "<TABLE WIDTH=\"100%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation </i></TD><TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/ydoc/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
     . "</BODY>\n</HTML>\n";
 
+my $infohead = "<p>\n"
+    . "<table bgcolor=\"#f96500\" cellpadding=1 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
+    . "<table bgcolor=\"#ffc080\" cellpadding=3 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
+    . "Info:\n"
+    . "</td></tr></table>\n"
+    . "</td></tr></table>\n";
 # 0: global/local 1:function, 2:anchor 3:-> 4:returntype
 my $functionhead = "<p>\n"
     . "<table bgcolor=\"#f96500\" cellpadding=1 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
@@ -1138,7 +1144,13 @@ sub write_onefile ($$)
 	# skip scruple stubs
 	next if ($one->{"kind"} eq "scruple");
 
-	if($one->{"kind"} ne "info")
+	if($one->{"kind"} eq "info")
+	{
+	    # if we did not print the header, the info text could be
+	    # mistaken to belong to another function
+	    printf OUT $infohead;
+	}
+	else
 	{
 	    my $gl = $one->{"global"} ? "global":"local";
 	    $one->{"signature"} ||= $one->{"name"};

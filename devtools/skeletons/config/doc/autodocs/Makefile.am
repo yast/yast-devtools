@@ -1,4 +1,4 @@
-# Makefile.am for devtools/devtools/skeletons/config/doc/autodocs
+# Makefile.am for XXpkgXX/doc/autodocs
 
 htmldir = $(docdir)/autodocs
 

@@ -1,6 +1,4 @@
-#
-# Makefile.am for devtools/devtools/skeletons/config/agents
-#
+# Makefile.am for XXpkgXX/agents
 
 agent_SCRIPTS =
 

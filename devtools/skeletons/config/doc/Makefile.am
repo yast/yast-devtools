@@ -1,6 +1,4 @@
-#
-# Makefile.am for devtools/devtools/skeletons/config/doc
-#
+# Makefile.am for XXpkgXX/doc
 
 SUBDIRS = autodocs
 

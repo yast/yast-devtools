@@ -1,8 +1,11 @@
 #
-# Makefile.cvs for yast2-devtools
+# Makefile.cvs
 #
+
+LIB = $(shell ./devtools/bin/get-lib)
+
 configure: all
-	./configure
+	./configure --libdir=/usr/$(LIB)
 
 all:
 	./devtools/bin/y2autoconf --bootstrap ./devtools/admin

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# somehow detect if this is a lib or lib64 system
+
+LIB=`gcc -v 2>&1 | sed -n 's,.*--libdir=/usr/\([^ ]*\).*,\1,p'`
+
+if [ -z $LIB ] ; then
+    LIB="lib"
+fi
+
+echo $LIB

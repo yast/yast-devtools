@@ -15,8 +15,8 @@ pkgdata_SCRIPTS = 				\
 	create-new-package			\
 	create-spec				\
 	for-proofread				\
-	kill-leftover-stuff
-
+	kill-leftover-stuff			\
+	get-lib
 
 EXTRA_DIST = $(bin_SCRIPTS) $(pkgdata_SCRIPTS)
 

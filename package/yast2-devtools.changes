@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 20 05:14:54 CEST 2004 - nashif@suse.de
+
+- added schemadir macro
+- added norootforbuild in skeleton spec file
+- 2.10.3
+
+-------------------------------------------------------------------
 Thu Jul 22 14:51:13 CEST 2004 - visnov@suse.cz
 
 - Fixed dependencies for agent skeleton C++ autodocs

@@ -98,6 +98,7 @@ localedir=${yast2dir}/locale
 clientdir=${yast2dir}/clients
 moduledir=${yast2dir}/modules
 yncludedir=${yast2dir}/include
+schemadir=${yast2dir}/schema
 scrconfdir=${yast2dir}/scrconf
 desktopdir=\${prefix}/share/applications/YaST2
 
@@ -123,6 +124,7 @@ AC_SUBST(localedir)
 AC_SUBST(clientdir)
 AC_SUBST(moduledir)
 AC_SUBST(yncludedir)
+AC_SUBST(schemadir)
 AC_SUBST(scrconfdir)
 AC_SUBST(agentdir)
 AC_SUBST(desktopdir)

@@ -565,6 +565,9 @@ clientdir=${yast2dir}/clients
 moduledir=${yast2dir}/modules
   for ycp modules
 
+schemadir=${yast2dir}/schema
+  for schema files (autoyast, control file)
+
 yncludedir=${yast2dir}/include
   for ycp includes
 

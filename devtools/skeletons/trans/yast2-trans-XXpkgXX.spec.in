@@ -20,7 +20,7 @@ Summary:	YaST2 translations for XXpkgXX localization
 
 %files
 %defattr(-,root,root)
+%doc @docdir@
 %dir @localedir@/*
 %dir @localedir@/*/LC_MESSAGES
 @localedir@/*/LC_MESSAGES/*
-

@@ -26,6 +26,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Do not warn if the types differ only in whitespace</short
 ><type
 >list&lt;string&gt;</type
 ></provides_item

@@ -22,6 +22,7 @@ use vars qw(
 	     $opt_m
 	     $opt_y
 	     $opt_a
+	     $opt_u
 	     );
 
 #
@@ -46,6 +47,35 @@ my @core_binaries =
      "perl-bindings"
      );
 
+# Directories to exclude from building - unmaintained packages, packages that
+# are not yet ready to be built, ...
+#
+# You may want to append to this list in your personal config file:
+#
+#	push @exclude_list, ( "dontwantthis", "dontwantthat" );
+
+my @exclude_list =
+    (
+     "CVS",
+     "openteam",
+     "debugger"
+     );
+
+# Personal favourites - those directories will be processed first (in this order).
+# This is what most YCP package maintainers will want to change in their personal
+# ~/.yast2/y2makeallrc file to get their personal packages processed first.
+# Remember to omit the "my" in your personal config file!
+#
+# All other directories (except of course those from the exclude list) will be
+# processed automatically after those.
+
+my @ycp_favourites =
+    (
+     "yast2",
+     "installation"
+     );
+
+
 
 my $work_root = $ENV{'PWD'};
 my $make_log  = $work_root . "/make.log";
@@ -60,6 +90,7 @@ my $enable_make_core_binaries	= 0;	# -b
 my $enable_byte_compile_modules	= 0;	# -m
 my $enable_make_ycp_packages	= 0;	# -y
 my $enable_make_all		= 1;	# -a
+my $favourites_only		= 0;	# -u
 
 
 # Verbosity values
@@ -85,6 +116,7 @@ my $ycpc_cmd			= "/usr/bin/ycpc";
 my $modules_dir			= "/usr/share/YaST2/modules";
 my $ycp_include_dir		= "/usr/share/YaST2/include";
 
+
 # ---- END configuration variables ----------------------------------------
 
 
@@ -94,6 +126,8 @@ my %ycp_modules;
 my %needed_ycp_include_files;
 my %included_by;
 my %ycp_install_dirs;
+my %exclude_dirs;
+my %done_dirs;
 
 
 #
@@ -150,7 +184,8 @@ sub main()
     $enable_make_ycp_packages		= 1	if $opt_y;
 
     $disable_make_makefile_cvs		= 1	if $opt_f;
-    $prog_name = basename( $0 );
+    $favourites_only			= 1	if $opt_u;
+
 
     #
     # Check if we are in the right directory
@@ -174,7 +209,7 @@ sub main()
     # his config file!
     #
 
-    require $user_config_file if ( -f $user_config_file );
+    eval { require $user_config_file } if ( -f $user_config_file );
 
 
     #
@@ -182,6 +217,13 @@ sub main()
     #
 
     open( LOG, ">" . $make_log ) or warn "Couldn't open $make_log";
+
+    #
+    # Make a hash from the exclude list
+    #
+
+    @exclude_dirs{ @exclude_list } = (); # Black magic - see Perl cook book chapter 4.7
+
 
     #
     # Build phases
@@ -206,7 +248,7 @@ sub main()
 
 sub make_core_binaries()
 {
-    log_milestone( "--- Phase 1 (-b): Building core binaries..." );
+    log_milestone( "\n--- Phase 1 (-b): Building core binaries..." );
 
     my $dir;
 
@@ -215,7 +257,7 @@ sub make_core_binaries()
 	make( $dir );
     }
 
-    log_milestone( "--- Core binaries done." );
+    log_milestone( "--- Core binaries done.\n" );
 }
 
 
@@ -225,21 +267,37 @@ sub make_core_binaries()
 
 sub byte_compile_modules()
 {
-    log_milestone( "--- Phase 2 (-m): Byte-compiling YCP modules..." );
+    log_milestone( "\n--- Phase 2 (-m): Byte-compiling YCP modules..." );
 
     #
     # Find all YCP modules in CVS working directory
     #
 
     # Make use of YCP programming conventions: Module names start with a capital letter.
-    my @module_candidates = find_files( $work_root, "[A-Z]*.ycp",
-					"(testsuite|examples|skeleton|openteam)" );
+    my @module_candidates = find_files( $work_root, "[A-Z]*.ycp", "(testsuite|examples|skeleton)" );
 
+    log_info( "Exclude list: " . join( " ", sort( keys %exclude_dirs ) ) );
     my $file;
 
     foreach $file ( @module_candidates )
     {
-	$ycp_modules{ basename( $file ) } = $file if is_ycp_module( $file );
+	if ( is_ycp_module( $file ) )
+	{
+	    my $pkg = $file;
+	    $pkg =~ s:^$work_root/::;	# remove leading work root
+	    $pkg =~ s:/.*$::;		# remove all path components but the first
+	    my $mod = basename( $file );
+
+	    if ( exists( $exclude_dirs{ $pkg } ) )
+	    {
+		log_info( "Excluding module \"$mod\" from package \"$pkg\"" );
+	    }
+	    else
+	    {
+		log_debug( "Found module \"$mod\" from package \"$pkg\"" );
+		$ycp_modules{ $mod } = $file;
+	    }
+	}
     }
 
 
@@ -314,7 +372,7 @@ sub byte_compile_modules()
     byte_compile( @order );
 
 
-    log_milestone( "--- Byte-compiling YCP modules done." );
+    log_milestone( "--- Byte-compiling YCP modules done.\n" );
 }
 
 
@@ -325,11 +383,59 @@ sub byte_compile_modules()
 
 sub make_ycp_packages()
 {
-    log_milestone( "--- Phase 3 (-y): Building YCP packages..." );
+    log_milestone( "\n--- Phase 3 (-y): Building YCP packages..." );
 
-    log_always( "*** still missing! ***" );
+    #
+    # Set up hash with packages not to process
+    #
 
-    log_milestone( "--- Building YCP packages done." );
+    my %dont_process = %exclude_dirs;
+
+    # Add the contents of @core_binaries to that hash
+    @dont_process{ @core_binaries } = (); # Black magic - see Perl cook book chapter 4.7
+
+    log_debug( "Excluding packages " . join( " ", sort ( keys( %dont_process ) ) ) );
+
+    #
+    # Set up list with packages to process
+    #
+
+    my @packages = @ycp_favourites;
+
+    if ( ! $favourites_only )
+    {
+	chdir( $work_root );
+	push( @packages, sort( glob( "*" )  ) );
+    }
+
+    #
+    # Process packages
+    #
+
+    my $pkg;
+
+    foreach $pkg ( @packages )
+    {
+	my $dir = $work_root . "/" . $pkg;
+
+	if ( -d $dir )
+	{
+	    if ( ! exists( $dont_process{ $pkg } ) )
+	    {
+		# log_progress( "Building $pkg" );
+		make( $dir );
+	    }
+	    else
+	    {
+		if ( exists( $exclude_dirs{ $pkg } ) )
+		{
+		    log_progress( "\nExcluding $pkg\n" );
+		}
+	    }
+	}
+    }
+
+    log_milestone( "--- Building YCP packages done.\n" );
 }
 
 
@@ -427,7 +533,7 @@ sub is_ycp_module()
     my ( $file_name ) = @_;
     my $module_name = basename( $file_name, ".ycp" );
 
-    log_debug( "Checking mod candidate $module_name: $file_name" );
+    # log_debug( "Checking mod candidate $module_name: $file_name" );
     open( MOD, $file_name ) or return 0;
 
     my $line;
@@ -439,7 +545,7 @@ sub is_ycp_module()
 
 	if ( $line =~ /^\s*module\s+"$module_name"\s*;/ )
 	{
-	    log_debug( "Found \'module \"$module_name\"\' in $file_name" );
+	    # log_debug( "Found \'module \"$module_name\"\' in $file_name" );
 	    close( MOD );
 	    return 1;
 	}
@@ -938,25 +1044,29 @@ sub usage()
 	"\t-b binaries - make core binaries\n"					.
 	"\t-m modules - byte-compile YCP modules\n"				.
 	"\t-y YCP - make YCP packages\n"					.
+	"\t-u favourites only - stop processing after favourites list is done\n".
 	"\t-f fast - no \"make -f Makefile.cvs\" if it can be avoided\n"	.
 	"\n"									.
-	"\t-d debug\n"								.
+	"\t-v verbose\n"							.
+	"\t-d debug - even more verbose\n"					.
+	"\t-s silent - turn verbosity down\n"					.
 	"\t-h help (this message)\n"						.
-	"\t-s silent (turn verbose off)\n"					.
-	"\t-v verbose (default)\n"						.
 	"\n"									.
-	"Examples:\n"								.
+	"EXAMPLES:\n"								.
 	"\n"									.
 	"Build everything:\n"							.
-	"\t$prog_name\n"								.
+	"\t$prog_name\n"							.
 	"\n"									.
 	"Do a \"make pot\" in all YCP packages:\n"				.
 	"\t$prog_name -y pot\n"							.
 	"\n"									.
-	"Byte-recompile all YCP modules, then make all YCP packages, but\n" .
-	"don't do \"make -f Makefile.cvs\" if it can be avoided:\n" .
+	"Byte-recompile all YCP modules, then make all YCP packages, but\n"	.
+	"don't do \"make -f Makefile.cvs\" if it can be avoided:\n"		.
 	"\t$prog_name -myf\n"							.
-	"\n";
+	"\n"									.
+	"Default values can be overridden in $user_config_file\n"		.
+	"Remember to look into $make_log for build errors!\n"			.
+	"";
 }
 
 

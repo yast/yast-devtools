@@ -6,7 +6,7 @@ AC_DEFUN([AX_CHECK_DOCBOOK], [
 XSLTPROC_FLAGS=--nonet
 DOCBOOK_ROOT=
 if test ! -f /etc/xml/catalog; then
-        for i in /usr/share/sgml/docbook/stylesheet/xsl/nwalsh /usr/share/sgml/docbook/xsl-stylesheets/;
+        for i in /usr/share/sgml/docbook/stylesheet/xsl/nwalsh /usr/share/sgml/docbook/xsl-stylesheets /usr/share/xml/docbook/stylesheet/nwalsh/current;
         do
                 if test -d "$i"; then
                         DOCBOOK_ROOT=$i
@@ -23,7 +23,7 @@ else
         CAT_ENTRY_END='-->'
 fi
 
-AC_CHECK_PROG(XSLTPROC,xsltproc,xsltproc,)
+AC_PATH_PROG(XSLTPROC,xsltproc,false)
 XSLTPROC_WORKS=no
 if test -n "$XSLTPROC"; then
         AC_MSG_CHECKING([whether xsltproc works])

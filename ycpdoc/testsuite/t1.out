@@ -35,8 +35,6 @@
  inputs and outputs of modules. Note that characters &amp;lt; and &amp;gt;
  are allowed in body.
 </body
-><deprecated
-></deprecated
 ><example
 >&lt;pre&gt; 
   This example shows multiline example tag.
@@ -50,8 +48,6 @@
 >0</global
 ><kind
 >info</kind
-><name
-></name
 ><parameters
 ><description
 >First argument description</description
@@ -77,10 +73,6 @@
 ><see_item
 >example#another</see_item
 ></see
-><signature
-></signature
-><since
-></since
 ><type
 >void</type
 ></provides_item
@@ -88,14 +80,10 @@
 ><body
 >
  Convert numeric value to hexadecimal string.</body
-><deprecated
-></deprecated
 ><example
 >&lt;pre&gt;  string hex = tohex(65);&lt;/pre&gt;</example
 ><file
 >t1-example.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
@@ -114,10 +102,6 @@
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
 >string</type
 ></provides_item
@@ -126,14 +110,8 @@
 >
  Who knows what is this function for?!? Note that there can be couple of
  empty lines between end of comment and define.</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >t1-example.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
@@ -160,43 +138,27 @@
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
-></type
+>any</type
 ></provides_item
 ><provides_item
 ><body
 >
  This function has no return value defined.</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >t1-example.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
 >black_hole</name
 ><parameters
 ></parameters
-><return
-></return
 ><scruple
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
-></type
+>void</type
 ></provides_item
 ></provides
 ><requires
@@ -242,44 +204,28 @@
  Description.
  @param a
  @param c</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >t1-mis.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
 >misdocumented</name
 ><parameters
-><description
-></description
 ><name
 >a</name
 ><type
 >string</type
-><description
-></description
 ><name
 >b</name
 ><type
 >string</type
 ></parameters
-><return
-></return
 ><scruple
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
-></type
+>void</type
 ></provides_item
 ></provides
 ><requires
@@ -314,14 +260,8 @@
 ><body
 >
  I was just too lazy to fabricate some good name of sample function.</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >t1-modules.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
@@ -334,18 +274,12 @@
 ><type
 >integer</type
 ></parameters
-><return
-></return
 ><scruple
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
-></type
+>void</type
 ></provides_item
 ></provides
 ><requires

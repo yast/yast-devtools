@@ -1,53 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ycpdoc
 ><files
-><file_item key="new-types.ycp"
+><file_item key="nodefine.ycp"
 ><header
 ><authors
 ></authors
 ><descr
-> Tests parsing of the angle-bracketed types</descr
+> Since 9.1 the interpreter does not require the "define" keyword
+ for function definitions.</descr
 ></header
 ><provides
 ><provides_item
+><body
+>
+ Main DNS GUI</body
 ><file
->new-types.ycp</file
-><kind
->function</kind
-><name
->ListToMap</name
-><parameters
-><description
->foo</description
-><name
->l</name
-><type
->list &lt;string&gt;</type
-></parameters
-><return
->bar</return
-><scruple
-></scruple
-><see
-></see
-><type
->map &lt;integer, string&gt;</type
-></provides_item
-><provides_item
-><file
->new-types.ycp</file
+>nodefine.ycp</file
 ><global
 >0</global
 ><kind
 >info</kind
 ><parameters
-><description
->foo</description
-><name
->m</name
 ></parameters
 ><return
->bar</return
+>sequencer symbol</return
+><scruple
+></scruple
+><see
+></see
+></provides_item
+><provides_item
+><body
+>
+ Global one</body
+><file
+>nodefine.ycp</file
+><global
+>0</global
+><kind
+>info</kind
+><parameters
+></parameters
 ><scruple
 ></scruple
 ><see

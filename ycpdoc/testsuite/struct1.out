@@ -5,18 +5,12 @@
 ><header
 ><authors
 ></authors
-><module
-></module
 ></header
 ><provides
 ><provides_item
 ><body
 >
  A list of services</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >struct1.ycp</file
 ><global
@@ -27,8 +21,6 @@
 >services</name
 ><parameters
 ></parameters
-><return
-></return
 ><scruple
 ><ITEM
 >service</ITEM
@@ -41,12 +33,8 @@
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
->list(map)</type
+>list&lt;map&gt;</type
 ></provides_item
 ><provides_item
 ><file
@@ -62,14 +50,8 @@
 ><body
 >
  Starts the service (@ref struct1#service) specified.</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >struct1.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
@@ -88,10 +70,6 @@
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
 >map</type
 ></provides_item
@@ -100,7 +78,5 @@
 ></requires
 ></file_item
 ></files
-><intro_html
-></intro_html
 ></ycpdoc
 >

@@ -5,22 +5,14 @@
 ><header
 ><authors
 ></authors
-><module
-></module
 ></header
 ><provides
 ><provides_item
 ><body
 >
  Euthanizes a process</body
-><deprecated
-></deprecated
-><example
-></example
 ><file
 >deprecated.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
@@ -33,16 +25,10 @@
 ><type
 >integer</type
 ></parameters
-><return
-></return
 ><scruple
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
 >void</type
 ></provides_item
@@ -52,12 +38,8 @@
  Kills a process</body
 ><deprecated
 >Euthanize</deprecated
-><example
-></example
 ><file
 >deprecated.ycp</file
-><global
-></global
 ><kind
 >function</kind
 ><name
@@ -70,16 +52,10 @@
 ><type
 >integer</type
 ></parameters
-><return
-></return
 ><scruple
 ></scruple
 ><see
 ></see
-><signature
-></signature
-><since
-></since
 ><type
 >void</type
 ></provides_item
@@ -88,7 +64,5 @@
 ></requires
 ></file_item
 ></files
-><intro_html
-></intro_html
 ></ycpdoc
 >

@@ -69,6 +69,7 @@ else if (func == "Write") {
     Progress::off();
     ret = XXPkgXX::Write();
     Progress::on();
+    return ret;
 }
 /* Unknown function */
 else {

@@ -28,7 +28,7 @@ global define symbol Configure1Dialog () ``{
     /* XXPkgXX configure1 dialog caption */
     string caption = _("XXPkgXX configuration");
 
-    /* XXPkg configure1 dialog contents */
+    /* XXPkgXX configure1 dialog contents */
     term contents = `Label (_("First part of configuration of XXpkgXX"));
 
     Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
@@ -65,7 +65,7 @@ global define symbol Configure2Dialog () ``{
     /* XXPkgXX configure2 dialog caption */
     string caption = _("XXPkgXX configuration");
 
-    /* XXPkg configure2 dialog contents */
+    /* XXPkgXX configure2 dialog contents */
     term contents = `Label (_("Second part of configuration of XXpkgXX"));
 
     Wizard::SetContentsButtons(caption, contents, HELPS["c2"]:"",

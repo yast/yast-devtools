@@ -71,6 +71,7 @@ yast2-online-update	default			YOU
 yast2-phone-services	default			isdn
 yast2-powertweak	expert_user		powertweak configuration
 yast2-printer		default			printer
+yast2-printerdb		default			printer
 yast2-profile-manager	default			profile-manager
 yast2-restore		default			restore
 yast2-runlevel		default			runlevel editor

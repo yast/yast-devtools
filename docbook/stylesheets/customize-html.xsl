@@ -65,8 +65,8 @@
   <xsl:include href="header.xsl" />
   -->
 
-  <!--
   <xsl:param name="funcsynopsis.style">ansi</xsl:param>
+  <!--
   <xsl:param name="funcsynopsis.decoration">1</xsl:param>
   <xsl:param name="funcsynopsis.tabular.threshold" select="40"></xsl:param>
   -->

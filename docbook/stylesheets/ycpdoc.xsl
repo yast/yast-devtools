@@ -31,27 +31,30 @@
         <xsl:variable name="moduleName" select="substring-before(@key,'.')"/>
         <xsl:variable name="referenceName"
             select="concat(substring-before(@key,'.'), '.xml')"/>
-        <xsl:document href="{$referenceName}" method="xml" indent="yes" encoding="ISO-8859-1"> 
-            <reference>
-                <xsl:attribute name="id">
-                    <xsl:text>Module_</xsl:text>
-                    <xsl:value-of select="$moduleName"/>
-                    <xsl:text>_</xsl:text>
-                    <xsl:text>reference</xsl:text>
-                </xsl:attribute>
-                <title>
-                    <xsl:apply-templates select="header/summary"/>
-                </title>
 
-                <xsl:apply-templates select="provides">
-                    <xsl:with-param name="moduleName" select="$moduleName" />
-                </xsl:apply-templates>
+        <xsl:if test="requires/requires_item/kind = 'module'" >
+            <xsl:document href="{$referenceName}" method="xml" indent="yes" encoding="ISO-8859-1"> 
+                <reference>
+                    <xsl:attribute name="id">
+                        <xsl:text>Module_</xsl:text>
+                        <xsl:value-of select="$moduleName"/>
+                        <xsl:text>_</xsl:text>
+                        <xsl:text>reference</xsl:text>
+                    </xsl:attribute>
+                    <title>
+                        <xsl:apply-templates select="header/summary"/>
+                    </title>
 
-                <xsl:apply-templates select="requires"> 
-                    <xsl:with-param name="moduleName" select="$moduleName" />
-                </xsl:apply-templates>
-            </reference>
-        </xsl:document>
+                    <xsl:apply-templates select="provides">
+                        <xsl:with-param name="moduleName" select="$moduleName" />
+                    </xsl:apply-templates>
+
+                    <xsl:apply-templates select="requires"> 
+                        <xsl:with-param name="moduleName" select="$moduleName" />
+                    </xsl:apply-templates>
+                </reference>
+            </xsl:document>
+        </xsl:if>
     </xsl:template>
 
 

@@ -727,7 +727,7 @@ sub do_shipout ($$$$$@)
     if ($entry->{"example"} ne "" )
     {
         # FIXME
-        $entry->{"example"} =~ s:^\n*(.*):<pre>$1</pre>:s;
+        #$entry->{"example"} =~ s:^\n*(.*):<pre>$1</pre>:s;
     }
 
     # check arguments
@@ -819,7 +819,7 @@ sub parse_header (@)
     foreach my $a (@lines)
     {
 	#TODO: warn on unknown key, missing field
-	if ($a =~ s/^\s*(Module|Package|File|Summary|Depends|Authors):\s*(.*)/$2/)
+	if ($a =~ s/^\s*(Module|Package|File|Summary|Depends|Authors|Author):\s*(.*)/$2/)
 	{
 	    $key = lc $1;
 	    # Module is old style, Package is new style. TODO, define meaning

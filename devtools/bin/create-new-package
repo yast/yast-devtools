@@ -98,17 +98,16 @@ sub main()
     }
 
     $new_name =~ s/_(.)/-$1/g;
+    $new_name =~ s/(.*)/\L$1/;
 
     # XXpkgXX
     $raw_name = $new_name;
-    $raw_name =~ s/(.*)/\L$1/;
     $raw_name =~ s/-([A-Z]+)/-\L$1/;
     $raw_name =~ s/-([A-Z]+)/-\L$1/;
     # print "RN: $raw_name\n";
 
     # XXPkgXX
     $Raw_name = $new_name;
-    $Raw_name =~ s/(.*)/\L$1/;
     $Raw_name =~ s/^(.)/\u$1/;
     $Raw_name =~ s/-(.)/\u$1/g;
     # print "RR: $Raw_name\n";

@@ -13,7 +13,8 @@ RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
 Y2TEXTDOMAIN_FILE	= $(shell test -e $(srcdir)/Y2TEXTDOMAIN && echo Y2TEXTDOMAIN)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
-HAS_GPL_LICENSE		= $(shell test -e $(srcdir)/GPL && echo GPL)
+
+HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
 
 # we can specify additional files to .pot creation
 POTFILES_FILE		= $(shell test -e $(srcdir)/POTFILES     && echo POTFILES)
@@ -24,14 +25,14 @@ IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
 DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir)/devtools,$(PREFIX)/share/YaST2/data/devtools)
 ALL_PACKAGES		= $(DEVTOOLS_DIR)/admin/all-packages
-LEGALESE_DIR		= $(if $(HAS_GPL_LICENSE),$(DEVTOOLS_DIR)/admin/copyright/gpl,$(DEVTOOLS_DIR)/admin/copyright/yast)
+LEGALESE_DIR		= $(if $(HAS_YAST_LICENSE),$(DEVTOOLS_DIR)/admin/copyright/yast,$(DEVTOOLS_DIR)/admin/copyright/gpl)
 
-COPYRIGHT_files_gpl	= GPL README COPYING COPYRIGHT.english
+COPYRIGHT_files_gpl	= README COPYING COPYRIGHT.english
 
-COPYRIGHT_files_yast	= README COPYING COPYRIGHT.english \
+COPYRIGHT_files_yast	= YAST_LICENSE README COPYING COPYRIGHT.english \
 			  COPYRIGHT.french COPYRIGHT.german COPYRIGHT.spanish
 
-extra_COPYRIGHT_files =  $(if $(HAS_GPL_LICENSE), $(COPYRIGHT_files_gpl), $(COPYRIGHT_files_yast))
+extra_COPYRIGHT_files =  $(if $(HAS_YAST_LICENSE), $(COPYRIGHT_files_yast), $(COPYRIGHT_files_gpl))
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 

@@ -17,12 +17,14 @@
 ><name
 >ListToMap</name
 ><parameters
+><parameters_item
 ><description
 >foo</description
 ><name
 >l</name
 ><type
 >list &lt;string&gt;</type
+></parameters_item
 ></parameters
 ><return
 >bar</return
@@ -41,12 +43,14 @@
 ><name
 >NoSpaces</name
 ><parameters
+><parameters_item
 ><description
 >foo</description
 ><name
 >l</name
 ><type
 >list&lt;string&gt;</type
+></parameters_item
 ></parameters
 ><return
 >bar</return
@@ -65,10 +69,12 @@
 ><kind
 >info</kind
 ><parameters
+><parameters_item
 ><description
 >foo</description
 ><name
 >m</name
+></parameters_item
 ></parameters
 ><return
 >bar</return

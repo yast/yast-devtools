@@ -57,12 +57,14 @@
 ><name
 >StartService</name
 ><parameters
+><parameters_item
 ><description
 >@ref service</description
 ><name
 >svc</name
 ><type
 >map</type
+></parameters_item
 ></parameters
 ><return
 >the @ref #service that was started</return

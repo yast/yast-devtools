@@ -1,7 +1,7 @@
 #
 #
 
-dbimgdir = $(DESTDIR)$(ydatadir)/docbook/images/navig
+dbimgdir = $(ydatadir)/docbook/images/navig
 
 dbimg_DATA = $(wildcard *.png)
 

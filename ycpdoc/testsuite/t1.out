@@ -49,14 +49,18 @@
 ><kind
 >info</kind
 ><parameters
+><parameters_item
 ><description
 >First argument description</description
 ><name
 >first</name
+></parameters_item
+><parameters_item
 ><description
 >Second argument description. &lt;string&gt;</description
 ><name
 >second</name
+></parameters_item
 ></parameters
 ><return
 >|map &lt;map&gt; of results or nil.
@@ -89,12 +93,14 @@
 ><name
 >tohex</name
 ><parameters
+><parameters_item
 ><description
 >value to convert</description
 ><name
 >i</name
 ><type
 >integer</type
+></parameters_item
 ></parameters
 ><return
 >hexadecimal rep. of i starting by 0x</return
@@ -117,6 +123,7 @@
 ><name
 >another</name
 ><parameters
+><parameters_item
 ><description
 >Value to convert.
   Descriptions of parameters can be multiline.</description
@@ -124,12 +131,15 @@
 >i</name
 ><type
 >integer</type
+></parameters_item
+><parameters_item
 ><description
 >Some string.</description
 ><name
 >j</name
 ><type
 >string</type
+></parameters_item
 ></parameters
 ><return
 >? Unknown. Lets show that return value description
@@ -211,14 +221,18 @@
 ><name
 >misdocumented</name
 ><parameters
+><parameters_item
 ><name
 >a</name
 ><type
 >string</type
+></parameters_item
+><parameters_item
 ><name
 >b</name
 ><type
 >string</type
+></parameters_item
 ></parameters
 ><scruple
 ></scruple
@@ -267,12 +281,14 @@
 ><name
 >lazy</name
 ><parameters
+><parameters_item
 ><description
 >some value</description
 ><name
 >i</name
 ><type
 >integer</type
+></parameters_item
 ></parameters
 ><scruple
 ></scruple

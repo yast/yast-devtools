@@ -20,16 +20,20 @@
 ><name
 >UI::CallbackCallback</name
 ><parameters
+><parameters_item
 ><description
 >send data to Japan?</description
 ><name
 >sdj</name
 ><type
 >boolean</type
+></parameters_item
+><parameters_item
 ><name
 >f</name
 ><type
 >string</type
+></parameters_item
 ></parameters
 ><scruple
 ></scruple

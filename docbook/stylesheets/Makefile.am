@@ -2,7 +2,7 @@
 # Makefile.am for devtools/ydoc/doc
 #
 
-xsldir = $(DESTDIR)$(ydatadir)/docbook/stylesheets
+xsldir = $(ydatadir)/docbook/stylesheets
 
 xsl_DATA = $(wildcard *.xsl)
 

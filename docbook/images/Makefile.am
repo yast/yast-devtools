@@ -3,7 +3,7 @@
 #
 SUBDIRS= navig admon
 
-dbimgdir = $(DESTDIR)$(ydatadir)/docbook/images
+dbimgdir = $(ydatadir)/docbook/images
 
 dbimg_DATA = $(wildcard *.png)
 

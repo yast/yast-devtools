@@ -17,12 +17,13 @@ html_DATA = $(wildcard html/*.html) \
 	    $(BUILD)/index.html \
 	    $(BUILD)/susebooks.css
 
-$(BUILD)/index.html: $(xml_files) 
+$(html_DATA): $(xml_files) 
 	xsltproc \
 	-stringparam base.dir "$(BUILD)/" \
 	--xinclude \
 	$(STYLESHEET_HTML) \
 	yast2-devtools.xml
+
 
 $(BUILD)/susebooks.css:
 	cp ../../docbook/css/susebooks.css $(BUILD)

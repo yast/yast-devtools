@@ -1,5 +1,9 @@
-# $Id$
+#
+# Makefile.am for devtools/scrdoc/doc
+#
 
-htmldir = @DOCDIR@
+htmldir = @docdir@
+
 html_DATA = README example.scr example.html index.scr.html overview.scr.html
+
 EXTRA_DIST = $(html_DATA)

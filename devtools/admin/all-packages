@@ -113,6 +113,7 @@ yast2-you-server	default			YOU server
 yast2-trans-bg		inst-sys		all
 yast2-trans-bs		inst-sys		all
 yast2-trans-cs		inst-sys		all
+yast2-trans-cy		inst-sys		all
 yast2-trans-da		inst-sys		all
 yast2-trans-de		inst-sys		all
 yast2-trans-el_GR	inst-sys		all

@@ -73,7 +73,16 @@ my @exclude_list =
 my @ycp_favourites =
     (
      "yast2",
-     "installation"
+     "xml",
+     "installation",
+     "storage",
+     "country",
+     "bootloader",
+     "mouse",
+     "x11",
+     "packager",
+     "transfer",
+     "autoinstallation",
      );
 
 
@@ -156,7 +165,7 @@ sub main()
     # This will set a variable opt_? for any option,
     # e.g. opt_v if option '-v' is passed on the command line.
 
-    getopts('hvsdfbmya');
+    getopts('hvsdfbmyau');
 
     usage()		if $opt_h;
 

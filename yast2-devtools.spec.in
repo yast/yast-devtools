@@ -28,7 +28,7 @@ make
 @INSTALL@
 
 # Change false to true in the following line when yast2 core is broken
-true && cat > "$RPM_BUILD_ROOT/@ydatadir@/devtools/NO_MAKE_CHECK" <<EOF
+false && cat > "$RPM_BUILD_ROOT/@ydatadir@/devtools/NO_MAKE_CHECK" <<EOF
 When yast2 core is broken and the interpreter does not work,
 submitting yast2-devtools with the flag file existing will
 prevent ycp developers being flooded by testsuite failures.

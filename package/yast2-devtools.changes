@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Sep 19 16:30:30 CEST 2003 - sh@suse.de
+
+- V 2.8.9
+- Support for GPL license
+- Moved YaST license to separate subdir
+- New subdir for GPL 
+
+-------------------------------------------------------------------
 Thu Aug 28 13:37:34 CEST 2003 - sh@suse.de
 
 - V 2.8.8

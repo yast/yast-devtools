@@ -1,8 +1,8 @@
 #
-# Makefile.am for devtools/devtools/admin/copyright
+# Makefile.am for devtools/devtools/admin/copyright/yast
 #
 
-copyrightdir = @YAST2DEVTOOLS@/admin/copyright
+copyrightdir = @YAST2DEVTOOLS@/admin/copyright/yast
 
 copyright_DATA = \
 	COPYING \

@@ -11,6 +11,7 @@ RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
 Y2TEXTDOMAIN_FILE	= $(shell test -e $(srcdir)/Y2TEXTDOMAIN && echo Y2TEXTDOMAIN)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
+HAS_GPL_LICENSE		= $(shell test -e $(srcdir)/GPL && echo GPL)
 
 # we can specify additional files to .pot creation
 POTFILES_FILE		= $(shell test -e $(srcdir)/POTFILES     && echo POTFILES)
@@ -21,10 +22,14 @@ IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
 DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir)/devtools,/usr/share/YaST2/data/devtools)
 ALL_PACKAGES		= $(DEVTOOLS_DIR)/admin/all-packages
+LEGALESE_DIR		= $(if $(HAS_GPL_LICENSE),$(DEVTOOLS_DIR)/admin/copyright/gpl,$(DEVTOOLS_DIR)/admin/copyright/yast)
 
-extra_COPYRIGHT_files = \
-	README COPYING \
-	COPYRIGHT.english COPYRIGHT.french COPYRIGHT.german COPYRIGHT.spanish
+COPYRIGHT_files_gpl	= README COPYING COPYRIGHT.english
+
+COPYRIGHT_files_yast	= README COPYING COPYRIGHT.english \
+			  COPYRIGHT.french COPYRIGHT.german COPYRIGHT.spanish
+
+extra_COPYRIGHT_files =  $(if $(HAS_GPL_LICENSE), $(COPYRIGHT_files_gpl), $(COPYRIGHT_files_yast))
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 
@@ -73,19 +78,19 @@ show-extra-dist:
 	@echo $(EXTRA_DIST)
 
 dist-hook:
-	@for I in $(extra_COPYRIGHT_files) ; \
-	do \
-	    EX="" ; \
-	    if test -f $(srcdir)/$$I ; then \
-		EX=$(srcdir)/$$I ; \
-	    elif test -f $(DEVTOOLS_DIR)/admin/copyright/$$I ; then \
-		EX=$(DEVTOOLS_DIR)/admin/copyright/$$I ; \
-	    else \
-	        echo "Error: File $$I does not exist either in $(srcdir)/ or in $(DEVTOOLS_DIR)/admin/copyright"; \
-		exit 1 ; \
-	    fi ; \
-	    echo "cp $$EX $(distdir)" ; \
-	    cp $$EX "$(distdir)" ; \
+	@for I in $(extra_COPYRIGHT_files) ;					\
+	do									\
+	    EX="" ;								\
+	    if test -f $(srcdir)/$$I ; then					\
+		EX=$(srcdir)/$$I ;						\
+	    elif test -f $(LEGALESE_DIR)/$$I ; then				\
+		EX=$(LEGALESE_DIR)/$$I ;					\
+	    else								\
+	        echo "Error: No file $$I in $(srcdir)/ or in $$LEGALESE_DIR/";	\
+		exit 1 ;							\
+	    fi ;								\
+	    echo "cp $$EX $(distdir)" ;						\
+	    cp $$EX "$(distdir)" ;						\
 	done
 
 xgettext_call = \
@@ -142,19 +147,19 @@ install-pot: $(POT_DST)
 
 install-data-local: # $(if $(IS_DEVTOOLS),,install-pot)
 	mkdir -p $(DESTDIR)$(docdir)
-	@for I in $(extra_COPYRIGHT_files) ; \
-	do \
-	    EX="" ; \
-	    if test -f $(srcdir)/$$I ; then \
-		EX=$(srcdir)/$$I ; \
-	    elif test -f $(DEVTOOLS_DIR)/admin/copyright/$$I ; then \
-		EX=$(DEVTOOLS_DIR)/admin/copyright/$$I ; \
-	    else \
-	        echo "Error: File $$I does not exist either in $(srcdir)/ or in $(DEVTOOLS_DIR)/admin/copyright"; \
-		exit 1 ; \
-	    fi ; \
-	    echo "$(INSTALL_DATA) $$EX $(DESTDIR)$(docdir)" ; \
-	    $(INSTALL_DATA) $$EX $(DESTDIR)$(docdir) ; \
+	@for I in $(extra_COPYRIGHT_files) ;					\
+	do									\
+	    EX="" ;								\
+	    if test -f $(srcdir)/$$I ; then					\
+		EX=$(srcdir)/$$I ;						\
+	    elif test -f $(LEGALESE_DIR)/$$I ; then				\
+		EX=$(LEGALESE_DIR)/$$I ;					\
+	    else								\
+		echo "Error: No file $$I in $(srcdir)/ or in $(LEGALESE_DIR)/";	\
+		exit 1 ;							\
+	    fi ;								\
+	    echo "$(INSTALL_DATA) $$EX $(DESTDIR)$(docdir)" ;			\
+	    $(INSTALL_DATA) $$EX $(DESTDIR)$(docdir) ;				\
 	done
 
 # TODO "if which y2tool" will be improved when we will have a generated

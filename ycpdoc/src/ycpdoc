@@ -136,7 +136,7 @@ my $help = 0;
 my $man = 0;
 my $skip_index = 0;
 my $output_stdout = 0;
-my $output_dir = "";
+my $output_dir = ".";
 my $strip_prefix = "";		# both with a trailing slash
 my $new_index_style = 1;
 my $warning_level = 2;
@@ -907,7 +907,8 @@ sub create_index ($)
     my ($new) = @_;
 
     my $index = $output_dir."index.html";
-    open(OUT,">$index") or die "Cannot open file index.html: $!";
+    print STDERR "Writing $index\n";
+    open(OUT,">$index") or die "Cannot open file $index: $!";
 
     if ($new)
     {
@@ -951,6 +952,7 @@ sub create_index ($)
     {
 	$index = $output_dir."files.html";
 
+	print STDERR "Writing $index\n";
 	open(FOUT,">$index") or die "Cannot open file $index: $!";
 	printf FOUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
     }
@@ -980,6 +982,7 @@ sub create_index ($)
     {
 	$index = $output_dir."intro.html";
 
+	print STDERR "Writing $index\n";
 	open(OUT,">$index") or die "Cannot open file $index: $!";
 
 	printf OUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";

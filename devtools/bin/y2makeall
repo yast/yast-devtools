@@ -123,7 +123,7 @@ my $make_target			= "";
 # if we don't install to usr, it is not necessary
 # -n means "no sudo"
 # note the trailing space
-my $sudo_cmd			= "/usr/bin/sudo ";
+my $sudo_cmd			= "/usr/bin/sudo";
 my $install_cmd			= "/usr/bin/install";
 
 # assigned only after the prefix option could be evaluated
@@ -202,10 +202,7 @@ sub main()
     $favourites_only			= 1	if $opt_u;
 
     $sudo_cmd = ""				if $opt_n;
-    if ( $opt_p )
-    {
-	$prefix = $opt_p;
-    }
+    $prefix = $opt_p				if $opt_p;
 
     $ycpc_cmd = "$prefix/bin/ycpc";
     $modules_dir = "$prefix/share/YaST2/modules";
@@ -267,23 +264,34 @@ sub main()
 
 #-----------------------------------------------------------------------------
 
-# call "system" and then exit if we got interrupted by a signal
+# Call "system" and then exit if we got interrupted by a signal
 
 sub system_int($)
 {
-    my $ret = system (shift);
+    my $cmd = shift;
+    my $ret = system( $cmd );
     my $sig = $ret & 127;
-    if ($sig == 2 || $sig == 15)
+
+    if ( $sig == 2 || $sig == 15 )
     {
 	die "Got SIGINT or SIGTERM, exiting.\n";
     }
     return $ret;
 }
 
+
+#-----------------------------------------------------------------------------
+
+
+# Call a command with "sudo"
+
 sub sudo_system_int($)
 {
-    return system_int ($sudo_cmd . shift);
+    my $cmd = shift;
+
+    return system_int( $sudo_cmd . " " . $cmd );
 }
+
 
 #-----------------------------------------------------------------------------
 
@@ -517,7 +525,7 @@ sub make()
     {
 
 	log_progress( "\tmake -f Makefile.cvs" );
-	system_int( "make -f Makefile.cvs 2>&1 >>$make_log" );
+	system_int( "make -f Makefile.cvs >>$make_log 2>&1" );
 
 	if ( $CHILD_ERROR )
 	{
@@ -533,7 +541,7 @@ sub make()
     if ( ! $error )
     {
 	log_progress( "\tmake $make_target" );
-	system_int( "make $make_target 2>&1 >>$make_log" );
+	system_int( "make $make_target >>$make_log 2>&1" );
 
 	if ( $CHILD_ERROR )
 	{
@@ -549,7 +557,7 @@ sub make()
     if ( $make_target eq "" && ! $error )
     {
 	log_progress( "\t$sudo_cmd make install" );
-	sudo_system_int( "make install 2>&1 >>$make_log" );
+	sudo_system_int( "make install >>$make_log 2>&1" );
 
 	if ( $CHILD_ERROR )
 	{
@@ -949,7 +957,7 @@ sub byte_compile()
 	$module .= ".ycp";
 	log_info( "Byte-compiling $module" );
 
-	my $cmd = "$ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module 2>&1 >>$make_log";
+	my $cmd = "$ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module >>$make_log 2>&1";
 
 	log_debug( "$sudo_cmd $cmd" );
 	sudo_system_int( $cmd );

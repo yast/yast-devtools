@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar  2 17:43:45 CET 2004 - sh@suse.de
+
+- Added support for translatable text ("make pot") in XML files:
+  <textdomain>..</textdomain> 
+
+-------------------------------------------------------------------
 Mon Mar  1 12:56:49 CET 2004 - jsrain@suse.de
 
 - fixed ycpdoc to process correctly function definitions without

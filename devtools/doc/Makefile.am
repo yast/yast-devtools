@@ -5,7 +5,8 @@
 SUBDIRS = skeletons
 
 sgmldir	= $(docdir)
-htmldir	= $(docdir)/html
+ghtmldir	= $(docdir)/html
+nhtmldir	= $(docdir)/html
 
 sgml_DATA =	\
 	yast2-devtools.sgml
@@ -30,8 +31,6 @@ $(ghtml_DATA): $(sgml_DATA)
 
 nhtml_DATA = \
 	rny2rnc.html 
-
-html_DATA = $(ghtml_DATA) $(nhtml_DATA)
 
 html: $(ghtml_DATA)
 

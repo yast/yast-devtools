@@ -53,7 +53,7 @@ yast2-nis-server	default			nis server
 yast2-nisplus-client	default			nis+ client
 yast2-online-update	default			YOU
 yast2-printer		default			printer
-yast2-restore		default			restore
+yast2-restore		inst-sys,default	restore
 yast2-runlevel		default			runlevel editor
 yast2-samba		slcs			samba
 yast2-scanner		default			scanner

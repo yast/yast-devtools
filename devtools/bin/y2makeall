@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 #
-# y2makeall - build all YaST2 sources from CVS.
+# File:		y2makeall
+# Package:	devtools
+# Summary:	Build all YaST2 sources from CVS
+# Authors:	Stefan Hundhammer <sh@suse.de>
+#
+# $Id$
 #
 # Call this from your toplevel yast2/source CVS working directory.
-#
-#
-# Author:  Stefan Hundhammer <sh@suse.de>
-# Updated: 2004-02-26
 
 use strict;
 use English;

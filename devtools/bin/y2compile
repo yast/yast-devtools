@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# File:		y2compile
+# Package:	devtools
+# Summary:	Recompile all YaST2 modules
+# Authors:	Michal Svec <msvec@suse.cz>
+#
+# $Id$
+
+[ "$UID" -ne "0" ] && exec su -c "$0"
+
+. /etc/rc.status
+cd /usr/share/YaST2/modules
+
+all=X
+count=0
+rm -f *.ybc
+
+while test "$all" && test "$count" -lt 20; do
+  all=
+  echo "Attempt #$count"
+  echo
+  for ycp in *.ycp; do
+    ybc="${ycp/.ycp}.ybc"
+    if ! test -f "$ybc"; then
+      echo -n "Compiling $ycp -> $ybc"
+      ycpc -cq "$ycp" 2>/dev/null
+      rc_status -v
+      all=X
+    fi
+  done
+  count=$[$count+1]
+  echo
+done
+
+if ! test "$all"; then
+  echo "Everything compiled OK"
+else
+  echo "Still some modules failing (attempts count overflow)"
+  false
+fi
+rc_status -v
+echo

@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<section>
+    <title>YaST2 Development Tools</title>
+
+<para>
+This document is a user's guide to the YaST2 <emphasis>devtools</emphasis> (short for
+"development tools"), a utility collection to make developing YaST2 code easier
+- C++ as well as YCP.
+</para>
+
+
+<section id="devtools_quick-start">
+<title>Quick Start</title>
+
+
+<itemizedlist>
+<listitem>
+
+<para>
+Install the <literal remap="tt">yast2-devtools</literal> RPM or check out the <literal remap="tt">devtools</literal> module from
+the YaST2 CVS and build and install it:
+
+
+<programlisting>
+cd yast2                  # your YaST2 CVS working directory
+cvs co devtools
+cd devtools
+make -f Makefile.cvs
+make
+sudo make install
+</programlisting>
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+    See the <link linkend="migration"/> how to change your C++ or
+YCP module.
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Build and use your package as before.
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+If <literal remap="tt">make package</literal> complains, fix the complaints. For a tempoarary package to
+check whether or not <literal remap="tt">build</literal> works with your changes, use "<literal remap="tt">make
+package-local</literal>" - but <emphasis remap="bf">never check in a package to <literal remap="tt">/work/src/done</literal>
+that you created this way!</emphasis>
+
+
+</para>
+</listitem>
+
+</itemizedlist>
+
+
+</section>
+
+<section>
+<title>What is it?</title>
+
+<para>
+The YaST2 devtools are an add-on to the classic automake / autoconf environment
+YaST2 used to use.
+</para>
+
+<para>
+Since the toplevel <literal remap="tt">Makefile.am</literal> is pretty much the same throughout all
+YaST2 C++ or YCP modules yet contains more and more specialized <literal remap="tt">make</literal>
+targets, this toplevel <literal remap="tt">Makefile.am</literal> is now automatically generated.
+</para>
+
+<para>
+The only thing that is (or, rather, "should be") different in all those
+toplevel <literal remap="tt">Makefile.am</literal> files is the "<literal remap="tt">SUBDIRS =</literal>" line. This line is
+moved to a <link linkend="subdirs"/> in the
+package's toplevel directory, much like <literal remap="tt">RPMNAME</literal>, <literal remap="tt">VERSION</literal>,
+<literal remap="tt">MAINTAINER</literal> etc. - the rest of <literal remap="tt">Makefile.am</literal> is copied from a common
+path <literal remap="tt">/usr/share/YaST2/data/devtools/admin</literal>. Thus, changes that should affect
+all of YaST2's toplevel <literal remap="tt">Makefile.am</literal> files are much easier to do and all
+YaST2 modules can benefit from them without the need to change (i.e. <literal remap="tt">cvs
+up</literal>, edit, <literal remap="tt">cvs ci</literal>) all of over 85 individual files.
+</para>
+
+<para>
+This implies, of course, that the toplevel <literal remap="tt">Makefile.am</literal> is no longer stored
+in the CVS repository since it is now automatically generated.
+</para>
+
+<para>
+On the downside, this of course implies that the files and scripts required for
+this new automagic are available at build time - i.e. on each YaST2 developer's
+development machine as well as in the <emphasis>Autobuild</emphasis> environment. Thus, you
+will need to either install the appropriate RPM or build the devtools manually
+- see the <link linkend="quick-start"/> section for details.
+</para>
+
+</section>
+
+<section id="devtools_migration">
+<title>Migration</title>
+
+<para>
+If you haven't done that yet, install the devtools - see the
+<link linkend="quick-start"/> section for details.
+</para>
+
+<para>
+If you are not sure, check <literal remap="tt">/usr/share/YaST2/data/devtools</literal> - if you don't
+have that directory, the devtools are not installed.
+</para>
+
+<para>
+You can simply use the <literal remap="tt">devtools-migration</literal> script that comes with the
+devtools package:
+</para>
+
+<para>
+
+<programlisting>
+cd yast2/modules/mypackage
+y2tool devtools-migration
+cvs ci
+</programlisting>
+
+</para>
+
+<para>
+This script performs the following steps:
+</para>
+
+
+<itemizedlist>
+<listitem>
+
+<para>
+Go to your package's toplevel directory:
+
+
+<programlisting>
+cd yast2/modules/mypackage
+</programlisting>
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+    <link linkend="subdirs"/> file from your existing
+<literal remap="tt">Makefile.am</literal> (Note: you can do without that <literal remap="tt">SUBDIRS</literal> file if you want
+to include all subdirectories that have a <literal remap="tt">Makefile.am</literal> in alphabetical
+order anyway):
+
+<programlisting>
+grep 'SUBDIRS' Makefile.am | sed -e 's/SUBDIRS *= *//' &#62;SUBDIRS
+</programlisting>
+
+
+Getting rid of the "<literal remap="tt">SUBDIRS = </literal>" prefix is not exactly mandatory (the
+devtools are forgiving enough to handle that), but recommended.
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Add that new <literal remap="tt">SUBDIRS</literal> file to the CVS repository:
+
+<programlisting>
+cvs add SUBDIRS
+</programlisting>
+
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Get rid of the old <literal remap="tt">Makefile.am</literal> both locally and in the CVS repository -
+this file will be automatically generated from now on:
+
+
+<programlisting>
+cvs rm -f Makefile.am
+</programlisting>
+
+
+
+</para>
+</listitem>
+<listitem>
+<para>
+Get rid of the old copyright notices (<literal remap="tt">COPYING</literal>,
+&#60;<literal remap="tt">COPYRIGHT.{english,german,french}</literal>)  both locally and in the CVS repository:
+
+<programlisting>
+cvs rm -f COPYING COPYRIGHT.{english,french,german}
+</programlisting>
+
+</para>
+
+
+<para>
+Those files will automatically be added to the tarball upon <literal remap="tt">make package</literal>,
+<literal remap="tt">make dist</literal> and related commands.
+</para>
+</listitem>
+<listitem>
+
+<para>
+Add <literal remap="tt">Makefile.am</literal> to the <literal remap="tt">.cvsignore</literal> file since it will be automatically
+generated from now on (otherwise "cvs up" will keep complaining about it):
+
+
+<programlisting>
+echo "Makefile.am" &#62;&#62;.cvsignore
+</programlisting>
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Edit your <literal remap="tt">.spec.in</literal> file. Locate the <literal remap="tt">neededforbuild</literal> line and add
+<literal remap="tt">yast2-devtools</literal> to it:
+
+
+<programlisting>
+vi *.spec.in
+...
+(locate "neededforbuild")
+(add "yast2-devtools")
+(save + quit)
+</programlisting>
+
+
+OK, that was the wimp version. Here is the freak version:
+
+<programlisting>
+perl -p -i -e 's/neededforbuild/neededforbuild yast2-devtools/' *.spec.in
+</programlisting>
+
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Add the line that creates the toplevel <literal remap="tt">Makefile.am</literal> to your <literal remap="tt">Makefile.cvs</literal>:
+
+
+<programlisting>
+vi Makefile.cvs
+(locate "aclocal")
+(add a new line above this:)
+[tab]	y2tool y2automake
+(save + quit)
+</programlisting>
+
+
+Again, a freak version for this:
+
+
+<programlisting>
+perl -p -i -e 'print "\ty2tool y2automake\n" if /aclocal/' Makefile.cvs
+</programlisting>
+
+
+The new <literal remap="tt">Makefile.cvs</literal> should look like this:
+
+
+<programlisting>
+all:
+        y2tool y2automake
+        autoreconf --force --install
+</programlisting>
+
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Double-check what you just did and check it into the CVS when everything looks OK.
+
+"<literal remap="tt">cvs up</literal>" should print something like this:
+
+
+<programlisting>
+M .cvsignore
+R COPYING
+R COPYRIGHT.english
+R COPYRIGHT.french
+R COPYRIGHT.german
+R Makefile.am
+M Makefile.cvs
+A SUBDIRS
+M myproject.spec.in
+</programlisting>
+
+
+
+"<literal remap="tt">cvs diff</literal>"should print something like this:
+
+
+<programlisting>
+Index: .cvsignore
+...
+ config.log
+ aclocal.m4
++Makefile.am
+...
+cvs server: Makefile.am was removed, no comparison available
+...
+Index: Makefile.cvs
+...
+ all:
++       y2tool y2automake
+	autoreconf --force --install
+...
+cvs server: SUBDIRS is a new entry, no comparison available
+...
+Index: myproject.spec.in
+...
+-# neededforbuild autoconf automake ...
++# neededforbuild yast2-devtools autoconf automake ...
+...
+</programlisting>
+
+
+Important: <emphasis remap="bf">Don't build yet</emphasis>, otherwise <literal remap="tt">Makefile.am</literal> will be
+regenerated and "cvs ci" will complain when trying to check all this in.
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Check your changes in:
+
+
+<programlisting>
+cvs ci
+</programlisting>
+
+
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Test-build your package locally:
+
+
+<programlisting>
+make -f Makefile.cvs &#38;&#38; make &#38;&#38; sudo make install
+</programlisting>
+
+
+You should now have a new <literal remap="tt">Makefile.am</literal>.
+
+
+</para>
+</listitem>
+
+</itemizedlist>
+
+
+</section>
+
+<section id="devtools_po-modules">
+<title>Translation (<literal remap="tt">po</literal>) Modules</title>
+
+<para>
+For YaST2 translation modules (<literal remap="tt">yast2-trans-...</literal>), the <literal remap="tt">Makefile.am</literal>
+in the <literal remap="tt">po</literal> subdirectory is automatically generated as well. The strategy
+for that is slightly different, though: The resulting <literal remap="tt">Makefile.am</literal> is
+combined from <literal remap="tt">Makefile.am.top</literal>, <literal remap="tt">Makefile.am.center</literal>, and
+<literal remap="tt">Makefile.am.bottom</literal>. The top and bottom files are used from the current
+project, if there is such a file; otherwise, all files are taken from
+<literal remap="tt">/usr/share/YaST2/data/devtools/admin/po</literal>. The center part is <emphasis remap="bf">always</emphasis>
+taken from there.
+</para>
+
+<para>
+Add custom <literal remap="tt">make</literal> targets or variable definitions to the top or bottom part
+as required. This may only be necessary for the <literal remap="tt">yast2-trans-...</literal> data
+modules (e.g., keyboard, mouse, printers).
+</para>
+
+<para>
+The migration script takes care of that: It migrates the <literal remap="tt">po/</literal>
+subdirectory, too, if there is one - and if there is a <literal remap="tt">Y2TEXTDOMAIN</literal>
+file in the the project toplevel directory. For data modules, the migration
+script backs up the existing <literal remap="tt">Makefile.am</literal> to <literal remap="tt">Makefile.am.bottom</literal> (or to
+<literal remap="tt">Makefile.am.old</literal>, if there already is a file named
+<literal remap="tt">Makefile.am.bottom</literal>). <emphasis remap="bf">Make sure to edit this file</emphasis> and get rid of
+duplicate parts before checking in.
+</para>
+
+</section>
+
+<section>
+<title>y2autoconf: Automatic creation of <literal remap="tt">configure.in</literal></title>
+
+<para>
+Sorry, for now it is just a hardcopy of a mail to yast2-hacker:
+</para>
+
+<para>
+
+<programlisting>
+Q: Why?
+A: It has a similar reason as the creation of y2automake. The configure.in's
+   are usually similar (or same) for a group of packages, so let's care just
+   about the different parts. Let's generate the rest.
+   Additionally it is much simplier to maintain the common parts. Do we
+   need  to switch to use BuildRoot? If we edit each of the .spec.in, it
+   will need a lot of effort. If we do it on one place, we do it once and
+   then just test it for each package (the usage of BuildRoot already is
+   in the create-spec, BTW).
+
+Q: How to migrate to y2autoconf?
+A: - checkout the newest devtools and install them
+   - save your configure.in to configure.in.bak
+   - edit your Makefile.cvs:
+	|        ./configure
+ 	|
+	|all:
+	|+       y2tool y2autoconf
+	|        y2tool y2automake
+	|        aclocal
+	|        autoconf
+   - create configure.in.in with a content you need. Example for a package
+     containing YCP:
+	|## configure.in.in for XXpkgXX
+	|
+	|## Initialize
+	|@YAST2-INIT-COMMON@
+	|@YAST2-INIT-YCP@
+	|
+	|## some common checks
+	|@YAST2-CHECKS-COMMON@
+	|@YAST2-CHECKS-YCP@
+	|
+	|## and generate the output...
+	|@YAST2-OUTPUT@
+     Instead of @YAST2-INIT-YCP@ and @YAST2-CHECKS-YCP@ you may want to use
+     the similar @YAST2-*-PROGRAM@, or @YAST2-*-PO@.
+   - if you need some additional checks, add them after @YAST2-CHECKS-*@:
+	|@YAST2-CHECKS-YCP@
+	|AC_PATH_PROG(SGML2HTML, sgml2html, false)
+	|if test "$SGML2HTML" ...etc.
+	|...etc...
+	|
+	|## and generate the output...
+	|@YAST2-OUTPUT@
+   - do "make -f Makefile.cvs", it will hopefully create a new "configure"
+   - compare the new configure.in and your saved configure.in.bak
+     if it fulfils your needs.
+   - if no (because of bug, typo or something), write me a mail
+   - if yes:
+	|rm configure.in
+	|cvs remove configure.in
+	|cvs add configure.in.in
+	|cvs commit
+
+Even though I tried to do my best to avoid bugs and mistakes, I am sure
+that there will be some... Please, report them to me (kendy@suse.cz),
+I'll try to fix them ASAP.
+</programlisting>
+
+</para>
+
+</section>
+
+<section>
+<title>create-spec: Automatic creation of the <literal remap="tt">.spec</literal> file</title>
+
+<para>
+Sorry, for now it is just a hardcopy of two mails to yast2-hacker:
+</para>
+
+<para>
+
+<programlisting>
+When I was adding support for BuildRoot in .spec to the config skeleton, I
+noticed, that everyone, who wants to use it in his package must edit his
+*.spec.in similar way, he had to do it for Makefile.am. So I decided to do
+one more y2tool: create-spec.
+
+It is called in "make package-local" and it can handle the current
+*.spec.in, so you should not notice any difference. Of course, there is
+one: the file package/*.spec created in the time of "make -f Makefile.cvs"
+is overwitten in the time of "make package(-local)" with the
+package/*.spec created by "y2tool create-spec". But it should have the
+same content.
+
+But it is not all, of course :-)
+
+The new feature is, that you can use more 'macros' (than just @RPMNAME@,
+@VERSION@, @MAINTAINER@) in the *.spec.in:
+
+  @HEADER-COMMENT@ - writes the SuSE .spec comment
+  @HEADER@         - writes the usual header except BuildArch:,
+                     Requires:, Summary:
+  @PREP@           - writes %prep with %setup
+  @BUILD-YCP@      - writes %build with usual make
+  @INSTALL-YCP@    - writes %install with usual YCP make install
+  @CLEAN@          - writes %clean with removing RPM_BUILD_ROOT
+
+So the new *.spec.in could look like:
+
+---------------------------------------------------
+@HEADER-COMMENT@
+# neededforbuild  autoconf automake ycpdoc yast2-testsuite ...
+
+@HEADER@
+Requires:       yast2 yast2-trans-XXpkgXX yast2-lib-wizard yast2-lib-sequencer
+BuildArchitectures:     noarch
+
+Summary:        Configuration of XXpkgXX
+
+%description
+This package is a part of YaST2. It contains the necessary scripts to
+configure XXpkgXX.
+
+@PREP@
+
+@BUILD-YCP@
+
+@INSTALL-YCP@
+
+@CLEAN@
+
+%files
+%dir @yncludedir@/XXpkgXX
+/...
+------------------------------------------------------------------
+
+Please try the skeleton if you want to see the new features in action :-)
+
+&lt;IMPORTANT&gt;
+Please, if you use yast2-devtools and you tested that your package works
+with create-spec, remove the line
+
+	package/yast2-*.spec:yast2-*.spec.in
+
+from its configure.in!
+&lt;/IMPORTANT&gt;
+
+@BUILD-CPP@, @INSTALL-CPP@, @BUILD-PO@ and @INSTALL-PO@ are coming soon...
+
+BTW:
+- the line "package/*.spec:*.spec.in" in yast2-devtools configure.in has
+  to stay there (at least for now) for the case "make package" in devtools
+  without devtoools previously installed
+</programlisting>
+
+</para>
+
+<para>
+
+<programlisting>
+Q: How to migrate to create-spec?
+A: - checkout the newest devtools and install them
+   - save your package.spec.in to package.spec.in.bak and package/package.spec
+     to package/package.spec.bak
+   - edit package.spec.in to be similar to:
+	|@HEADER-COMMENT@
+	|
+	|# neededforbuild  yast2-devtools autoconf automake gpp libgpp ydoc libycp libycp-devel liby2 liby2-devel libscr libscr-devel tcl dejagnu expect
+	|
+	|@HEADER@
+	|Summary:	YaST2 SCR agent for rc.config-style files
+	|
+	|%description
+	|-
+	|
+	|%package devel
+	|Version:	@VERSION@
+	|Summary:	YaST2 SCR agent for rc.config-style files for developers
+	|Group:		Development/Libraries
+	|Provides:	y2a_rcnf
+	|Obsoletes:	y2a_rcnf
+	|
+	|%description devel
+	|-
+	|
+	|@PREP@
+	|
+	|@BUILD-PROGRAM@
+	|
+	|@INSTALL-PROGRAM@
+	|
+	|@CLEAN@
+	|
+	|%files
+	|%defattr(-,root,root)
+	|@plugindir@/libpy2ag_rcconfig.so.*
+	|@scrconfdir@/*.scr
+	|
+	|%files devel
+	|%defattr(-,root,root)
+	|@plugindir@/libpy2ag_rcconfig.so
+	|@plugindir@/libpy2ag_rcconfig.la
+	|%doc @docdir@
+     Instead of @BUILD-PROGRAM@ and @INSTALL-PROGRAM@ you may want to use
+     the similar @*-YCP@, or @*-PO@.
+   - Some packages most probably  do not have a "-devel" package, so you
+     do not need to specify that part
+   - do "make -f Makefile.cvs" followed by "make package-local" (now the
+     package/package.spec is generated during it, not during configure)
+   - compare the new package/package.spec and your saved
+     package/package.spec.bak if it fulfils your needs.
+   - if no (because of bug, typo or something), write me a mail
+   - if yes:
+	|cvs commit
+</programlisting>
+
+</para>
+
+</section>
+
+<section>
+<title>Overview of paths</title>
+
+<para>
+These paths are defined in your <literal remap="tt">configure.in</literal> generated by <literal remap="tt">y2autoconf</literal>
+and substituted by <literal remap="tt">create-spec</literal>. That means they are accessible in all
+your Makefiles and can be uses in <literal remap="tt">spec.in</literal> files.
+</para>
+
+<para>
+
+<programlisting>
+
+yast2dir=${prefix}/share/YaST2
+  not for direct use
+
+docdir=${prefix}/share/doc/packages/\$RPMNAME
+  for documentation
+
+ybindir=${prefix}/lib/YaST2/bin
+  for all yast2 programs not be started by the user.
+
+plugindir=${libdir}/YaST2/plugin
+  for loadable plugins
+
+includedir=${prefix}/include/YaST2
+  for c header files
+
+localedir=${yast2dir}/locale
+  for translations files
+
+clientdir=${yast2dir}/clients
+  for ycp clients
+
+moduledir=${yast2dir}/modules
+  for ycp modules
+
+schemadir=${yast2dir}/schema
+  for schema files (autoyast, control file)
+
+yncludedir=${yast2dir}/include
+  for ycp includes
+
+scrconfdir=${yast2dir}/scrconf
+  for scr files
+
+desktopdir=${prefix}/share/applications/YaST2/modules
+  for .desktop files (former *.y2cc)
+
+execcompdir=${prefix}/lib/YaST2
+  for external programs that are yast2 components. here you
+  have to append servers, servers_non_y2, clients or
+  clients_non_y2.
+
+ydatadir=${yast2dir}/data
+  for general data
+
+imagedir=${yast2dir}/images
+  for non theme-able images
+
+themedir=${yast2dir}/theme
+  for theme-able images (every theme must provide the same list of images)
+
+</programlisting>
+
+</para>
+
+<para>
+Some examples:
+</para>
+
+<para>
+
+<programlisting>
+
+- In Makefile.am you can simply say
+
+    ybin_PROGRAMS = y2base
+
+  when you what the program y2base to be installed in ybindir. No
+  need to change bindir or even prefix.
+
+- In the files section of your spec.in file use something like this:
+
+    @scrconfdir@/*.scr
+
+  Remember that the asterisk is only save when using a BuildRoot (and
+  please use a BuildRoot).
+
+- If you need a define in a C++ file you have to pass it to the compiler.
+  Simply use
+
+    AM_CXXFLAGS = -DPLUGINDIR=\"${plugindir}\"
+
+  in your Makefile.am.
+
+</programlisting>
+
+</para>
+
+</section>
+
+<section>
+<title>Toplevel <literal remap="tt">make</literal> Targets in Detail</title>
+
+<section>
+<title><literal remap="tt">make package-local</literal></title>
+
+<para>
+This is what the old "<literal remap="tt">make package</literal>" did: Create a tarball from your module
+and put it into the <literal remap="tt">package/</literal> directory. This also creates a spec file
+from the .spec.in file.
+</para>
+
+</section>
+
+<section>
+<title><literal remap="tt">make package</literal></title>
+
+<para>
+This checks for cvs consistency (see below) and whether or not you correctly
+tagged that version (don't forget to increase the version number in
+<literal remap="tt">VERSION</literal>!), then does everything "<literal remap="tt">make package-local</literal>" did.
+</para>
+
+</section>
+
+<section>
+<title><literal remap="tt">make check-tagversion</literal></title>
+
+<para>
+This is performed by <literal remap="tt">make package</literal> prior to actually creating a tarball:
+It checks whether or not you correctly tagged the current version. Use
+"<literal remap="tt">y2tool tagversion</literal>" to do that once you increased the version number in
+<literal remap="tt">VERSION</literal>.
+</para>
+
+<para>
+You will very likely never call this manually.
+</para>
+
+</section>
+
+<section>
+<title><literal remap="tt">make check-cvs-up-to-date</literal></title>
+
+<para>
+This is performed by <literal remap="tt">make package</literal> prior to actually creating a tarball:
+It checks whether or not everyting in this directory tree is checked into
+CVS. Any modified, added or removed files make this check fail.
+</para>
+
+<para>
+You will very likely never call this manually.
+</para>
+
+</section>
+
+<section>
+<title><literal remap="tt">make checkin-stable</literal></title>
+
+<para>
+This makes a package (i.e. it does everything "<literal remap="tt">make package</literal>" does and
+checks it into the correct SuSE Linux distribution.
+</para>
+
+<para>
+This requires <literal remap="tt">/work/src/done</literal> to be mounted via NFS.
+</para>
+
+</section>
+
+<section>
+<title><literal remap="tt">make stable</literal></title>
+
+<para>
+Just an alias for "<literal remap="tt">make checkin-stable</literal>".
+</para>
+
+</section>
+
+</section>
+
+<section>
+<title>Troubleshooting</title>
+
+<section>
+<title>Can't find <literal remap="tt">y2tool</literal> or <literal remap="tt">y2automake</literal></title>
+
+<para>
+Did you install the devtools?
+</para>
+
+<para>
+    See the <link linkend="quick-start"/> section for details.
+</para>
+
+</section>
+
+<section>
+<title>"<literal remap="tt">cvs up</literal>" reports changes in the toplevel <literal remap="tt">Makefile.am</literal></title>
+
+<para>
+The toplevel <literal remap="tt">Makefile.am</literal> should no longer be in the CVS repository. Remove
+it from there - it is automatically generated now.
+</para>
+
+<para>
+    See the <link linkend="migration"/> section for details.
+</para>
+
+</section>
+
+<section>
+<title>"<literal remap="tt">make package</literal>" fails</title>
+
+<para>
+"<literal remap="tt">make package</literal>" is much more picky now: It checks whether your working
+directory is up-to-date, everything is checked in and whether or not you
+correctly tagged the package you wish to create. If any of those steps fails,
+"<literal remap="tt">make package</literal>" fails. This is to make sure only consistent packages are
+checked into the SuSE distributions.
+</para>
+
+<para>
+You can work around this by using "<literal remap="tt">make package-local</literal>" instead.
+But <emphasis remap="bf">never check in a package to <literal remap="tt">/work/src/done</literal>
+that you created this way!</emphasis>
+</para>
+
+</section>
+
+<section>
+<title><emphasis>Autobuild</emphasis> fails after migrating to <emphasis>devtools</emphasis></title>
+
+<para>
+Did you add "<literal remap="tt">yast2-devtools</literal>" to the "<literal remap="tt">neededforbuild</literal>" section in the
+spec file (or .spec.in)?
+</para>
+
+</section>
+
+</section>
+
+<section>
+<title>Questions and Answers</title>
+
+<section>
+<title>Why not use a straightforward <literal remap="tt">Makefile.am</literal> any more?</title>
+
+<para>
+At the time of this writing, we already have 86 YaST2 C++ and YCP modules, and
+the number keeps increasing. Each of those modules contains a <literal remap="tt">Makefile.am</literal>
+that is more or less the same - depending on when that module was created, how
+active the maintainer is etc. - all that meaning many of those files may be
+outdated or inconsistent with the rest of YaST2.
+</para>
+
+<para>
+Many <literal remap="tt">make</literal> targets in <literal remap="tt">Makefile.am</literal> are pure formalisms - introduced to
+enable easy and consistent package creation etc. - those targets should be the
+same for each module. This can only made sure by generating them.
+</para>
+
+</section>
+
+<section>
+<title>Why so much fuss about "<literal remap="tt">make package</literal>"?</title>
+
+<para>
+The primary purpose of "<literal remap="tt">make package</literal>" is to create a tarball that is
+checked into a SuSE Linux distribution - i.e. into a real product where
+consistency, reliablility and thus quality matters. We want to make sure we can
+reliably track the differences between each version that is checked in - thus
+the checks for consistency with the CVS repository and the check for tags.
+</para>
+
+</section>
+
+<section>
+<title>How do I test-build my package now prior to <literal remap="tt">CVS checkin</literal>?</title>
+
+<para>
+Use "<literal remap="tt">make package-local</literal>", then build. If everything works out allright,
+check in your changes into CVS, tag your version ("<literal remap="tt">y2tool tagversion</literal>") and
+then use "<literal remap="tt">make package</literal>".
+</para>
+
+</section>
+
+<section id="devtools_subdirs">
+<title>Do I really need a <literal remap="tt">SUBDIRS</literal> file?</title>
+
+<para>
+No - you can do without this file. In this case, all direct subdiretories of
+your toplevel directory are scanned for a <literal remap="tt">Makefile.am</literal>, and if such a file
+is found, the respective directory is added to <literal remap="tt">SUBDIRS</literal> in the toplevel
+<literal remap="tt">Makefile.am</literal>. The directories are sorted alphabetically.
+</para>
+
+<para>
+If there is a <literal remap="tt">SUBDIRS</literal> file, however, this has higher priority. You might
+want to use this if you want to temporarily disable a subdirectory or if you
+want to change the execution order.
+</para>
+
+</section>
+
+<section>
+<title>Why use <literal remap="tt">y2tool</literal> to call simple tools?</title>
+
+<para>
+This is just a workaround to avoid cluttering the system namespace. This
+<literal remap="tt">y2tool</literal> script is a simple wrapper that calls a script or program from
+<literal remap="tt">/usr/share/YaST2/data/devtools/bin</literal> - you might as well extend your
+<literal remap="tt">$PATH</literal> environment variable to include that path.
+</para>
+
+</section>
+
+</section>
+
+</article>

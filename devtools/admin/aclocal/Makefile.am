@@ -2,7 +2,7 @@
 # Makefile.am for devtools/devtools/admin/copyright/gpl
 #
 
-aclocaldir = /usr/share/aclocal
+aclocaldir = $(prefix)/share/aclocal
 
 aclocal_DATA =				\
 	y2devtools.m4

@@ -1,16 +1,17 @@
-## Emacs: -*- makefile -*-
-##
-## Makefile.am.center for a YaST2 translation (po/) subproject
+# Emacs: -*- makefile -*-
 
+LL = $(shell sed 's:.*-::' ../RPMNAME)
 POTDIR = ../../pot/pot
 POTFILES = $(wildcard $(POTDIR)/*.pot)
 GENERATED = $(MOFILES)
 CLEANFILES = $(GENERATED)
-EXTRA_DIST = $(POFILES)
 POFILES = $(wildcard *.po)
 MOFILES = $(POFILES:%.po=%.mo)
+INST_MOFILES = $(MOFILES:.$(LL).mo=.mo)
 POXFILES = $(POFILES:%.po=%.pox)
-LL = $(shell sed 's:.*-::' ../RPMNAME)
+EXTRA_DIST = $(POFILES)
+localedir=@localedir@
+locale_lang_msg_dir=$(localedir)/$(LL)/LC_MESSAGES
 compendium = @COMPENDIUM@
 
 MSGMERGE = @MSGMERGE@ --no-wrap --force-po
@@ -104,13 +105,9 @@ checkin:
 	fi
 
 install-data-local: $(MOFILES)
+	D=$(DESTDIR)$(locale_lang_msg_dir); \
+	  [ -d $$D ] || install -d -m 755 $$D; \
 	for l in $(MOFILES); do \
           m=$${l/$(LL).mo/mo}; \
-	  locale_lang_msg_dir=$$localedir/$(LL)/LC_MESSAGES; \
-	  [ -d $$locale_lang_msg_dir ] \
-	    || install -d -m 755 $$locale_lang_msg_dir; \
-	  install -m 644 $$l $$locale_lang_msg_dir/$$m; \
+	  install -m 644 $$l $$D/$$m; \
 	done
-
-## Makefile.am.center ends here
-

@@ -263,6 +263,17 @@ See `c-offsets-alist' for details")
 (unless (assoc "ycp" c-style-alist)
   (c-add-style "ycp" ycp-offsets-alist))
 
+(defun version-lessp (string1 string2)
+  (version-lessp-1 (split-string string1 "\\.") (split-string string2 "\\.")))
+(defun version-lessp-1 (versions1 versions2)
+  (if (or (null versions1) (null versions2))
+      (not (null versions2))
+    (let ((version1 (string-to-number (car versions1)))
+	  (version2 (string-to-number (car versions2))))
+      (or (< version1 version2)
+	  (and (= version1 version2)
+	       (version-lessp-1 (cdr versions1) (cdr versions2)))))))
+
 ;;;###autoload
 (defun ycp-mode ()
   "Major mode for editing YCP code.
@@ -280,15 +291,18 @@ with no args, if that value is non-nil."
   (setq major-mode 'ycp-mode)
   (setq mode-name "YCP")
   (setq local-abbrev-table ycp-mode-abbrev-table)
-  (c-common-init)
-  (setq comment-start "// "
-	comment-end   ""
-	c-conditional-key "\\b\\(for\\|if\\|do\\|else\\|while\\)\\b[^_]"
- 	c-class-key c-C-class-key	; WRONG
-	c-baseclass-key nil
-	c-comment-start-regexp c-C++-comment-start-regexp
-	imenu-create-index-function 'cc-imenu-c-generic-expression ; XXX
-	imenu-case-fold-search nil)
+  (if (version-lessp c-version "5.29")
+      (progn
+	(c-common-init)
+	(setq comment-start "// "
+	      comment-end   ""
+	      c-conditional-key "\\b\\(for\\|if\\|do\\|else\\|while\\)\\b[^_]"
+	      c-class-key c-C-class-key	; WRONG
+	      c-baseclass-key nil
+	      c-comment-start-regexp c-C++-comment-start-regexp
+	      imenu-create-index-function 'cc-imenu-c-generic-expression ; XXX
+	      imenu-case-fold-search nil))
+    (c-common-init 'c++-mode))
   (set-syntax-table ycp-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults)
        '(ycp-font-lock-keywords nil nil ((?_ . "w") (?` . "w"))))

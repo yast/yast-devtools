@@ -97,6 +97,7 @@ yast2-tune		default			hardware info and tune
 yast2-tv		default			TV card
 yast2-users		default			users
 yast2-x11		default			runtime x11
+yast2-wlanipsecclient	-			WLAN IPsec client
 
 # translations
 yast2-trans-bg		inst-sys		all

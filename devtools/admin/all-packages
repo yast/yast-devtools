@@ -34,6 +34,7 @@ yast2-theme-UnitedLinux	inst-sys,default	all (subpackage of yast2-theme)
 # installation
 yast2-installation	inst-sys,default	install
 yast2-slide-show	inst-sys		install
+yast2-slide-show-SLES	inst-sys		install
 
 # auto installation
 autoyast2		default			all,autoinstall

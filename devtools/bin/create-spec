@@ -133,12 +133,16 @@ autoreconf --force --install
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir}
 \%if \%ul_version > 0
-pushd po >/dev/null
-for f in *.po; do
+for f in po/*.po ; do
   cp \$f \$f.orig
   awk -f \@ybindir\@/cleanuppo.awk \$f.orig >\$f
 done
-popd >/dev/null
+\%endif
+\%if \%sles_version > 0
+for f in po/*.po ; do
+  cp \$f \$f.orig
+  awk -f \@ybindir\@/cleanuppo.awk -v sles=8 \$f.orig >\$f
+done
 \%endif
 make",
 

@@ -1,4 +1,21 @@
-------------------------------------------------------------------------
+-------------------------------------------------------------------
+Fri Oct 11 15:19:30 CEST 2002 - arvin@suse.de
+
+- enhance create-spec on account of SLES.
+
+-------------------------------------------------------------------
+Mon Sep 16 19:01:21 CEST 2002 - arvin@suse.de
+
+- updated to latest cleanuppo.awk from ke
+
+-------------------------------------------------------------------
+Wed Sep 12 11:24:47 CEST 2002 - ke@suse.de
+
+- Update to version 2.6.16.
+- ydoc/po-tools/cleanuppo.awk: Respect word bounderies; ignore
+  obsolete entries.
+
+-------------------------------------------------------------------
 Wed Sep 11 18:24:47 CEST 2002 - ke@suse.de
 
 - Update to version 2.6.15.

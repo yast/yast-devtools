@@ -5,17 +5,61 @@
 
 use strict;
 
-# TODO: "use" it and process the typeinfo
+
+sub typeinfo_to_signature ($;$);
+sub typeinfo_to_signature ($;$)
+{
+    my ($ti, $fname) = @_;
+#print STDERR "fname: '$fname'\n" if ($fname);
+    my $rti = ref ($ti);
+    if (! $rti)
+    {
+	return $ti;
+    }
+    elsif ($rti eq "ARRAY")
+    {
+	my $what = shift @{$ti};
+#print STDERR "what: '$what'\n";
+	my ($type, $name) = split (/\s/, $what);
+	$name = $name? " $name": "";
+	if ($type eq "list")
+	{
+	    my $itemsig = typeinfo_to_signature (shift @{$ti});
+	    return "list E<lt>${itemsig}E<gt>$name";
+	}
+	elsif ($type eq "map")
+	{
+	    my $keysig = typeinfo_to_signature (shift @{$ti});
+	    my $valsig = typeinfo_to_signature (shift @{$ti});
+	    return "map E<lt>${keysig}, ${valsig}E<gt>$name";
+	}
+	elsif ($type eq "function")
+	{
+	    # use fname if name not given (which is likely)
+	    $fname = $fname? " $fname": "";
+	    $name ||= $fname;
+	    my $retsig = typeinfo_to_signature (shift @{$ti});
+	    my @argsig = map (typeinfo_to_signature ($_), @{$ti});
+	    return "$retsig$name (". join (", ", @argsig). ")";
+	}
+	print STDERR "Oops\n";
+    }
+    print STDERR "Unknown typeinfo '$ti'\n";
+    return "?";
+}
+
 while (defined ($_ = <>))
 {
     print;
     if (m/^BEGIN\s*\{\s*\$TYPEINFO\s*\{\s*(\S*)\s*\}\s*=\s*(.*);/)
     {
+	my ($name, $ti) = ($1, $2);
+	my $sig = typeinfo_to_signature (eval($ti), $name);
 	chomp;
 	print "\n";
-	print "=head2 $1\n";
+	print "=head2 $name\n";
 	print "\n";
-	print "C<<< $2 >>>\n";
+	print "C< $sig >\n";
 	print "\n";
 	print "=cut\n";
 	print "\n";

@@ -59,6 +59,7 @@ yast2-dhcp-server	rop			DHCP server
 yast2-dns-server	default			DNS server
 yast2-firewall		default			firewall
 yast2-firewall-cd	firewall		firewall CD
+yast2-http-server	default			HTTP server
 yast2-imap-server	email			IMAP server
 yast2-inetd		default			inetd editor
 yast2-ldap-client	default			ldap client
@@ -82,6 +83,8 @@ yast2-repair		inst-sys,default	repair
 yast2-restore		default			restore
 yast2-runlevel		default			runlevel editor
 yast2-samba		slcs			samba
+yast2-samba-client      default                 samba client
+yast2-samba-server      default                 samba server
 yast2-scanner		default			scanner
 yast2-security		default			security
 yast2-sound		default			sound

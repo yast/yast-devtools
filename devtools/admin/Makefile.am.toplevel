@@ -40,7 +40,7 @@ $(RPMNAME)-$(VERSION).tar.bz2: checkpo dist-bzip2
 	    exit 1 ; \
 	fi
 
-CLEANFILES = $(RPMNAME).kdoc
+CLEANFILES =
 MAINTAINERCLEANFILES = package/$(RPMNAME)-$(VERSION).tar.bz2 package/$(RPMNAME).spec
 
 # all the .ycp and .y2cc files, we should separate texts from (exclude testsuite directory)

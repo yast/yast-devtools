@@ -21,6 +21,7 @@ include "commandline/commandline.ycp";
 
 map cmdline_description = $[
     "id" 	: "XXpkgXX",
+    // transltors: command line help text for the XXXpkgXX module
     "help"	: _("Configuration of XXpkgXX"),
     "guihandler"        : ``(XXPkgXXSequence()),
     "initialize"        : ``(XXPkgXX::Read()),

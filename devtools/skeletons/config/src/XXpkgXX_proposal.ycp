@@ -61,7 +61,9 @@ else if(func == "AskUser") {
 /* create titles */
 else if(func == "Description") {
     ret = $[
+	// translators: rich text title for XXPkgXX in proposals
 	"rich_text_title" : _("XXPkgXX"),
+	// translators: menu title for XXPkgXX in proposals
 	"menu_title" : _("&XXPkgXX"),
 	"id" : "XXpkgXX",
     ];

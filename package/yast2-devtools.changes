@@ -1,4 +1,22 @@
 -------------------------------------------------------------------
+Wed Nov 10 11:37:01 CET 2004 - mvidner@suse.cz
+
+- use VERSION instead of PACKAGE_VERSION, thus allow make package
+  after bumping VERSION again (arvin)
+- check_ycp: Removed check_alternate_declarations, they have long
+  been syntax errors.
+- i18n (ke)
+    detect language code and assign it to LL
+    Y2TEXTDOMAIN is gone; check for 'po' subdir
+    drop make-pox from checkpo
+- y2makeall (sh)
+    added pkg-bindings
+    filtered out "is newer" ycpc warning upon byte-compiling
+- Improved STYLESHEET_* so that they are found in the devtools
+  prefix, not the current prefix.
+- 2.11.3
+
+-------------------------------------------------------------------
 Fri Oct 29 11:55:21 CEST 2004 - mvidner@suse.cz
 
 - Added pkgconfig support.

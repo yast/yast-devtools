@@ -18,9 +18,9 @@ use ycp;
 use YaST::YCP qw(Boolean);
 
 use Locale::gettext;
-use POSIX;     # Needed for setlocale()
+use POSIX ();     # Needed for setlocale()
 
-setlocale(LC_MESSAGES, "");
+POSIX::setlocale(LC_MESSAGES, "");
 textdomain("XXpkgXX");
 
 sub _ {
@@ -278,4 +278,5 @@ sub AutoPackages {
     return \%ret;
 }
 
+1;
 # EOF

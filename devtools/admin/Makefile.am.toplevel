@@ -48,7 +48,7 @@ $(RPMNAME)-$(VERSION).tar.bz2: checkpo dist-bzip2
 CLEANFILES =
 MAINTAINERCLEANFILES = package/$(RPMNAME)-$(VERSION).tar.bz2 package/$(RPMNAME).spec
 
-# all the .ycp and .y2cc files, we should separate texts from (exclude testsuite directory)
+# all the .ycp and .pm files, we should separate texts from (exclude testsuite directory)
 POT_SRC = $(shell find $(srcdir) -type d -name testsuite -prune , \
 	-type f -name "*.ycp" -o -name "*.pm" | xargs grep -l '^[[:space:]]*[Tt]extdomain') \
 	$(POTFILES)

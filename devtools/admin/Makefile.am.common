@@ -17,6 +17,6 @@ CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 	mv .new.dep .dep
 
 check-syntax: $(client_DATA)
-	ycpc -qE -M. -I. $<
+	ycpc -qE -M. -I. $^
 
 -include .dep

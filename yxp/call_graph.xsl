@@ -14,11 +14,32 @@
        we want the one that is followed by a paren -->
   <xsl:template match="definition//term/identifier[
                        contains (following-sibling::CHAR, '(')
+                       and not (
+                         normalize-space () = '`id' or
+                         normalize-space () = '`opt' or
+                         normalize-space () = 'lookup' or
+                         normalize-space () = 'select' or
+                         normalize-space () = 'add' or
+                         normalize-space () = 'size' or
+                         false ()
+                       )
                        ]">
+    <xsl:text>"</xsl:text>    
     <xsl:apply-templates select="ancestor::definition//definition_symbol/SYMBOL" mode="output"/>
+    <xsl:text>"</xsl:text>    
     <xsl:text>-&gt;</xsl:text>
+    <xsl:text>"</xsl:text>    
     <xsl:apply-templates select="." mode="output"/>
+    <xsl:text>"</xsl:text>    
     <xsl:text>&#10;</xsl:text>
+  </xsl:template>
+
+  <!-- also, mark function definitions so that they stand out -->
+  <xsl:template match="definition//definition_symbol/SYMBOL">
+    <xsl:text>"</xsl:text>    
+    <xsl:apply-templates select="." mode="output"/>
+    <xsl:text>"</xsl:text>    
+    <xsl:text>[style=bold]&#10;</xsl:text>
   </xsl:template>
 
   <!-- in output mode, there is the implicit text-copying rule -->

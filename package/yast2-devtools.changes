@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Feb  8 17:08:57 CET 2005 - mvidner@suse.cz
+
+- Added po-stats to sum up translation file statistics (ke).
+
+-------------------------------------------------------------------
 Fri Jan 21 16:20:26 CET 2005 - mlazar@suse.cz
 
 - dual CVS/Subversion support

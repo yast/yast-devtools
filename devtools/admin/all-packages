@@ -13,19 +13,24 @@
 #
 # package		where			when
 # ------------------------------------------------------------------------------
-#
+
 # core packages
 yast2			inst-sys,default	all
 yast2-core		inst-sys,default	all
-yast2-installation	inst-sys		install
-autoyast2-installation	inst-sys,default	all,autoinstall
-autoyast2			default	all,autoinstall
 yast2-control-center	default			all
 yast2-ncurses		inst-sys,default	all
 yast2-qt		inst-sys,default	all
 yast2-theme-SuSELinux	inst-sys,default	all
 yast2-packager		inst-sys,default	all
 yast2-update		inst-sys,default	all
+
+# installation
+yast2-installation	inst-sys		install
+yast2-slide-show	inst-sys		install
+
+# auto installation
+autoyast2		default			all,autoinstall
+autoyast2-installation	inst-sys,default	all,autoinstall
 
 # development
 yast2-debugger		-			development

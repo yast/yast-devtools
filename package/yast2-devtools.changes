@@ -1,4 +1,18 @@
 -------------------------------------------------------------------
+Thu Dec  2 13:31:37 CET 2004 - mvidner@suse.cz
+
+- ycpdoc: Do not warn if the types differ only in whitespace
+- docbook stylesheets (nashif):
+   removed deprecated style parameter
+   removed some options which cause processing to run slow
+   improvements to html output
+   added ycpdoc stylesheet
+- ydoc2 (nashif): fixed adding properties from class files
+- y2makeall (sh): added unmaintained "certify" module to exclude
+  list
+- 2.11.4
+
+-------------------------------------------------------------------
 Wed Nov 10 11:37:01 CET 2004 - mvidner@suse.cz
 
 - use VERSION instead of PACKAGE_VERSION, thus allow make package

@@ -7,8 +7,7 @@ yncludedir = @yncludedir@/XXpkgXX
 client_DATA =			\
 	XXpkgXX.ycp		\
 	XXpkgXX_auto.ycp	\
-	XXpkgXX_proposal.ycp	\
-	XXpkgXX_write.ycp
+	XXpkgXX_proposal.ycp
 
 ynclude_DATA =			\
 	helps.ycp		\

@@ -40,11 +40,12 @@ any ret = nil;
 
 if(propose) ret = XXPkgXXAutoSequence();
 else ret = XXPkgXXSequence();
-y2debug("ret == %1", ret);
+y2debug("ret=%1", ret);
 
 /* Finish */
 y2milestone("XXPkgXX module finished");
 y2milestone("----------------------------------------");
+
 return ret;
 
 /* EOF */

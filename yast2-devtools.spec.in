@@ -1,5 +1,6 @@
 @HEADER-COMMENT@
-# neededforbuild gpp libgpp sgmltool perl-XML-Writer
+
+# neededforbuild  gpp libgpp sgmltool perl-XML-Writer
 
 @HEADER@
 Requires:	yast2 perl

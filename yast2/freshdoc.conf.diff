@@ -1,5 +1,5 @@
---- /opt/www/htdig/conf/htdig.conf	Tue Mar 26 16:42:12 2002
-+++ /opt/www/htdig/conf/yast2.conf	Wed Aug  7 17:18:29 2002
+--- /srv/www/htdig/conf/htdig.conf	2002-09-18 03:10:22.000000000 +0200
++++ /srv/www/htdig/conf/yast2.conf	2002-11-11 13:43:09.000000000 +0100
 @@ -25,7 +25,14 @@
  # You could also index all the URLs in a file like so:
  # start_url:	       `${common_dir}/start.url`
@@ -16,12 +16,12 @@
  
  #
  # This attribute limits the scope of the indexing process.  The default is to
-@@ -58,13 +65,14 @@
+@@ -57,13 +64,14 @@
  # exclude_url patterns are matched anywhere.
  #
  bad_extensions:		.wav .gz .z .sit .au .zip .tar .hqx .exe .com .gif \
-+		.png .ui \
- 		.jpg .jpeg .aiff .class .map .ram .tgz .bin .rpm .mpg .mov .avi
++	.png .ui \
+ 	.jpg .jpeg .aiff .class .map .ram .tgz .bin .rpm .mpg .mov .avi .css
  
  #
  # The string htdig will send in every request to identify the robot.  Change

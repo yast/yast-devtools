@@ -7,7 +7,7 @@
 # How to set up a freshdoc server:
 # Requires (in addition to yast2 development environment):
 #  apache (WWWSERVER?) htdig
-#  yast2-devtools scrdoc ydoc ycpdoc
+#  yast2-devtools
 # Set TEMPWEB, DOC_SANDBOX, CVSUSER, HTDIGCONF, SERVERNAME
 # Edit $HTDIGCONF (TODO: commit a sample (diff))
 # Allow symlinks in htdocs
@@ -37,12 +37,13 @@ export CVSROOT
 TEMPWEB=/local/home2/tempweb
 TARGET=freshdoc.new
 # $WEB/$TARGET will be rm -rf'd if --scratch is given
-WEB=/usr/local/httpd/htdocs
+# 8.1: /usr/local/httpd -> /srv/www
+WEB=/srv/www/htdocs
 # Where an up to date cvs tree will be kept.
 # Do not use your usual working directory!
 DOC_SANDBOX=/local/home2/yast2-$TARGET
 #BRANCH="-r freshdoc-branch"
-HTDIGCONF=/opt/www/htdig/conf/yast2.conf
+HTDIGCONF=/srv/www/htdig/conf/yast2.conf
 SERVERNAME=valkyrie.suse.cz
 
 # kdoc workaround
@@ -77,7 +78,7 @@ function update() {
     if [ $DOLOGIN ]; then
 	cvs login
     fi
-    for I in source; do # 'trans' is not interesting
+    for I in doc source; do # 'trans' is not interesting
 	if [ -d $I ]; then
 	    {
 		echo \*\* $I
@@ -215,7 +216,7 @@ function newmain() {
 
     if [ $DOINDEX ]; then
 	echo \* htdig
-	/opt/www/htdig/bin/rundig -v -c $HTDIGCONF
+	/usr/bin/rundig -v -c $HTDIGCONF
     fi
 }
 

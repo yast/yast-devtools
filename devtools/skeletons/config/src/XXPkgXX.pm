@@ -24,7 +24,7 @@ our %TYPEINFO;
 YaST::YCP::Import ("Progress");
 YaST::YCP::Import ("Report");
 YaST::YCP::Import ("Summary");
-
+YaST::YCP::Import ("Message");
 
 ##
  # Data was modified?
@@ -127,7 +127,7 @@ sub Read {
     # Error message
     if(0)
     {
-	Report::Error(__("Cannot read current settings."));
+	Report::Error(Message::CannotReadCurrentSettings());
     }
     sleep($sl);
 
@@ -196,7 +196,7 @@ sub Write {
     # Error message
     if(0)
     {
-	Report::Error (__("SuSEconfig script failed."));
+	Report::Error (Message::SuSEConfigFailed());
     }
     sleep($sl);
 

@@ -18,6 +18,7 @@ textdomain "XXpkgXX";
 import "Progress";
 import "Report";
 import "Summary";
+import "Message";
 
 /**
  * Prototypes
@@ -136,7 +137,7 @@ global boolean Read() {
     if(Abort()) return false;
     Progress::NextStage();
     /* Error message */
-    if(false) Report::Error(_("Cannot read current settings."));
+    if(false) Report::Error(Message::CannotReadCurrentSettings());
     sleep(sl);
 
     // detect devices
@@ -200,7 +201,7 @@ global boolean Write() {
     if(Abort()) return false;
     Progress::NextStage ();
     /* Error message */
-    if(false) Report::Error (_("SuSEconfig script failed."));
+    if(false) Report::Error (Message::SuSEConfigFailed());
     sleep(sl);
 
     if(Abort()) return false;

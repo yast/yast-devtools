@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Oct 26 09:40:40 CEST 2004 - locilka@suse.cz
+
+- Changed config-skeleton to use Message module
+
+-------------------------------------------------------------------
 Mon Oct 25 13:37:46 CEST 2004 - visnov@suse.cz
 
 - Removed Requires: yast2 

@@ -1,0 +1,99 @@
+#! /usr/bin/perl -w
+# $Id$
+#
+# Run doxygen with a default configuration file for YaST
+# but allow overriding some values
+
+
+=head1 NAME
+
+ydoxygen - Runs doxygen as configured for YaST.
+
+=head1 SYNOPSIS
+
+ ydoxygen -h|--help|--man
+ ydoxygen [-t <template>] [<param>=<value> ...]
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item B<-h>
+
+Show this help screen
+
+=item B<-t> I<file>, B<--template>=I<file>
+
+Use a template file different from <y2datadir>/devtools/Doxyfile
+Output files are placed to directory I<dir>
+
+=item I<param>=I<value>
+
+Replace a parameter in the template configuration file.
+
+=back
+
+=cut
+
+use strict;
+
+use Pod::Usage;
+use Getopt::Long;
+
+my $help = 0;
+my $man = 0;
+my $y2datadir = "/usr/share/YaST2/data";
+my $template = "$y2datadir/devtools/Doxyfile";
+my $debug = 0;
+
+# parse command line
+# - options
+Getopt::Long::Configure ("bundling");
+GetOptions (
+	    "help|h" => \$help,
+	    "man" => \$man,
+
+	    "template|t=s" => \$template,
+	    "debug|d" => \$debug,
+	   ) or pod2usage (2);
+pod2usage (1) if $help;
+pod2usage (-exitstatus => 0, -verbose => 2) if $man;
+
+# - arguments
+my %replacements = ();
+foreach (@ARGV)
+{
+    my ($param, $value) = split ('=', $_, 2);
+    $replacements{$param} = $value;
+    print "'$param'='$value'\n" if $debug;
+}
+
+# open input file
+open (IN, "<$template") or die "Cannot open $template: $!";
+
+# open output - pipe
+my $run_doxygen = "|doxygen -";
+if ($debug)
+{
+    $run_doxygen = "|tee ydoxygen ". $run_doxygen;
+}
+open (OUT, $run_doxygen) or die;
+
+# process input, passing it through, substituting what we want
+while (defined ($_ = <IN>))
+{
+    if (m/^([A-Z_]+)(\s*)=\s*(.*)\n/)
+    {
+	my ($param, $ws, $value) = ($1, $2, $3);
+	if (defined ($replacements{$param}))
+	{
+	    $value = $replacements{$param};
+	}
+
+	$_ = "$param$ws= $value\n";
+    }
+    print OUT $_;
+}
+
+close(OUT);
+close(IN);

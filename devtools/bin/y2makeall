@@ -44,7 +44,8 @@ my @core_binaries =
      );
 
 
-my $make_log = "make.log";
+my $work_root = $ENV{'PWD'};
+my $make_log = $work_root . "/make.log";
 
 
 #
@@ -66,7 +67,6 @@ my $install_cmd			= "/usr/bin/install";
 my $ycpc_cmd			= "/usr/bin/ycpc";
 
 my %done;
-my $work_root;
 my $modules_dir			= "/usr/share/YaST2/modules";
 my $ycp_include_dir		= "/usr/share/YaST2/include";
 my @ycp_files;
@@ -118,8 +118,6 @@ sub main()
 
     die "FATAL: Call \"$progname\" from your YaST2 CVS working directory! (yast2/source)\n"
 	unless -f "devtools/RPMNAME";
-
-    $work_root = $ENV{'PWD'};
 
 
     # All remaining parameters go to "make".

@@ -46,7 +46,8 @@ $OUTPUT = qx(SUBDIRS=`cat SUBDIRS 2> /dev/null` ;
 	     [ -z "\$SUBDIRS" ] && SUBDIRS="./" ;
 	     for DIR in \$SUBDIRS ;
 	       do find \$DIR -name 'Makefile.am' | grep -v "^./$RPMNAME-" | grep -v '^\\./Makefile.am\$' | sed 's/.am\$//' ;
-	     done);
+	     done;
+	     [ -d "po" ] && echo "po/Makefile");
 
 %macros =
 (

@@ -3,6 +3,7 @@ Wed Jul  3 10:55:44 CEST 2002 - ke@suse.de
 
 - For trans modules use @localedir@ instead of @YAST2DIR@/locale.
 - Simplify .mo file installation target.
+- y2autoconf: add po/Makefile to output for "trans" packages.
 
 -------------------------------------------------------------------
 Fri Jun 21 22:30:16 CEST 2002 - kkaempf@suse.de

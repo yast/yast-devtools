@@ -15,6 +15,7 @@
 #####
 # Author: Michael Hager <mike@suse.de>
 #         Jan Holesovsky <kendy@suse.cz>
+#         Michal Svec <msvec@suse.cz>
 
 use strict;
 use English;
@@ -100,13 +101,17 @@ sub main()
 
     # XXpkgXX
     $raw_name = $new_name;
+    $raw_name =~ s/(.*)/\L$1/;
     $raw_name =~ s/-([A-Z]+)/-\L$1/;
     $raw_name =~ s/-([A-Z]+)/-\L$1/;
+    # print "RN: $raw_name\n";
 
     # XXPkgXX
     $Raw_name = $new_name;
+    $Raw_name =~ s/(.*)/\L$1/;
     $Raw_name =~ s/^(.)/\u$1/;
     $Raw_name =~ s/-(.)/\u$1/g;
+    # print "RR: $Raw_name\n";
 
     $target_dir = $base_dir . "/" . $new_name;
     deb( "target_dir: ", $target_dir );  

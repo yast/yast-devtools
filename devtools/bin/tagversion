@@ -1,8 +1,13 @@
 #!/bin/bash
-# tagversion, tag version in cvs
-# options:
-# -n: don't tag, just echo tag name
-#
+# $Id$
+if [ "$1" == "-h" -o "$1" == "--help" ]; then
+    echo "tagversion, tag version in cvs"
+    echo "options:"
+    echo "  -n: don't tag, just echo tag name"
+    echo "  -h, --help: this help"
+    exit
+fi
+
 p=`cat RPMNAME`
 b=`cvs status VERSION | grep 'SuSE-.*-Branch' | sed 's/^.*SuSE-\(.*\)-Branch.*$/\1/'`
 v=`cat VERSION | tr "." "_"`

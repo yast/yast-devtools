@@ -1,0 +1,19 @@
+1. Make list of all .ycp files which contain 'module'
+
+find . -name \*.ycp| grep -v testsuite | xargs grep -l module > allycps
+
+2. Make dependency list
+
+for i in `cat allycps'; do gawk -f gendep.awk; done > deplist
+
+3. Make 'dot' file
+
+gawk -f dep2dot.awk < deplist > deplist.dot
+
+4. Generate transitive reduction
+
+tred < deplist.dot > deplist1.dot
+
+5. Make postscript
+
+dot -Tps -o out.ps deplist1.dot 

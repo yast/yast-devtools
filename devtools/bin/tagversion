@@ -3,9 +3,13 @@
 # options:
 # -n: don't tag, just echo tag name
 #
+p=`cat RPMNAME`
 b=`cvs status VERSION | grep 'SuSE-.*-Branch' | sed 's/^.*SuSE-\(.*\)-Branch.*$/\1/'`
 v=`cat VERSION | tr "." "_"`
-p=`cat RPMNAME`
+if [ -z "$p" -o -z "$v" ]; then
+    echo "Cannot find RPMNAME or VERSION in `pwd`"
+    exit 1
+fi
 if [ "$b" ]; then
   t=branch-$b-$v
 else

@@ -380,9 +380,8 @@ sub parse_file ($)
 		$declared_type = $2 || "";
 		$name = $3;
 		$params = $4;
-		if ($params =~ /(``)?\{/)
+		if ($params =~ s/(;|(``)?\{).*//)
 		{
-		    $params =~ s/(``)?\{.*//;
 		    $state = "start";
 		    $shipout = 1;
 		}
@@ -415,9 +414,8 @@ sub parse_file ($)
 	}
 	elsif ($state eq "longdefine")
 	{
-	    if (/(``)?\{/)
+	    if (s/(;|(``)?\{).*//)
 	    {
-		s/(``)?\{.*//;
 		$state = "start";
 		$shipout = 1;
 	    }

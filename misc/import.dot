@@ -1,313 +1,296 @@
 digraph imports {
- Tv -> Progress // /local/home2/yast2-freshdoc.new/source/tv/src/Tv.ycp
- Tv -> Report // /local/home2/yast2-freshdoc.new/source/tv/src/Tv.ycp
- Tv -> Summary // /local/home2/yast2-freshdoc.new/source/tv/src/Tv.ycp
- Tv -> UniqueKeys // /local/home2/yast2-freshdoc.new/source/tv/src/Tv.ycp
- Tv -> Mode // /local/home2/yast2-freshdoc.new/source/tv/src/Tv.ycp
- Display -> Mode // /local/home2/yast2-freshdoc.new/source/x11/src/modules/Display.ycp
- Display -> Installation // /local/home2/yast2-freshdoc.new/source/x11/src/modules/Display.ycp
- NameOfModule -> NameOfModule // /local/home2/yast2-freshdoc.new/source/core/libycp/testsuite/tests/module.ycp
- Im -> Im // /local/home2/yast2-freshdoc.new/source/core/libycp/testsuite/tests/TermPointer.ycp
- Mail -> MailAliases // /local/home2/yast2-freshdoc.new/source/mail/src/Mail.ycp
- Mail -> Report // /local/home2/yast2-freshdoc.new/source/mail/src/Mail.ycp
- Mail -> Runlevel // /local/home2/yast2-freshdoc.new/source/mail/src/Mail.ycp
- Mail -> Summary // /local/home2/yast2-freshdoc.new/source/mail/src/Mail.ycp
- Idedma -> Report // /local/home2/yast2-freshdoc.new/source/tune/idedma/src/Idedma.ycp
- Idedma -> Runlevel // /local/home2/yast2-freshdoc.new/source/tune/idedma/src/Idedma.ycp
- Console -> Mode // /local/home2/yast2-freshdoc.new/source/country/console/src/Console.ycp
- Language -> Misc // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/Language.ycp
- Language -> Mode // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/Language.ycp
- Language -> Installation // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/Language.ycp
- Language -> X11Version // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/Language.ycp
- Language -> XF86Path // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/Language.ycp
- XF86Path -> Installation // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/XF86Path.ycp
- XF86Path -> Mode // /local/home2/yast2-freshdoc.new/source/country/language/src/modules/XF86Path.ycp
- Timezone -> Arch // /local/home2/yast2-freshdoc.new/source/country/timezone/src/Timezone.ycp
- Timezone -> Misc // /local/home2/yast2-freshdoc.new/source/country/timezone/src/Timezone.ycp
- Timezone -> Mode // /local/home2/yast2-freshdoc.new/source/country/timezone/src/Timezone.ycp
- Timezone -> Language // /local/home2/yast2-freshdoc.new/source/country/timezone/src/Timezone.ycp
- Timezone -> Storage // /local/home2/yast2-freshdoc.new/source/country/timezone/src/Timezone.ycp
- XF86Keyboard -> Keyboard // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/XF86Keyboard.ycp
- Keyboard -> Arch // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Keyboard -> Mode // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Keyboard -> Language // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Keyboard -> Misc // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Keyboard -> X11Version // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Keyboard -> XF86Keyboard // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Keyboard -> X11Version // /local/home2/yast2-freshdoc.new/source/country/keyboard/src/modules/Keyboard.ycp
- Restore -> Progress // /local/home2/yast2-freshdoc.new/source/restore/src/Restore.ycp
- Restore -> Report // /local/home2/yast2-freshdoc.new/source/restore/src/Restore.ycp
- Restore -> Mode // /local/home2/yast2-freshdoc.new/source/restore/src/Restore.ycp
- Restore -> Summary // /local/home2/yast2-freshdoc.new/source/restore/src/Restore.ycp
- Restore -> Lilo // /local/home2/yast2-freshdoc.new/source/restore/src/Restore.ycp
- Inetd -> Progress // /local/home2/yast2-freshdoc.new/source/inetd/src/Inetd.ycp
- Inetd -> Runlevel // /local/home2/yast2-freshdoc.new/source/inetd/src/Inetd.ycp
- Inetd -> Report // /local/home2/yast2-freshdoc.new/source/inetd/src/Inetd.ycp
- XF86Mouse -> Mouse // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/XF86Mouse.ycp
- XF86Mouse -> Mode // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/XF86Mouse.ycp
- Mouse -> Arch // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/Mouse.ycp
- Mouse -> Language // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/Mouse.ycp
- Mouse -> Misc // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/Mouse.ycp
- Mouse -> Mode // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/Mouse.ycp
- Mouse -> ModuleLoading // /local/home2/yast2-freshdoc.new/source/mouse/src/modules/Mouse.ycp
- Sound -> Runlevel // /local/home2/yast2-freshdoc.new/source/sound/sound/src/Sound.ycp
- Sound -> Summary // /local/home2/yast2-freshdoc.new/source/sound/sound/src/Sound.ycp
- Sound -> Mode // /local/home2/yast2-freshdoc.new/source/sound/sound/src/Sound.ycp
- Sound -> Arch // /local/home2/yast2-freshdoc.new/source/sound/sound/src/Sound.ycp
- Joystick -> Progress // /local/home2/yast2-freshdoc.new/source/sound/sound/src/Joystick.ycp
- Joystick -> Mode // /local/home2/yast2-freshdoc.new/source/sound/sound/src/Joystick.ycp
- UserSettings -> Mode // /local/home2/yast2-freshdoc.new/source/users/src/UserSettings.ycp
- UserSettings -> UserDefs // /local/home2/yast2-freshdoc.new/source/users/src/UserSettings.ycp
- UserSettings -> UserAddDefs // /local/home2/yast2-freshdoc.new/source/users/src/UserSettings.ycp
- UserAddDefs -> Mode // /local/home2/yast2-freshdoc.new/source/users/src/UserAddDefs.ycp
- UserAddDefs -> Report // /local/home2/yast2-freshdoc.new/source/users/src/UserAddDefs.ycp
- UserAddDefs -> UserSettings // /local/home2/yast2-freshdoc.new/source/users/src/UserAddDefs.ycp
- Accounts -> Mode // /local/home2/yast2-freshdoc.new/source/users/src/Accounts.ycp
- Users -> Console // /local/home2/yast2-freshdoc.new/source/users/src/Users.ycp
- Users -> Mode // /local/home2/yast2-freshdoc.new/source/users/src/Users.ycp
- Users -> UserDefs // /local/home2/yast2-freshdoc.new/source/users/src/Users.ycp
- Users -> UserAddDefs // /local/home2/yast2-freshdoc.new/source/users/src/Users.ycp
- Users -> UserSettings // /local/home2/yast2-freshdoc.new/source/users/src/Users.ycp
- Users -> UserWriteStack // /local/home2/yast2-freshdoc.new/source/users/src/Users.ycp
- UserWriteStack -> Wizard // /local/home2/yast2-freshdoc.new/source/users/src/UserWriteStack.ycp
- UserWriteStack -> Report // /local/home2/yast2-freshdoc.new/source/users/src/UserWriteStack.ycp
- UserWriteStack -> Mode // /local/home2/yast2-freshdoc.new/source/users/src/UserWriteStack.ycp
- UserWriteStack -> UserDefs // /local/home2/yast2-freshdoc.new/source/users/src/UserWriteStack.ycp
- UserWriteStack -> UserSettings // /local/home2/yast2-freshdoc.new/source/users/src/UserWriteStack.ycp
- UserWriteStack -> MailAliases // /local/home2/yast2-freshdoc.new/source/users/src/UserWriteStack.ycp
- UserDefs -> Console // /local/home2/yast2-freshdoc.new/source/users/src/UserDefs.ycp
- UserDefs -> UserAddDefs // /local/home2/yast2-freshdoc.new/source/users/src/UserDefs.ycp
- UserDefs -> Installation // /local/home2/yast2-freshdoc.new/source/users/src/UserDefs.ycp
- MailAliases -> Report // /local/home2/yast2-freshdoc.new/source/yast2/mail/src/MailAliases.ycp
- MailAliases -> Summary // /local/home2/yast2-freshdoc.new/source/yast2/mail/src/MailAliases.ycp
- Debug -> Mode // /local/home2/yast2-freshdoc.new/source/yast2/modules/Debug.ycp
- Debug -> Installation // /local/home2/yast2-freshdoc.new/source/yast2/modules/Debug.ycp
- Summary -> Mode // /local/home2/yast2-freshdoc.new/source/yast2/wizard/src/Summary.ycp
- Wizard -> Directory // /local/home2/yast2-freshdoc.new/source/yast2/wizard/src/Wizard.ycp
- Progress -> Wizard // /local/home2/yast2-freshdoc.new/source/yast2/wizard/src/Progress.ycp
- SpaceCalculation -> Arch // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SpaceCalculation.ycp
- SpaceCalculation -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SpaceCalculation.ycp
- SpaceCalculation -> InstMedia // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SpaceCalculation.ycp
- SpaceCalculation -> Storage // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SpaceCalculation.ycp
- SpaceCalculation -> Mode // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SpaceCalculation.ycp
- SpaceCalculation -> Report // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SpaceCalculation.ycp
- PackageSelectionIO -> Mode // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageSelectionIO.ycp
- PackageSelectionIO -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageSelectionIO.ycp
- PackageSelectionIO -> Report // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageSelectionIO.ycp
- InstMedia -> Arch // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/InstMedia.ycp
- InstMedia -> Mode // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/InstMedia.ycp
- InstMedia -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/InstMedia.ycp
- Packages -> Mode // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> Product // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> Language // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> Kernel // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> SpaceCalculation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> Report // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> Display // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- Packages -> AutoInstall // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/Packages.ycp
- SlideShow -> Arch // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SlideShow.ycp
- SlideShow -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SlideShow.ycp
- SlideShow -> Language // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SlideShow.ycp
- SlideShow -> InstMedia // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/SlideShow.ycp
- MediaUI -> Arch // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/MediaUI.ycp
- MediaUI -> Misc // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/MediaUI.ycp
- MediaUI -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/MediaUI.ycp
- PackageInstallation -> Arch // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> AutoInstall // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> Report // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> Mode // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> Installation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> Version // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> SpaceCalculation // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> InstMedia // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> MediaUI // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> Packages // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> SlideShow // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- PackageInstallation -> Wizard // /local/home2/yast2-freshdoc.new/source/packager/packages/modules/PackageInstallation.ycp
- RunlevelEd -> Runlevel // /local/home2/yast2-freshdoc.new/source/runlevel/src/RunlevelEd.ycp
- RunlevelEd -> Progress // /local/home2/yast2-freshdoc.new/source/runlevel/src/RunlevelEd.ycp
- RunlevelEd -> Summary // /local/home2/yast2-freshdoc.new/source/runlevel/src/RunlevelEd.ycp
- RunlevelEd -> Report // /local/home2/yast2-freshdoc.new/source/runlevel/src/RunlevelEd.ycp
- Backup -> AIClone // /local/home2/yast2-freshdoc.new/source/backup/src/Backup.ycp
- Backup -> Lan // /local/home2/yast2-freshdoc.new/source/backup/src/Backup.ycp
- Backup -> Progress // /local/home2/yast2-freshdoc.new/source/backup/src/Backup.ycp
- Ldap -> Runlevel // /local/home2/yast2-freshdoc.new/source/ldap-client/src/Ldap.ycp
- Ldap -> Report // /local/home2/yast2-freshdoc.new/source/ldap-client/src/Ldap.ycp
- Ldap -> Summary // /local/home2/yast2-freshdoc.new/source/ldap-client/src/Ldap.ycp
- Installation -> Mode // /local/home2/yast2-freshdoc.new/source/installation/modules/Installation.ycp
- ModuleLoading -> Mode // /local/home2/yast2-freshdoc.new/source/installation/modules/ModuleLoading.ycp
- ModuleLoading -> Boot // /local/home2/yast2-freshdoc.new/source/installation/modules/ModuleLoading.ycp
- ModuleLoading -> Wizard // /local/home2/yast2-freshdoc.new/source/installation/modules/ModuleLoading.ycp
- Product -> Mode // /local/home2/yast2-freshdoc.new/source/installation/modules/Product.ycp
- Kernel -> Arch // /local/home2/yast2-freshdoc.new/source/installation/kernel/Kernel.ycp
- Kernel -> Boot // /local/home2/yast2-freshdoc.new/source/installation/kernel/Kernel.ycp
- ModulesConf -> Arch // /local/home2/yast2-freshdoc.new/source/installation/system/ModulesConf.ycp
- ModulesConf -> Misc // /local/home2/yast2-freshdoc.new/source/installation/system/ModulesConf.ycp
- ModulesConf -> Kernel // /local/home2/yast2-freshdoc.new/source/installation/system/ModulesConf.ycp
- Hotplug -> Arch // /local/home2/yast2-freshdoc.new/source/installation/hotplug/Hotplug.ycp
- Hotplug -> ModuleLoading // /local/home2/yast2-freshdoc.new/source/installation/hotplug/Hotplug.ycp
- Hotplug -> HwStatus // /local/home2/yast2-freshdoc.new/source/installation/hotplug/Hotplug.ycp
- StorageControllers -> Arch // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageControllers -> Mode // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageControllers -> Boot // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageControllers -> StorageDevices // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageControllers -> ModulesConf // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageControllers -> HwStatus // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageControllers -> Wizard // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageControllers.ycp
- StorageDevices -> Mode // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageDevices.ycp
- StorageDevices -> HwStatus // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageDevices.ycp
- StorageDevices -> Storage // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageDevices.ycp
- StorageDevices -> Partitions // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageDevices.ycp
- StorageDevices -> ModuleLoading // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageDevices.ycp
- StorageDevices -> Installation // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/StorageDevices.ycp
- Partitions -> Arch // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Partitions.ycp
- Partitions -> Mode // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Partitions.ycp
- Partitions -> AsciiFile // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Partitions.ycp
- Partitions -> Boot // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Partitions.ycp
- FileSystems -> Arch // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/FileSystems.ycp
- FileSystems -> Partitions // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/FileSystems.ycp
- Storage -> Mode // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> Arch // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> Misc // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> Partitions // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> StorageDevices // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> FileSystems // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> AsciiFile // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> Console // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> Update // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Storage -> Update // /local/home2/yast2-freshdoc.new/source/storage/storage/src/modules/Storage.ycp
- Nis -> Runlevel // /local/home2/yast2-freshdoc.new/source/nis-client/src/Nis.ycp
- Nis -> Report // /local/home2/yast2-freshdoc.new/source/nis-client/src/Nis.ycp
- Nis -> Summary // /local/home2/yast2-freshdoc.new/source/nis-client/src/Nis.ycp
- AutoInstall -> Installation // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> Mode // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> Report // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> XML // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> X11Version // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> BootLILO // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> BootGRUB // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AutoInstall -> Partitions // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AutoInstall.ycp
- AIClone -> Mode // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> XML // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Storage // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Packages // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Boot // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Language // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Keyboard // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Mouse // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> Timezone // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClone -> AIConfig // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClone.ycp
- AIClass -> XML // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClass.ycp
- AIClass -> Summary // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIClass.ycp
- AIPackages -> Packages // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIPackages.ycp
- AIPackages -> AIServer // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIPackages.ycp
- AIPackages -> Summary // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIPackages.ycp
- AIConfig -> Mode // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIConfig.ycp
- AIConfig -> Misc // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIConfig.ycp
- AIConfig -> AIServer // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIConfig.ycp
- AIConfig -> AutoInstall // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIConfig.ycp
- AIBootloader -> Summary // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIBootloader.ycp
- AIStorage -> Partitions // /local/home2/yast2-freshdoc.new/source/autoinstallation/src/modules/AIStorage.ycp
- Modem -> Firewall // /local/home2/yast2-freshdoc.new/source/network/src/modules/Modem.ycp
- Modem -> Providers // /local/home2/yast2-freshdoc.new/source/network/src/modules/Modem.ycp
- Modem -> Progress // /local/home2/yast2-freshdoc.new/source/network/src/modules/Modem.ycp
- Modem -> Summary // /local/home2/yast2-freshdoc.new/source/network/src/modules/Modem.ycp
- ISDN -> Firewall // /local/home2/yast2-freshdoc.new/source/network/src/modules/ISDN.ycp
- ISDN -> Providers // /local/home2/yast2-freshdoc.new/source/network/src/modules/ISDN.ycp
- ISDN -> Progress // /local/home2/yast2-freshdoc.new/source/network/src/modules/ISDN.ycp
- ISDN -> Summary // /local/home2/yast2-freshdoc.new/source/network/src/modules/ISDN.ycp
- DSL -> Progress // /local/home2/yast2-freshdoc.new/source/network/src/modules/DSL.ycp
- DSL -> Firewall // /local/home2/yast2-freshdoc.new/source/network/src/modules/DSL.ycp
- Providers -> DSL // /local/home2/yast2-freshdoc.new/source/network/src/modules/Providers.ycp
- Providers -> Modem // /local/home2/yast2-freshdoc.new/source/network/src/modules/Providers.ycp
- Providers -> ISDN // /local/home2/yast2-freshdoc.new/source/network/src/modules/Providers.ycp
- Providers -> Language // /local/home2/yast2-freshdoc.new/source/network/src/modules/Providers.ycp
- Lan -> Arch // /local/home2/yast2-freshdoc.new/source/network/src/modules/Lan.ycp
- Lan -> DNS // /local/home2/yast2-freshdoc.new/source/network/src/modules/Lan.ycp
- Lan -> Routing // /local/home2/yast2-freshdoc.new/source/network/src/modules/Lan.ycp
- Lan -> Firewall // /local/home2/yast2-freshdoc.new/source/network/src/modules/Lan.ycp
- Lan -> Progress // /local/home2/yast2-freshdoc.new/source/network/src/modules/Lan.ycp
- Lan -> Summary // /local/home2/yast2-freshdoc.new/source/network/src/modules/Lan.ycp
- Firewall -> Runlevel // /local/home2/yast2-freshdoc.new/source/network/src/modules/Firewall.ycp
- Network -> Progress // /local/home2/yast2-freshdoc.new/source/network/src/modules/Network.ycp
- Security -> Progress // /local/home2/yast2-freshdoc.new/source/security/src/Security.ycp
- Nisplus -> Runlevel // /local/home2/yast2-freshdoc.new/source/nisplus-client/src/Nisplus.ycp
- Nisplus -> Report // /local/home2/yast2-freshdoc.new/source/nisplus-client/src/Nisplus.ycp
- Nisplus -> Summary // /local/home2/yast2-freshdoc.new/source/nisplus-client/src/Nisplus.ycp
- Openteam -> Progress // /local/home2/yast2-freshdoc.new/source/openteam/src/Openteam.ycp
- Openteam -> Report // /local/home2/yast2-freshdoc.new/source/openteam/src/Openteam.ycp
- Openteam -> Summary // /local/home2/yast2-freshdoc.new/source/openteam/src/Openteam.ycp
- Openteam -> Runlevel // /local/home2/yast2-freshdoc.new/source/openteam/src/Openteam.ycp
- XXPkgXX -> Progress // /local/home2/yast2-freshdoc.new/source/devtools/devtools/skeletons/config/src/XXPkgXX.ycp
- XXPkgXX -> Report // /local/home2/yast2-freshdoc.new/source/devtools/devtools/skeletons/config/src/XXPkgXX.ycp
- XXPkgXX -> Summary // /local/home2/yast2-freshdoc.new/source/devtools/devtools/skeletons/config/src/XXPkgXX.ycp
- Nfs -> Report // /local/home2/yast2-freshdoc.new/source/nfs-client/src/Nfs.ycp
- Nfs -> Runlevel // /local/home2/yast2-freshdoc.new/source/nfs-client/src/Nfs.ycp
- Nfs -> Summary // /local/home2/yast2-freshdoc.new/source/nfs-client/src/Nfs.ycp
- OnlineUpdate -> Arch // /local/home2/yast2-freshdoc.new/source/online-update/src/OnlineUpdate.ycp
- OnlineUpdate -> Installation // /local/home2/yast2-freshdoc.new/source/online-update/src/OnlineUpdate.ycp
- OnlineUpdate -> Mode // /local/home2/yast2-freshdoc.new/source/online-update/src/OnlineUpdate.ycp
- BootPPC -> Arch // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/ppc/BootPPC.ycp
- BootPPC -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/ppc/BootPPC.ycp
- BootPPC -> Kernel // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/ppc/BootPPC.ycp
- BootGRUB -> Arch // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Kernel // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Mode // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Misc // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> StorageDevices // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Storage // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootGRUB -> Report // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/grub/BootGRUB.ycp
- BootLILO -> Arch // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Kernel // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Mode // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Misc // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> StorageDevices // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Storage // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootLILO -> Report // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/lilo/BootLILO.ycp
- BootMILO -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/milo/BootMILO.ycp
- BootMILO -> Installation // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/milo/BootMILO.ycp
- BootS390 -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/s390/BootS390.ycp
- BootS390 -> Installation // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/s390/BootS390.ycp
- BootS390 -> StorageControllers // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/s390/BootS390.ycp
- BootSILO -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/silo/BootSILO.ycp
- BootSILO -> Kernel // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/silo/BootSILO.ycp
- BootABOOT -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/aboot/BootABOOT.ycp
- BootELILO -> Arch // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/elilo/BootELILO.ycp
- BootELILO -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/elilo/BootELILO.ycp
- BootELILO -> Kernel // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/elilo/BootELILO.ycp
- BootELILO -> Mode // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/elilo/BootELILO.ycp
- BootELILO -> Boot // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/elilo/BootELILO.ycp
- Boot -> Arch // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> Misc // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> Mode // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> StorageDevices // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> Storage // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootLILO // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootLILO // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootGRUB // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> Lilo // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootGRUB // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootLILO // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootSILO // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootMILO // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootABOOT // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootELILO // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootPPC // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- Boot -> BootS390 // /local/home2/yast2-freshdoc.new/source/bootloader/installation/src/Boot.ycp
- ProfileManager -> Progress // /local/home2/yast2-freshdoc.new/source/profile-manager/src/ProfileManager.ycp
- ProfileManager -> Report // /local/home2/yast2-freshdoc.new/source/profile-manager/src/ProfileManager.ycp
- NfsServer -> Runlevel // /local/home2/yast2-freshdoc.new/source/nfs-server/src/NfsServer.ycp
- NfsServer -> Report // /local/home2/yast2-freshdoc.new/source/nfs-server/src/NfsServer.ycp
- NfsServer -> Summary // /local/home2/yast2-freshdoc.new/source/nfs-server/src/NfsServer.ycp
- Printer -> Printerlib // /local/home2/yast2-freshdoc.new/source/printer/src/common/Printer.ycp
- Printer -> Progress // /local/home2/yast2-freshdoc.new/source/printer/src/common/Printer.ycp
- Printer -> Runlevel // /local/home2/yast2-freshdoc.new/source/printer/src/common/Printer.ycp
- Printer -> Report // /local/home2/yast2-freshdoc.new/source/printer/src/common/Printer.ycp
- Printer -> Summary // /local/home2/yast2-freshdoc.new/source/printer/src/common/Printer.ycp
- Printer -> Mode // /local/home2/yast2-freshdoc.new/source/printer/src/common/Printer.ycp
+	NameOfModule;
+	Im;
+	Tv -> ModulesComments;
+	Tv -> Require;
+	Tv -> Sound;
+	Pam -> PamSettings;
+	XProposal -> Mouse;
+	XProposal -> XMessages;
+	Display -> Installation;
+	NtpClient -> Runlevel;
+	NtpClient -> Require;
+	DnsServer -> Runlevel;
+	DnsServer -> Require;
+	Mail -> MailAliases;
+	Mail -> Runlevel;
+	Mail -> Require;
+	Idedma -> Report;
+	Idedma -> Runlevel;
+	InitHWinfo -> String;
+	InitHWinfo -> Confirm;
+	InitHWinfo -> Progress;
+	Console -> Language;
+	Language -> X11Version;
+	Language -> XF86Path;
+	XF86Path -> Installation;
+	Timezone -> Storage;
+	XF86Keyboard -> Keyboard;
+	Keyboard -> Language;
+	Keyboard -> XF86Keyboard;
+	Restore -> Runlevel;
+	Restore -> Require;
+	Inetd -> Runlevel;
+	Inetd -> Progress;
+	Inetd -> Report;
+	XF86Mouse -> Mouse;
+	Mouse -> Language;
+	Mouse -> ModuleLoading;
+	Mouse -> XF86Mouse;
+	Sound -> Arch;
+	Sound -> Runlevel;
+	Sound -> Summary;
+	Sound -> Crash;
+	Sound -> Progress;
+	Sound -> Confirm;
+	Joystick -> Mode;
+	Joystick -> Runlevel;
+	UsersCache -> Mode;
+	Users -> UsersCache;
+	Users -> MailAliases;
+	Users -> Security;
+	Users -> Ldap;
+	CWM -> Report;
+	CWM -> Wizard;
+	TablePopup -> CWM;
+	LogView -> Report;
+	X11Version -> Require;
+	TypeRepository -> Address;
+	TypeRepository -> Netmask;
+	TypeRepository -> URL;
+	Address -> Hostname;
+	URL -> Hostname;
+	Hostname -> IP;
+	CommandLine -> Report;
+	CommandLine -> String;
+	CommandLine -> TypeRepository;
+	Crash -> Popup;
+	Autologin -> Require;
+	Report -> Popup;
+	Report -> Summary;
+	Summary -> Mode;
+	Confirm -> Popup;
+	Wizard -> Popup;
+	Wizard -> Directory;
+	Progress -> Wizard;
+	Popup -> Label;
+	Popup -> Mode;
+	NetworkPopup -> Label;
+	Require -> PackageCallbacks;
+	SlideShowCallbacks -> PackageCallbacks;
+	SpaceCalculation -> Product;
+	SpaceCalculation -> Storage;
+	PackageSelectionIO -> StorageDevices;
+	PackagesUI -> Label;
+	Packages -> SpaceCalculation;
+	Packages -> Display;
+	Packages -> AutoinstSoftware;
+	Packages -> InstURL;
+	SlideShow -> Packages;
+	SlideShow -> SlideShowCallbacks;
+	PackageCallbacks -> SlideShow;
+	PackageInstallation -> AutoInstall;
+	PackageInstallation -> Version;
+	Sysconfig -> Progress;
+	Sysconfig -> Report;
+	Sysconfig -> Product;
+	Samba -> PamSettings;
+	Samba -> Runlevel;
+	Samba -> Autologin;
+	Kerberos -> Require;
+	Kerberos -> PamSettings;
+	Kerberos -> Runlevel;
+	SlideTester -> Label;
+	SlideTester -> String;
+	RunlevelEd -> Runlevel;
+	RunlevelEd -> Progress;
+	RunlevelEd -> Report;
+	Backup -> Nfs;
+	LdapPopup -> Ldap;
+	Ldap -> Runlevel;
+	Ldap -> Autologin;
+	Ldap -> PamSettings;
+	Installation -> Mode;
+	ModuleLoading -> Initrd;
+	ModuleLoading -> Wizard;
+	Product -> Mode;
+	Hooks -> Popup;
+	Kernel -> Initrd;
+	ModulesConf -> Kernel;
+	Hotplug -> ModuleLoading;
+	Hotplug -> HwStatus;
+	StorageControllers -> ModulesConf;
+	StorageControllers -> Storage;
+	StorageControllers -> Hotplug;
+	StorageDevices -> HwStatus;
+	StorageDevices -> Storage;
+	StorageDevices -> Kernel;
+	Partitions -> AsciiFile;
+	Partitions -> Bootloader;
+	FileSystems -> String;
+	FileSystems -> Partitions;
+	Storage -> StorageDevices;
+	Storage -> FileSystems;
+	Storage -> Console;
+	Storage -> RootPart;
+	SuSEFirewall -> Progress;
+	SuSEFirewall -> Report;
+	SuSEFirewall -> Runlevel;
+	Nis -> Runlevel;
+	Nis -> Autologin;
+	SambaServer -> Samba;
+	SambaServer -> Printer;
+	SambaServer -> Ldap;
+	SambaServerWidgets -> LogView;
+	SambaServerWidgets -> CWM;
+	SambaServerWidgets -> SambaServer;
+	Debug -> Installation;
+	AutoInstall -> BootGRUB;
+	AutoInstall -> AutoinstScripts;
+	AutoInstall -> AutoinstGeneral;
+	AutoinstClone -> Call;
+	AutoinstClone -> Mouse;
+	AutoinstClass -> AutoinstConfig;
+	AutoinstCompat -> AutoinstStorage;
+	AutoinstStorage -> AutoinstLVM;
+	AutoinstStorage -> AutoinstRAID;
+	AutoinstX11 -> Summary;
+	Profile -> XML;
+	Profile -> Y2ModuleConfig;
+	Profile -> AutoinstCompat;
+	Y2ModuleConfig -> Mode;
+	AutoinstSoftware -> AutoInstall;
+	AutoinstConfig -> AutoInstall;
+	ProfileLocation -> AutoInstallRules;
+	ProfileLocation -> URL;
+	ProfileLocation -> HTTP;
+	ProfileLocation -> FTP;
+	ProfileLocation -> TFTP;
+	AutoInstallRules -> Storage;
+	AutoInstallRules -> IP;
+	AutoinstScripts -> Mode;
+	AutoinstScripts -> Label;
+	AutoinstGeneral -> Keyboard;
+	AutoinstGeneral -> Mouse;
+	AutoinstGeneral -> Timezone;
+	AutoinstGeneral -> Profile;
+	AutoinstRAID -> Storage;
+	ISO -> AutoinstConfig;
+	ISO -> URL;
+	AutoinstFile -> AutoInstall;
+	AutoinstLVM -> Storage;
+	Internet -> Provider;
+	DNS -> Detection;
+	DNS -> NetworkConfig;
+	Modem -> Firewall;
+	Modem -> Provider;
+	Modem -> Routing;
+	ISDN -> Firewall;
+	ISDN -> Provider;
+	DSL -> Lan;
+	DSL -> Provider;
+	Host -> Summary;
+	Remote -> Label;
+	Remote -> Runlevel;
+	Lan -> Arch;
+	Lan -> DNS;
+	Lan -> Routing;
+	Lan -> Firewall;
+	Lan -> Progress;
+	Lan -> Summary;
+	Detection -> Directory;
+	Provider -> Language;
+	Proxy -> Summary;
+	Firewall -> Runlevel;
+	Network -> Progress;
+	Routing -> Detection;
+	Security -> Pam;
+	Security -> Progress;
+	Nisplus -> Runlevel;
+	Nisplus -> Autologin;
+	Answering_machine -> Users;
+	Fax -> Users;
+	HttpServer -> SuSEFirewall;
+	HttpServer -> Lan;
+	HttpServer -> Require;
+	HttpServerWidgets -> IP;
+	HttpServerWidgets -> LogView;
+	HttpServerWidgets -> CWM;
+	HttpServerWidgets -> HttpServer;
+	OSRDirect -> OSRFstab;
+	OSRFloppy -> StorageDevices;
+	OSRFloppy -> OSRModuleLoading;
+	OSRFsck -> OSRExecute;
+	OSRPkg -> OSRPkgUI;
+	OSRBoot -> OSRPkg;
+	OSRPtbl -> OSRExecute;
+	OSRPtbl -> OSRFloppy;
+	OSRPtbl -> OSRPopup;
+	OSRRepairUI -> StorageControllers;
+	OSRRepairUI -> OSRSummary;
+	OSRRepairUI -> OSRPtbl;
+	OSRExecute -> OSRDirect;
+	OSRExecute -> OSR;
+	OSRSummary -> OSR;
+	OSRSummary -> OSRProgress;
+	OSRPkgVerify -> OSRPkg;
+	OSRPkgVerify -> OSRExecute;
+	OSRSwap -> OSRExecute;
+	OSR -> OSRSystem;
+	OSR -> OSRRepairUI;
+	OSRPkgUI -> OSRPkgVerify;
+	OSRMode -> OSRLogFile;
+	OSRMode -> Report;
+	OSRPopup -> OSRMode;
+	OSRPopup -> OSRRepairUI;
+	OSRSystem -> FileSystems;
+	OSRSystem -> OSRStatus;
+	OSRFstab -> OSRFsck;
+	OSRModuleLoading -> ModuleLoading;
+	NisServer -> Nis;
+	Openteam -> Runlevel;
+	Openteam -> PackageCallbacks;
+	RootPart -> Storage;
+	Wlanipsecclient -> Report;
+	Wlanipsecclient -> Lan;
+	XXPkgXX -> Progress;
+	XXPkgXX -> Report;
+	Nfs -> Report;
+	Nfs -> Runlevel;
+	Nfs -> Progress;
+	TftpServer -> Runlevel;
+	TftpServer -> Report;
+	OnlineUpdate -> Arch;
+	OnlineUpdate -> Installation;
+	BootMILO -> StorageControllers;
+	BootS390 -> StorageControllers;
+	Initrd -> Arch;
+	Initrd -> Misc;
+	Initrd -> Report;
+	BootLILO -> Storage;
+	BootABOOT -> StorageControllers;
+	BootSkeleton -> BootCommon;
+	Bootloader -> BootCommon;
+	Bootloader -> Progress;
+	BootPPC -> Storage;
+	BootSILO -> Storage;
+	BootCommon -> Storage;
+	BootCommon -> HTML;
+	BootELILO -> Storage;
+	BootGRUB -> Storage;
+	DhcpServer -> Require;
+	DhcpServer -> SuSEFirewall;
+	ProfileManager -> Require;
+	NfsServer -> Runlevel;
+	NfsServer -> Report;
+	NfsServer -> Progress;
+	"PrinterTest.ycp" -> Printer;
+	Printer -> Crash;
+	Printer -> Confirm;
+	Printer -> Printerdb;
+	Printerlib -> Spooler;
+	Printerdb -> Printerlib;
+	Spooler -> Require;
+	Spooler -> Runlevel;
+	Spooler -> CUPS;
 }

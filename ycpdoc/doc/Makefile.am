@@ -2,11 +2,12 @@
 # Makefile.am for devtools/ycpdoc/doc
 #
 
-htmldir = @docdir@
+SUBDIRS = example
+htmldir = @docdir@/ycpdoc
 
-html_DATA =	README \
-	  	example.ycp mis.ycp modules.ycp \
-	  	example.html mis.html modules.html \
-	  	files.html intro.html index.html
+html_DATA =	README
+
+README: $(srcdir)/../src/ycpdoc
+	pod2text $< >$@
 
 EXTRA_DIST = $(html_DATA)

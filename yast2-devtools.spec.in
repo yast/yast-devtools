@@ -3,7 +3,7 @@
 # neededforbuild  gpp libgpp sgmltool
 
 @HEADER@
-Requires:	yast2
+Requires:	yast2 perl
 Provides:	ycpdoc ydoc
 Obsoletes:	ycpdoc ydoc
 

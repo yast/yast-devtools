@@ -26,29 +26,29 @@ XXPkgXXAgent::~XXPkgXXAgent()
 /**
  * Dir
  */
-YCPValue XXPkgXXAgent::Dir(const YCPPath& path)
+YCPList XXPkgXXAgent::Dir(const YCPPath& path)
 {
     y2error("Wrong path '%s' in Read().", path->toString().c_str());
-    return YCPVoid();
+    return YCPNull();
 }
 
 /**
  * Read
  */
-YCPValue XXPkgXXAgent::Read(const YCPPath &path, const YCPValue& arg)
+YCPValue XXPkgXXAgent::Read(const YCPPath &path, const YCPValue& arg, const YCPValue& opt)
 {
     y2error("Wrong path '%s' in Read().", path->toString().c_str());
-    return YCPVoid();
+    return YCPNull();
 }
 
 /**
  * Write
  */
-YCPValue XXPkgXXAgent::Write(const YCPPath &path, const YCPValue& value,
+YCPBoolean XXPkgXXAgent::Write(const YCPPath &path, const YCPValue& value,
     const YCPValue& arg)
 {
     y2error("Wrong path '%s' in Write().", path->toString().c_str());
-    return YCPVoid();
+    return YCPBoolean(false);
 }
 
 /**
@@ -58,7 +58,7 @@ YCPValue XXPkgXXAgent::Execute(const YCPPath &path,
     const YCPValue& value , const YCPValue& arg)
 {
     y2error("Wrong path '%s' in Execute().", path->toString().c_str());
-    return YCPVoid();
+    return YCPNull();
 }
 
 /**
@@ -66,12 +66,12 @@ YCPValue XXPkgXXAgent::Execute(const YCPPath &path,
  */
 YCPValue XXPkgXXAgent::otherCommand(const YCPTerm& term)
 {
-    string sym = term->symbol()->symbol();
+    string sym = term->name();
 
     if (sym == "XXPkgXXAgent") {
         /* Your initialization */
         return YCPVoid();
     }
 
-    return YCPNull();
+    return YCPVoid();
 }

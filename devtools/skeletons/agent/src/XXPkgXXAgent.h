@@ -12,7 +12,6 @@
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>
-#include <scr/SCRInterpreter.h>
 
 /**
  * @short An interface class between YaST2 and XXPkgXX Agent
@@ -41,12 +40,13 @@ public:
      * @param arg Additional parameter.
      */
     virtual YCPValue Read(const YCPPath &path,
-			  const YCPValue& arg = YCPNull());
+			  const YCPValue& arg = YCPNull(),
+                          const YCPValue& opt = YCPNull());
 
     /**
      * Provides SCR Write ().
      */
-    virtual YCPValue Write(const YCPPath &path,
+    virtual YCPBoolean Write(const YCPPath &path,
 			   const YCPValue& value,
 			   const YCPValue& arg = YCPNull());
 
@@ -60,7 +60,7 @@ public:
     /**
      * Provides SCR Dir ().
      */
-    virtual YCPValue Dir(const YCPPath& path);
+    virtual YCPList Dir(const YCPPath& path);
 
     /**
      * Used for mounting the agent.

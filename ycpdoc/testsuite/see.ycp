@@ -1,0 +1,43 @@
+//
+{
+    /**
+     * Does nothing.
+     */
+    global define void DoNothing () ``{
+    }
+
+    /**
+     * Does nothing,
+     * privately.
+     */
+    define void LocalNothing () ``{
+    }
+
+    /**
+     * Foo1
+     * @see #foo2
+     * @see example2#foo3
+     * @see foo4
+     * @see example#
+     */
+    global define void foo1 () ``{
+    }
+
+    /**
+     * Foo2
+     */
+    global define void foo2 () ``{
+    }
+
+    /**
+     * Foo3
+     */
+    global define void foo3 () ``{
+    }
+
+    /**
+     * Foo4
+     */
+    global define void foo4 () ``{
+    }
+}

@@ -80,6 +80,23 @@
                     <title>Parameters</title>
                     <xsl:call-template name="varlist_parameters"/>
                 </refsect1>
+                <refsect1>
+                    <title>Return Value</title>
+                    <variablelist>
+                        <varlistentry>
+                            <term>
+                                <type>
+                                    <xsl:value-of select="type"/>
+                                </type>
+                            </term>
+                            <listitem>
+                                <para>
+                                    <xsl:value-of select="return"/>
+                                </para>
+                            </listitem>
+                        </varlistentry>
+                    </variablelist>
+                </refsect1>
             </refentry>
         </xsl:if>
     </xsl:template>

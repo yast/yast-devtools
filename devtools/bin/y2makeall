@@ -1,0 +1,814 @@
+#!/usr/bin/perl -w
+#
+# y2makeall - build all YaST2 sources from CVS.
+#
+# Call this from your toplevel yast2/source CVS working directory.
+#
+#
+# Author:  Stefan Hundhammer <sh@suse.de>
+# Updated: 2004-02-23
+
+use strict;
+use English;
+use Getopt::Std;
+use File::Basename;
+use vars qw(
+	     $opt_h
+	     $opt_v
+	     $opt_s
+	     $opt_d
+	     $opt_f
+	     $opt_b
+	     $opt_m
+	     $opt_y
+	     $opt_a
+	     );
+
+#
+# Configuration variables.
+#
+
+
+# Core binary packages that need to be built in that order before any YCP code
+# can be built.
+my @core_binaries =
+    (
+     "devtools",
+     "liby2util",
+     "packagemanager",
+     "core",
+     "qt",
+     "ncurses",
+     "testsuite",
+     "perl-bindings"
+     );
+
+
+my $make_log = "make.log";
+
+
+#
+# Other global variables.
+#
+
+my $verbose			= 1;	# -v
+my $debug			= 1;	# -d
+
+my $disable_make_makefile_cvs	= 0;	# -f
+my $enable_make_core_binaries	= 0;	# -b
+my $enable_byte_compile_modules	= 0;	# -m
+my $enable_make_ycp_packages	= 0;	# -y
+my $enable_make_all		= 1;	# -a
+
+my $make_args			= "";
+my $sudo_cmd			= "/usr/bin/sudo";
+my $install_cmd			= "/usr/bin/install";
+my $ycpc_cmd			= "/usr/bin/ycpc";
+
+my %done;
+my $work_root;
+my $modules_dir			= "/usr/share/YaST2/modules";
+my $ycp_include_dir		= "/usr/share/YaST2/include";
+my @ycp_files;
+my %ycp_modules;
+my %needed_ycp_include_files;
+my %included_by;
+my %ycp_install_dirs;
+
+
+#
+# Forward declarations.
+#
+
+sub main();
+
+
+# Call the main function and exit.
+# DO NOT enter any other code outside a sub -
+# any variables would otherwise be global.
+
+
+main();
+exit 0;
+
+
+#-----------------------------------------------------------------------------
+
+
+sub main()
+{
+    # Extract command line options.
+    # This will set a variable opt_? for any option,
+    # e.g. opt_v if option '-v' is passed on the command line.
+
+    getopts('hvsdfbmya');
+
+    usage()		if $opt_h;
+    $verbose	= 1 	if $opt_v;
+    $verbose	= 0 	if $opt_s;
+    $debug	= 1 	if $opt_d;
+
+    $enable_make_all			= 0	if $opt_b or $opt_m or $opt_y;
+    $enable_make_core_binaries		= 1	if $opt_b;
+    $enable_byte_compile_modules	= 1	if $opt_m;
+    $enable_make_ycp_packages		= 1	if $opt_y;
+
+    $disable_make_makefile_cvs		= 1	if $opt_f;
+    my $progname = basename( $0 );
+
+    die "FATAL: Call \"$progname\" from your YaST2 CVS working directory! (yast2/source)\n"
+	unless -f "devtools/RPMNAME";
+
+    $work_root = $ENV{'PWD'};
+
+
+    # All remaining parameters go to "make".
+    $make_args = join @ARGV;
+
+    unlink $make_log;
+
+    make_core_binaries()	if $enable_make_all or $enable_make_core_binaries;
+    byte_compile_modules()	if $enable_make_all or $enable_byte_compile_modules;
+    make_ycp_packages()		if $enable_make_all or $enable_make_ycp_packages;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Build the YaST2 core binaries - those packages that are required for
+# everything else.
+
+sub make_core_binaries()
+{
+    logf( "--- Step 1 (-b): Building core binaries..." );
+
+    my $dir;
+
+    foreach $dir ( @core_binaries )
+    {
+	make( $dir );
+    }
+
+    logf( "--- Core binaries done." );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Byte-compile all YCP modules in all subdirectories.
+
+sub byte_compile_modules()
+{
+    logf( "--- Step 2 (-m): Byte-compiling YCP modules..." );
+
+    #
+    # Find all YCP modules in CVS working directory
+    #
+
+    # Make use of YCP programming conventions: Module names start with a capital letter.
+    my @module_candidates = find_files( $work_root, "[A-Z]*.ycp", 
+					"(testsuite|examples|skeleton|openteam)" );
+
+    my $file;
+
+    foreach $file ( @module_candidates )
+    {
+	$ycp_modules{ basename( $file ) } = $file if is_ycp_module( $file );
+    }
+
+
+    #
+    # Find all YCP modules that are already installed
+    #
+
+    my @installed_modules = glob( $modules_dir . "/*.ycp" );
+
+    foreach $file( @installed_modules )
+    {
+	$file = basename( $file );
+
+	if ( ! defined( $ycp_modules{ $file } ) )
+	{
+	    logf( "Warning: Module $file not found below $work_root" );
+	}
+    }
+
+
+    #
+    # Clear old YCP byte code files (.ybc)
+    #
+
+    deb( "Removing old byte code files" );
+    system( "$sudo_cmd rm -f $modules_dir/*.ybc" );
+
+
+    #
+    # Clear old YCP module files (.ycp)
+    #
+
+    deb( "Removing old modules from $modules_dir" );
+    system( "$sudo_cmd rm -f $modules_dir/*.ycp" );
+
+
+    #
+    # Copy modules from CVS tree to system
+    #
+
+    deb( "Installing " . scalar( keys( %ycp_modules ) ) . " YCP modules" );
+
+    make_install_dir( $modules_dir );
+    xargs_install( $modules_dir, values( %ycp_modules ) );
+
+
+    #
+    # Find all 'include' statements in the newly copied modules
+    #
+
+    my $module;
+
+    foreach $module( keys( %ycp_modules ) )
+    {
+	find_include_statements( $modules_dir . "/" . $module );
+    }
+
+    deb( "Modules require " . scalar( keys( %needed_ycp_include_files ) ) . " YCP include files" );
+
+    #
+    # Now find and install all include files required by the installed YCP modules
+    #
+
+    locate_include_files();
+    install_include_files();
+
+
+    #
+    # Figure out YCP compilation order and compile the modules
+    #
+
+    my @order = calc_ycp_compilation_order();
+    byte_compile( @order );
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Build YCP packages.
+
+sub make_ycp_packages()
+{
+    logf( "--- Step 3 (-y): Building YCP packages..." );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Make one package.
+#
+# Parameters:
+#	$pkg	package to build (from $work)
+
+sub make()
+{
+    my( $pkg ) = @_;
+
+    chdir $work_root;
+    chdir $pkg;
+
+    logf( "Building $pkg" );
+
+
+    # Check if "make -f Makefile.cvs" must be performed.
+    # Even if command line option "-f" (fast mode - sets $disable_make_makefile_cvs)
+    # is given , it still needs to be done if there is no toplevel Makefile.
+
+    my $do_make_makefile_cvs = 1;
+    $do_make_makefile_cvs = 0 if $disable_make_makefile_cvs;
+    $do_make_makefile_cvs = 1 unless -f "Makefile";
+
+    #
+    # make -f Makefile.cvs
+    #
+
+    if ( $do_make_makefile_cvs )
+    {
+
+	deb( "    make -f Makefile.cvs" );
+	system( "make -f Makefile.cvs >>$make_log 2>&1" );
+
+	die "*** FATAL: 'make -f Makefile.cvs' failed for $pkg\n" if ( $CHILD_ERROR );
+    }
+
+    #
+    # make
+    #
+
+    deb( "    make $make_args" );
+    system( "make $make_args >>$make_log 2>&1" );
+    die "*** FATAL: 'make $make_args' failed for $pkg\n" if ( $CHILD_ERROR );
+
+    #
+    # sudo make install
+    #
+
+    if ( $make_args eq "" )
+    {
+	deb( "    $sudo_cmd make install" );
+	system( "$sudo_cmd make install >>$make_log 2>&1" );
+	die "*** FATAL: '$sudo_cmd make install' failed for $pkg\n" if ( $CHILD_ERROR ) ;
+    }
+
+    deb( "    OK" );
+
+    chdir $work_root;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Check if a file is a YCP module: Search it for 'module XY'.
+#
+# Parameters:
+#	file name
+#
+# Return value:
+#	1 if it is a YCP module,
+#	0 if it is not.
+
+sub is_ycp_module()
+{
+    my ( $file_name ) = @_;
+    my $module_name = basename( $file_name, ".ycp" );
+
+    # deb( "Checking mod candidate $module_name: $file_name" );
+    open( MOD, $file_name ) or return 0;
+
+    my $line;
+
+    while ( $line = <MOD> )
+    {
+	# A valid YCP named "ABC" module must have a line
+	#	module "ABC";
+
+	if ( $line =~ /^\s*module\s+"$module_name"\s*;/ )
+	{
+	    # deb( "Found module $module_name in $file_name" );
+	    close( MOD );
+	    return 1;
+	}
+    }
+
+    close( MOD );
+    return 0;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Find all 'include' statements in a file and add the include file to the
+# global %needed_ycp_include_files hash.
+#
+# Parameters:
+#	Filename
+
+sub find_include_statements()
+{
+    my ( $ycp ) = @_;
+
+    open( YCP, $ycp ) or die "Can't open $ycp";
+
+    my $line;
+
+    while ( $line = <YCP> )
+    {
+	# Note: This search method will also find 'include' statements in
+	# multi-line comments, but then this can be considered _very_ broken.
+	# It should really be fixed in the YCP source.
+	# Anyway, it doesn't hurt much: Maybe one include file too many will be
+	# installed to /usr/share/YaST2/include/ - so what...
+
+	if ( $line =~ /^\s*include\s+"(.*)"/ )
+	{
+	    my $include_file = $1;
+	    $needed_ycp_include_files{ $include_file } = undef;
+	    # deb( basename( $ycp ) . " includes \"" . $include_file . "\"" );
+	    $included_by{ $include_file } .= basename ( $ycp ) . " " ;
+	}
+    }
+
+    close( YCP );
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Locate all include files in the global %needed_ycp_include_files hash in the
+# CVS working directory - write the full path into the hash.
+
+sub locate_include_files()
+{
+    deb( "Searching include files" );
+
+    # Grep all Makefile.am files to find out where include files get installed to.
+    # This is necessary since somebody came up with that crazy idea to give
+    # lots of include files the same name, differing only in install directory,
+    # which has no match at all in the source directory structure. What a mess.
+
+    find_install_dirs();
+
+
+    # Cache YCP files for faster search
+
+    deb( "Creating .ycp file location cache" );
+    my @ycp_files = find_files( $work_root, "*.ycp", "(testsuite|examples|skeleton)" );
+
+
+    deb( "Mapping include file paths" );
+
+    #
+    # Map all full path names to install directories, if possible
+    # (i.e., if their Makefile.am had a line with @yncludedir@);
+    # if not, it is most likely not an include file and can be ignored here.
+    # If it is anyway, its Makefile.am is broken and needs to be fixed.
+    #
+
+    my %found_ycp_include_files;
+    my $ycp_file;
+
+    foreach $ycp_file ( @ycp_files )
+    {
+	my $dir = dirname( $ycp_file );
+
+	if ( defined( $ycp_install_dirs{ $dir } ) )
+	{
+	    my $target = $ycp_install_dirs{ $dir };
+	    $target .= "/" . basename( $ycp_file );
+	    $found_ycp_include_files{ $target } = $ycp_file;
+
+	    # deb( "Include file " . $target . " is " . $ycp_file );
+	}
+    }
+
+
+    my $not_found = 0;
+    my $needed_include;
+
+    foreach $needed_include ( keys( %needed_ycp_include_files ) )
+    {
+	if ( ! defined( $found_ycp_include_files{ $needed_include } ) )
+	{
+	    $not_found++;
+	    logf( "ERROR: Can't find include file \"" . $needed_include 
+		  . "\"\n    included by " . $included_by{ $needed_include } );
+	}
+	else
+	{
+	    # deb( "Found " . $needed_include );
+
+	    $needed_ycp_include_files{ $needed_include } = 
+		$found_ycp_include_files{ $needed_include };
+	}
+    }
+
+    if ( $not_found > 0 )
+    {
+	logf( "Can't resolve YCP include dependencies" );
+    }
+    else
+    {
+	deb( "Found all YCP files included from modules" );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Install all YCP include files in the global %needed_ycp_include_files hash.
+
+sub install_include_files()
+{
+    deb( "Installing include files" );
+    my $ycp_include_file;
+
+    foreach $ycp_include_file ( keys( %needed_ycp_include_files ) )
+    {
+	if ( defined( $needed_ycp_include_files{ $ycp_include_file } ) )
+	{
+	    my $src = $needed_ycp_include_files{ $ycp_include_file };
+	    my $target = $ycp_include_dir . "/" . $ycp_include_file;
+
+	    install_file( $src, $target );
+	}
+	else
+	{
+	    logf( "WARNING: Skipping $ycp_include_file - not found" );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Install multiple files like "xargs": Build a command line as long as possible
+# to avoid to many shell calls. Calls
+#
+#	sudo install -m 644 <file> [<file>...] <target>
+#
+# until all files are installed.
+#
+# Parameters:
+#	target directory
+#	(array) files to install
+
+sub xargs_install()
+{
+    my $target_dir = shift;
+    my @files = @_;
+
+
+    my $cmd_line_limit = 8000;
+    my $sources = "";
+
+    while ( $#files >= 0 )
+    {
+	my $file = shift @files;
+
+	if ( length( $sources ) + length( $file ) > $cmd_line_limit )
+	{
+	    # Buffer is full - execute command
+	    # (avoid "command line too long" error)
+	    
+	    install_file( $sources, $target_dir );
+	    $sources = "";
+	}
+
+	$sources .= " " . $file;
+    }
+
+    #
+    # Handle any leftovers
+    #
+
+    if ( ! $sources =~ /^\s*$/ )
+    {
+	install_file( $sources, $target_dir );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Install "src" to "target" with proper permissions (644).
+#
+# Parameters:
+#	source (may be multiple source files as one string)
+#	target (may be a directory
+
+sub install_file()
+{
+    my ( $src, $target ) = @_;
+    my $cmd = "$sudo_cmd $install_cmd -p -m 644 $src $target";
+    # deb( "$cmd" );
+    system( $cmd );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Create an installation directory with all its component with mode 755.
+#
+# Parameters:
+#	Directory to create
+
+sub make_install_dir()
+{
+    my ( $dir ) = @_;
+    my $cmd = "$sudo_cmd $install_cmd -m 755 -d $dir";
+    # deb( "$cmd" );
+    system( $cmd );
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Since some of our developers in their infinite wisdom decided long ago that
+# it might be a cool thing to try what happens when source file names are not
+# unique, we now have to deal with dozens of YCP include files with the same
+# name, sometimes even in the same source directory level. The only thing to
+# tell them apart is the install target in the respective Makefile.am, so now
+# we have to 'grep' through all of them and find lines with "@yncludedir" to
+# figure out the installation target directory.
+#
+# Yes, this is broken by design.
+#
+# This function now searches all Makefile.am files in the CVS working directory
+# for lines with @yncludedir@ and fills the global %ycp_install_dirs hash with
+# the result. The keys of this hash are directories in the CVS working tree,
+# the values are the target directories below /usr/share/YaST2/include 
+# (with the @yncludedir@ macro removed, e.g. "network/services" ).
+
+sub find_install_dirs()
+{
+    deb( "Searching target directories for YCP include files" );
+
+    my $makefile_am;
+
+    foreach $makefile_am ( find_files( $work_root, "Makefile.am", "(testsuite|examples|skeleton)" ) )
+    {
+	open( MAKEFILE_AM, $makefile_am ) or die "Can't open $makefile_am";
+
+	my $dir = dirname( $makefile_am );
+	my $line;
+
+	while ( $line = <MAKEFILE_AM> )
+	{
+	    $line =~ s/#.*//;
+
+	    if ( $line =~ /\@yncludedir\@/ )
+	    {
+		$line =~ s:^.*\@yncludedir\@/?::;  # strip everything up to @yncludedir@/
+		$line =~ s/\s*$//;		   # strip trailing whitespace
+
+		if ( defined( $ycp_install_dirs{ $dir } ) )
+		{
+		    logf( "Include target in $makefile_am not unique!" );
+		}
+		else
+		{
+		    $ycp_install_dirs{ $dir } = $line;
+		    # deb( "Dir " . $dir . " => " . $line );
+		}
+	    }
+	}
+
+	close( MAKEFILE_AM );
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Let the YCP compiler calculate the compilation order for the YCP modules,
+# taking their interdependencies into account.
+#
+# Parameters:
+#	---
+# Return value:
+#	Module list in compilation order
+
+sub calc_ycp_compilation_order()
+{
+    deb( "Calculating YCP module compilation order" );
+
+    chdir( $modules_dir );
+    my @order = split( "\n", `$ycpc_cmd -f -r -I $ycp_include_dir *.ycp | egrep -v '(^Check)|(^\$)'` );
+
+    return @order;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Byte-compile a list of YCP modules in this order.
+#
+# Parameters:
+#	YCP module list
+
+sub byte_compile()
+{
+    my @modules = @_;
+    chdir( $modules_dir );
+
+    my $module;
+
+    foreach $module ( @modules )
+    {
+	$module .= ".ycp";
+	my $cmd = "$sudo_cmd $ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module";
+	# deb( $cmd );
+	system $cmd;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# (Recursively) find all .ycp files in directory tree $dir that match $pattern,
+# but not $exclude_regexp.
+#
+# Parameters:
+#	Directory to start searching
+#	File pattern ("*.ycp", "[A-Z]*.ycp")
+#	Exclude regexp ( "(testsuite|examples)" )
+#
+# Returns:
+#	Array of .ycp files
+
+sub find_files()
+{
+    my ( $dir, $pattern, $exclude_regexp ) = @_;
+    my @files=split( '\n', `find $dir -name "$pattern" -print | egrep -v "$exclude_regexp"`);
+
+    return @files;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Log a message to stdout if verbose mode is set
+# (command line option '-v').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub logf()
+{
+    my $msg;
+
+    if ( $verbose )
+    {
+	foreach $msg( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	$OUTPUT_AUTOFLUSH = 1;	# inhibit buffering
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Log a debugging message to stdout if debug mode is set
+# (command line option '-d').
+#
+# Parameters:
+#	Messages to write (any number).
+
+sub deb()
+{
+    my $msg;
+
+    if ( $debug )
+    {
+	foreach $msg( @_ )
+	{
+	    print $msg . " ";
+	}
+
+	$OUTPUT_AUTOFLUSH = 1;	# inhibit buffering
+	print "\n";
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Print usage message and abort program.
+#
+# Parameters:
+#	---
+
+sub usage()
+{
+    my $progname = basename( $0 );
+    die "Usage: $progname [opt] [make-target]\n"				.
+	"\n"									.
+	"Builds all YaST2 sources from CVS.\n"					.
+	"Call this from your toplevel yast2/source CVS working directory!\n"	.
+	"\n"									.
+	"\t-a all (default) - same as -bmy if none of -b -m -y is given\n"	.
+	"\t-b binaries - make core binaries\n"					.
+	"\t-m modules - byte-compile YCP modules\n"				.
+	"\t-y YCP - make YCP packages\n"					.
+	"\t-f fast - no \"make -f Makefile.cvs\" if it can be avoided\n"	.
+	"\n"									.
+	"\t-d debug\n"								.
+	"\t-h help (this message)\n"						.
+	"\t-s silent (turn verbose off)\n"					.
+	"\t-v verbose (default)\n"						.
+	"\n"									.
+	"Examples:\n"								.
+	"\n"									.
+	"Build everything:\n"							.
+	"\t$progname\n"								.
+	"\n"									.
+	"Do a \"make pot\" in all YCP packages:\n"				.
+	"\t$progname -y pot\n"							.
+	"\n"									.
+	"Byte-recompile all YCP modules, then make all YCP packages, but\n" .
+	"don't do \"make -f Makefile.cvs\" if it can be avoided:\n" .
+	"\t$progname -myf\n"							.
+	"\n";
+}
+
+
+
+# EOF

@@ -35,9 +35,9 @@ clean-local:
 	rm -rf $(BUILD)/images
 	rm -rf $(BUILD)/susebooks.css
 
-#install-data-local:
-#	mkdir -p $(htmldir)
-#	cp -a $(BUILD)/images $(htmldir)
+install-data-local:
+	mkdir -p $(DESTDIR)$(htmldir)
+	cp -a $(srcdir)/$(BUILD)/images $(DESTDIR)$(htmldir)
 
 EXTRA_DIST =  $(xml_files) rny2rnc.html
 

@@ -190,6 +190,9 @@ function newmain() {
 	    DOCDIRS=`find . -name doc`
 	    if [ ${I##*/} = doc ]; then
 		DOCDIRS=". $DOCDIRS"
+	    elif [ ${I##*/} = core ]; then
+		# this is not under doc
+		DOCDIRS="autodocs $DOCDIRS"
 	    fi
 	    for J in $DOCDIRS; do
 		docdir $J $MAKECLEAN

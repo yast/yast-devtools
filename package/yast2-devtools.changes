@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 22 14:51:13 CEST 2004 - visnov@suse.cz
+
+- Fixed dependencies for agent skeleton C++ autodocs
+
+-------------------------------------------------------------------
 Thu May 27 16:07:08 CEST 2004 - ke@suse.de
 
 - On SLES9 do not cleanup PO files (disable cleanuppo.awk).

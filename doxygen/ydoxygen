@@ -30,6 +30,7 @@ Output files are placed to directory I<dir>
 =item I<param>=I<value>
 
 Replace a parameter in the template configuration file.
+Setting PROJECT_NAME also sets GENERATE_TAGFILE to $PROJECT_NAME.tag
 
 =back
 
@@ -65,6 +66,10 @@ foreach (@ARGV)
 {
     my ($param, $value) = split ('=', $_, 2);
     $replacements{$param} = $value;
+    if ($param eq "PROJECT_NAME")
+    {
+	$replacements{"GENERATE_TAGFILE"} = "$value.tag";
+    }
     print "'$param'='$value'\n" if $debug;
 }
 

@@ -224,6 +224,8 @@ my $execcompdir = "/usr/lib/YaST2";
     "\@plugindir\@" => "%{_libdir}/YaST2/plugin",
     "\@includedir\@" => "/usr/include/YaST2",
     "\@docdir\@" => "/usr/share/doc/packages/$RPMNAME",
+    "\@logdir\@" => "/var/log/YaST2",
+    "\@vardir\@" => "/var/lib/YaST2",
 
     "\@execcompdir\@" => "/usr/lib/YaST2",
     "\@agentdir\@" => "${execcompdir}/servers_non_y2",

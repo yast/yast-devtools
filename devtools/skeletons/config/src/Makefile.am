@@ -11,18 +11,15 @@ ynclude_DATA =			\
 	helps.ycp		\
 	wizards.ycp		\
 	dialogs.ycp		\
-	complex.ycp		\
-	routines.ycp
-
-config_DATA =			\
-	XXpkgXX.y2cc
+	complex.ycp
 
 desktop_DATA =			\
 	XXpkgXX.desktop
 
 module_DATA =			\
-	XXPkgXX.ycp
+	XXPkgXX.ycp		\
+	XXPkgXX.pm
 
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(module_DATA) $(desktop_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common

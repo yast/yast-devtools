@@ -12,20 +12,25 @@
 {
 
 /***
- * <h3>Configuration of the XXpkgXX</h3>
+ * <h3>Configuration of XXpkgXX</h3>
  */
 
 textdomain "XXpkgXX";
 
-include "commandline/commandline.ycp";
+/* The main () */
+y2milestone ("----------------------------------------");
+y2milestone ("XXPkgXX module started");
+
+import "CommandLine";
+include "XXpkgXX/wizards.ycp";
 
 map cmdline_description = $[
     "id" 	: "XXpkgXX",
-    // transltors: command line help text for the XXXpkgXX module
+    /* Command line help text for the XXXpkgXX module */
     "help"	: _("Configuration of XXpkgXX"),
-    "guihandler"        : ``(XXPkgXXSequence()),
-    "initialize"        : ``(XXPkgXX::Read()),
-    "finish"            : ``(XXPkgXX::Write()),
+    "guihandler"        : XXPkgXXSequence,
+    "initialize"        : XXPkgXX::Read,
+    "finish"            : XXPkgXX::Write,
     "actions"           : $[
 	// FIXME TODO: fill the functionality description here
     ],
@@ -36,12 +41,6 @@ map cmdline_description = $[
 	// FIXME TODO: fill the mappings of actions and options here
     ]
 ];
-
-/* The main () */
-y2milestone ("----------------------------------------");
-y2milestone ("XXPkgXX module started");
-
-include "XXpkgXX/wizards.ycp";
 
 /* is this proposal or not? */
 boolean propose = false;
@@ -57,7 +56,7 @@ if(size(args) > 0) {
 any ret = nil;
 
 if(propose) ret = XXPkgXXAutoSequence();
-else ret = CommandLineRun(cmdline_description);
+else ret = CommandLine::Run(cmdline_description);
 y2debug("ret=%1", ret);
 
 /* Finish */

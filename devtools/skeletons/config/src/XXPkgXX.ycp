@@ -1,7 +1,7 @@
 /**
  * File:	modules/XXPkgXX.ycp
  * Package:	Configuration of XXpkgXX
- * Summary:	Data for configuration of XXpkgXX, input and output functions.
+ * Summary:	XXPkgXX settings, input and output functions
  * Authors:	XXmaintainerXX <XXemailXX>
  *
  * $Id$
@@ -19,19 +19,18 @@ import "Progress";
 import "Report";
 import "Summary";
 
-include "XXpkgXX/routines.ycp";
-
 /**
- * Abort function
- * return boolean return true if abort
+ * Prototypes
  */
-global block AbortFunction = nil;
+global boolean Modified();
 
 /**
  * Data was modified?
  */
 global boolean modified = false;
 
+/**
+ */
 global boolean proposal_valid = false;
 
 /**
@@ -41,13 +40,29 @@ global boolean proposal_valid = false;
 global boolean write_only = false;
 
 /**
+ * Abort function
+ * return boolean return true if abort
+ */
+global boolean() AbortFunction = Modified;
+
+/**
+ * Abort function
+ * @return blah blah lahjk
+ */
+global define boolean Abort() ``{
+    if(AbortFunction != nil)
+	return eval(AbortFunction) == true;
+    return false;
+}
+
+/**
  * Data was modified?
  * @return true if modified
  */
-global define boolean Modified() ``{
+global boolean Modified() {
     y2debug("modified=%1",modified);
     return modified;
-};
+}
 
 // Settings: Define all variables needed for configuration of XXpkgXX
 // TODO FIXME: Define all the variables necessary to hold
@@ -68,7 +83,7 @@ global define boolean Modified() ``{
  * Read all XXpkgXX settings
  * @return true on success
  */
-global define boolean Read() ``{
+global boolean Read() {
 
     /* XXPkgXX read dialog caption */
     string caption = _("Initializing XXpkgXX Configuration");
@@ -82,20 +97,20 @@ global define boolean Read() ``{
     // TODO FIXME Names of real stages
     // We do not set help text here, because it was set outside
     Progress::New( caption, " ", steps, [
-	    // translators: progress stage 1/3
+	    /* Progress stage 1/3 */
 	    _("Read the database"),
-	    // translators: progress stage 2/3
+	    /* Progress stage 2/3 */
 	    _("Read the previous settings"),
-	    // translators: progress stage 3/3
+	    /* Progress stage 3/3 */
 	    _("Detect the devices")
 	], [
-	    // translators: progress step 1/3
+	    /* Progress step 1/3 */
 	    _("Reading the database..."),
-	    // translators: progress step 2/3
+	    /* Progress step 2/3 */
 	    _("Reading the previous settings..."),
-	    // translators: progress step 3/3
+	    /* Progress step 3/3 */
 	    _("Detecting the devices..."),
-	    // translators: progress finished
+	    /* Progress finished */
 	    _("Finished")
 	],
 	""
@@ -104,34 +119,34 @@ global define boolean Read() ``{
     // read database
     if(Abort()) return false;
     Progress::NextStage();
-    // translators: error message
+    /* Error message */
     if(false) Report::Error(_("Cannot read the database1."));
     sleep(sl);
 
     // read another database
     if(Abort()) return false;
     Progress::NextStep();
-    // translators: error message
+    /* Error message */
     if(false) Report::Error(_("Cannot read the database2."));
     sleep(sl);
 
     // read current settings
     if(Abort()) return false;
     Progress::NextStage();
-    // translators: error message
+    /* Error message */
     if(false) Report::Error(_("Cannot read current settings."));
     sleep(sl);
 
     // detect devices
     if(Abort()) return false;
     Progress::NextStage();
-    // translators: error message
+    /* Error message */
     if(false) Report::Warning(_("Cannot detect devices."));
     sleep(sl);
 
     if(Abort()) return false;
-    // translators: progress finished
-    ProgressNextStage(_("Finished"));
+    /* Progress finished */
+    Progress::NextStage();
     sleep(sl);
 
     if(Abort()) return false;
@@ -143,7 +158,7 @@ global define boolean Read() ``{
  * Write all XXpkgXX settings
  * @return true on success
  */
-global define boolean Write() ``{
+global boolean Write() {
 
     /* XXPkgXX read dialog caption */
     string caption = _("Saving XXpkgXX Configuration");
@@ -157,16 +172,16 @@ global define boolean Write() ``{
     // TODO FIXME Names of real stages
     // We do not set help text here, because it was set outside
     Progress::New(caption, " ", steps, [
-	    // translators: progress stage 1/2
+	    /* Progress stage 1/2 */
 	    _("Write the settings"),
-	    // translators: progress stage 2/2
+	    /* Progress stage 2/2 */
 	    _("Run SuSEconfig")
 	], [
-	    // translators: progress step 1/2
+	    /* Progress step 1/2 */
 	    _("Writing the settings..."),
-	    // translators: progress step 2/2
+	    /* Progress step 2/2 */
 	    _("Running SuSEconfig..."),
-	    // translators: progress finished
+	    /* Progress finished */
 	    _("Finished")
 	],
 	""
@@ -175,20 +190,20 @@ global define boolean Write() ``{
     // write settings
     if(Abort()) return false;
     Progress::NextStage();
-    // translators: error message
+    /* Error message */
     if(false) Report::Error (_("Cannot write settings."));
     sleep(sl);
 
     // run SuSEconfig
     if(Abort()) return false;
     Progress::NextStage ();
-    // translators: error message
+    /* Error message */
     if(false) Report::Error (_("SuSEconfig script failed."));
     sleep(sl);
 
     if(Abort()) return false;
-    // translators: progress finished
-    ProgressNextStage(_("Finished"));
+    /* Progress finished */
+    Progress::NextStage();
     sleep(sl);
 
     if(Abort()) return false;
@@ -201,9 +216,8 @@ global define boolean Write() ``{
  * @param settings The YCP structure to be imported.
  * @return boolean True on success
  */
-global define boolean Import (map settings) ``{
+global boolean Import (map settings) {
     // TODO FIXME: your code here (fill the above mentioned variables)...
-    sleep(3000);
     return true;
 }
 
@@ -212,9 +226,8 @@ global define boolean Import (map settings) ``{
  * (For use by autoinstallation.)
  * @return map Dumped settings (later acceptable by Import ())
  */
-global define map Export () ``{
+global map Export () {
     // TODO FIXME: your code here (return the above mentioned variables)...
-    sleep(3000);
     return $[];
 }
 
@@ -222,9 +235,9 @@ global define map Export () ``{
  * Create a textual summary and a list of unconfigured cards
  * @return summary of the current configuration
  */
-global define list Summary() ``{
+global list Summary() {
     // TODO FIXME: your code here...
-    // translators: Configuration summary text for autoyast
+    /* Configuration summary text for autoyast */
     return [ _("Configuration summary ..."), [] ];
 }
 
@@ -232,7 +245,7 @@ global define list Summary() ``{
  * Create an overview table with all configured cards
  * @return table items
  */
-global define list Overview() ``{
+global list Overview() {
     // TODO FIXME: your code here...
     return [];
 }
@@ -243,7 +256,7 @@ global define list Overview() ``{
  * installed.
  * @return map with 2 lists.
  */
-global define map AutoPackages() ``{
+global map AutoPackages() {
     // TODO FIXME: your code here...
     return $[ "install":[], "remove":[] ];
 }

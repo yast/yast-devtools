@@ -11,75 +11,45 @@
 
 textdomain "XXpkgXX";
 
+import "Sequencer";
 import "Wizard";
-
-include "wizard/sequencer.ycp";
 
 include "XXpkgXX/complex.ycp";
 include "XXpkgXX/dialogs.ycp";
 
 /**
- * Whole configuration of XXpkgXX
+ * Add a configuration of XXpkgXX
  * @return sequence result
  */
-global define symbol XXPkgXXSequence() ``{
+any AddSequence() {
 
+    /* FIXME: adapt to your needs */
     map aliases = $[
-	"read"	: [ ``( ReadDialog() ), true ],
-	"main"	:   ``( MainSequence() ),
-	"write"	: [ ``( WriteDialog() ), true ]
+	"config1"	: ``(Configure1Dialog()),
+	"config2"	: ``(Configure2Dialog()),
     ];
 
+    /* FIXME: adapt to your needs */
     map sequence = $[
-	"ws_start" : "read",
-	"read" : $[
+	"ws_start" : "config1",
+	"config1" : $[
 	    `abort	: `abort,
-	    `next	: "main"
+	    `next	: "config2"
 	],
-	"main" : $[
-	    `abort	: `abort,
-	    `next	: "write"
-	],
-	"write" : $[
+	"config2" : $[
 	    `abort	: `abort,
 	    `next	: `next
 	]
     ];
 
-    Wizard::CreateDialog();
-
-    any ret = WizardSequencer(aliases, sequence);
-
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
- * Whole configuration of XXpkgXX but without reading and writing.
- * For use with autoinstallation.
- * @return sequence result
- */
-global define symbol XXPkgXXAutoSequence() ``{
-    /* Initialization dialog caption */
-    string caption = _("XXPkgXX Configuration");
-    /* Initialization dialog contents */
-    term contents = `Label(_("Initializing..."));
-
-    Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption, contents, "",
-	    Label::BackButton(), Label::NextButton());
-
-    any ret = MainSequence();
-
-    UI::CloseDialog();
-    return ret;
+    return Sequencer::Run(aliases, sequence);
 }
 
 /**
  * Main workflow of the XXpkgXX configuration
  * @return sequence result
  */
-global define symbol MainSequence() ``{
+any MainSequence() {
 
     /* FIXME: adapt to your needs */
     map aliases = $[
@@ -120,37 +90,67 @@ global define symbol MainSequence() ``{
 	]
     ];
 
-    any ret = WizardSequencer(aliases, sequence);
+    any ret = Sequencer::Run(aliases, sequence);
 
     return ret;
 }
 
 /**
- * Add a configuration of XXpkgXX
+ * Whole configuration of XXpkgXX
  * @return sequence result
  */
-global define symbol AddSequence() ``{
+any XXPkgXXSequence() {
 
-    /* FIXME: adapt to your needs */
     map aliases = $[
-	"config1"	: ``( Configure1Dialog() ),
-	"config2"	: ``( Configure2Dialog() )
+	"read"	: [ ``( ReadDialog() ), true ],
+	"main"	:   ``( MainSequence() ),
+	"write"	: [ ``( WriteDialog() ), true ]
     ];
 
-    /* FIXME: adapt to your needs */
     map sequence = $[
-	"ws_start" : "config1",
-	"config1" : $[
+	"ws_start" : "read",
+	"read" : $[
 	    `abort	: `abort,
-	    `next	: "config2"
+	    `next	: "main"
 	],
-	"config2" : $[
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: "write"
+	],
+	"write" : $[
 	    `abort	: `abort,
 	    `next	: `next
 	]
     ];
 
-    return WizardSequencer( aliases, sequence );
+    Wizard::CreateDialog();
+
+    any ret = Sequencer::Run(aliases, sequence);
+
+    UI::CloseDialog();
+    return ret;
+}
+
+/**
+ * Whole configuration of XXpkgXX but without reading and writing.
+ * For use with autoinstallation.
+ * @return sequence result
+ */
+any XXPkgXXAutoSequence() {
+
+    /* Initialization dialog caption */
+    string caption = _("XXPkgXX Configuration");
+    /* Initialization dialog contents */
+    term contents = `Label(_("Initializing..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption, contents, "",
+	    Label::BackButton(), Label::NextButton());
+
+    any ret = MainSequence();
+
+    UI::CloseDialog();
+    return ret;
 }
 
 /* EOF */

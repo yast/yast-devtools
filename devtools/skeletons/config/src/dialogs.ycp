@@ -11,19 +11,17 @@
 
 textdomain "XXpkgXX";
 
-import "XXPkgXX";
-import "Wizard";
-
 import "Label";
+import "Wizard";
+import "XXPkgXX";
 
 include "XXpkgXX/helps.ycp";
-include "XXpkgXX/routines.ycp";
 
 /**
  * Configure1 dialog
  * @return dialog result
  */
-global define symbol Configure1Dialog () ``{
+any Configure1Dialog () {
 
     /* XXPkgXX configure1 dialog caption */
     string caption = _("XXPkgXX Configuration");
@@ -60,7 +58,7 @@ global define symbol Configure1Dialog () ``{
  * Configure2 dialog
  * @return dialog result
  */
-global define symbol Configure2Dialog () ``{
+any Configure2Dialog () {
 
     /* XXPkgXX configure2 dialog caption */
     string caption = _("XXPkgXX Configuration");

@@ -11,31 +11,37 @@
 
 textdomain "XXpkgXX";
 
+import "Label";
+import "Popup";
 import "Wizard";
 import "Wizard_hw";
-
 import "XXPkgXX";
 
-import "Label";
-
 include "XXpkgXX/helps.ycp";
-include "XXpkgXX/routines.ycp";
 
 /**
  * Return a modification status
  * @return true if data was modified
  */
-global define boolean Modified() ``{
+boolean Modified() {
     return XXPkgXX::Modified();
+}
+
+boolean ReallyAbort() {
+    return !XXPkgXX::Modified() || Popup::ReallyAbort(true);
+}
+
+boolean PollAbort() {
+    return UI::PollInput() == `abort;
 }
 
 /**
  * Read settings dialog
  * @return `abort if aborted and `next otherwise
  */
-global define symbol ReadDialog() ``{
+symbol ReadDialog() {
     Wizard::RestoreHelp(HELPS["read"]:"");
-    XXPkgXX::AbortFunction = ``{ return PollAbort();};
+    XXPkgXX::AbortFunction = PollAbort;
     boolean ret = XXPkgXX::Read();
     return ret ? `next : `abort;
 }
@@ -44,9 +50,9 @@ global define symbol ReadDialog() ``{
  * Write settings dialog
  * @return `abort if aborted and `next otherwise
  */
-global define symbol WriteDialog() ``{
+symbol WriteDialog() {
     Wizard::RestoreHelp(HELPS["write"]:"");
-    XXPkgXX::AbortFunction = ``{ return PollAbort();};
+    XXPkgXX::AbortFunction = PollAbort;
     boolean ret = XXPkgXX::Write();
     return ret ? `next : `abort;
 }
@@ -55,7 +61,7 @@ global define symbol WriteDialog() ``{
  * Summary dialog
  * @return dialog result
  */
-global define symbol SummaryDialog() ``{
+any SummaryDialog() {
 
     /* XXPkgXX summary dialog caption */
     string caption = _("XXPkgXX Configuration");
@@ -115,7 +121,7 @@ global define symbol SummaryDialog() ``{
  * Overview dialog
  * @return dialog result
  */
-global define symbol OverviewDialog() ``{
+any OverviewDialog() {
 
     /* XXPkgXX overview dialog caption */
     string caption = _("XXPkgXX Overview");

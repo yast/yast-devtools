@@ -84,6 +84,7 @@ my @ycp_favourites =
      "x11",
      "packager",
      "transfer",
+     "update",
      "autoinstallation",
      );
 

@@ -45,9 +45,19 @@ YCPValue XXPkgXXAgent::Read(const YCPPath &path, const YCPValue& arg)
  * Write
  */
 YCPValue XXPkgXXAgent::Write(const YCPPath &path, const YCPValue& value,
-			     const YCPValue& arg)
+    const YCPValue& arg)
 {
     y2error("Wrong path '%s' in Write().", path->toString().c_str());
+    return YCPVoid();
+}
+
+/**
+ * Execute
+ */
+YCPValue XXPkgXXAgent::Execute(const YCPPath &path,
+    const YCPValue& value = YCPNull(), const YCPValue& arg = YCPNull())
+{
+    y2error("Wrong path '%s' in Execute().", path->toString().c_str());
     return YCPVoid();
 }
 

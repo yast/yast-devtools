@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar  1 12:56:49 CET 2004 - jsrain@suse.de
+
+- fixed ycpdoc to process correctly function definitions without
+  double backquites
+
+-------------------------------------------------------------------
 Fri Feb 27 12:23:39 CET 2004 - mvidner@suse.cz
 
 - y2tool is prefix aware

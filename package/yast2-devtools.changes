@@ -2,6 +2,7 @@
 Tue Jul 09 14:44:58 CEST 2002 - arvin@suse.de
 
 - changed call of xgettext (bug #16832)
+- run y2autoconf and y2automake during build (of created packages)
 
 -------------------------------------------------------------------
 Mon Jul  8 16:22:38 CEST 2002 - mvidner@suse.cz

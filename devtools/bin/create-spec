@@ -96,6 +96,8 @@ Group:		SuSE internal",
 
     "\@BUILD\@" =>
 "\%build
+y2tool y2autoconf
+y2tool y2automake
 autoreconf --force --install
 
 \%ifarch s390x
@@ -110,6 +112,8 @@ make",
 
     "\@BUILD-QT\@" =>
 "\%build
+y2tool y2autoconf
+y2tool y2automake
 autoreconf --force --install
 
 \%ifarch s390x

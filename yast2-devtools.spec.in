@@ -1,5 +1,6 @@
 @HEADER-COMMENT@
-# neededforbuild sgmltool gpp libgpp
+
+# neededforbuild  gpp libgpp sgmltool
 
 @HEADER@
 Requires:	yast2
@@ -15,9 +16,16 @@ BuildArchitectures: noarch
 
 @PREP@
 
-@BUILD@
+%build
+autoreconf --force --install
+
+%{?suse_update_config:%{suse_update_config -f}}
+./configure --libdir=%{_libdir}
+make
 
 @INSTALL@
+
+@CLEAN@
 
 %files
 %defattr(-,root,root)

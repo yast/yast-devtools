@@ -1,4 +1,17 @@
 -------------------------------------------------------------------
+Tue Jan 27 10:18:37 CET 2004 - mvidner@suse.cz
+
+- 
+
+-------------------------------------------------------------------
+Tue Jan 27 10:14:57 CET 2004 - mvidner@suse.cz
+
+- y2autoconf, CXXFLAGS:
+  removed useless -Wmissing-prototypes, added -Woverloaded-virtual 
+- freshdoc: process also core/autodocs
+- 2.9.7
+
+-------------------------------------------------------------------
 Mon Jan 26 16:42:12 CET 2004 - msvec@suse.cz
 
 - leave only *ybc in CLEANFILES

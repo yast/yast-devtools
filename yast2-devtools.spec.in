@@ -43,6 +43,7 @@ make
 @ybindir@/makehtml
 @ybindir@/makedocs
 @ybindir@/makebuiltindocs
+@ybindir@/cleanuppo.awk
 @ybindir@/installmo
 @ybindir@/makemo
 @ybindir@/makepot

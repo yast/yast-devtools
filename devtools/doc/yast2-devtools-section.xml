@@ -36,7 +36,8 @@ sudo make install
 <listitem userlevel="suse">
 
 <para>
-    See the <link linkend="devtools_migration" endterm="devtools_migration.title"/> how to change your C++ or
+    See the <link linkend="devtools_migration"
+        endterm="devtools_migration.title"/> how to change your C++ or
 YCP module.
 </para>
 </listitem>
@@ -76,7 +77,7 @@ targets, this toplevel <filename>Makefile.am</filename> is now automatically gen
 <para>
 The only thing that is (or, rather, "should be") different in all those
 toplevel <filename>Makefile.am</filename> files is the "<literal remap="tt">SUBDIRS =</literal>" line. This line is
-moved to a <link linkend="devtools_subdirs"/> in the
+moved to a <link linkend="devtools_subdirs">SUBDIRS</link>  in the
 package's toplevel directory, much like <literal remap="tt">RPMNAME</literal>, <literal remap="tt">VERSION</literal>,
 <literal remap="tt">MAINTAINER</literal> etc. - the rest of <filename>Makefile.am</filename> is copied from a common
 path <filename>/usr/share/YaST2/data/devtools/admin</filename>. Thus, changes that should affect
@@ -942,8 +943,8 @@ then use "<literal remap="tt">make package</literal>".
 </answer>
 </qandaentry>
 
-<qandaentry id="devtools_subdirs">
-<question>
+<qandaentry>
+<question id="devtools_subdirs">
 <para>Do I really need a <literal remap="tt">SUBDIRS</literal> file?</para>
 </question>
 

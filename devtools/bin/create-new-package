@@ -96,6 +96,8 @@ sub main()
 
     # XXpkgXX
     $raw_name = $new_name;
+    $raw_name =~ s/-([A-Z]+)/-\L$1/;
+    $raw_name =~ s/-([A-Z]+)/-\L$1/;
 
     # XXPkgXX
     $Raw_name = $new_name;

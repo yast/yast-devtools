@@ -12,7 +12,6 @@
 #	See sub usage() for command line options.
 #
 # Author:  Stefan Hundhammer <sh@suse.de>
-# Updated: 2001-10-08
 #
 # $Id$
 #
@@ -210,7 +209,6 @@ sub check_ycp_file()
     my $has_translations = check_for_translations( $ycp_code );
     check_translations( $ycp_code )		if $has_translations;
     check_widget_params( $ycp_code )		unless $dont_check_keyboard_shortcuts && $dont_force_translations;
-    check_alternate_declarations( $ycp_code )	unless $dont_check_alternate_declarations;
     check_obsolete_functions( $ycp_code )	unless $dont_check_obsolete_functions;
     check_predefined_messages( $ycp_code )	unless $dont_check_predefined_messages;
     check_imports( $ycp_code )			unless $dont_check_imports;
@@ -1061,69 +1059,6 @@ sub check_widget_params()
 
 	    deb( "" );
 	}
-    }
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Check old style alternate YCP variable declarations which are now obsolete,
-# e.g.
-#	string|any  xy  = "hello";	# now invalid
-#	symbol|void sym = `abc;		# now superfluous - all types can be nil
-#
-# Parameters:
-#	$ycp_code	The YCP code to check (without comments!)
-#
-
-sub check_alternate_declarations()
-{
-    my ( $ycp_code ) = @_;
-
-    while ( $ycp_code =~
-	    m{
-		(				# any YCP primitive type
-			(?:string)	|	# "?:": don't store match in $1, $2, ...
-			(?:integer)	|
-			(?:float)	|
-			(?:boolean)	|
-			(?:term)	|
-			(?:symbol)	|
-			(?:list)	|
-			(?:map)		|
-			(?:locale)	|
-			(?:byteblock)	|
-			(?:path)	|
-			(?:void)	|
-			(?:any)
-		)
-			\s*			# maybe whitespace
-			\|			# literal pipe character "|"
-			\s*			# maybe whitespace
-		(				#
-			(?:string)	|
-			(?:integer)	|
-			(?:float)	|
-			(?:boolean)	|
-			(?:term)	|
-			(?:symbol)	|
-			(?:list)	|
-			(?:map)		|
-			(?:locale)	|
-			(?:byteblock)	|
-			(?:path)	|
-			(?:void)	|
-			(?:any)
-		)
-	    }xmsg				# "x": enable regexp comments
-						# "m": multi line input string
-						# "s": "." matches newline
-						# "g": enable repeated matches in while() loop
-	    )
-    {
-	my $line_no	= count_lines( $ycp_code, pos( $ycp_code ) ) + 1;
-
-	warning( $line_no, "Obsolete alternative declaration: \"$1|$2\"" )
     }
 }
 
@@ -1993,7 +1928,7 @@ sub usage()
 	"\n"									.
 	"Check one or more YaST2 YCP scripts for common errors.\n"		.
 	"\n"									.
-	"\t-a don't check alternate declarations (map|any x, map|void x)\n"	.
+	"\t-a obsolete (alternate declarations are a syntax error now)\n"	.
 	"\t-b don't check for obsolete functions\n"				.
 	"\t-c don't check file header comments\n"				.
 	"\t-d debug\n"								.

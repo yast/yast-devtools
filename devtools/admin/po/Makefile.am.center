@@ -2,7 +2,7 @@
 ##
 ## Makefile.am.center for a YaST2 translation (po/) subproject
 
-POTDIR = ../../y2t_pot/pot
+POTDIR = ../../pot/pot
 POTFILES = $(wildcard $(POTDIR)/*.pot)
 GENERATED = $(MOFILES)
 CLEANFILES = $(GENERATED)

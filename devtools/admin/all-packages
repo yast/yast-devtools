@@ -48,6 +48,7 @@ autoyast2-installation	inst-sys,default	all,autoinstall
 yast2-debugger		-			development
 yast2-devtools		-			development
 yast2-testsuite		-			development
+y2pmsh			-			development
 
 # agents
 yast2-ldap		inst-sys,default	ldap agent (users)

@@ -30,7 +30,7 @@
     <xsl:template match="file_item">
         <xsl:variable name="moduleName" select="substring-before(@key,'.')"/>
         <xsl:variable name="referenceName"
-            select="concat(substring-before(@key,'.'), '-reference.xml')"/>
+            select="concat(substring-before(@key,'.'), '.xml')"/>
         <xsl:document href="{$referenceName}" method="xml" indent="yes" encoding="ISO-8859-1"> 
             <reference>
                 <xsl:attribute name="id">
@@ -170,9 +170,11 @@
         <xsl:if test="count(provides_item) > 0">
             <xsl:for-each select="provides_item">
                 <xsl:sort select="name"/>
-                <xsl:call-template name="provides_item">
-                    <xsl:with-param name="moduleName" select="$moduleName" />
-                </xsl:call-template>
+                <xsl:if test='global = 1'>
+                    <xsl:call-template name="provides_item">
+                        <xsl:with-param name="moduleName" select="$moduleName" />
+                    </xsl:call-template>
+                </xsl:if>
             </xsl:for-each>
         </xsl:if>
     </xsl:template>

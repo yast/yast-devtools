@@ -15,13 +15,6 @@ BuildArchitectures: noarch
 
 @BUILD@
 
-#%build
-#./devtools/bin/y2automake --bootstrap ./devtools/admin
-#autoreconf --force --install
-#%{?suse_update_config:%{suse_update_config -f}}
-#./configure
-#make
-
 @INSTALL@
 
 %files

@@ -7,7 +7,10 @@
 #
 # $Id$
 
-[ "$UID" -ne "0" ] && exec su -c "$0"
+if [ "$UID" -ne "0" ]; then
+  echo -n "root's "
+  exec su -c "$0"
+fi
 
 . /etc/rc.status
 cd /usr/share/YaST2/modules

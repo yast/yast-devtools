@@ -7,6 +7,7 @@ ycpmakedep - find out YaST import dependencies
 =head1 SYNOPSIS
 
   ycpmakedep -h|--help|--man
+  ycpmakedep [-I <incpath> -M <modpath> -M ...]
   ycpmakedep {--modules [--clusters] | --packages} [--y2dir <y2dir>] [--topdown]
 
 =head1 AUTHOR
@@ -25,7 +26,8 @@ use Pod::Usage;
 my $help = 0;
 my $man = 0;
 
-my $y2dir = "/usr/share/YaST2";
+my $prefix = "/usr";
+
 my %search_paths =
     (
      "INCLUDE" => [],
@@ -50,9 +52,17 @@ GetOptions (
 	    "topdown|t" => \$topdown,
 	    "include-path|I=s" => $search_paths{INCLUDE},
 	    "module-path|M=s" => $search_paths{MODULE},
+	    "prefix=s" => \$prefix,
 	   ) or pod2usage (2);
 pod2usage (1) if $help;
 pod2usage (-exitstatus => 0, -verbose => 2) if $man;
+
+my $y2dir = "$prefix/share/YaST2";
+my %std_search_paths =
+    (
+     "INCLUDE" => [ "$y2dir/include" ],
+     "MODULE" =>  ["$y2dir/modules" ],
+    );
 
 my $makefile = !($modgraph || $pkggraph);
 
@@ -119,7 +129,7 @@ sub get_imports ($$)
 sub find_file ($$)
 {
     my ($type, $what) = @_;
-    my @where = (".", @{$search_paths{$type}});
+    my @where = (".", @{$search_paths{$type}}, @{$std_search_paths{$type}});
     foreach my $path (@where)
     {
 	if (-f "$path/$what")

@@ -5,7 +5,7 @@
 pkgdatadir = @YAST2DEVTOOLS@/bin
 
 bin_SCRIPTS = y2tool
-ybin_SCRIPTS = makedep.sh
+ybin_SCRIPTS = ycpmakedep
 
 pkgdata_SCRIPTS = 				\
 	checkin-stable				\

@@ -1,4 +1,4 @@
-# Makefile.am.common
+# Makefile.am.common					-*- Makefile -*-
 # Generated file, do not edit!
 
 # suffix mapping
@@ -12,8 +12,9 @@ modulebindir = $(moduledir)
 CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 
 # generate dependencies
+# two steps not to lose the file if the command fails
 .dep: $(wildcard *.ycp)
-	${YCPMAKEDEP} > .new.dep
+	${YCPMAKEDEP} ${YCPCFLAGS} > .new.dep
 	mv .new.dep .dep
 
 dist-hook: check-syntax

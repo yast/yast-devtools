@@ -1,7 +1,8 @@
 #! /bin/bash -e
-./import.pl -m > import.notr.dot
-./import.pl -p > import-pkg.notr.dot
-./import.pl -m -c > import-clu.notr.dot
+MKDOT=../devtools/bin/ycpmakedep
+$MKDOT -m > import.notr.dot
+$MKDOT -p > import-pkg.notr.dot
+$MKDOT -m -c > import-clu.notr.dot
 make import.ps
 make import-pkg.ps
 make import-clu.ps

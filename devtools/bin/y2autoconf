@@ -298,9 +298,9 @@ fi
 if test "$YCPDOC" = "false"; then
     AC_MSG_ERROR([ycpdoc is not installed])
 fi
-AC_PATH_PROG(YCPMAKEDEP, makedep.sh, false, $PATH:$devtools_ybindir)
+AC_PATH_PROG(YCPMAKEDEP, ycpmakedep, false, $PATH:$devtools_ybindir)
 if test "$YCPMAKEDEP" = "false"; then
-    AC_MSG_ERROR([ycp makedep.sh is not installed])
+    AC_MSG_ERROR([ycpmakedep is not installed])
 fi
 ',
 

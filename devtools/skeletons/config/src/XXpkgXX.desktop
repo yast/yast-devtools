@@ -14,7 +14,7 @@ X-SuSE-YaST-RootOnly=true
 X-SuSE-YaST-AutoInst=
 X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
-X-SuSE-YaST-AutoinstResource= XXpkgXX
+X-SuSE-YaST-AutoInstResource= XXpkgXX
 
 Icon=XXpkgXX
 Exec=/sbin/yast2 XXpkgXX 

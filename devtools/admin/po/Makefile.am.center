@@ -145,7 +145,7 @@ checkin:
 	  fi; \
 	fi
 
-install-data-local: $(MOFILES)
+install-data-local: $(MOFILES) $(stat)
 	D=$(DESTDIR)$(locale_lang_msg_dir); \
 	  [ -d $$D ] || install -d -m 755 $$D; \
 	for l in $(MOFILES); do \

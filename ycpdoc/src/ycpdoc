@@ -443,7 +443,7 @@ sub parse_file ($)
 		push (@{$f->{"requires"}}, $prov);
 	    }
 
-	    if (/define\s+($ycp_typedecl)?\s*(${ycp_symbol})/o)
+	    if (/define\s+($ycp_typedecl)?\s*(${ycp_symbol})\s*\(/o)
 	    {
 		warning ("Function $2 has no comment.");
 	    }

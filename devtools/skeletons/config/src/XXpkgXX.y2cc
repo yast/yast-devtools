@@ -7,7 +7,7 @@
 [Y2Module XXpkgXX]
 
 ; name of the entry, shown in y2cc
-Name = _("XXPkgXX configuration")
+Name = _("XXPkgXX")
 
 ; "raw" group name to which this module belongs
 ; see /usr/share/YaST2/config/y2cc.groups for valid values

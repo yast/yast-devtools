@@ -6,7 +6,7 @@
 #
 #
 # Author:  Stefan Hundhammer <sh@suse.de>
-# Updated: 2004-02-23
+# Updated: 2004-02-24
 
 use strict;
 use English;
@@ -45,21 +45,34 @@ my @core_binaries =
 
 
 my $work_root = $ENV{'PWD'};
-my $make_log = $work_root . "/make.log";
+my $make_log  = $work_root . "/make.log";
 
 
 #
 # Other global variables.
 #
 
-my $verbose			= 1;	# -v
-my $debug			= 1;	# -d
-
 my $disable_make_makefile_cvs	= 0;	# -f
 my $enable_make_core_binaries	= 0;	# -b
 my $enable_byte_compile_modules	= 0;	# -m
 my $enable_make_ycp_packages	= 0;	# -y
 my $enable_make_all		= 1;	# -a
+
+
+# Verbosity values
+
+use constant
+{
+    LOG_ALWAYS		=> 999,
+    LOG_MILESTONE	=> 3,
+    LOG_PROGRESS	=> 2,
+    LOG_INFO		=> 1,
+    LOG_DEBUG		=> 0
+};
+
+my $tty_verbosity		= LOG_PROGRESS;
+my $log_verbosity		= LOG_INFO;
+
 
 my $make_args			= "";
 my $sudo_cmd			= "/usr/bin/sudo";
@@ -104,9 +117,25 @@ sub main()
     getopts('hvsdfbmya');
 
     usage()		if $opt_h;
-    $verbose	= 1 	if $opt_v;
-    $verbose	= 0 	if $opt_s;
-    $debug	= 1 	if $opt_d;
+
+    if ( $opt_v )		# verbose
+    {
+	$tty_verbosity	= LOG_INFO;
+	$log_verbosity	= LOG_DEBUG;
+    }
+
+    if ( $opt_d )		# debug
+    {
+	$tty_verbosity	= LOG_DEBUG;
+	$log_verbosity	= LOG_DEBUG;
+    }
+
+    if ( $opt_s )		# silent
+    {
+	$tty_verbosity	= LOG_MILESTONE;
+	$log_verbosity	= LOG_PROGRESS;
+    }
+
 
     $enable_make_all			= 0	if $opt_b or $opt_m or $opt_y;
     $enable_make_core_binaries		= 1	if $opt_b;
@@ -121,13 +150,16 @@ sub main()
 
 
     # All remaining parameters go to "make".
-    $make_args = join @ARGV;
+    $make_args = join( @ARGV );
 
     unlink $make_log;
+    open( LOG, ">" . $make_log ) or warn "Couldn't open $make_log";
 
     make_core_binaries()	if $enable_make_all or $enable_make_core_binaries;
     byte_compile_modules()	if $enable_make_all or $enable_byte_compile_modules;
     make_ycp_packages()		if $enable_make_all or $enable_make_ycp_packages;
+
+    close( LOG );
 }
 
 
@@ -138,7 +170,7 @@ sub main()
 
 sub make_core_binaries()
 {
-    logf( "--- Step 1 (-b): Building core binaries..." );
+    log_milestone( "--- Phase 1 (-b): Building core binaries..." );
 
     my $dir;
 
@@ -147,7 +179,7 @@ sub make_core_binaries()
 	make( $dir );
     }
 
-    logf( "--- Core binaries done." );
+    log_milestone( "--- Core binaries done." );
 }
 
 
@@ -157,14 +189,14 @@ sub make_core_binaries()
 
 sub byte_compile_modules()
 {
-    logf( "--- Step 2 (-m): Byte-compiling YCP modules..." );
+    log_milestone( "--- Phase 2 (-m): Byte-compiling YCP modules..." );
 
     #
     # Find all YCP modules in CVS working directory
     #
 
     # Make use of YCP programming conventions: Module names start with a capital letter.
-    my @module_candidates = find_files( $work_root, "[A-Z]*.ycp", 
+    my @module_candidates = find_files( $work_root, "[A-Z]*.ycp",
 					"(testsuite|examples|skeleton|openteam)" );
 
     my $file;
@@ -187,7 +219,7 @@ sub byte_compile_modules()
 
 	if ( ! defined( $ycp_modules{ $file } ) )
 	{
-	    logf( "Warning: Module $file not found below $work_root" );
+	    log_warning( "Module $file not found below $work_root" );
 	}
     }
 
@@ -196,7 +228,7 @@ sub byte_compile_modules()
     # Clear old YCP byte code files (.ybc)
     #
 
-    deb( "Removing old byte code files" );
+    log_progress( "Removing old byte code files" );
     system( "$sudo_cmd rm -f $modules_dir/*.ybc" );
 
 
@@ -204,7 +236,7 @@ sub byte_compile_modules()
     # Clear old YCP module files (.ycp)
     #
 
-    deb( "Removing old modules from $modules_dir" );
+    log_progress( "Removing old modules from $modules_dir" );
     system( "$sudo_cmd rm -f $modules_dir/*.ycp" );
 
 
@@ -212,7 +244,7 @@ sub byte_compile_modules()
     # Copy modules from CVS tree to system
     #
 
-    deb( "Installing " . scalar( keys( %ycp_modules ) ) . " YCP modules" );
+    log_progress( "Installing " . scalar( keys( %ycp_modules ) ) . " YCP modules" );
 
     make_install_dir( $modules_dir );
     xargs_install( $modules_dir, values( %ycp_modules ) );
@@ -229,7 +261,7 @@ sub byte_compile_modules()
 	find_include_statements( $modules_dir . "/" . $module );
     }
 
-    deb( "Modules require " . scalar( keys( %needed_ycp_include_files ) ) . " YCP include files" );
+    log_progress( "Modules require " . scalar( keys( %needed_ycp_include_files ) ) . " YCP include files" );
 
     #
     # Now find and install all include files required by the installed YCP modules
@@ -245,6 +277,9 @@ sub byte_compile_modules()
 
     my @order = calc_ycp_compilation_order();
     byte_compile( @order );
+
+
+    log_milestone( "--- Byte-compiling YCP modules done." );
 }
 
 
@@ -255,7 +290,11 @@ sub byte_compile_modules()
 
 sub make_ycp_packages()
 {
-    logf( "--- Step 3 (-y): Building YCP packages..." );
+    log_milestone( "--- Phase 3 (-y): Building YCP packages..." );
+
+    log_always( "*** still missing! ***" );
+
+    log_milestone( "--- Building YCP packages done." );
 }
 
 
@@ -269,11 +308,12 @@ sub make_ycp_packages()
 sub make()
 {
     my( $pkg ) = @_;
+    my $error = 0;
 
     chdir $work_root;
     chdir $pkg;
 
-    logf( "Building $pkg" );
+    log_progress( "Building $pkg" );
 
 
     # Check if "make -f Makefile.cvs" must be performed.
@@ -291,19 +331,28 @@ sub make()
     if ( $do_make_makefile_cvs )
     {
 
-	deb( "    make -f Makefile.cvs" );
+	log_progress( "\tmake -f Makefile.cvs" );
 	system( "make -f Makefile.cvs >>$make_log 2>&1" );
 
-	die "*** FATAL: 'make -f Makefile.cvs' failed for $pkg\n" if ( $CHILD_ERROR );
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'make -f Makefile.cvs' failed for $pkg" );
+	    $error = 1;
+	}
     }
 
     #
     # make
     #
 
-    deb( "    make $make_args" );
+    log_progress( "\tmake $make_args" );
     system( "make $make_args >>$make_log 2>&1" );
-    die "*** FATAL: 'make $make_args' failed for $pkg\n" if ( $CHILD_ERROR );
+
+    if ( $CHILD_ERROR )
+    {
+	log_error( "'make $make_args' failed for $pkg" );
+	$error = 1;
+    }
 
     #
     # sudo make install
@@ -311,12 +360,17 @@ sub make()
 
     if ( $make_args eq "" )
     {
-	deb( "    $sudo_cmd make install" );
+	log_progress( "\t$sudo_cmd make install" );
 	system( "$sudo_cmd make install >>$make_log 2>&1" );
-	die "*** FATAL: '$sudo_cmd make install' failed for $pkg\n" if ( $CHILD_ERROR ) ;
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'$sudo_cmd make install' failed for $pkg" );
+	    $error = 1;
+	}
     }
 
-    deb( "    OK" );
+    log_progress( "\tOK" ) unless $error;
 
     chdir $work_root;
 }
@@ -338,7 +392,7 @@ sub is_ycp_module()
     my ( $file_name ) = @_;
     my $module_name = basename( $file_name, ".ycp" );
 
-    # deb( "Checking mod candidate $module_name: $file_name" );
+    log_debug( "Checking mod candidate $module_name: $file_name" );
     open( MOD, $file_name ) or return 0;
 
     my $line;
@@ -350,7 +404,7 @@ sub is_ycp_module()
 
 	if ( $line =~ /^\s*module\s+"$module_name"\s*;/ )
 	{
-	    # deb( "Found module $module_name in $file_name" );
+	    log_debug( "Found \'module \"$module_name\"\' in $file_name" );
 	    close( MOD );
 	    return 1;
 	}
@@ -374,7 +428,11 @@ sub find_include_statements()
 {
     my ( $ycp ) = @_;
 
-    open( YCP, $ycp ) or die "Can't open $ycp";
+    if ( ! open( YCP, $ycp ) )
+    {
+	log_error( "Can't open $ycp" );
+	return;
+    }
 
     my $line;
 
@@ -390,7 +448,7 @@ sub find_include_statements()
 	{
 	    my $include_file = $1;
 	    $needed_ycp_include_files{ $include_file } = undef;
-	    # deb( basename( $ycp ) . " includes \"" . $include_file . "\"" );
+	    log_info( basename( $ycp ) . " includes \"" . $include_file . "\"" );
 	    $included_by{ $include_file } .= basename ( $ycp ) . " " ;
 	}
     }
@@ -407,7 +465,7 @@ sub find_include_statements()
 
 sub locate_include_files()
 {
-    deb( "Searching include files" );
+    log_progress( "Searching include files" );
 
     # Grep all Makefile.am files to find out where include files get installed to.
     # This is necessary since somebody came up with that crazy idea to give
@@ -419,11 +477,11 @@ sub locate_include_files()
 
     # Cache YCP files for faster search
 
-    deb( "Creating .ycp file location cache" );
+    log_progress( "Creating .ycp file location cache" );
     my @ycp_files = find_files( $work_root, "*.ycp", "(testsuite|examples|skeleton)" );
 
 
-    deb( "Mapping include file paths" );
+    log_progress( "Mapping include file paths" );
 
     #
     # Map all full path names to install directories, if possible
@@ -445,7 +503,7 @@ sub locate_include_files()
 	    $target .= "/" . basename( $ycp_file );
 	    $found_ycp_include_files{ $target } = $ycp_file;
 
-	    # deb( "Include file " . $target . " is " . $ycp_file );
+	    log_info( "Include file " . $target . " is " . $ycp_file );
 	}
     }
 
@@ -458,25 +516,25 @@ sub locate_include_files()
 	if ( ! defined( $found_ycp_include_files{ $needed_include } ) )
 	{
 	    $not_found++;
-	    logf( "ERROR: Can't find include file \"" . $needed_include 
+	    log_error( "Can't find include file \"" . $needed_include
 		  . "\"\n    included by " . $included_by{ $needed_include } );
 	}
 	else
 	{
-	    # deb( "Found " . $needed_include );
+	    log_debug( "Found " . $needed_include );
 
-	    $needed_ycp_include_files{ $needed_include } = 
+	    $needed_ycp_include_files{ $needed_include } =
 		$found_ycp_include_files{ $needed_include };
 	}
     }
 
     if ( $not_found > 0 )
     {
-	logf( "Can't resolve YCP include dependencies" );
+	log_error( "Can't resolve YCP include dependencies" );
     }
     else
     {
-	deb( "Found all YCP files included from modules" );
+	log_progress( "Found all YCP files included from modules" );
     }
 }
 
@@ -488,7 +546,7 @@ sub locate_include_files()
 
 sub install_include_files()
 {
-    deb( "Installing include files" );
+    log_progress( "Installing include files" );
     my $ycp_include_file;
 
     foreach $ycp_include_file ( keys( %needed_ycp_include_files ) )
@@ -502,7 +560,7 @@ sub install_include_files()
 	}
 	else
 	{
-	    logf( "WARNING: Skipping $ycp_include_file - not found" );
+	    log_warning( "Skipping $ycp_include_file - not found" );
 	}
     }
 }
@@ -538,7 +596,7 @@ sub xargs_install()
 	{
 	    # Buffer is full - execute command
 	    # (avoid "command line too long" error)
-	    
+
 	    install_file( $sources, $target_dir );
 	    $sources = "";
 	}
@@ -569,7 +627,8 @@ sub install_file()
 {
     my ( $src, $target ) = @_;
     my $cmd = "$sudo_cmd $install_cmd -p -m 644 $src $target";
-    # deb( "$cmd" );
+
+    log_info( "$cmd" );
     system( $cmd );
 }
 
@@ -585,7 +644,8 @@ sub make_install_dir()
 {
     my ( $dir ) = @_;
     my $cmd = "$sudo_cmd $install_cmd -m 755 -d $dir";
-    # deb( "$cmd" );
+
+    log_info( "$cmd" );
     system( $cmd );
 }
 
@@ -606,18 +666,22 @@ sub make_install_dir()
 # This function now searches all Makefile.am files in the CVS working directory
 # for lines with @yncludedir@ and fills the global %ycp_install_dirs hash with
 # the result. The keys of this hash are directories in the CVS working tree,
-# the values are the target directories below /usr/share/YaST2/include 
+# the values are the target directories below /usr/share/YaST2/include
 # (with the @yncludedir@ macro removed, e.g. "network/services" ).
 
 sub find_install_dirs()
 {
-    deb( "Searching target directories for YCP include files" );
+    log_progress( "Searching target directories for YCP include files" );
 
     my $makefile_am;
 
     foreach $makefile_am ( find_files( $work_root, "Makefile.am", "(testsuite|examples|skeleton)" ) )
     {
-	open( MAKEFILE_AM, $makefile_am ) or die "Can't open $makefile_am";
+	if ( ! open( MAKEFILE_AM, $makefile_am ) )
+	{
+	    log_error( "Can't open $makefile_am" );
+	    return;
+	}
 
 	my $dir = dirname( $makefile_am );
 	my $line;
@@ -633,12 +697,12 @@ sub find_install_dirs()
 
 		if ( defined( $ycp_install_dirs{ $dir } ) )
 		{
-		    logf( "Include target in $makefile_am not unique!" );
+		    log_error( "Include target in $makefile_am not unique!" );
 		}
 		else
 		{
 		    $ycp_install_dirs{ $dir } = $line;
-		    # deb( "Dir " . $dir . " => " . $line );
+		    log_debug( "Dir " . $dir . " => " . $line );
 		}
 	    }
 	}
@@ -660,10 +724,16 @@ sub find_install_dirs()
 
 sub calc_ycp_compilation_order()
 {
-    deb( "Calculating YCP module compilation order" );
+    log_progress( "Calculating YCP module compilation order" );
 
     chdir( $modules_dir );
-    my @order = split( "\n", `$ycpc_cmd -f -r -I $ycp_include_dir *.ycp | egrep -v '(^Check)|(^\$)'` );
+    my $cmd = "$ycpc_cmd -f -r -I $ycp_include_dir *.ycp 2>>$make_log | egrep -v '(^Check)|(^\$)'";
+
+    log_info( "$cmd" );
+    my @order = split( "\n", `$cmd` );
+
+    log_debug( "YCP compilation order:\n", join( "\t\n", @order ) );
+    chdir( $work_root );
 
     return @order;
 }
@@ -685,11 +755,17 @@ sub byte_compile()
 
     foreach $module ( @modules )
     {
+
 	$module .= ".ycp";
-	my $cmd = "$sudo_cmd $ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module";
-	# deb( $cmd );
-	system $cmd;
+	log_info( "Byte-compiling $module" );
+
+	my $cmd = "$sudo_cmd $ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module >>$make_log 2>&1";
+
+	log_debug( $cmd );
+	system( $cmd );
     }
+
+    chdir( $work_root );
 }
 
 
@@ -709,60 +785,100 @@ sub byte_compile()
 sub find_files()
 {
     my ( $dir, $pattern, $exclude_regexp ) = @_;
-    my @files=split( '\n', `find $dir -name "$pattern" -print | egrep -v "$exclude_regexp"`);
+    my $cmd = "find $dir -name \"$pattern\" -print | egrep -v \"$exclude_regexp\"";
+
+    log_debug( "$cmd" );
+    my @files = split( '\n', `$cmd`);
 
     return @files;
 }
 
+#-----------------------------------------------------------------------------
+
+# Logging functions - messages go to stdout and to the log file (make.log)
+# depending on the respective verbosities of each.
+
+sub log_always()
+{
+    log_msg( LOG_ALWAYS, @_ );
+}
+
+sub log_milestone()
+{
+    log_msg( LOG_MILESTONE, @_ );
+}
+
+sub log_progress()
+{
+    log_msg( LOG_PROGRESS, @_ );
+}
+
+sub log_info()
+{
+    log_msg( LOG_INFO, @_ );
+}
+
+sub log_debug()
+{
+    log_msg( LOG_DEBUG, @_ );
+}
+
 
 #-----------------------------------------------------------------------------
 
-# Log a message to stdout if verbose mode is set
-# (command line option '-v').
+# Log errors to stderr and to the log file - unconditionally.
+
+sub log_error()
+{
+    log_stderr( ( "ERROR: ", @_ ) );
+}
+
+#-----------------------------------------------------------------------------
+
+# Log warnings to stderr and to the log file - unconditionally.
+
+sub log_warning()
+{
+    log_stderr( ( "WARNING: ", @_ ) );
+}
+
+#-----------------------------------------------------------------------------
+
+# Log a message to stdout and to the log file (make.log) depeding on the current
+# log levels.
 #
 # Parameters:
-#	Messages to write (any number).
+#	(int) log level
+#	(array) messages
 
-sub logf()
+sub log_msg()
 {
-    my $msg;
+    my $log_level = shift;
+    my $msg = join( " ", @_ ) . "\n";
 
-    if ( $verbose )
-    {
-	foreach $msg( @_ )
-	{
-	    print $msg . " ";
-	}
+    $OUTPUT_AUTOFLUSH = 1;	# inhibit buffering
 
-	$OUTPUT_AUTOFLUSH = 1;	# inhibit buffering
-	print "\n";
-    }
+    print $msg		if $log_level >= $tty_verbosity;
+    print LOG $msg	if $log_level >= $log_verbosity;
 }
 
 
 #-----------------------------------------------------------------------------
 
 
-# Log a debugging message to stdout if debug mode is set
-# (command line option '-d').
+# (Unconditionally) log a message to stderr and to the log file (make.log)
 #
 # Parameters:
-#	Messages to write (any number).
+#	(array) messages
 
-sub deb()
+sub log_stderr()
 {
-    my $msg;
+    my $msg = join( " ", @_ ) . "\n";
 
-    if ( $debug )
-    {
-	foreach $msg( @_ )
-	{
-	    print $msg . " ";
-	}
+    $OUTPUT_AUTOFLUSH = 1;	# inhibit buffering
 
-	$OUTPUT_AUTOFLUSH = 1;	# inhibit buffering
-	print "\n";
-    }
+    print STDERR $msg;
+    print LOG    $msg;
 }
 
 

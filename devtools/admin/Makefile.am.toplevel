@@ -75,7 +75,7 @@ EXTRA_DIST = \
 	VERSION RPMNAME MAINTAINER configure.in.in		\
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
 	$(Y2TEXTDOMAIN_FILE) $(POTFILES_FILE)			\
-	$(if $(IS_DEVTOOLS),,$(POT_DST))
+	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))
 
 show-extra-dist:
 	@echo $(EXTRA_DIST)

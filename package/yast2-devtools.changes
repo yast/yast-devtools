@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan 16 16:03:04 CET 2004 - msvec@suse.cz
+
+- updates for the NI
+- 2.9.4
+
+-------------------------------------------------------------------
 Mon Dec 15 11:57:28 CET 2003 - msvec@suse.cz
 
 - use prefix wher possible to simplify relocation

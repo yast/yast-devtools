@@ -1,3 +1,19 @@
 # Makefile.am.common
-# Placeholder for the NI stuff
-#
+# Generated file, do not edit!
+
+# suffix mapping
+%.ybc: %.ycp $(ycpchook)
+	Y2DIR=$(yast2dir) $(bindir)/ycpc -c -M. -q $(YCPCFLAGS) $<
+
+modulebin_DATA = $(patsubst %.ycp,%.ybc,$(module_DATA))
+modulebindir = $(moduledir)
+
+# files to clean
+CLEANFILES = $(modulebin_DATA)
+
+# generate dependencies
+.dep: $(wildcard *.ycp)
+	$(ybindir)/makedep.sh > .new.dep
+	mv .new.dep .dep
+
+-include .dep

@@ -195,13 +195,16 @@ check-cvs-up-to-date:
 check-tagversion:
 	@cd $(srcdir) && cvs status -v VERSION | grep -w `$(TAGVERSION) -n` >/dev/null || ( echo "ERROR: Please run 'tagversion' first"; false )
 
-check-parse:
+check-parse-old:
 	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "yast2-core" ] ; then \
 		echo "Running parseycp..." ; \
 		parseycp -q -R ; \
 	else \
 		echo "Not running parseycp." ; \
 	fi
+
+check-parse:
+	@echo "Not running parseycp."
 
 check-all-packages:
 	@if [ ! -e "$(ALL_PACKAGES)" ]; then				\

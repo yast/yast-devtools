@@ -5,6 +5,7 @@
 pkgdatadir = @YAST2DEVTOOLS@/bin
 
 bin_SCRIPTS = y2tool
+ybin_SCRIPTS = makedep.sh
 
 pkgdata_SCRIPTS = 				\
 	y2autoconf 				\
@@ -19,5 +20,5 @@ pkgdata_SCRIPTS = 				\
 	get-lib					\
 	version
 
-EXTRA_DIST = $(bin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
+EXTRA_DIST = $(bin_SCRIPTS) $(ybin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
 

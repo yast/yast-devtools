@@ -3,19 +3,19 @@
 
 @HEADER@
 Requires:	yast2
+
 BuildArchitectures:	noarch
 
 Summary:	Configuration of XXpkgXX
 
 %description
-This package is a part of YaST2. It contains the necessary scripts to
-configure XXpkgXX.
+-
 
 @PREP@
 
-@BUILD-YCP@
+@BUILD@
 
-@INSTALL-YCP@
+@INSTALL@
 
 @CLEAN@
 

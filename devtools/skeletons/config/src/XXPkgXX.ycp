@@ -1,225 +1,196 @@
 /**
- * File:
- *   modules/XXPkgXX.ycp
- *
- * Package:
- *   Configuration of XXpkgXX
- *
- * Summary:
- *   Data for configuration of XXpkgXX, input and output functions.
- *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * File:	modules/XXPkgXX.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Data for configuration of XXpkgXX, input and output functions.
+ * Authors:	XXmaintainerXX <XXemailXX>
  *
  * $Id$
  *
  * Representation of the configuration of XXpkgXX.
  * Input and output routines.
- *
  */
 
 {
-    // Set the name of the module
-    module "XXPkgXX";
-    import "Progress";
-    import "Report";
 
-    textdomain "XXpkgXX";
+module "XXPkgXX";
+textdomain "XXpkgXX";
 
-    // Settings: Define all variables needed for configuration of XXpkgXX
-    // TODO FIXME: Define all the variables necessary to hold
-    // TODO FIXME: the configuration here (with the appropriate
-    // TODO FIXME: description)
-    // TODO FIXME: For example:
-    //   /**
-    //    * List of the configured cards.
-    //    */
-    //   list cards = [];
-    //
-    //   /**
-    //    * Some additional parameter needed for the configuration.
-    //    */
-    //   boolean additional_parameter = true;
+import "Progress";
+import "Report";
+import "Summary";
 
-    /**
-     * Read all XXpkgXX settings from the SCR
-     * @param abort A block that can be called by Read to find
-     *	      out whether abort is requested. Returns true if abort
-     *	      was pressed.
-     * @return boolean True on success
-     */
-    global define boolean Read (block abort) ``{
-	boolean read_aborted = false;
+/**
+ * Abort function
+ * return boolean return true if abort
+ */
+global block AbortFunction = nil;
 
-	// TODO FIXME Assign the true texts intead of these
-	string caption = _("Initializing XXpkgXX configuration");
-	// TODO FIXME Set the right number of stages
-	integer no_of_steps = 4;
+// Settings: Define all variables needed for configuration of XXpkgXX
+// TODO FIXME: Define all the variables necessary to hold
+// TODO FIXME: the configuration here (with the appropriate
+// TODO FIXME: description)
+// TODO FIXME: For example:
+//   /**
+//    * List of the configured cards.
+//    */
+//   list cards = [];
+//
+//   /**
+//    * Some additional parameter needed for the configuration.
+//    */
+//   boolean additional_parameter = true;
 
-	// TODO FIXME Names of real stages
-	// We do not set help text here, because it was set outside
-	Progress::New ( caption, " ", no_of_steps,
-		       [ _("Read the database"),
-			 _("Read the previous settings"),
-			 _("Detect the devices") ],
-		       [ _("Reading the database..."),
-			 _("Reading the previous settings..."),
-			 _("Detecting the devices..."),
-			 _("Finished") ],
-		       "" );
+/**
+ * Read all XXpkgXX settings from the SCR
+ * @param abort A block that can be called by Read to find
+ *	      out whether abort is requested. Returns true if abort
+ *	      was pressed.
+ * @return boolean True on success
+ */
+global define boolean Read() ``{
 
-	// TODO FIXME: your code here (fill the above mentioned variables)...
+    /* XXXpkgXX read dialog caption */
+    string caption = _("Initializing XXpkgXX configuration");
 
-	// read database
-	Progress::NextStage ();
-	read_aborted = eval (abort);
-	if (read_aborted)
-	{
-	    return !read_aborted;
-	}
-	sleep (500);	// TODO FIXME remove all sleep()
-	if (false)	// TODO FIXME read db1 here e.g. if (!SCR::Read (.path.db1))
-	{
-	    Report::Error (_("Can not read the database1!"));
-	}
+    // TODO FIXME Set the right number of stages
+    integer no_of_steps = 4;
 
-	// read another database
-	Progress::NextStep ();
-	read_aborted = eval (abort);
-	if (read_aborted)
-	{
-	    return !read_aborted;
-	}
-	sleep (500);
-	if (false)	// TODO FIXME read db2 here e.g. if (!SCR::Read(.path.db2))
-	{
-	    Report::Error (_("Can not read the database2"));
-	}
+    // TODO FIXME Names of real stages
+    // We do not set help text here, because it was set outside
+    Progress::New ( caption, " ", no_of_steps,
+		   [ _("Read the database"),
+		     _("Read the previous settings"),
+		     _("Detect the devices") ],
+		   [ _("Reading the database..."),
+		     _("Reading the previous settings..."),
+		     _("Detecting the devices..."),
+		     _("Finished") ],
+		   "" );
 
-	// read current settings
-	Progress::NextStage ();
-	read_aborted = eval (abort);
-	if (read_aborted)
-	{
-	    return !read_aborted;
-	}
-	sleep (500);
-	if (false)	// TODO FIXME read settings here e.g. if (!SCR::Read(.path.settings))
-	{
-	    Report::Error (_("Can not read current settings!"));
-	}
+    // TODO FIXME: your code here (fill the above mentioned variables)...
 
-	// detect devices
-	Progress::NextStage ();
-	read_aborted = eval (abort);
-	if (read_aborted)
-	{
-	    return !read_aborted;
-	}
-	sleep (500);
-	if (false)	// TODO FIXME detect devices here e.g. if (SCR::Read(.probe.device) == nil)
-	{
-	    Report::Warning (_("Can not detect device"));
-	}
-
-	// increase the progress to "finish"
-	Progress::NextStage ();
-
-	return !read_aborted;
+    // read database
+    Progress::NextStage ();
+    sleep (500);	// TODO FIXME remove all sleep()
+    if (false)	// TODO FIXME read db1 here e.g. if (!SCR::Read (.path.db1))
+    {
+	Report::Error (_("Can not read the database1!"));
     }
 
-    /**
-     * Update the SCR according to XXpkgXX settings
-     * @param abort A block that can be called by Write to find
-     *	      out whether abort is requested. Returns true if abort
-     *	      was pressed.
-     * @return boolean True on success
-     */
-    global define boolean Write (block abort) ``{
-	boolean write_aborted = false;
-	// TODO FIXME Assign the true texts intead of these
-	string caption = _("Saving XXpkgXX configuration");
-	// TODO FIXME And set the right number of stages
-	integer no_of_steps = 2;
-
-	// TODO FIXME Names of real stages
-	// We do not set help text here, because it was set outside
-	Progress::New ( caption, " ", no_of_steps,
-		       [ _("Write the settings"),
-			 _("Run SuSEconfig") ],
-		       [ _("Writing the settings..."),
-			 _("Running SuSEconfig..."),
-			 _("Finished") ],
-		       "" );
-
-	// TODO FIXME: your code here (store the above mentioned variables)...
-
-	// write settings
-	Progress::NextStage ();
-	write_aborted = eval (abort);
-	if (write_aborted)
-	{
-	    return !write_aborted;
-	}
-	sleep (500);
-	if (false)	// TODO FIXME write setting here e.g. if (!SCR::Write(.path.settings, settings))
-	{
-	    Report::Error (_("Can not write settings!"));
-	}
-
-	// run SuSEconfig
-	Progress::NextStage ();
-	write_aborted = eval (abort);
-	if (write_aborted)
-	{
-	    return !write_aborted;
-	}
-	sleep (500);
-	if (false)	// TODO FIXME run SuSE config e.g. if (SCR::Execute(.target.bash, "/sbin/SuSEconfig") != 0)
-	{
-	    Report::Error (_("SuSEconfig script failed!"));
-	}
-
-	// increase the progress to "finish"
-	Progress::NextStage ();
-
-	return !write_aborted;
+    // read another database
+    Progress::NextStep ();
+    sleep (500);
+    if (false)	// TODO FIXME read db2 here e.g. if (!SCR::Read(.path.db2))
+    {
+	Report::Error (_("Can not read the database2"));
     }
 
-    /**
-     * Get all XXpkgXX settings from the first parameter
-     * (For use by autoinstallation.)
-     * @param settings The YCP structure to be imported.
-     * @return boolean True on success
-     */
-    global define boolean Import (map settings) ``{
-	// TODO FIXME: your code here (fill the above mentioned variables)...
-	sleep (3000);
-	return true;
+    // read current settings
+    Progress::NextStage ();
+    sleep (500);
+    if (false)	// TODO FIXME read settings here e.g. if (!SCR::Read(.path.settings))
+    {
+	Report::Error (_("Can not read current settings!"));
     }
 
-    /**
-     * Dump the XXpkgXX settings to a single map
-     * (For use by autoinstallation.)
-     * @return map Dumped settings (later acceptable by Import ())
-     */
-    global define map Export () ``{
-	// TODO FIXME: your code here (return the above mentioned variables)...
-	sleep (3000);
-	return $[];
+    // detect devices
+    Progress::NextStage ();
+    sleep (500);
+    if (false)	// TODO FIXME detect devices here e.g. if (SCR::Read(.probe.device) == nil)
+    {
+	Report::Warning (_("Can not detect device"));
     }
 
-    /**
-     * Build a textual summary that can be used e.g. in inst_hw_config () or
-     * something similar.
-     * @return string Summary of the configuration.
-     */
-    global define string Summary () ``{
-	// TODO FIXME: your code here...
-	return _("Summary of the configuration...");
+    // increase the progress to "finish"
+    Progress::NextStage ();
+
+    return true;
+}
+
+/**
+ * Update the SCR according to XXpkgXX settings
+ * @param abort A block that can be called by Write to find
+ *	      out whether abort is requested. Returns true if abort
+ *	      was pressed.
+ * @return boolean True on success
+ */
+global define boolean Write() ``{
+
+    /* XXXpkgXX read dialog caption */
+    string caption = _("Saving XXpkgXX configuration");
+    // TODO FIXME And set the right number of stages
+    integer no_of_steps = 2;
+
+    // TODO FIXME Names of real stages
+    // We do not set help text here, because it was set outside
+    Progress::New ( caption, " ", no_of_steps,
+		   [ _("Write the settings"),
+		     _("Run SuSEconfig") ],
+		   [ _("Writing the settings..."),
+		     _("Running SuSEconfig..."),
+		     _("Finished") ],
+		   "" );
+
+    // TODO FIXME: your code here (store the above mentioned variables)...
+
+    // write settings
+    Progress::NextStage ();
+    sleep (500);
+    if (false)	// TODO FIXME write setting here e.g. if (!SCR::Write(.path.settings, settings))
+    {
+	Report::Error (_("Can not write settings!"));
     }
 
-    // TODO FIXME: Your code (the needed operations with the settings)
-    // TODO FIXME: For example remembering the card being currently
-    // TODO FIXME: configured and storing it to the structures, etc.
+    // run SuSEconfig
+    Progress::NextStage ();
+    sleep (500);
+    if (false)	// TODO FIXME run SuSE config e.g. if (SCR::Execute(.target.bash, "/sbin/SuSEconfig") != 0)
+    {
+	Report::Error (_("SuSEconfig script failed!"));
+    }
+
+    // increase the progress to "finish"
+    Progress::NextStage ();
+
+    return true;
+}
+
+/**
+ * Get all XXpkgXX settings from the first parameter
+ * (For use by autoinstallation.)
+ * @param settings The YCP structure to be imported.
+ * @return boolean True on success
+ */
+global define boolean Import (map settings) ``{
+    // TODO FIXME: your code here (fill the above mentioned variables)...
+    sleep(3000);
+    return true;
+}
+
+/**
+ * Dump the XXpkgXX settings to a single map
+ * (For use by autoinstallation.)
+ * @return map Dumped settings (later acceptable by Import ())
+ */
+global define map Export () ``{
+    // TODO FIXME: your code here (return the above mentioned variables)...
+    sleep(3000);
+    return $[];
+}
+
+/**
+ * Build a textual summary that can be used e.g. in inst_hw_config () or
+ * something similar.
+ * @return string Summary of the configuration.
+ */
+global define string Summary () ``{
+    // TODO FIXME: your code here...
+    return _("Configuration summary ...");
+}
+
+// TODO FIXME: Your code (the needed operations with the settings)
+// TODO FIXME: For example remembering the card being currently
+// TODO FIXME: configured and storing it to the structures, etc.
+
+/* EOF */
 }

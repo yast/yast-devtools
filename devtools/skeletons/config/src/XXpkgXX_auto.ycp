@@ -1,15 +1,8 @@
 /**
- * File:
- *   XXpkgXX_auto.ycp
- *
- * Package:
- *   Configuration of XXpkgXX
- *
- * Summary:
- *   Client for autoinstallation
- *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * File:	clients/XXpkgXX_auto.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Client for autoinstallation
+ * Authors:	XXmaintainerXX <XXemailXX>
  *
  * $Id$
  *
@@ -26,35 +19,38 @@
  */
 
 {
-    textdomain "XXpkgXX";
 
-    import "XXPkgXX";
+textdomain "XXpkgXX";
 
-    include "XXpkgXX/ui.ycp";
+y2milestone("----------------------------------------");
+y2milestone("XXPkgXX auto started");
 
-    list args = Args ();
-    if ( size (args) <= 0 )
-    {
-	y2error ("Did not get the settings, probably some mistake...");
-	return false;
-    }
-    if ( !is ( Args (0), map ) )
-    {
-	y2error ("Bad argument for XXpkgXX_auto: %1", Args (0));
-	return false;
-    }
+import "XXPkgXX";
+include "XXpkgXX/ui.ycp";
 
-    // The settings are in the first argument
-    map settings = select (args, 0, $[]);
-    y2milestone("Imported: (%1)", settings);
+list args = Args();
+if(size(args) <= 0) {
+    y2error("Did not get the settings, probably some mistake...");
+    return false;
+}
+if(!is(Args(0), map)) {
+    y2error("Bad argument for XXpkgXX_auto: %1", Args(0));
+    return false;
+}
 
-    XXPkgXX::Import ( settings );
+/* The settings are in the first argument */
+map settings = select(args, 0, $[]);
+y2milestone("Imported: (%1)", settings);
 
-    symbol ret = XXPkgXXAutoSequence ();
+XXPkgXX::Import(settings);
+symbol ret = XXPkgXXAutoSequence();
+y2debug("ret=%1", ret);
 
-    if (ret == `next || ret == `finish)
-    {
-	return XXPkgXX::Export ();
-    }
-    return $[];
+y2milestone("XXPkgXX auto finished");
+y2milestone("----------------------------------------");
+
+if(ret == `next) return XXPkgXX::Export();
+return $[];
+
+/* EOF */
 }

@@ -1,102 +1,84 @@
 /**
- * File:
- *   clients/proposal_XXpkgXX.ycp
- *
- * Package:
- *   Configuration of XXpkgXX
- *
- * Summary:
- *   Proposal function dispatcher.
- *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * File:	clients/XXpkgXX_proposal.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Proposal function dispatcher.
+ * Authors:	XXmaintainerXX <XXemailXX>
  *
  * $Id$
  *
  * Proposal function dispatcher for XXpkgXX configuration.
- *
  */
 
 {
-    textdomain "XXpkgXX";
 
-    import "XXPkgXX";
-    import "Progress";
+textdomain "XXpkgXX";
 
-    string func  = Args(0);
-    map    param = Args(1);
-    map    ret   = $[];
+import "XXPkgXX";
+import "Progress";
 
-    // Make proposal for installation/configuration...
-    if ( func == "MakeProposal" )
-    {
-	boolean force_reset = param["force_reset"]:false;
+/* The main () */
+y2milestone("----------------------------------------");
+y2milestone("XXPkgXX proposal started");
 
-	// TODO FIXME Call some function that makes a proposal here:
-	// TODO FIXME For example:
+string func = Args(0);
+map param = Args(1);
+map ret = $[];
 
-	// Do not show any progress during Read()
-	Progress::off ();
-	boolean success = XXPkgXX::Read ( ``{ return false; } );
-	Progress::on ();
+/* create a textual proposal */
+if(func == "MakeProposal") {
+    string proposal = "";
+    string warning = nil;
+    symbol warning_level = nil;
+    boolean force_reset = param["force_reset"]:false;
 
-	string proposal = XXPkgXX::Summary ();
-
-	// Fill return map
-	// TODO FIXME Write the real values here
-	ret =
-	    $[ "preformatted_proposal" : proposal, // TODO FIXME
-	       "warning"               : _("This is just a XXpkgXX proposal!"), // TODO FIXME
-	       "warning_level"         : `blocker // TODO FIXME
-	    ];
+    if(force_reset || !XXPkgXX::proposal_valid) {
+        XXPkgXX::proposal_valid = true;
+	Progress::off();
+	XXPkgXX::Read();
     }
-    // Run an interactive workflow
-    else if ( func == "AskUser" )
-    {
-	boolean has_next = param["has_next"]:false;
+    list sum = XXPkgXX::Summary(false);
+    proposal = select(sum, 0, "");
+    Progress::on();
 
-	// Store current settings
-	any settings = XXPkgXX::Export ();
+    ret = $[
+	"preformatted_proposal" : proposal,
+	"warning_level" : warning_level,
+	"warning" : warning,
+    ];
+}
+/* run the module */
+else if(func == "AskUser") {
+    map stored = XXPkgXX::Export();
+    symbol seq = CallFunction(`XXpkgXX(.propose));
+    if(seq != `next) XXPkgXX::Import(stored);
+    y2debug("stored=%1",stored);
+    y2debug("seq=%1",seq);
+    ret = $[
+	"workflow_sequence" : seq
+    ];
+}
+/* create titles */
+else if(func == "Description") {
+    ret = $[
+	"rich_text_title" : _("XXPkgXX"),
+	"menu_title" : _("&XXPkgXX"),
+	"id" : "XXpkgXX",
+    ];
+}
+/* write the proposal */
+else if(func == "Write") {
+    XXPkgXX::Write();
+}
+/* unknown function */
+else {
+    y2error("unknown function: %1", func);
+}
 
-	// TODO FIXME Call a function that displays a user dialog
-	// TODO FIXME or a sequence of dialogs here:
-	any sequence = CallFunction ( `XXpkgXX ( .noio ) );
+/* Finish */
+y2debug("ret=%1",ret);
+y2milestone("XXPkgXX proposal finished");
+y2milestone("----------------------------------------");
+return ret;
 
-	// Fill return map
-	// TODO FIXME Write the real values here
-	ret =
-	    $[ "workflow_sequence" : sequence // TODO FIXME
-	    ];
-
-	if ( sequence != `next )	// restore previous settings
-	{
-	    XXPkgXX::Import ( settings );
-	}
-    }
-    // Return human readable titles for the proposal
-    else if ( func == "Description" )
-    {
-	// Fill return map
-	// TODO FIXME Usually just static values. Write them here.
-	ret =
-	    $[ "rich_text_title" : _( "XXPkgXX" ),  // TODO FIXME
-	       "menu_title"      : _( "&XXPkgXX" ), // TODO FIXME
-	       "id"              : "XXpkgXX_conf"   // TODO FIXME
-	    ];
-    }
-    // Write the proposed settings
-    else if ( func == "Write" )
-    {
-	// Write settings
-	boolean result = XXPkgXX::Write ();
-
-	ret =
-	    $[ "success" : result ];
-    }
-    else
-    {
-	y2error("Unknown function: %1", func);
-    }
-
-    return ret;
+/* EOF */
 }

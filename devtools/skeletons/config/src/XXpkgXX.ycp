@@ -1,54 +1,51 @@
 /**
- * File:
- *   clients/XXpkgXX.ycp
- *
- * Package:
- *   Configuration of XXpkgXX
- *
- * Summary:
- *   Main file
- *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * File:	clients/XXpkgXX.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Main file
+ * Authors:	XXmaintainerXX <XXemailXX>
  *
  * $Id$
  *
  * Main file for XXpkgXX configuration. Uses all other files.
- *
  */
 
 {
-    /***
-     * <h3>Configuration of the XXpkgXX</h3>
-     */
 
-    textdomain "XXpkgXX";
+/***
+ * <h3>Configuration of the XXpkgXX</h3>
+ */
 
-    include "XXpkgXX/ui.ycp";
+textdomain "XXpkgXX";
 
-    /* The main () */
-    y2milestone ("XXPkgXX module started");
-    y2milestone ("----------------------------------------");
+/* The main () */
+y2milestone ("----------------------------------------");
+y2milestone ("XXPkgXX module started");
 
-    /**
-     * Should we suppress Read() and Write()? It is necessary in proposals...
-     */
-    boolean no_io = false;
+include "XXpkgXX/ui.ycp";
 
-    foreach (`arg, Args(), ``{
-	    if (arg == .noio)
-	    {
-		no_io = true;
-	    }
-	}
-    );
+/* is this proposal or not? */
+boolean propose = false;
+list args = Args();
+if(size(args) > 0) {
+    if(is(Args(0), path) && Args(0) == .propose) {
+        y2milestone("Using PROPOSE mode");
+        propose = true;
+    }
+    else
+        y2error("Bad argument for XXpkgXX: %1", Args(0));
+}
 
+/* main ui function */
+any ret = nil;
 
-    /* main ui function */
-    any ret = (no_io) ? XXPkgXXAutoSequence () : XXPkgXXSequence ();
-    y2debug ("ret == %1", ret);
+if(propose) ret = XXPkgXXAutoSequence();
+else ret = XXPkgXXSequence();
+y2debug("ret == %1", ret);
 
-    /* Finish */
-    y2milestone ("XXPkgXX module finished");
-    return ret;
+/* Finish */
+y2milestone("XXPkgXX module finished");
+y2milestone("----------------------------------------");
+return ret;
+
+/* EOF */
 }

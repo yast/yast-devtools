@@ -1,15 +1,8 @@
 /**
- * File:
- *   XXpkgXX_write.ycp
- *
- * Package:
- *   Configuration of XXpkgXX
- *
- * Summary:
- *   Writing only client
- *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * File:	clients/XXpkgXX_write.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Writing only client
+ * Authors:	XXmaintainerXX <XXemailXX>
  *
  * $Id$
  *
@@ -25,34 +18,39 @@
  */
 
 {
-    textdomain "XXpkgXX";
 
-    import "XXPkgXX";
-    import "Progress";
+textdomain "XXpkgXX";
 
-    list args = Args ();
-    if ( size (args) <= 0 )
-    {
-	y2error ("NOT writing, probably some mistake...");
-	return false;
-    }
-    if ( !is ( Args (0), map ) )
-    {
-	y2error ("Bad argument for XXpkgXX write: %1", Args (0));
-	return false;
-    }
+y2milestone("----------------------------------------");
+y2milestone("XXPkgXX write started");
 
-    // The settings are in the first argument
-    map settings = select (args, 0, $[]);
-    y2milestone("Only writing... (%1)", settings);
+import "XXPkgXX";
+import "Progress";
 
-    if (! XXPkgXX::Import (settings))
-    {
-	return false;
-    }
+list args = Args();
+if(size(args) <= 0) {
+    y2error("NOT writing, probably some mistake...");
+    return false;
+}
+if(!is(Args(0), map)) {
+    y2error ("Bad argument for XXpkgXX write: %1", Args(0));
+    return false;
+}
 
-    Progress::off ();
-    boolean ret = XXPkgXX::Write ( ``{ return false; } );
-    Progress::on ();
-    return ret;
+// The settings are in the first argument
+map settings = select(args, 0, $[]);
+y2milestone("Only writing... (%1)", settings);
+
+if(!XXPkgXX::Import(settings))
+    return false;
+
+Progress::off();
+boolean ret = XXPkgXX::WriteOnly();
+Progress::on();
+
+y2milestone("XXPkgXX write finished");
+y2milestone("----------------------------------------");
+return ret;
+
+/* EOF */
 }

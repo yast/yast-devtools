@@ -1,6 +1,5 @@
 @HEADER-COMMENT@
-
-# neededforbuild  autoconf automake dejagnu expect gpp libgpp libscr libscr-devel libxcrypt libxcrypt-devel liby2 liby2-devel libycp libycp-devel tcl yast2-devtools ydoc
+# neededforbuild gpp libgpp libxcrypt libxcrypt-devel tcl yast2-devel-packages
 
 @HEADER@
 Summary:	-
@@ -8,27 +7,18 @@ Summary:	-
 %description
 -
 
-@HEADER-DEVEL@
-Summary:	-
-
-%description devel
--
-
 @PREP@
 
-@BUILD-PROGRAM@
+@BUILD@
 
-@INSTALL-PROGRAM@
+@INSTALL@
 
 @CLEAN@
 
 %files
 %defattr(-,root,root)
-@plugindir@/libpy2ag_XXpkgXX.so.*
 @scrconfdir@/*.scr
-
-%files devel
-%defattr(-,root,root)
+@plugindir@/libpy2ag_XXpkgXX.so.*
 @plugindir@/libpy2ag_XXpkgXX.so
 @plugindir@/libpy2ag_XXpkgXX.la
 %doc @docdir@

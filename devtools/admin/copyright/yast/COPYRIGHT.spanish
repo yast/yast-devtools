@@ -4,113 +4,113 @@
 YaST 2 copyright (c) SuSE GmbH, Nuremberg, Alemania, 1995 - 2001
 YaST 2 copyright (c) SuSE Linux AG, Nuremberg, Alemania, 2002 - 2003
 
-Esta licencia cubre el programa YaST 2 (Yet another Setup Tool 2) así
-como el nombre "YaST", SuSE Linux (la distribución Linux de SuSE Linux
+Esta licencia cubre el programa YaST 2 (Yet another Setup Tool 2) asÃ­
+como el nombre "YaST", SuSE Linux (la distribuciÃ³n Linux de SuSE Linux
 AG), todos los programas derivados de YaST 2 y todas las obras o nombres
-derivados total o parcialmente de YaST 2, además del uso, aplicación,
-almacenamiento, reproducción y distribución tanto de YaST 2 como de los
+derivados total o parcialmente de YaST 2, ademÃ¡s del uso, aplicaciÃ³n,
+almacenamiento, reproducciÃ³n y distribuciÃ³n tanto de YaST 2 como de los
 programas y obras derivados total o parcialmente de YaST 2. El programa
 YaST 2 y todas sus fuentes son propiedad intelectual de SuSE Linux AG
-y están protegidos por la legislación correspondiente de derechos de autor.
+y estÃ¡n protegidos por la legislaciÃ³n correspondiente de derechos de autor.
 El nombre YaST es una marca registrada de SuSE Linux AG. En adelante, SuSE
-Linux AG actuará como concesionista (poseedor del copyright) y cualquier
+Linux AG actuarÃ¡ como concesionista (poseedor del copyright) y cualquier
 usuario o adaptador de YaST 2 o de obras derivadas total o parcialmente de
 YaST 2, o cualquier persona que reproduzca, distribuya o archive YaST 2 o
-SuSE Linux, serán consideradas como concesionarios de SuSE Linux AG.
+SuSE Linux, serÃ¡n consideradas como concesionarios de SuSE Linux AG.
 
-La transformación, utilización, aplicación, almacenamiento, reproducción y
-distribución de YaST 2 implican el reconocimiento de los siguientes términos
+La transformaciÃ³n, utilizaciÃ³n, aplicaciÃ³n, almacenamiento, reproducciÃ³n y
+distribuciÃ³n de YaST 2 implican el reconocimiento de los siguientes tÃ©rminos
 y condiciones de licencia.
 
-Esta licencia es la única que autoriza al concesionario a usar, reproducir,
+Esta licencia es la Ãºnica que autoriza al concesionario a usar, reproducir,
 distribuir, o modificar YaST 2 u obras derivadas del mismo. En caso de que
-no se acepten los términos y condiciones de esta licencia, estas acciones
-quedan prohibidas por la ley de propiedad intelectual. La aceptación y
-observación de los términos de esta licencia en su totalidad conlleva la
-validez de la misma, aún sin la conformidad por escrito del concesionario.
+no se acepten los tÃ©rminos y condiciones de esta licencia, estas acciones
+quedan prohibidas por la ley de propiedad intelectual. La aceptaciÃ³n y
+observaciÃ³n de los tÃ©rminos de esta licencia en su totalidad conlleva la
+validez de la misma, aÃºn sin la conformidad por escrito del concesionario.
 
-1. Utilización
+1. UtilizaciÃ³n
    YaST 2 y SuSE Linux pueden usarse con fines particulares y comerciales siempre
    que se respeten el copyright y las condiciones de licencia de los paquetes
-   y programas instalados. El uso de YaST 2 o de una versión modificada del
-   mismo no exime al concesionario de la obligación de respetar debidamente
+   y programas instalados. El uso de YaST 2 o de una versiÃ³n modificada del
+   mismo no exime al concesionario de la obligaciÃ³n de respetar debidamente
    las condiciones de licencia de los programas o paquetes instalados mediante
    YaST2 u obras derivadas del mismo.
 
-2. Transformación
+2. TransformaciÃ³n
    Todos los programas y obras derivados total o parcialmente de YaST 2 han de
-   incluir en su pantalla de bienvenida la mención explícita de "versión
-   modificada". El nombre de la persona que realiza la adaptación así como una nota
+   incluir en su pantalla de bienvenida la menciÃ³n explÃ­cita de "versiÃ³n
+   modificada". El nombre de la persona que realiza la adaptaciÃ³n asÃ­ como una nota
    exonerando a SuSE de toda responsabilidad e indicando que SuSE Linux AG no
-   proporcionará ningún tipo de soporte para la "versión modificada", han de aparecer
-   asimismo en la pantalla de bienvenida. Se entiende por "versión modificada" cualquier
+   proporcionarÃ¡ ningÃºn tipo de soporte para la "versiÃ³n modificada", han de aparecer
+   asimismo en la pantalla de bienvenida. Se entiende por "versiÃ³n modificada" cualquier
    cambio en las fuentes que no haya sido realizado por SuSE Linux AG. El concesionario
    tiene derecho a modificar su copia de las fuentes de YaST 2, lo que implica
-   la creación de una obra basada en el programa YaST 2, siempre y cuando se cumplan
+   la creaciÃ³n de una obra basada en el programa YaST 2, siempre y cuando se cumplan
    las siguientes condiciones:
 
    a) Todos los cambios deben documentarse en las fuentes indicando su fecha y autor.
-      De acuerdo con la sección 3), las fuentes modificadas han de ponerse a disposición
+      De acuerdo con la secciÃ³n 3), las fuentes modificadas han de ponerse a disposiciÃ³n
       del usuario junto con esta licencia sin modificar.
 
-   b) El concesionario deberá proporcionar, sin tasas de licencia, cualquier obra difundida
-      por él a terceros y derivada total o parcialmente de YaST 2 o de sus partes,
+   b) El concesionario deberÃ¡ proporcionar, sin tasas de licencia, cualquier obra difundida
+      por Ã©l a terceros y derivada total o parcialmente de YaST 2 o de sus partes,
       como un todo sujeto a las condiciones de esta licencia.
 
-   c) Queda prohibida la modificación total o parcial de esta licencia por parte
+   c) Queda prohibida la modificaciÃ³n total o parcial de esta licencia por parte
       del concesionario.
 
    SuSE Linux AG se reserva el derecho de incluir en parte o en su totalidad los
-   cambios de una versión modificada de YaST2 en la versión oficial del mismo de
+   cambios de una versiÃ³n modificada de YaST2 en la versiÃ³n oficial del mismo de
    forma gratuita y sin influencia por parte del concesionario.
 
-3. Distribución
-   No se permite la reproducción comercial de YaST 2 o SuSE Linux o su distribución
-   en medios de almacenamiento reproducidos de forma ilegal sin previa autorización
-   por escrito de SuSE Linux AG. La distribución comercial del programa YaST 2,
+3. DistribuciÃ³n
+   No se permite la reproducciÃ³n comercial de YaST 2 o SuSE Linux o su distribuciÃ³n
+   en medios de almacenamiento reproducidos de forma ilegal sin previa autorizaciÃ³n
+   por escrito de SuSE Linux AG. La distribuciÃ³n comercial del programa YaST 2,
    de sus fuentes inalteradas o modificadas total o parcialmente, y de obras derivadas
    del mismo, requiere el consentimiento previo por escrito de SuSE Linux AG.
 
-   De acuerdo con la sección 2b), la distribución de todos los programas y obras
-   derivados total o parcialmente de YaST 2 se permite únicamente incluyendo las fuentes
+   De acuerdo con la secciÃ³n 2b), la distribuciÃ³n de todos los programas y obras
+   derivados total o parcialmente de YaST 2 se permite Ãºnicamente incluyendo las fuentes
    modificadas y la presente licencia. La disponibilidad gratuita de YaST 2 o de obras
    derivadas del mismo junto con SuSE Linux en servidores ftp y buzones de correo
-   está permitida siempre que se observe la licencia del software.
+   estÃ¡ permitida siempre que se observe la licencia del software.
 
-4. Garantía
-   No se ofrece ningún tipo de garantía para YaST 2 u obras derivadas del mismo o
-   para SuSE Linux. La garantía de SuSE Linux AG cubre únicamente la corrección
+4. GarantÃ­a
+   No se ofrece ningÃºn tipo de garantÃ­a para YaST 2 u obras derivadas del mismo o
+   para SuSE Linux. La garantÃ­a de SuSE Linux AG cubre Ãºnicamente la correcciÃ³n
    de los medios de almacenamiento de datos.
 
    SuSE Linux AG ofrece YaST 2 y SuSE Linux "tal cual", sin garantizar su idoneidad
    para un fin determinado o su utilidad. En concreto, SuSE no se responsabiliza de
-   la pérdida de beneficios, ahorros no realizados o daños reclamados por terceros
-   al concesionario. SuSE Linux AG tampoco se hace responsable de pérdidas directas
-   o indirectas, y en especial de la pérdida o producción de datos pregrabados.
+   la pÃ©rdida de beneficios, ahorros no realizados o daÃ±os reclamados por terceros
+   al concesionario. SuSE Linux AG tampoco se hace responsable de pÃ©rdidas directas
+   o indirectas, y en especial de la pÃ©rdida o producciÃ³n de datos pregrabados.
 
-   El cumplimiento de los términos de licencia y copyright del software instalado
-   incumbe únicamente al usuario de YaST 2 y de SuSE Linux.
+   El cumplimiento de los tÃ©rminos de licencia y copyright del software instalado
+   incumbe Ãºnicamente al usuario de YaST 2 y de SuSE Linux.
 
 5. Derechos
-   Los únicos derechos otorgados sobre YaST 2 o SuSE Linux son los incluidos en
-   la presente licencia. El incumplimiento de esta licencia anula automáticamente
+   Los Ãºnicos derechos otorgados sobre YaST 2 o SuSE Linux son los incluidos en
+   la presente licencia. El incumplimiento de esta licencia anula automÃ¡ticamente
    los derechos del concesionario. No obstante, los derechos de terceros
    que hayan obtenido del concesionario copias o derechos bajo esta licencia
-   se mantendrán, en tanto que esta licencia se observe y reconozca en su totalidad.
+   se mantendrÃ¡n, en tanto que esta licencia se observe y reconozca en su totalidad.
    Si el concesionario se encuentra sometido a condiciones u obligaciones
-   como resultado de una sentencia judicial, cláusulas de patentes, condiciones
+   como resultado de una sentencia judicial, clÃ¡usulas de patentes, condiciones
    de licencia u otros motivos, y estas condiciones u obligaciones contradicen
-   esta licencia total o parcialmente, será necesario el consentimiento previo por
-   escrito de SuSE para conceder al concesionario la exoneración total o parcial
+   esta licencia total o parcialmente, serÃ¡ necesario el consentimiento previo por
+   escrito de SuSE para conceder al concesionario la exoneraciÃ³n total o parcial
    de esta licencia y sus condiciones. SuSE se reserva el derecho de denegar su
    consentimiento sin explicar los motivos.
 
 6. Restricciones adicionales
-   En caso de que la distribución o el uso de YaST 2 y SuSE Linux o partes de SuSE
-   Linux estén restringidos en un país debido a patentes o interfaces protegidas
-   por el derecho de propiedad, SuSE Linux AG puede definir restricciones geográficas
-   para la distribución de YaST 2 y SuSE Linux o partes de SuSE Linux, que excluyan total
-   o parcialmente a este país de la distribución. En este caso, la licencia incluye
-   la restricción total o parcial tal y como si estuviese recogida por escrito en
+   En caso de que la distribuciÃ³n o el uso de YaST 2 y SuSE Linux o partes de SuSE
+   Linux estÃ©n restringidos en un paÃ­s debido a patentes o interfaces protegidas
+   por el derecho de propiedad, SuSE Linux AG puede definir restricciones geogrÃ¡ficas
+   para la distribuciÃ³n de YaST 2 y SuSE Linux o partes de SuSE Linux, que excluyan total
+   o parcialmente a este paÃ­s de la distribuciÃ³n. En este caso, la licencia incluye
+   la restricciÃ³n total o parcial tal y como si estuviese recogida por escrito en
    la presente licencia.
 

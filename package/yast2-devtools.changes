@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 27 10:57:35 CEST 2004 - arvin@suse.de
+
+- recoded some files to UTF-8 (bug #46179)
+
+-------------------------------------------------------------------
 Fri Sep 24 13:47:42 CEST 2004 - arvin@suse.de
 
 - fixed for packages with uppercase characters in their name

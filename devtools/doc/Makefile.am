@@ -13,6 +13,7 @@ STYLESHEET_HTML=../../docbook/stylesheets/customize-html.xsl
 xml_files =  $(wildcard *.xml) 
 
 html_DATA = $(wildcard html/*.html) \
+	    rny2rnc.html \
 	    $(BUILD)/index.html \
 	    $(BUILD)/susebooks.css
 

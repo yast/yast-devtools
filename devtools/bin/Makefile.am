@@ -18,7 +18,8 @@ pkgdata_SCRIPTS = 				\
 	for-proofread				\
 	kill-leftover-stuff			\
 	get-lib					\
-	version
+	version					\
+	y2makeall
 
 EXTRA_DIST = $(bin_SCRIPTS) $(ybin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
 

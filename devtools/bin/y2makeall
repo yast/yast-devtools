@@ -375,8 +375,12 @@ sub byte_compile_modules()
     # Clear old YCP byte code files (.ybc)
     #
 
-    log_progress( "Removing old byte code files" );
+    log_progress( "Removing old byte code files in $modules_dir" );
     sudo_system_int( "rm -f $modules_dir/*.ybc" );
+
+    log_progress( "Removing old byte code files in $work_root" );
+    system_int( "find $work_root -name '*.ybc' -print0 | xargs -0 $sudo_cmd rm" );
+    
 
 
     #

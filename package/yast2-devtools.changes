@@ -1,3 +1,10 @@
+------------------------------------------------------------------------
+Thu Sep 11 09:24:47 CEST 2002 - ke@suse.de
+
+- Update to version 2.6.13.
+- devtools/devtools/admin/all-packages: add yast2-trans-ko and
+  yast2-trans-zh_TW.
+
 -------------------------------------------------------------------
 Thu Sep 05 17:47:24 CEST 2002 - arvin@suse.de
 

@@ -91,6 +91,7 @@ yast2-users		default			users
 yast2-x11		default			runtime x11
 
 # translations
+yast2-trans-bg          inst-sys                all
 yast2-trans-bs		inst-sys		all
 yast2-trans-cs		inst-sys		all
 yast2-trans-da		inst-sys		all

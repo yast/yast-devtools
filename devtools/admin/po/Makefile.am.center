@@ -13,6 +13,7 @@ EXTRA_DIST = $(POFILES)
 localedir=@localedir@
 locale_lang_msg_dir=$(localedir)/$(LL)/LC_MESSAGES
 compendium = @COMPENDIUM@
+with_compendium =
 
 MSGMERGE = @MSGMERGE@ --no-wrap --force-po
 MSGFMT = @MSGFMT@
@@ -39,7 +40,7 @@ update-po: Makefile $(POTFILES)
 	  po=$${q%pot}$(LL).po; \
 	  echo $$po; \
 	  if [ -f $$po ]; then \
-	    $(MSGMERGE) -o $$po.tmp $$po $$p; \
+	    $(MSGMERGE) -o $$po.tmp $(with_compendium) $$po $$p; \
 	  else \
 	    $(MSGMERGE) -o $$po.tmp -C $(compendium) \
 	       --verbose /dev/null $$p; \
@@ -53,7 +54,7 @@ update-po: Makefile $(POTFILES)
 	done
 
 update-po-with-compendium:
-	$(MAKE) update-po with_c="-C $(compendium)"
+	$(MAKE) update-po with_compendium="-C $(compendium)"
 
 update-mo: $(MOFILES)
 	@:

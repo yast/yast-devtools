@@ -17,7 +17,7 @@ xml_files =  $(wildcard *.xml)
 html_DATA = $(wildcard html/*.html) \
 	    rny2rnc.html \
 	    html/index.html \
-	    html/susebooks.css
+	    html/yast2docs.css
 
 
 html/index.html: yast2-devtools.xml
@@ -27,8 +27,8 @@ html/index.html: yast2-devtools.xml
 
 
 
-html/susebooks.css: 
-	cp ../../docbook/css/susebooks.css html
+html/yast2docs.css: 
+	cp ../../docbook/css/yast2docs.css $@
 	cp -a ../../docbook/images html
 	find html -name "Makefile*"  | xargs rm
 

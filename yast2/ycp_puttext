@@ -211,7 +211,9 @@ sub read_po()
 	    foreach $line_no_info ( @line_no_infos )
 	    {
 		my ( $filename, $line_no ) = split ( ':', $line_no_info, 2 );
-		$filename = basename( $filename );
+		# use the filename in the pot file instead of the basename
+		# bug 23297
+		# $filename = basename( $filename );
 		$ycp_files{ $filename } = "";
 		push @line_numbers, $line_no;
 	    }
@@ -321,10 +323,18 @@ sub find_ycp_files()
     foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" \\) -print` )
     {
 	chomp $ycp_file;
-	$basename = basename( $ycp_file );
+
+	# use the filename in the pot file instead of the basename
+	# bug 23297
+	# $basename = basename( $ycp_file );
+	($basename = $ycp_file) =~ s:^$ycp_base_path/?::;
 
 	if ( defined $ycp_files{ $basename } )
 	{
+	    if ($ycp_files{$basename} ne "")
+	    {
+		warning ("Overriding $ycp_files{$basename}");
+	    }
 	    $ycp_files{ $basename } = $ycp_file;
 	    logf( "Found $ycp_file" );
 	}

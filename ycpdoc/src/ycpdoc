@@ -585,7 +585,7 @@ sub do_shipout ($$$$$@)
 	warn "No parentheses? '$params'" unless $ok;
 
 	my $last_comma = ',';
-	while ($params =~ m/\G\s*($ycp_typedecl)\s*($ycp_symbol)\s*(,?)/ogc)
+	while ($params =~ m/\G\s*($ycp_typedecl\s*?\&?)\s*($ycp_symbol)\s*(,?)/ogc)
 	{
 	    warn "Missing comma before '$1 $2'" unless $last_comma;
 	    $last_comma = $3;

@@ -1,0 +1,14 @@
+/**
+ * Tests parsing of reference parameters
+ */
+{
+    /**
+     * @param a foo
+     * @param b foo
+     * @param c foo
+     * @param d foo
+     */
+    void Foo (list & a, list&b, list& c, list &d) {
+	//...
+    }
+}

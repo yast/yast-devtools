@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep 17 14:36:57 CEST 2004 - mvidner@suse.cz
+
+- Recognize parameters passed by& reference (AsciiFile).
+
+-------------------------------------------------------------------
 Tue Sep 14 12:58:38 CEST 2004 - mvidner@suse.cz
 
 - Convertor from Relax NG for YaST to Relax NG Compact

@@ -153,14 +153,10 @@ sub parse_comments (@)
     $entry->{"deprecated"} = "";
     my @entries = ($entry);
 
-    my %param_infunc;	# (declared) parameter names, keyed by themselves
-    my %param_incomment; # parameter descriptions
-    my %option_incomment; # option descriptions
-    my %optarg_incomment; # optarg descriptions
+    my @param_incomment = ();	# parameter descriptions
+    my @option_incomment = ();	# option descriptions
+    my @optarg_incomment = ();	# optarg descriptions
 
-    my @parameters = ();
-    my @options = ();
-    my @optargs = ();
     my @description = ();
     my @examples = ();
 
@@ -203,8 +199,8 @@ sub parse_comments (@)
             push @odescr, $d;
             $oentry->{'description'} = [];
             push @{$oentry->{'description'}},  @odescr;
-	    $param_incomment{$last_param} = $oentry;
-            print Dumper(%param_incomment);
+	    push @param_incomment, $oentry;
+            print Dumper(@param_incomment);
 	}
 	elsif($line =~ /\@option\s+(.*)/)
 	{
@@ -217,7 +213,7 @@ sub parse_comments (@)
             push @odescr, $d;
             $oentry->{'description'} = [];
             push @{$oentry->{'description'}}, @odescr;
-	    $option_incomment{$last_option} = $oentry;
+	    push @option_incomment, $oentry;
 	}
 	elsif($line =~ /\@optarg\s+(.*)/)
 	{
@@ -230,7 +226,7 @@ sub parse_comments (@)
             push @odescr, $d;
             $oentry->{'description'} = [];
             push @{$oentry->{'description'}}, @odescr;
-	    $optarg_incomment{$last_optarg} = $oentry;
+	    push @optarg_incomment, $oentry;
 	}
 	elsif($line =~ /\@return\s+(.*)/)
 	{
@@ -324,7 +320,7 @@ sub parse_comments (@)
 	elsif($lastwas eq "optargs")
 	{
             $lastwas = "optargs";
-            $oentry = $optarg_incomment{$last_optarg};
+            $oentry = pop @optarg_incomment;
             if ($keepformat == 0)
             {
                 $line =~ s/^\s+//;
@@ -346,7 +342,7 @@ sub parse_comments (@)
                 {
                     push  @a, $line;
                     push @{$oentry->{'description'}} , @a;
-                    $optarg_incomment{$last_optarg} = $oentry;
+                    push @optarg_incomment, $oentry;
                     $newpara = 0;
                 } else {
                     $newpara = 1;
@@ -358,14 +354,14 @@ sub parse_comments (@)
                 $last .= " $line";
                 push  @a, $last;
                 push @{$oentry->{'description'}} , @a;
-                $optarg_incomment{$last_optarg} = $oentry;
+                push @optarg_incomment, $oentry;
                 $newpara = 0;
             }
 	}
 	elsif($lastwas eq "option")
 	{
             $lastwas ="option";
-            $oentry = $option_incomment{$last_option};
+            $oentry = pop @option_incomment;
             if ($keepformat == 0)
             {
                 $line =~ s/^\s+//;
@@ -387,7 +383,7 @@ sub parse_comments (@)
                 {
                     push  @a, $line;
                     push @{$oentry->{'description'}} , @a;
-                    $option_incomment{$last_option} = $oentry;
+                    push @option_incomment, $oentry;
                     $newpara = 0;
                 } else {
                     $newpara = 1;
@@ -399,14 +395,14 @@ sub parse_comments (@)
                 $last .= " $line";
                 push  @a, $last;
                 push @{$oentry->{'description'}} , @a;
-                $option_incomment{$last_option} = $oentry;
+                push @option_incomment, $oentry;
                 $newpara = 0;
             }
 	}
 	elsif($lastwas eq "param")
 	{
             $lastwas = "param";
-            $oentry = $param_incomment{$last_param};
+            $oentry = pop @param_incomment;
             $line =~ s/^\s+//;
             my @a = ();
             # UGLY 
@@ -416,7 +412,7 @@ sub parse_comments (@)
                 {
                     push  @a, $line;
                     push @{$oentry->{'description'}} , @a;
-                    $param_incomment{$last_param} = $oentry;
+                    push @param_incomment, $oentry;
                     $newpara = 0;
                 } else {
                     $newpara = 1;
@@ -428,7 +424,7 @@ sub parse_comments (@)
                 $last .= " $line";
                 push  @a, $last;
                 push @{$oentry->{'description'}} , @a;
-                $param_incomment{$last_param} = $oentry;
+                push @param_incomment, $oentry;
                 $newpara = 0;
             }
 	}
@@ -440,10 +436,9 @@ sub parse_comments (@)
 	}
 	elsif($lastwas eq "option")
 	{
-            my $o = $option_incomment{$last_option};
+            my $o = $option_incomment[$#option_incomment]; # last element
             $line =~ s/^\s+//;
             $o->{"description"} .=$line;
-	    $option_incomment{$last_option} = $o;
 	}
 	elsif($lastwas eq "examples")
         {
@@ -493,34 +488,15 @@ sub parse_comments (@)
 
 
     # for commented parameters
-    foreach my $key ( keys %param_incomment)
-    {
-	my $pp = $param_incomment{$key};
-        push @parameters, $pp;
-    }
-
-    push @{$entry->{"parameters"}}, @parameters;
+    push @{$entry->{"parameters"}}, @param_incomment;
 
     # for commented options
-    foreach my $key ( keys %option_incomment)
-    {
-        $oentry = {};
-	$oentry = $option_incomment{$key};
-        push @options, $oentry;
-    }
-
-    push @{$entry->{"options"}}, @options;
+    push @{$entry->{"options"}}, @option_incomment;
 
     # for commented optargs
-    foreach my $key ( keys %optarg_incomment)
-    {
-        $oentry = {};
-	$oentry = $optarg_incomment{$key};
-        push @optargs, $oentry;
-    }
-    print "Final Optargs " . Dumper(@optargs) if $debug > 3;
+    print "Final Optargs " . Dumper(@optarg_incomment) ."\n" if $debug > 3;
 
-    push @{$entry->{"optargs"}}, @optargs;
+    push @{$entry->{"optargs"}}, @optarg_incomment;
 
 
     return @entries;
@@ -528,9 +504,7 @@ sub parse_comments (@)
 
 sub main () 
 {
-    #scan_file("/home/nashif/Work/yast2-head/source/core/wfm/src/Y2WFMComponent.cc");
-    scan_file("/home/nashif/Work/yast2-head/source/core/libycp/src/YCPBuiltinList.cc");
-    #scan_file("./y2.cc");
+    scan_file($ARGV[0]);
     yastdoc::XML::write_docs();
 
 }

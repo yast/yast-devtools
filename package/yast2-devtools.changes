@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul  1 10:57:01 CEST 2003 - msvec@suse.de
+
+- again include cvsignore in skeletons
+- 2.8.4
+
+-------------------------------------------------------------------
 Thu Jun 19 13:43:53 CEST 2003 - mvidner@suse.cz
 
 - check_ycp: check_imports does not look inside strings,

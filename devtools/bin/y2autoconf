@@ -288,6 +288,8 @@ print OUTPUT
     "\@YAST2-CHECKS-PROG\@" => "\@YAST2-CHECKS-PROGRAM\@",
 );
 
+$unknown_macro = 0;
+
 while (<INPUT>)
 {
     if (! /^##.*/)
@@ -301,8 +303,22 @@ while (<INPUT>)
 	{
 	    s/$macro_name/$macros{$macro_name}/g;
 	}
+
+	if (/^\@.+\@/)
+	{
+	    chomp;
+	    print STDERR "y2autoconf: ERROR: unknown macro $_\n";
+	    $unknown_macro = 1;
+	}
+
 	print OUTPUT;
     }
 }
 close (INPUT);
 close (OUTPUT);
+
+if ($unknown_macro)
+{
+    print STDERR "y2autoconf: ERROR: unknown macro - update your yast2-devtools\n";
+    exit 1;
+}

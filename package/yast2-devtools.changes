@@ -2,6 +2,7 @@
 Mon Jul 08 13:06:45 CEST 2002 - arvin@suse.de
 
 - added checks for expect and dejagnu (bug #16835)
+- warn about unknown macros
 
 -------------------------------------------------------------------
 Wed Jul  3 18:00:42 CEST 2002 - msvec@suse.cz

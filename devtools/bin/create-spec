@@ -253,6 +253,8 @@ Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check",
 my $warn_defattr = 1;
 my $warn_doc     = 0;
 
+$unknown_macro = 0;
+
 while (<STDIN>)
 {
     if (! /^##.*/)
@@ -265,6 +267,13 @@ while (<STDIN>)
 	foreach $macro_name ( keys %tiny_macros )
 	{
 	    s/$macro_name/$tiny_macros{$macro_name}/g;
+	}
+
+	if (/^\@.+\@/)
+	{
+	    chomp;
+	    print STDERR "create-spec: ERROR: unknown macro $_\n";
+	    $unknown_macro = 1;
 	}
 
 	$warn_defattr = 0 if (/^\%defattr/);
@@ -280,4 +289,10 @@ if ($warn_defattr)
 if ($warn_doc)
 {
     print STDERR "create-spec: WARNING: Do you use \%doc for documentation?\n";
+}
+
+if ($unknown_macro)
+{
+    print STDERR "create-spec: ERROR: unknown macro - update your yast2-devtools\n";
+    exit 1;
 }

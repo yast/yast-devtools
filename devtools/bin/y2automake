@@ -130,6 +130,8 @@ EOF
 
 fi
 
+# keep the code, just in case ;-)
+if false; then
 #
 # Build hack:
 #  while binary packages don't build and run,
@@ -157,3 +159,4 @@ case `pwd` in /usr/src/packages/BUILD/*)
     *)
 	echo "no (not in %build)"
 esac
+fi

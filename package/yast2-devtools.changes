@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul 26 10:47:07 CEST 2002 - arvin@suse.de
+
+- fixed generation of plural forms of message texts
+
+-------------------------------------------------------------------
 Fri Jul 19 12:11:46 CEST 2002 - arvin@suse.de
 
 - reduced ydoc to a wrapper for kdoc

@@ -31,7 +31,7 @@
 -->
 
   <xsl:param name="navig.showtitles">1</xsl:param>
-  <xsl:param name="html.extra.head.links" select="1"></xsl:param>
+  <xsl:param name="html.extra.head.links" select="0"></xsl:param>
   <xsl:param name="generate.legalnotice.link" select="0"/>
 
   <!-- use custom icons for navigation -->
@@ -58,7 +58,7 @@
   <xsl:param name="show.revisionflag">1</xsl:param>
 
   <!-- shut up!  -->
-  <xsl:param name="chunk.quietly" select="1"></xsl:param>
+  <xsl:param name="chunk.quietly" select="0"></xsl:param>
 
   <!-- include header.xsl -->
   <!--
@@ -66,7 +66,7 @@
   -->
 
   <!--
-  <xsl:param name="funcsynopsis.style">kr</xsl:param>
+  <xsl:param name="funcsynopsis.style">ansi</xsl:param>
   <xsl:param name="funcsynopsis.decoration">1</xsl:param>
   <xsl:param name="funcsynopsis.tabular.threshold" select="40"></xsl:param>
   -->

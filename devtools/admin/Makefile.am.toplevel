@@ -246,5 +246,6 @@ checkin-stable: package
 
 # For po/ modules
 checkpo:
-	test ! -d $(srcdir)/po \
-	  || { $(MAKE) -C po checkpo && $(MAKE) -C po make-pox; }
+	test ! -d $(srcdir)/po || $(MAKE) -C po checkpo
+#	test ! -d $(srcdir)/po \
+#	  || { $(MAKE) -C po checkpo && $(MAKE) -C po make-pox; }

@@ -76,6 +76,7 @@ yast2-imap-server	email			IMAP server
 yast2-inetd		default			inetd editor
 yast2-instserver	default			installation server
 yast2-ipsec		default			IPsec
+yast2-irda		default			IrDA
 yast2-kerberos-client	default			kerberos client
 yast2-ldap-client	default			ldap client
 yast2-ldap-server	default			LDAP server

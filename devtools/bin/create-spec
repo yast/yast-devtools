@@ -61,7 +61,8 @@ if ($#ARGV > 0)
     "\@HEADER-COMMENT\@" =>
 "#
 # spec file for package $RPMNAME (Version $VERSION)
-#",
+#
+# norootforbuild",
 
 # The group tag is only a dummy entry. The correct one is inserted by
 # prepare_spec.

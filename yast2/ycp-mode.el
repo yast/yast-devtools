@@ -251,7 +251,9 @@
 		       "SetLanguage"
 		       "SetModulename"
 		       "StopRecordMacro"
+		       "TimeoutUserInput"
 		       "UserInput"
+		       "WaitForEvent"
 		       "WidgetExists"
 		       ))))
        )

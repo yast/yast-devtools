@@ -20,7 +20,7 @@ my $verbose		= 1;
 my $debug		= 0;
 my $allow_missing_files = 0;
 my $suppress_logfile	= 0;
-my $logfile		= </tmp/ycp_puttext.log>;
+my $logfile		= $ENV{'HOME'}.'/ycp_puttext.log';
 
 
 my %trans;		# translations:		$trans{"orig"} = "translated";
@@ -320,7 +320,7 @@ sub find_ycp_files()
     my $ycp_file;
     my $basename;
 
-    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" \\) -print` )
+    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" -o -name "*.pm" -o -name "*.cc" \\) -print` )
     {
 	chomp $ycp_file;
 

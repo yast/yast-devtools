@@ -816,6 +816,7 @@ Just an alias for "<literal remap="tt">make checkin-stable</literal>".
 </section>
 
 
+<!--
 <section>
     <title>FAQ</title>
     <qandaset defaultlabel='number'>
@@ -990,4 +991,5 @@ spec file (or .spec.in)?
 </qandaset>
 
 </section>
+-->
 </section>

@@ -123,6 +123,7 @@
                 <xsl:apply-templates select="return"/>
                 <xsl:apply-templates select="description"/>
                 <xsl:apply-templates select="usage"/>
+                <xsl:apply-templates select="examples"/>
         </refentry>
       </xsl:template>
 
@@ -230,8 +231,47 @@
                 </variablelist>
             </refsect1>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="examples">
+        <xsl:if test="count(examples_item) > 0 ">
+            <refsect1>
+                <title>Examples</title>
+                <xsl:for-each select="examples_item">
+                    <informalexample>
+                    <programlisting><xi:include 
+                            xmlns:xi="http://www.w3.org/2001/XInclude">
+                            <xsl:attribute name="href">
+                                <xsl:text>examples/</xsl:text>
+                                <xsl:value-of select="example"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="parse">
+                                <xsl:text>text</xsl:text>
+                            </xsl:attribute>
+                        </xi:include>
+                        <xsl:if test="screenshot != ''">
+                            <screenshot>
+                                <screeninfo>
+                                    <xsl:value-of select="example"/>
+                                </screeninfo>
+                                <graphic>
+                                    <xsl:attribute name="fileref">
+                                        <xsl:text>examples/screenshots/</xsl:text>
+                                        <xsl:value-of select="screenshot"/>
+                                    </xsl:attribute>
+                                </graphic>
+                            </screenshot>
+                        </xsl:if>
+                    </programlisting>
+
+                    </informalexample>
+                </xsl:for-each>
+            </refsect1>
+        </xsl:if>
 
     </xsl:template>
+
+    
     <xsl:template match="parameters">
         <xsl:if test="count(parameters_item) > 0 ">
             <refsect1>

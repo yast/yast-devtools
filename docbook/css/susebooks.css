@@ -72,9 +72,17 @@ div.figure p.title, div.table p.title {
 	font-weight:bolder;
 	border-style: none;
 }
-div.example {
+div.informalexample {
 	background-color: #efefef;
 	padding:5px;
+        margin-bottom: 10px;
+	border: thin solid #333333;
+}
+div.example{
+	background-color: #efefef;
+	padding:5px;
+        margin-bottom: 10px;
+	border: thin solid #333333;
 }
 div.userheadercontent { 
         font-style: oblique;

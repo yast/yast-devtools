@@ -142,6 +142,7 @@ yast2-trans-nb		inst-sys		all
 yast2-trans-nl		inst-sys		all
 yast2-trans-pa		inst-sys		all
 yast2-trans-pl		inst-sys		all
+yast2-trans-pt		inst-sys                all
 yast2-trans-pt_BR	inst-sys		all
 yast2-trans-ro		inst-sys		all
 yast2-trans-ru		inst-sys		all

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar  4 11:18:00 CET 2004 - lnussel@suse.de
+
+- add package yast2-ipsec
+
+-------------------------------------------------------------------
 Tue Mar  2 17:43:45 CET 2004 - sh@suse.de
 
 - Added support for translatable text ("make pot") in XML files:

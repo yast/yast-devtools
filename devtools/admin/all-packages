@@ -105,7 +105,7 @@ yast2-tv		default			TV card
 yast2-users		default			users
 yast2-x11		default			runtime x11
 yast2-you-server	default			YOU server
-yast2-wlanipsecclient	-			WLAN IPsec client
+yast2-ipsec		default			IPsec configuration
 
 # translations
 yast2-trans-bg		inst-sys		all
@@ -148,3 +148,4 @@ yast2-trans-zh_TW	inst-sys		all
 #yast2-soho-lan		slcs			slcs network configuration
 #yast2-update		default			runtime update starter
 #yast2-vpn_ncp		vpnncp			vpn/ncp configuration
+#yast2-wlanipsecclient	-			WLAN IPsec client

@@ -5,22 +5,23 @@
 #Create YaST2 configure.in from configure.in.in
 #
 #Available macros in the configure.in.in:
-#  @RPMNAME@             - reads it from file RPMNAME
-#  @VERSION@             - reads it from file VERSION
-#  @MAINTAINER@          - reads it from file MAINTAINER
+#  @RPMNAME@                - reads it from file RPMNAME
+#  @VERSION@                - reads it from file VERSION
+#  @MAINTAINER@             - reads it from file MAINTAINER
 #
-#  @YAST2-INIT-COMMON@   - Initialization. The generated configure.in
-#                          will not work without it (or its equivalent)
-#  @YAST2-INIT-PROGRAM@  - Initilazation necessary for packages with programs
-#  @YAST2-INIT-PO@       -                        with translations
-#  @YAST2-INIT-YCP@      -                        with YCP
+#  @YAST2-INIT-COMMON@      - Initialization. The generated configure.in
+#                              will not work without it (or its equivalent)
+#  @YAST2-INIT-PROGRAM@     - Initilazation necessary for packages with programs
+#  @YAST2-INIT-PO@          -                        with translations
+#  @YAST2-INIT-YCP@         -                        with YCP
 #
-#  @YAST2-CHECKS-COMMON@ - Checks for tools needed by all YaST2 code
-#  @YAST2-CHECKS-PROGRAM@ - Additional checks for packages with programs
-#  @YAST2-CHECKS-PO@     -                        with translations
-#  @YAST2-CHECKS-YCP@    -                        with YCP
+#  @YAST2-CHECKS-COMMON@    - Checks for tools needed by all YaST2 code
+#  @YAST2-CHECKS-PROGRAM@   - Additional checks for packages with programs
+#  @YAST2-CHECKS-PO@        -                        with translations
+#  @YAST2-CHECKS-YCP@       -                        with YCP
+#  @YAST2-CHECKS-TESTSUITE@ - Checks for expect and dejagnu
 #
-#  @YAST2-OUTPUT@        - Creates list of Makefiles to be generated
+#  @YAST2-OUTPUT@           - Creates list of Makefiles to be generated
 #####
 #Authors:
 #  Jan Holesovsky <kendy@suse.cz>, 2001
@@ -206,6 +207,19 @@ if test -n \"\$x_includes\"; then
 fi
 if test -n \"\$x_libraries\"; then
         LDFLAGS=\"\$LDFLAGS -L\$x_libraries\"
+fi
+",
+
+    # check: qt
+    "\@YAST2-CHECKS-TESTSUITE\@" =>
+"dnl Check runtest and expect
+AC_PATH_PROG(MYRUNTEST, runtest, false)
+if test \"\$MYRUNTEST\" = \"false\"; then
+        AC_MSG_ERROR([runtest not installed])
+fi
+AC_PATH_PROG(MYEXPECT, expect, false)
+if test \"\$MYEXPECT\" = \"false\"; then
+        AC_MSG_ERROR([expect not installed])
 fi
 ",
 

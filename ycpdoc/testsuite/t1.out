@@ -172,14 +172,18 @@
 ></provides_item
 ></provides
 ><requires
+><requires_item
 ><kind
 >include</kind
 ><name
 >module/misc.ycp</name
+></requires_item
+><requires_item
 ><kind
 >include</kind
 ><name
 >common/conv.ycp</name
+></requires_item
 ></requires
 ></file_item
 ><file_item key="t1-mis.ycp"

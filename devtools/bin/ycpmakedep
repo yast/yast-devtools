@@ -7,8 +7,8 @@ ycpmakedep - find out YaST import dependencies
 =head1 SYNOPSIS
 
   ycpmakedep -h|--help|--man
-  ycpmakedep [-I <incpath> -M <modpath> -M ...]
-  ycpmakedep {--modules [--clusters] | --packages} [--y2dir <y2dir>] [--topdown]
+  ycpmakedep [-I <incpath> -M <modpath> -M ...] [--prefix <prefix>]
+  ycpmakedep {--modules [--clusters] | --packages} [--topdown]
 
 =head1 AUTHOR
 
@@ -48,7 +48,6 @@ GetOptions (
 	    "modules|m" => \$modgraph,
 	    "clusters|c" => \$clusters,
 	    "packages|p" => \$pkggraph,
-	    "y2dir|d=s" => \$y2dir,
 	    "topdown|t" => \$topdown,
 	    "include-path|I=s" => $search_paths{INCLUDE},
 	    "module-path|M=s" => $search_paths{MODULE},

@@ -18,7 +18,7 @@ CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 
 dist-hook: check-syntax
 
-check-syntax: $(client_DATA)
-	if test "$(client_DATA)"; then $(bindir)/ycpc -qE -M. -I. $(YCPCFLAGS) $^ || exit 1; fi
+check-syntax: $(client_DATA) $(ycpchook)
+	if test "$(client_DATA)"; then $(bindir)/ycpc -qE -M. -I. $(YCPCFLAGS) $(filter %.ycp,$^) || exit 1; fi
 
 -include .dep

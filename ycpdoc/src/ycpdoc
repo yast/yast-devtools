@@ -18,7 +18,7 @@ ycpdoc - Creates html files based on comments in ycp file.
 
 =head1 OPTIONS AND ARGUMENTS
 
-over
+=over
 
 =item B<-h>
 

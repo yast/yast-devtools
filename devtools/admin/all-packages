@@ -21,7 +21,8 @@ yast2-core		inst-sys,default	all
 yast2-control-center	default			all
 yast2-ncurses		inst-sys,default	all
 yast2-qt		inst-sys,default	all
-yast2-theme-SuSELinux	inst-sys,default	all
+yast2-theme-SuSELinux	inst-sys,default	all (SuSELinux)
+yast2-theme-UnitedLinux	inst-sys,default	all (UnitedLinux)
 yast2-packager		inst-sys,default	all
 yast2-update		inst-sys,default	all
 yast2-packagemanager	inst-sys,default	all

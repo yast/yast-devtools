@@ -1,0 +1,34 @@
+--- /opt/www/htdig/conf/htdig.conf	Tue Mar 26 16:42:12 2002
++++ /opt/www/htdig/conf/yast2.conf	Wed Aug  7 17:18:29 2002
+@@ -25,7 +25,14 @@
+ # You could also index all the URLs in a file like so:
+ # start_url:	       `${common_dir}/start.url`
+ #
+-start_url:		http://www.htdig.org/
++start_url:		http://valkyrie.suse.cz/freshdoc.new/ http://valkyrie.suse.cz/freshdoc.old/
++
++#freshdoc:
++# valid_punctuation are characters that will be deleted
++# from indexed and searched words. Default is .-_/!#$%^&'
++# So for YCP we allow _
++valid_punctuation: .-/!#$%^&'
++extra_word_characters: _
+ 
+ #
+ # This attribute limits the scope of the indexing process.  The default is to
+@@ -58,13 +65,14 @@
+ # exclude_url patterns are matched anywhere.
+ #
+ bad_extensions:		.wav .gz .z .sit .au .zip .tar .hqx .exe .com .gif \
++		.png .ui \
+ 		.jpg .jpeg .aiff .class .map .ram .tgz .bin .rpm .mpg .mov .avi
+ 
+ #
+ # The string htdig will send in every request to identify the robot.  Change
+ # this to your email address.
+ #
+-maintainer:		unconfigured@htdig.searchengine.maintainer
++maintainer:		mvidner@suse.cz
+ 
+ #
+ # The excerpts that are displayed in long results rely on stored information

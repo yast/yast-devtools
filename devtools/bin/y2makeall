@@ -27,6 +27,9 @@ use vars qw(
 #
 # Configuration variables.
 #
+# Users can override any of these in this file (Perl syntax!):
+
+my $user_config_file = <~/.yast2/y2makeallrc>;
 
 
 # Core binary packages that need to be built in that order before any YCP code
@@ -73,15 +76,19 @@ use constant
 my $tty_verbosity		= LOG_PROGRESS;
 my $log_verbosity		= LOG_INFO;
 
-
-my $make_args			= "";
+my $make_target			= "";
 my $sudo_cmd			= "/usr/bin/sudo";
 my $install_cmd			= "/usr/bin/install";
 my $ycpc_cmd			= "/usr/bin/ycpc";
 
-my %done;
+
 my $modules_dir			= "/usr/share/YaST2/modules";
 my $ycp_include_dir		= "/usr/share/YaST2/include";
+
+# ---- END configuration variables ----------------------------------------
+
+
+my $prog_name = basename( $0 );
 my @ycp_files;
 my %ycp_modules;
 my %needed_ycp_include_files;
@@ -143,21 +150,50 @@ sub main()
     $enable_make_ycp_packages		= 1	if $opt_y;
 
     $disable_make_makefile_cvs		= 1	if $opt_f;
-    my $progname = basename( $0 );
+    $prog_name = basename( $0 );
 
-    die "FATAL: Call \"$progname\" from your YaST2 CVS working directory! (yast2/source)\n"
+    #
+    # Check if we are in the right directory
+    #
+
+    die "FATAL: Call \"$prog_name\" from your YaST2 CVS working directory! (yast2/source)\n"
 	unless -f "devtools/RPMNAME";
 
+    #
+    # All remaining command line parameters go to "make".
+    #
 
-    # All remaining parameters go to "make".
-    $make_args = join( @ARGV );
+    $make_target = join( @ARGV );
 
-    unlink $make_log;
+
+    #
+    # Read user configuration from ~/.yast2/y2makeallrc (if present)
+    #
+    # NOTE: This must be done before anything else happens, in particular,
+    # before the log file is opened - the user might have chosen to change it in
+    # his config file!
+    #
+
+    require $user_config_file if ( -f $user_config_file );
+
+
+    #
+    # Set up log file
+    #
+
     open( LOG, ">" . $make_log ) or warn "Couldn't open $make_log";
+
+    #
+    # Build phases
+    #
 
     make_core_binaries()	if $enable_make_all or $enable_make_core_binaries;
     byte_compile_modules()	if $enable_make_all or $enable_byte_compile_modules;
     make_ycp_packages()		if $enable_make_all or $enable_make_ycp_packages;
+
+    #
+    # Clean up
+    #
 
     close( LOG );
 }
@@ -245,7 +281,6 @@ sub byte_compile_modules()
     #
 
     log_progress( "Installing " . scalar( keys( %ycp_modules ) ) . " YCP modules" );
-
     make_install_dir( $modules_dir );
     xargs_install( $modules_dir, values( %ycp_modules ) );
 
@@ -345,12 +380,12 @@ sub make()
     # make
     #
 
-    log_progress( "\tmake $make_args" );
-    system( "make $make_args >>$make_log 2>&1" );
+    log_progress( "\tmake $make_target" );
+    system( "make $make_target >>$make_log 2>&1" );
 
     if ( $CHILD_ERROR )
     {
-	log_error( "'make $make_args' failed for $pkg" );
+	log_error( "'make $make_target' failed for $pkg" );
 	$error = 1;
     }
 
@@ -358,7 +393,7 @@ sub make()
     # sudo make install
     #
 
-    if ( $make_args eq "" )
+    if ( $make_target eq "" )
     {
 	log_progress( "\t$sudo_cmd make install" );
 	system( "$sudo_cmd make install >>$make_log 2>&1" );
@@ -749,6 +784,8 @@ sub calc_ycp_compilation_order()
 sub byte_compile()
 {
     my @modules = @_;
+
+    log_progress( "Byte-compiling " . ( $#modules + 1 ) . " YCP modules" );
     chdir( $modules_dir );
 
     my $module;
@@ -892,8 +929,7 @@ sub log_stderr()
 
 sub usage()
 {
-    my $progname = basename( $0 );
-    die "Usage: $progname [opt] [make-target]\n"				.
+    die "Usage: $prog_name [opt] [make-target]\n"				.
 	"\n"									.
 	"Builds all YaST2 sources from CVS.\n"					.
 	"Call this from your toplevel yast2/source CVS working directory!\n"	.
@@ -912,14 +948,14 @@ sub usage()
 	"Examples:\n"								.
 	"\n"									.
 	"Build everything:\n"							.
-	"\t$progname\n"								.
+	"\t$prog_name\n"								.
 	"\n"									.
 	"Do a \"make pot\" in all YCP packages:\n"				.
-	"\t$progname -y pot\n"							.
+	"\t$prog_name -y pot\n"							.
 	"\n"									.
 	"Byte-recompile all YCP modules, then make all YCP packages, but\n" .
 	"don't do \"make -f Makefile.cvs\" if it can be avoided:\n" .
-	"\t$progname -myf\n"							.
+	"\t$prog_name -myf\n"							.
 	"\n";
 }
 

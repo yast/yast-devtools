@@ -11,9 +11,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- Main DNS GUI</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >nodefine.ycp</file
 ><kind
@@ -28,13 +29,17 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Main DNS GUI</short
 ><type
 >any</type
 ></provides_item
 ><provides_item
-><body
->
- Global one</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >nodefine.ycp</file
 ><global
@@ -49,6 +54,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Global one</short
 ><type
 >void</type
 ></provides_item

@@ -10,6 +10,10 @@
 ></header
 ><provides
 ><provides_item
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >new-types.ycp</file
 ><kind
@@ -36,6 +40,10 @@
 >map &lt;integer, string&gt;</type
 ></provides_item
 ><provides_item
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >new-types.ycp</file
 ><kind
@@ -62,6 +70,10 @@
 >map&lt;integer,string&gt;</type
 ></provides_item
 ><provides_item
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >new-types.ycp</file
 ><global

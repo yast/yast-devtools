@@ -18,7 +18,7 @@ ycpdoc - Creates html files based on comments in ycp file.
 
 =head1 OPTIONS AND ARGUMENTS
 
-=over
+over
 
 =item B<-h>
 
@@ -69,10 +69,13 @@ html file from them. Uses the same comment syntax as
 kdoc/ydoc.
 
 	Supported tags:
+            @short very short description
+            @descr complete description
 	    @param name description	html allowed
 	    @return type description	html allowed
 	    @since version		html allowed
 	    @example anything		html allowed, <pre>
+	    @example_file file path
 	    @see function
 	    @see #function
 	    @see file#function
@@ -81,6 +84,10 @@ kdoc/ydoc.
 	    @deprecated replacement
 	    @struct name		begins a struct description, <pre>
 	    @ref function		(inline, otherwise like @see)
+
+First line is automatically taken as short if it has no tag. Empty line after
+the first line indicates begin of the description. Every following new line
+indicates a new paragraph.
 
 All tags except @see can be multiline.
 Also processes initial comment of file if it starts at the
@@ -541,10 +548,16 @@ sub do_shipout ($$$$$@)
     tie @{$entry->{"parameters"}}, "parameters";
     $entry->{"since"} = "";
     $entry->{"example"} = "";
+    $entry->{"screenshot"} = "";
+    $entry->{"example_file"} = [];
+    tie @{$entry->{"example_file"}}, "example_file";
     $entry->{"scruple"} = [];
     $entry->{"see"} = [];
     tie @{$entry->{"see"}}, "see";
     $entry->{"body"} = "";
+    $entry->{"short"} = "";
+    $entry->{"descr"} = [];
+    tie @{$entry->{"descr"}}, "descr";
     $entry->{"deprecated"} = "";
     my @entries = ($entry);
 
@@ -552,6 +565,9 @@ sub do_shipout ($$$$$@)
     my %param_incomment; # parameter descriptions
 
     my @parameters = ();
+    my @descr = ();
+    my @example_file = ();
+
     if ($name eq "")
     {
 	$entry->{"kind"} = "info";
@@ -583,8 +599,11 @@ sub do_shipout ($$$$$@)
 
     my $last_param;
     my $documented_type = "";
+    my $para = "";
     foreach my $line (@comments)
     {
+        my $empty_line = $line;
+        $empty_line =~ s/\s+//;
 	if($line =~ /\@param\s+($ycp_symbol)\s+(.*)/o)
 	{
 	    $lastwas = "param";
@@ -603,6 +622,16 @@ sub do_shipout ($$$$$@)
 	    $lastwas = "since";
 	    $entry->{"since"} = almost_html ($1);
 	}
+	elsif ($line =~ /\@short\s+(.*)/)
+	{
+	    $lastwas = "short";
+	    $entry->{"short"} = almost_html ($1);
+	}
+	elsif ($line =~ /\@descr\s+(.*)/)
+	{
+	    $lastwas = "descr";
+            $para .= almost_html("\n$1");
+	}
 	elsif($line =~ /\@see\s+(.*)/)
 	{
 	    $lastwas = "see";  # it is an error, we do not allow multiline see...
@@ -612,6 +641,20 @@ sub do_shipout ($$$$$@)
 	    # Simply copy it to the see list and let the backend do the work.
 	    # Maybe do some syntax checks here?
 	    push @{$entry->{"see"}}, $line;
+	}
+	elsif($line =~ /\@example_file(.*)/)
+	{
+	    $lastwas = "example_file";
+	    $line =~ s/\@example_file//; # remove it if it's there
+	    $line =~ s/\s+//; # remove empty spaces
+            push @example_file, $line;
+	}
+	elsif($line =~ /\@screenshot(.*)/)
+	{
+	    $lastwas = "screenshot";
+	    $line =~ s/\@screenshot//; # remove it if it's there
+	    $line =~ s/\s+//; # remove empty spaces
+	    $entry->{"screenshot"} .= $line;
 	}
 	elsif($line =~ /\@example(.*)/ || $lastwas eq "example")
 	{
@@ -650,16 +693,41 @@ sub do_shipout ($$$$$@)
 	{
 	    $param_incomment{$last_param} .= almost_html ("\n$line");
 	}
+	elsif($lastwas eq "short" && $empty_line ne "")
+        {
+            $lastwas = "short";
+	    $entry->{"short"} .= almost_html ("\n$line");
+        }
+	elsif($lastwas eq "short" || $lastwas eq "descr")
+	{
+            $lastwas = "descr";
+            if ($empty_line eq "")
+            { 
+                if ($para ne "")
+                {
+	            push @descr, $para;
+                }
+                $para = "";
+            }
+            else 
+            {
+                $para .= almost_html("\n$line");
+            }
+	}
 	else
 	{
-	    $entry->{"body"} .= almost_html ("\n$line");
-	    $lastwas = "";
+            $lastwas = "short";
+	    $entry->{"short"} .= almost_html ("\n$line");
 	}
     }
     $entry->{"type"} = $declared_type || $documented_type;
-    if ($entry->{"example"} ne "")
+    push @{$entry->{"descr"}}, @descr;
+    push @{$entry->{"example_file"}}, @example_file;
+
+    if ($entry->{"example"} ne "" )
     {
-	$entry->{"example"} =~ s:^\n*(.*):<pre>$1</pre>:s;
+        # FIXME
+        $entry->{"example"} =~ s:^\n*(.*):<pre>$1</pre>:s;
     }
 
     # check arguments
@@ -792,7 +860,7 @@ sub almost_html ($)
     my $text = shift;
     $text =~ s/\&(?![A-Za-z])/\&amp;/g; # negative lookahead
     $text =~  s:<(?![A-Za-z/]):\&lt;:g;
-    $text =~ s/([[:space:]-])>/$1\&gt;/g;
+    #$text =~ s/([[:space:]-])>/$1\&gt;/g;
     return $text;
 }
 
@@ -1209,9 +1277,15 @@ sub write_onefile ($$)
 	    print OUT "</em></p>\n";
 	}
 
-	print OUT $functiondescintro;
-	print OUT subst_refs ($one->{"body"});
-	print OUT $functiondescoutro;
+        print OUT $functiondescintro;
+        print OUT subst_refs ($one->{"short"});
+        print OUT $functiondescoutro;
+        foreach my $para (@{$one->{"descr"}})
+        {
+            print OUT $functiondescintro;
+            print OUT $para;
+            print OUT $functiondescoutro;
+        }
 
 	if (@{$one->{"scruple"}} == 2)
 	{
@@ -1396,6 +1470,11 @@ package requires;
 package provides;
 @provides::ISA = ("Tie::StdArray");
 
+package descr;
+@descr::ISA = ("Tie::StdArray");
+
+package example_file;
+@example_file::ISA = ("Tie::StdArray");
 package parameters;
 @parameters::ISA = ("Tie::StdArray");
 

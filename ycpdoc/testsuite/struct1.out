@@ -8,9 +8,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- A list of services</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >struct1.ycp</file
 ><global
@@ -33,6 +34,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ A list of services</short
 ><type
 >list&lt;map&gt;</type
 ></provides_item
@@ -47,9 +51,10 @@
 >service</signature
 ></provides_item
 ><provides_item
-><body
->
- Starts the service (@ref struct1#service) specified.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >struct1.ycp</file
 ><kind
@@ -72,6 +77,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Starts the service (@ref struct1#service) specified.</short
 ><type
 >map</type
 ></provides_item

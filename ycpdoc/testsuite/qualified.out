@@ -8,9 +8,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- This is a documented function</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >qualified.ycp</file
 ><global
@@ -39,6 +40,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ This is a documented function</short
 ><type
 >any</type
 ></provides_item

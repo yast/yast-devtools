@@ -29,12 +29,8 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- Additional comments to this module. We can also document
- inputs and outputs of modules. Note that characters &amp;lt; and &amp;gt;
- are allowed in body.
-</body
+><descr
+></descr
 ><example
 >&lt;pre&gt; 
   This example shows multiline example tag.
@@ -42,6 +38,8 @@
                 io.ycp // &lt;filename&gt;
                );
 &lt;/pre&gt;</example
+><example_file
+></example_file
 ><file
 >t1-example.ycp</file
 ><global
@@ -77,15 +75,21 @@
 ><see_item
 >example#another</see_item
 ></see
+><short
+>
+ Additional comments to this module. We can also document
+ inputs and outputs of modules. Note that characters &amp;lt; and &gt;
+ are allowed in body.</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Convert numeric value to hexadecimal string.</body
+><descr
+></descr
 ><example
 >&lt;pre&gt;  string hex = tohex(65);&lt;/pre&gt;</example
+><example_file
+></example_file
 ><file
 >t1-example.ycp</file
 ><kind
@@ -108,14 +112,17 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Convert numeric value to hexadecimal string.</short
 ><type
 >string</type
 ></provides_item
 ><provides_item
-><body
->
- Who knows what is this function for?!? Note that there can be couple of
- empty lines between end of comment and define.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >t1-example.ycp</file
 ><kind
@@ -148,13 +155,18 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Who knows what is this function for?!? Note that there can be couple of
+ empty lines between end of comment and define.</short
 ><type
 >any</type
 ></provides_item
 ><provides_item
-><body
->
- This function has no return value defined.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >t1-example.ycp</file
 ><kind
@@ -167,6 +179,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ This function has no return value defined.</short
 ><type
 >void</type
 ></provides_item
@@ -213,11 +228,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- Description.
- @param a
- @param c</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >t1-mis.ycp</file
 ><kind
@@ -242,6 +256,11 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Description.
+ @param a
+ @param c</short
 ><type
 >void</type
 ></provides_item
@@ -275,9 +294,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- I was just too lazy to fabricate some good name of sample function.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >t1-modules.ycp</file
 ><kind
@@ -298,6 +318,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ I was just too lazy to fabricate some good name of sample function.</short
 ><type
 >void</type
 ></provides_item

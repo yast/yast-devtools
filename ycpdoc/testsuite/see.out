@@ -8,9 +8,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- Does nothing.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >see.ycp</file
 ><global
@@ -25,14 +26,17 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Does nothing.</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Does nothing,
- privately.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >see.ycp</file
 ><kind
@@ -45,13 +49,18 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Does nothing,
+ privately.</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Foo1</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >see.ycp</file
 ><global
@@ -74,13 +83,17 @@
 ><see_item
 >example#</see_item
 ></see
+><short
+>
+ Foo1</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Foo2</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >see.ycp</file
 ><global
@@ -95,13 +108,17 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Foo2</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Foo3</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >see.ycp</file
 ><global
@@ -116,13 +133,17 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Foo3</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Foo4</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >see.ycp</file
 ><global
@@ -137,6 +158,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Foo4</short
 ><type
 >void</type
 ></provides_item

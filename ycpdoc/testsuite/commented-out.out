@@ -8,9 +8,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- Holds default configuration for currently edited superserver.</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >commented-out.ycp</file
 ><global
@@ -25,31 +26,39 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Holds default configuration for currently edited superserver.</short
 ><type
 >map</type
 ></provides_item
 ><provides_item
-><body
+><descr
+></descr
+><example_file
+></example_file
+><file
+>commented-out.ycp</file
+><global
+>0</global
+><kind
+>info</kind
+><parameters
+></parameters
+><scruple
+></scruple
+><see
+></see
+><short
 >
  This variable holds informations about main package (inetd or xinetd)
- This variable is used in autoinstallation mode.</body
-><file
->commented-out.ycp</file
-><global
->0</global
-><kind
->info</kind
-><parameters
-></parameters
-><scruple
-></scruple
-><see
-></see
+ This variable is used in autoinstallation mode.</short
 ></provides_item
 ><provides_item
-><body
->
- A useless function</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >commented-out.ycp</file
 ><global
@@ -62,6 +71,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ A useless function</short
 ></provides_item
 ></provides
 ><requires

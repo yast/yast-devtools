@@ -8,9 +8,10 @@
 ></header
 ><provides
 ><provides_item
-><body
->
- Euthanizes a process</body
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >deprecated.ycp</file
 ><kind
@@ -31,15 +32,19 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Euthanizes a process</short
 ><type
 >void</type
 ></provides_item
 ><provides_item
-><body
->
- Kills a process</body
 ><deprecated
 >Euthanize</deprecated
+><descr
+></descr
+><example_file
+></example_file
 ><file
 >deprecated.ycp</file
 ><kind
@@ -60,6 +65,9 @@
 ></scruple
 ><see
 ></see
+><short
+>
+ Kills a process</short
 ><type
 >void</type
 ></provides_item

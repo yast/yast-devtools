@@ -813,13 +813,108 @@ Just an alias for "<literal remap="tt">make checkin-stable</literal>".
 </para>
 
 </section>
-
 </section>
 
-<section>
-<title>Troubleshooting and FAQ</title>
 
-<qandaset defaultlabel='qanda'>
+<section>
+    <title>FAQ</title>
+    <qandaset defaultlabel='number'>
+<qandaentry id="devtools_qa_5">
+    <question id="devtools_qa_5_q">
+<para>Why not use a straightforward <filename>Makefile.am</filename> any more?</para>
+</question>
+<answer>
+<para>
+At the time of this writing, we already have 86 YaST2 C++ and YCP modules, and
+the number keeps increasing. Each of those modules contains a <filename>Makefile.am</filename>
+that is more or less the same - depending on when that module was created, how
+active the maintainer is etc. - all that meaning many of those files may be
+outdated or inconsistent with the rest of YaST2.
+</para>
+<para>
+Many <literal remap="tt">make</literal> targets in <filename>Makefile.am</filename> are pure formalisms - introduced to
+enable easy and consistent package creation etc. - those targets should be the
+same for each module. This can only made sure by generating them.
+</para>
+</answer>
+</qandaentry>
+
+
+<qandaentry id="devtools_qa_6">
+    <question id="devtools_qa_6_q">
+<para>Why so much fuss about <literal remap="tt">make package</literal>?</para>
+</question>
+
+<answer>
+<para>
+The primary purpose of "<literal remap="tt">make package</literal>" is to create a tarball that is
+checked into a SuSE Linux distribution - i.e. into a real product where
+consistency, reliablility and thus quality matters. We want to make sure we can
+reliably track the differences between each version that is checked in - thus
+the checks for consistency with the CVS repository and the check for tags.
+</para>
+</answer>
+</qandaentry>
+
+<qandaentry id="devtools_qa_7">
+    <question id="devtools_qa_7_q">
+<para>How do I test-build my package now prior to <literal remap="tt">CVS checkin</literal>?</para>
+</question>
+
+<answer>
+<para>
+Use "<literal remap="tt">make package-local</literal>", then build. If everything works out allright,
+check in your changes into CVS, tag your version ("<literal remap="tt">y2tool tagversion</literal>") and
+then use "<literal remap="tt">make package</literal>".
+</para>
+</answer>
+</qandaentry>
+
+<qandaentry id="devtools_qa_8">
+    <question id="devtools_qa_8_q">
+<para>Do I really need a <literal remap="tt">SUBDIRS</literal> file?</para>
+</question>
+
+<answer>
+<para>
+No - you can do without this file. In this case, all direct subdiretories of
+your toplevel directory are scanned for a <filename>Makefile.am</filename>, and if such a file
+is found, the respective directory is added to <literal remap="tt">SUBDIRS</literal> in the toplevel
+<filename>Makefile.am</filename>. The directories are sorted alphabetically.
+</para>
+
+<para>
+If there is a <literal remap="tt">SUBDIRS</literal> file, however, this has higher priority. You might
+want to use this if you want to temporarily disable a subdirectory or if you
+want to change the execution order.
+</para>
+
+</answer>
+</qandaentry>
+
+
+<qandaentry id="devtools_qa_9">
+<question id="devtools_qa_9_q">
+<para>Why use <literal remap="tt">y2tool</literal> to call simple tools?</para>
+</question>
+
+<answer>
+<para>
+This is just a workaround to avoid cluttering the system namespace. This
+<literal remap="tt">y2tool</literal> script is a simple wrapper that calls a script or program from
+<literal remap="tt">/usr/share/YaST2/data/devtools/bin</literal> - you might as well extend your
+<literal remap="tt">$PATH</literal> environment variable to include that path.
+</para>
+</answer>
+</qandaentry>
+</qandaset>
+</section>
+
+
+<section>
+<title>Troubleshooting</title>
+
+<qandaset defaultlabel='number'>
     <qandaentry id="devtools_qa_1">
     <question id="devtools_qa_1_q">
 <para>Can't find <literal remap="tt">y2tool</literal> or <literal remap="tt">y2automake</literal></para>
@@ -892,100 +987,7 @@ spec file (or .spec.in)?
 </para>
 </answer>
 </qandaentry>
-
-<qandaentry id="devtools_qa_5">
-    <question id="devtools_qa_5_q">
-<para>Why not use a straightforward <filename>Makefile.am</filename> any more?</para>
-</question>
-<answer>
-<para>
-At the time of this writing, we already have 86 YaST2 C++ and YCP modules, and
-the number keeps increasing. Each of those modules contains a <filename>Makefile.am</filename>
-that is more or less the same - depending on when that module was created, how
-active the maintainer is etc. - all that meaning many of those files may be
-outdated or inconsistent with the rest of YaST2.
-</para>
-<para>
-Many <literal remap="tt">make</literal> targets in <filename>Makefile.am</filename> are pure formalisms - introduced to
-enable easy and consistent package creation etc. - those targets should be the
-same for each module. This can only made sure by generating them.
-</para>
-</answer>
-</qandaentry>
-
-
-<!--
-<qandaentry id="devtools_qa_6">
-    <question id="devtools_qa_6_q">
-<para>Why so much fuss about <literal remap="tt">make package</literal>?</para>
-</question>
-
-<answer>
-<para>
-The primary purpose of "<literal remap="tt">make package</literal>" is to create a tarball that is
-checked into a SuSE Linux distribution - i.e. into a real product where
-consistency, reliablility and thus quality matters. We want to make sure we can
-reliably track the differences between each version that is checked in - thus
-the checks for consistency with the CVS repository and the check for tags.
-</para>
-</answer>
-</qandaentry>
-
-<qandaentry id="devtools_qa_7">
-    <question id="devtools_qa_7_q">
-<para>How do I test-build my package now prior to <literal remap="tt">CVS checkin</literal>?</para>
-</question>
-
-<answer>
-<para>
-Use "<literal remap="tt">make package-local</literal>", then build. If everything works out allright,
-check in your changes into CVS, tag your version ("<literal remap="tt">y2tool tagversion</literal>") and
-then use "<literal remap="tt">make package</literal>".
-</para>
-</answer>
-</qandaentry>
-
-<qandaentry id="devtools_qa_8">
-    <question id="devtools_qa_8_q">
-<para>Do I really need a <literal remap="tt">SUBDIRS</literal> file?</para>
-</question>
-
-<answer>
-<para>
-No - you can do without this file. In this case, all direct subdiretories of
-your toplevel directory are scanned for a <filename>Makefile.am</filename>, and if such a file
-is found, the respective directory is added to <literal remap="tt">SUBDIRS</literal> in the toplevel
-<filename>Makefile.am</filename>. The directories are sorted alphabetically.
-</para>
-
-<para>
-If there is a <literal remap="tt">SUBDIRS</literal> file, however, this has higher priority. You might
-want to use this if you want to temporarily disable a subdirectory or if you
-want to change the execution order.
-</para>
-
-</answer>
-</qandaentry>
-
-
-<qandaentry id="devtools_qa_9">
-<question id="devtools_qa_9_q">
-<para>Why use <literal remap="tt">y2tool</literal> to call simple tools?</para>
-</question>
-
-<answer>
-<para>
-This is just a workaround to avoid cluttering the system namespace. This
-<literal remap="tt">y2tool</literal> script is a simple wrapper that calls a script or program from
-<literal remap="tt">/usr/share/YaST2/data/devtools/bin</literal> - you might as well extend your
-<literal remap="tt">$PATH</literal> environment variable to include that path.
-</para>
-</answer>
-</qandaentry>
--->
 </qandaset>
 
-
 </section>
-
 </section>

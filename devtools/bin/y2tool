@@ -1,4 +1,5 @@
 #!/bin/sh
+# $Id$
 #
 # y2tool - Start a YaST2 tool from the YaST2 tool path
 #
@@ -7,7 +8,23 @@
 #
 
 self=`basename $0`
-y2toolpath=/usr/share/YaST2/data/devtools/bin
+
+if [ "$1" == "--prefix" -o "$1" == "-p" ]; then
+    shift
+    prefix="$1"
+    shift
+fi
+
+# run the tools that are in the same prefix as we are
+if [ -z "$prefix" ]; then
+    if [ `dirname $0` == "." ]; then
+	y2toolpath=.
+    else
+	prefix=${0%/bin/$self}
+	y2toolpath=${prefix}/share/YaST2/data/devtools/bin
+    fi
+fi
+
 cmd=$1
 shift
 
@@ -19,9 +36,9 @@ fi
 
 if [ -z $cmd ]; then
     echo ""							>&2
-    echo "Usage: ${self} [--help] <command> [<arg> ...]"	>&2
+    echo "Usage: ${self} [--prefix <prefix>] [--help] <command> [<arg> ...]">&2
     echo ""							>&2
-    echo "Starts a YaST2 tool from $y2toolpath."		>&2
+    echo "Starts a YaST2 tool from '$y2toolpath'."		>&2
     echo ""							>&2
     exit 1
 fi

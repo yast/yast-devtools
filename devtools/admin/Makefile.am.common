@@ -16,6 +16,8 @@ CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 	$(ybindir)/makedep.sh > .new.dep
 	mv .new.dep .dep
 
+dist-hook: check-syntax
+
 check-syntax: $(client_DATA)
 	$(bindir)/ycpc -qE -M. -I. $(YCPCFLAGS) $^
 

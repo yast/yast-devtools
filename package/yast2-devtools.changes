@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Feb 10 12:55:02 CET 2004 - msvec@suse.cz
+
+- added check-syntax target dependence to make package-local
+
+-------------------------------------------------------------------
 Mon Feb  9 16:42:46 CET 2004 - msvec@suse.cz
 
 - drop setting of Y2DIR in common Makefile.am

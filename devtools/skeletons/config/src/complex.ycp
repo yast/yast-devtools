@@ -30,7 +30,6 @@ global define boolean Modified() ``{
     return XXPkgXX::Modified();
 }
 
-
 /**
  * Read settings dialog
  * @return `abort if aborted and `next otherwise
@@ -80,7 +79,7 @@ global define symbol SummaryDialog() ``{
 	ret = UI::UserInput();
 
 	/* abort? */
-	if(ret == `abort || ret == `cancel) {
+	if(ret == `abort || ret == `cancel || ret == `back) {
 	    if(ReallyAbort()) break;
 	    else continue;
 	}
@@ -101,7 +100,7 @@ global define symbol SummaryDialog() ``{
             }
             break;
         }
-        else if(ret == `next || ret == `back) {
+        else if(ret == `next) {
             break;
         }
         else {

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 20 15:52:50 CEST 2003 - jsuchome@suse.de
+
+- removed redundant "initialization dialog" (#28779) from skeleton
+- 2.8.7
+
+-------------------------------------------------------------------
 Tue Aug 12 07:31:59 CEST 2003 - visnov@suse.de
 
 - merged in proofread texts into the config skeleton 

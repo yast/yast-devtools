@@ -297,6 +297,8 @@ sub parse_sources ()
 
 # like "[[:alpha:]_][[:alnum:]_]*" except a single _
 my $ycp_symbol = "(?:[[:alpha:]_][[:alnum:]_]+|[[:alpha:]][[:alnum:]_]*)";
+my $ycp_quad = "(?:::)";
+my $ycp_qualified_symbol = "(?:$ycp_quad?$ycp_symbol(?:$ycp_quad$ycp_symbol)*)";
 
 my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock|map"
     . "|locale|term|path|block|declaration|symbol)";
@@ -342,7 +344,7 @@ sub parse_file ($)
 	if ("aftercomment" eq $state)
 	{
 	    # function definition
-	    if (/(global\s+)?define\s+($ycp_typedecl)?\s*($ycp_symbol)(.*)/o)
+	    if (/(global\s+)?define\s+($ycp_typedecl)?\s*($ycp_qualified_symbol)(.*)/o)
 	    {
 		$isglobal = defined $1;
 		$declared_type = $2 || "";
@@ -351,7 +353,7 @@ sub parse_file ($)
 		if ($params =~ /``\{/)
 		{
 		    $params =~ s/``\{.*//;
-		    $state = "skip";
+		    $state = "start";
 		    $shipout = 1;
 		}
 		else
@@ -360,7 +362,7 @@ sub parse_file ($)
 		}
 	    }
 	    # variable declaration
-	    elsif (/(global\s+)?($ycp_typedecl)\s+($ycp_symbol)\s*=/o)
+	    elsif (/(global\s+)?($ycp_typedecl)\s+($ycp_qualified_symbol)\s*=/o)
 	    {
 		  $isglobal = defined $1;
 		  $declared_type = $2;
@@ -390,11 +392,6 @@ sub parse_file ($)
 		$shipout = 1;
 	    }
 	    $params .= $_;
-	}
-	elsif ($state eq "skip")
-	{
-	    # but why is skip needed at all?
-	    $state = "start";
 	}
 	elsif ($state eq "firstline")
 	{
@@ -443,7 +440,7 @@ sub parse_file ($)
 		push (@{$f->{"requires"}}, $prov);
 	    }
 
-	    if (/define\s+($ycp_typedecl)?\s*(${ycp_symbol})\s*\(/o)
+	    if (/define\s+($ycp_typedecl)?\s*(${ycp_qualified_symbol})\s*\(/o)
 	    {
 		warning ("Function $2 has no comment.");
 	    }

@@ -1,0 +1,18 @@
+// how it copes with qualified definitions
+// (used for faking UI)
+{
+    
+    // undocumented
+    global define UI::foo () ``{ return; }
+
+    // forbidden by the parser
+    //boolean UI::show_penguins = true;
+
+    /**
+     * This is a documented function
+     * @param sdj send data to Japan?
+     */
+    global define UI::CallbackCallback (boolean sdj, string f) ``{
+	return;
+    }
+}

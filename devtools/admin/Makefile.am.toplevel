@@ -160,7 +160,6 @@ package: check-cvs-up-to-date check-tagversion check-parse check-all-packages pa
 
 TAGVERSION	 = y2tool tagversion
 CHECKIN_BASE_DIR = /work/src/done
-#CHECKIN_BASE_DIR = /tmp/done
 
 check-cvs-up-to-date:
 	cd $(srcdir) && ! cvs -q -n up 2>/dev/null | grep '^[MCAR] '

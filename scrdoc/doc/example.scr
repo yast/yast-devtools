@@ -25,5 +25,5 @@
 .XXpkgXX
 
 `ag_XXpkgXX(
-  XXPkgXXAgent()
+  SCR::XXPkgXXAgent()
 )

@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Thu Jan 13 17:13:12 CET 2005 - mvidner@suse.cz
+
+- Dependency fixes:
+ * Create the dependency file outside "." to prevent endless loops.
+ * Added line oriented /* */ comment handling.
+ * Feed only ybc files to the pattern rule, preventing the warning
+   "Target Foo.pm does not match the target pattern."
+- 2.11.6
+
+-------------------------------------------------------------------
 Wed Jan 12 19:09:54 CET 2005 - nashif@suse.de
 
 - Updated testsuite and fixed ycpdoc to not add <pre> in xml output

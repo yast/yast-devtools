@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-  <section id="ycp_check_quickstart">
+<!DOCTYPE section PUBLIC "-//SuSE//DTD DocBook XML"
+"/usr/share/xml/docbook/schema/dtd/4.2/docbookx.dtd">
+<section id="check_ycp">
+    <title>Check YCP Syntax</title>
+  <section id="check_ycp_quickstart">
     <title>Quick Start</title>
     <para>
       Simply invoke <literal>check_ycp</literal> with the YCP file(s) you wish to check as
@@ -16,7 +20,7 @@ check_ycp *.ycp
     <para>
       The error messages should be self explanatory. They stick to the GNU standards
       for error messages, so you can use your favourite editor's
-      (e.g. <link linkend="emacs">Emacs</link>)
+      (e.g. <link linkend="check_ycp_emacs">Emacs</link>)
 	function to process them.
     </para>
 
@@ -36,7 +40,7 @@ check_ycp -h
 
 
 
-  <section id="ycp_check_why">
+  <section id="check_ycp_why">
     <title>Why this Document?</title>
 
     <para>
@@ -61,7 +65,7 @@ check_ycp -h
     </para>
   </section>
 
-  <section id="ycp_check_header_comments">
+  <section id="check_ycp_header_comments">
     <title>Header Comment Checks</title>
 
     <para>
@@ -91,7 +95,7 @@ check_ycp -h
       </itemizedlist>
     </para>
   </section>
-  <section id="ycp_check_filename">
+  <section id="check_ycp_filename">
     <title>Filename Check</title>
 
     <section>
@@ -301,7 +305,8 @@ check_ycp -h
       </section>
     </section>
 
-    <section id="ycp_check_html-check">
+</section>
+    <section id="check_ycp_html-check">
       <title>RichText / HTML Sanity Check</title>
 
       <para>
@@ -325,7 +330,6 @@ check_ycp -h
 	  wrong portions of help text will slip through undetected, thus unchecked.
 	</para>
       </formalpara>
-    </section>
     <section>
       <title>Completeness of &lt;p&gt; / &lt;/p&gt; Paragraph Tags</title>
 
@@ -360,7 +364,7 @@ check_ycp -h
 
       <section><title>How</title>
 	<para>
-            See the <link linkend="html-check">intro</link> of this section.
+            See the <link linkend="check_ycp_html-check">intro</link> of this section.
 	</para>
       </section>
     </section>
@@ -394,7 +398,7 @@ check_ycp -h
       </section>
       <section><title>How</title>
 	<para>
-            See the <link linkend="html-check">intro</link> of this section.
+            See the <link linkend="check_ycp_html-check">intro</link> of this section.
 	</para>
       </section>
     </section>
@@ -436,8 +440,8 @@ check_ycp -h
 	  careful manual checking which is not really necessary for all the text.
 	</para>
       </section>
-    </section>
-    <section><title>Workaround</title>
+      <section>
+          <title>Workaround</title>
 
       <para>
 	Split your help texts and use the YCP string addition operator to put them
@@ -495,9 +499,10 @@ bla blurb bla ...
 
     <section><title>How</title>
       <para>
-          See the <link linkend="html-check">intro</link> of this section.
+          See the <link linkend="check_ycp_html-check">intro</link> of this section.
       </para>
 
+    </section>
     </section>
     <section>
       <title>Excess Forced Line Breaks &lt;br&gt; after Paragraphs</title>
@@ -554,10 +559,10 @@ bla blurb bla ...
 	</para>
 
       </section>
-    </section>
 
   </section>
-  <section id="ycp_check_widget-checks"><title>Widget / UI Function Parameter Checks</title>
+    </section>
+  <section id="check_ycp_widget-checks"><title>Widget / UI Function Parameter Checks</title>
 
     <para>
       Parameters to YaST2 UI widgets plus some commonly used functions
@@ -617,9 +622,8 @@ PushButton(`opt(`default), _("OK"));
 	PushButton( message );
     </programlisting>
     </para>
-  </section>
 
-  <section id="ycp_check_widget-shortcut">
+  <section id="check_ycp_widget-shortcut">
     <title>Keyboard Shortcut Check</title>
 
     <section><title>What</title>
@@ -665,12 +669,12 @@ PushButton(`opt(`default), _("OK"));
 	one ampersand "<literal>&amp;</literal>".
       </para>
       <para>
-          See the <link linkend="ycp_check_widget-checks">widget checks</link> of this section for more.
+          See the <link linkend="check_ycp_widget-checks">widget checks</link> of this section for more.
       </para>
 
     </section>
   </section>
-  <section id="ycp_check_widget-trans">
+  <section id="check_ycp_widget-trans">
     <title>Translatable Messages Check</title>
 
     <section><title>What</title>
@@ -692,7 +696,7 @@ PushButton(`opt(`default), _("OK"));
 
     <section><title>How</title>
       <para>
-          See the <link linkend="widget-checks">intro</link> of this section.
+          See the <link linkend="check_ycp_widget-checks">intro</link> of this section.
       </para>
     </section>
   </section>
@@ -721,7 +725,6 @@ PushButton(`opt(`default), _("OK"));
 	  than simply copying it. Those days are gone; YCP now supports an
 	  <literal>include</literal> mechanism similar to C or C++.
 	</para>
-      </section>
       <para>
 	Very general code like how to create the typical YaST2 wizard window layout has
 	now been moved to the <emphasis>wizard lib</emphasis>, a collection of include files that
@@ -842,10 +845,12 @@ PushButton(`opt(`default), _("OK"));
 
     </section>
   </section>
+  </section>
+  </section>
 
   <section><title>Checks for Changed YCP Syntax</title>
 
-    <section>Alternative Variable Declarations
+      <section><title>Alternative Variable Declarations</title>
 
       <section><title>What</title>
 
@@ -921,7 +926,8 @@ check_ycp -x HelloWorld.ycp
   </section>
 
 
-  <section><title><literal>check_ycp</literal> and Emacs</title>
+  <section id="check_ycp_emacs">
+      <title><literal>check_ycp</literal> and Emacs</title>
 
     <para>
       <literal>check_ycp</literal> and Emacs go together well:
@@ -1038,7 +1044,7 @@ elsif ( $widget =~ /MyWidget/ )
       </para>
 
       <para>
-          Of course you can omit the <link linkend="widget-shortcut">keyboard
+          Of course you can omit the <link linkend="check_ycp_widget-shortcut">keyboard
               shortcut check</link>
 	   (<literal>check_keyboard_shortcut()</literal>) if it doesn't make sense for your
 	  widget or function.
@@ -1046,7 +1052,7 @@ elsif ( $widget =~ /MyWidget/ )
 
       <para>
           If there is more than one parameter to be <link
-              linkend="widget-trans">checked for translatable messages</link>, add a call to <literal>check_translation()</literal> for
+              linkend="check_ycp_widget-trans">checked for translatable messages</link>, add a call to <literal>check_translation()</literal> for
 	  each.
       </para>
     </section>
@@ -1071,4 +1077,5 @@ elsif ( $widget =~ /MyWidget/ )
 
 
     </section>
+  </section>
   </section>

@@ -7,7 +7,7 @@ use Data::Dumper;
 use XML::Writer;
 use Tie::Hash;
 use Tie::Array;
-use Getopt::Std;
+use Getopt::Long;
 use File::Basename;
 use FileHandle;
 
@@ -18,10 +18,22 @@ my $supported = "builtin|widget";
 my $prog;
 my ($filename,$filepath,$filesuffix);
 my $file_summary;
+my $namespace; # The namespace to use when referencing the functions
 my $screenshot_dir = "examples/screenshots";
 
 my $f = {};
 
+sub parse_arguments
+{
+##
+## find switches
+##
+    Getopt::Long::Configure ("bundling");
+    GetOptions (
+		"output-file|o=s" => \$xml_output,
+	       );
+
+}
 sub scan_file ($)
 {
     my ($file) = @_;
@@ -64,6 +76,11 @@ sub scan_file ($)
             {
                 $file_summary=$1;
                 $file_summary=~ s/^\s+//;
+            }
+            elsif ( /Namespace:(.*)/ )
+            {
+                $namespace=$1;
+                $namespace=~ s/^\s+//;
             }
             elsif( /\@(widget|builtin)(.*)/)
             {
@@ -122,6 +139,7 @@ sub parse_comments (@)
 
     $entry->{"filename"} = $filename;
     $entry->{"file_summary"} = $file_summary;
+    $entry->{"namespace"} = $namespace;
     $entry->{"type"} = "";
     $entry->{"parameters"} = [$oentry];
     tie @{$entry->{"parameters"}}, "parameters";
@@ -723,6 +741,7 @@ sub read_class_file()
 
 sub main () 
 {
+    parse_arguments();
     ($filename,$filepath,$filesuffix) = fileparse($ARGV[0],qr{\.cc});
     scan_file($ARGV[0]);
     yastdoc::XML::write_docs();

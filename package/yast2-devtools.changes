@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug  1 12:30:37 CEST 2003 - mvidner@suse.cz
+
+- ycpdoc: don't expose perl-internal hash ordering (fixes build).
+- 2.8.5
+
+-------------------------------------------------------------------
 Wed Jul 30 09:05:30 CEST 2003 - visnov@suse.de
 
 - added translator comments for all skeleton messages

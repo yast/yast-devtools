@@ -653,7 +653,9 @@ sub do_shipout ($$$$$@)
 	}
 	}
     # for commented parameters: warn if no such actual parameter
-    while ( my ($key, $descr) = each %param_incomment) {
+    foreach my $key (sort keys %param_incomment)
+    {
+	my $descr = $param_incomment{$key};
 	if (!defined ($param_infunc{$key})) {
 	    if ($entry->{"kind"} eq "function")
 	    {
@@ -1274,7 +1276,7 @@ sub make_ahref ($)
 
 package ycpdoc::XML;
 
-use IO;
+use IO qw(File);
 
 my $writer;
 

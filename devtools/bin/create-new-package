@@ -94,9 +94,14 @@ sub main()
 	    "Use -s to get a list.\n";
     }
 
+    # XXpkgXX
     $raw_name = $new_name;
+
+    # XXPkgXX
     $Raw_name = $new_name;
     $Raw_name =~ s/^(.)/\u$1/;
+    $Raw_name =~ s/-(.)/\u$1/;
+    $Raw_name =~ s/-(.)/_\u$1/;
 
     $target_dir = $base_dir . "/" . $new_name;
     deb( "target_dir: ", $target_dir );  

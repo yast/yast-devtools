@@ -106,6 +106,10 @@ Source0:	$RPMNAME-$VERSION.tar.bz2",
 Requires:	$RPMNAME
 Group:		Development/Libraries",
 
+    "\@HEADER-INSTSYS\@" =>
+"\%package instsys
+Group:		SuSE internal",
+
     "\@PREP\@" =>
 "\%prep
 \%setup -n $RPMNAME-$VERSION",

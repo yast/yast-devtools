@@ -1,9 +1,14 @@
 -------------------------------------------------------------------
+Thu Jun 12 10:15:37 CEST 2003 - arvin@suse.de
+
+- added missing directories to file list
+
+-------------------------------------------------------------------
 Fri Jun  6 09:43:06 CEST 2003 - mvidner@suse.cz
 
-- Hack: while yast2 core is broken, don't run ycp testsuites.
+- Hack: while yast2-core is broken, don't run ycp testsuites.
 - create-new-package: generate a better Module_Name (msvec).
-- 2.8.1 
+- 2.8.1
 
 -------------------------------------------------------------------
 Fri May 30 11:23:56 CEST 2003 - mvidner@suse.cz

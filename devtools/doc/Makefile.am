@@ -27,9 +27,9 @@ html/index.html: yast2-devtools.xml
 
 
 
-html/yast2docs.css: 
-	cp ../../docbook/css/yast2docs.css $@
-	cp -a ../../docbook/images html
+html/yast2docs.css: html/index.html
+	cp $(srcdir)/../../docbook/css/yast2docs.css $@
+	cp -a $(srcdir)/../../docbook/images html
 	find html -name "Makefile*"  | xargs rm
 
 clean-local:

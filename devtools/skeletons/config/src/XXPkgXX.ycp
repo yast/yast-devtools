@@ -237,6 +237,16 @@ global define list Overview() ``{
     // TODO FIXME: your code here...
     return [];
 }
+/**
+ * Return packages needed to be installed and removed during 
+ * Autoinstallation to insure module has all needed software 
+ * installed.
+ * @return map with 2 lists.
+ */
+global define list AutoPackages() ``{
+    // TODO FIXME: your code here...
+    return $["install":[], "remove":[]];
+}
 
 /* EOF */
 }

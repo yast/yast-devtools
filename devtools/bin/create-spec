@@ -5,24 +5,19 @@
 #Create a spec file for YaST2 package
 #
 #Available macros in the xxx.spec.in:
-#  @RPMNAME@        - reads it from file RPMNAME
-#  @VERSION@        - reads it from file VERSION
-#  @MAINTAINER@     - reads it from file MAINTAINER
+#  @RPMNAME@		- reads it from file RPMNAME
+#  @VERSION@		- reads it from file VERSION
+#  @MAINTAINER@		- reads it from file MAINTAINER
 #
-#  @HEADER-COMMENT@ - writes the SuSE .spec comment
-#  @HEADER@         - writes the usual header except BuildArch:,
-#                     Requires:, Summary:
-#  @HEADER-DEVEL@   - writes the -devel subpackage header, similar to @HEADER@
-#  @PREP@           - writes %prep with %setup
-#  @BUILD-PROGRAM@  - writes %build with usual make for package with any programs, libaries or plugins.
-#  @BUILD-SCRIPT@   - writes %build with usual make for package with (bash) scripts.
-#  @BUILD-PO@       - writes %build with usual make for package with trans.
-#  @BUILD-YCP@      - writes %build with usual make for package with YCP
-#  @INSTALL-PROGRAM@ - writes %install with usual make install of any programs, libaries or plugins.
-#  @INSTALL-SCRIPT@ - writes %install with usual make install of any (bash) scripts.
-#  @INSTALL-PO@     - writes %install with usual make install of translations
-#  @INSTALL-YCP@    - writes %install with usual YCP make install
-#  @CLEAN@          - writes %clean with removing RPM_BUILD_ROOT
+#  @HEADER-COMMENT@	- writes the SuSE .spec comment
+#  @HEADER@		- writes the usual header except BuildArch:,
+#  @HEADER-DEVEL@	- writes the -devel subpackage header, similar to @HEADER@
+#  @HEADER-INSTSYS@	- writes the -instsys subpackage header, similar to @HEADER@
+#  @PREP@		- writes %prep with %setup
+#  @BUILD@		- writes %build with usual make
+#  @BUILD-QT@		- writes %build with usual make for qt stuff
+#  @INSTALL@		- writes %install with usual make install and make check
+#  @CLEAN@		- writes %clean with removing RPM_BUILD_ROOT
 #####
 # Author: Jan Holesovsky <kendy@suse.cz>, 2001
 

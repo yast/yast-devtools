@@ -12,7 +12,7 @@ ydoxygen - Runs doxygen as configured for YaST.
 =head1 SYNOPSIS
 
  ydoxygen -h|--help|--man
- ydoxygen [-t <template>] [<param>=<value> ...]
+ ydoxygen [-d] [-t <template>] [<param>=<value> ...]
 
 =head1 OPTIONS AND ARGUMENTS
 
@@ -26,6 +26,11 @@ Show this help screen
 
 Use a template file different from <y2datadir>/devtools/Doxyfile
 Output files are placed to directory I<dir>
+
+=item B<-d>, B<--debug>
+
+Show what is substituted.
+Write doxygen.log and doxygen.conf.
 
 =item I<param>=I<value>
 
@@ -80,13 +85,26 @@ open (IN, "<$template") or die "Cannot open $template: $!";
 my $run_doxygen = "|doxygen -";
 if ($debug)
 {
-    $run_doxygen = "|tee ydoxygen ". $run_doxygen;
+    $run_doxygen = "|tee doxygen.conf ". $run_doxygen;
 }
 open (OUT, $run_doxygen) or die;
 
+# $_ holds the whole definitioin of a parameter
+# that may be split over multiple lines
+
+# a single physical line
+my $single;
+
 # process input, passing it through, substituting what we want
-while (defined ($_ = <IN>))
+while (defined ($single = <IN>))
 {
+    $_ .= $single;
+    # check if this line continues (by trying to cut the continuation mark off)
+    if (s/\\$//)
+    {
+	next;
+    }
+
     if (m/^([A-Z_]+)(\s*)=\s*(.*)\n/)
     {
 	my ($param, $ws, $value) = ($1, $2, $3);
@@ -98,6 +116,7 @@ while (defined ($_ = <IN>))
 	$_ = "$param$ws= $value\n";
     }
     print OUT $_;
+    $_ = "";			# this line does not continue
 }
 
 close(OUT);

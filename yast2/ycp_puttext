@@ -289,7 +289,7 @@ sub store_translation()
     my $line_no;
     $msgid  = normalize ( $msgid  );
 
-    if ( length ( $msgid  ) > 0 && 
+    if ( length ( $msgid  ) > 0 &&
 	 length ( $msgstr ) > 0 &&
 	 ! $fuzzy &&
 	 $msgid ne normalize( $msgstr ) )
@@ -318,7 +318,7 @@ sub find_ycp_files()
     my $ycp_file;
     my $basename;
 
-    foreach $ycp_file ( `find $ycp_base_path -name "*.ycp" -print` )
+    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" \\) -print` )
     {
 	chomp $ycp_file;
 	$basename = basename( $ycp_file );
@@ -414,7 +414,7 @@ sub replace_ycp_messages()
 	    {
 		if ( ! defined $trans_ref_count{ $norm_msg } || $trans_ref_count{ $norm_msg } < 1 )
 		{
-		    warning ( "$ycp_file: WARNING: Invalid reference count for \"" 
+		    warning ( "$ycp_file: WARNING: Invalid reference count for \""
 			      .  shorten ( $msg, 50 ) . "\"" );
 		}
 		else
@@ -428,7 +428,7 @@ sub replace_ycp_messages()
 		    my $old_msg =  $msg;
 		    $msg = $trans{ $norm_msg };
 
-		    # Avoid over-long lines with embedded "\n" 
+		    # Avoid over-long lines with embedded "\n"
 		    # if otherwise formatted in the original
 
 		    if ( $old_msg =~ /.+\n.+/ &&	# old message contained literal newlines
@@ -648,7 +648,7 @@ sub usage()
 	. "\t-s silent (turn verbose off)\n"
 	. "\t-v verbose (default)\n"
 	. "\t-m allow missing .ycp files\n"
-	. "\t-l suppress logging to $logfile\n"    
+	. "\t-l suppress logging to $logfile\n"
 	. "\n"
 	. "Patches proof-read English messages from <po-file> back into\n"
 	. "the corresponding .ycp files somewhere below <ycp-file-base-path>.\n"

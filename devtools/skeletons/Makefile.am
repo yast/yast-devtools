@@ -17,7 +17,9 @@ install-data-local:
 		echo "Removing old $(skeletonsdir)/$$D and installing new one..." ; \
 		rm -rf $(skeletonsdir)/$$D ; \
 		find $$D \
-		     -type f -and -not -path "*CVS*" -and -not -path "*~" \
+		     -type f -and -not -path "*CVS*" \
+		             -and -not -path "*~" \
+		             -and -not -path "*.cvsignore" \
 		     -exec cp --parents {} $(skeletonsdir) \; ; \
 	    fi ; \
 	done
@@ -32,7 +34,9 @@ dist-hook:
 	    if [ -d $$D -a "$$D" != "CVS" ] ; \
 	    then \
 		find $$D \
-		     -type f -and -not -path "*CVS*" -and -not -path "*~" \
+		     -type f -and -not -path "*CVS*" \
+		             -and -not -path "*~" \
+		             -and -not -path "*.cvsignore" \
 		     -exec cp --parents {} $${distdir} \; ; \
 	    fi ; \
 	done

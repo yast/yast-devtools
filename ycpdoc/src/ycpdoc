@@ -354,8 +354,8 @@ sub parse_file ($)
     my $state = "firstline"; # aftercomment, fistcomment, firstline, incomment, intro, start,
 
     my $f = {};
-    $f->{"requires"} = [];
     tie @{$f->{"provides"}}, "provides";
+    tie @{$f->{"requires"}}, "requires";
 
     my @header_lines = ();	# list of header lines (first /** */)
 
@@ -1389,6 +1389,9 @@ sub dump_data
 
 package file;
 @file::ISA = ("Tie::StdHash");
+
+package requires;
+@requires::ISA = ("Tie::StdArray");
 
 package provides;
 @provides::ISA = ("Tie::StdArray");

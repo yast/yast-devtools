@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct 26 17:36:57 CEST 2004 - nashif@suse.de
+
+- Updated docu styelsheets
+- 2.11.1
+
+-------------------------------------------------------------------
 Tue Oct 26 16:05:05 CEST 2004 - mvidner@suse.cz
 
 - Create acinclude.m4 in Makefile.cvs instead of having a redundant

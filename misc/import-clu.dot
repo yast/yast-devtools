@@ -1,0 +1,328 @@
+digraph import {
+	graph [rankdir=LR, size="16,11", rotate=90];
+	subgraph "cluster-yast2-xml" {
+		XML;
+	}
+	subgraph "cluster-yast2-ntp-client" {
+		NtpClient;
+	}
+	subgraph "cluster-yast2-nfs-client" {
+		Nfs;
+	}
+	subgraph "cluster-yast2" {
+		Address;
+		Arch;
+		AsciiFile;
+		Call;
+		CommandLine;
+		Confirm;
+		Crash;
+		Cron;
+		CWM;
+		Desktop;
+		Directory;
+		Encoding;
+		Hostname;
+		HTML;
+		Initrd;
+		IP;
+		Kernel;
+		Label;
+		LogView;
+		Map;
+		Misc;
+		Mode;
+		ModuleLoading;
+		ModulesConf;
+		Netmask;
+		NetworkPopup;
+		Package;
+		PackageAI;
+		PackageCallbacksInit;
+		PackageSystem;
+		Popup;
+		ProductFeatures;
+		Progress;
+		Report;
+		Require;
+		RichText;
+		Runlevel;
+		Sequencer;
+		Service;
+		String;
+		Summary;
+		TablePopup;
+		TypeRepository;
+		URL;
+		Version;
+		Wizard;
+		Wizard_hw;
+	}
+	subgraph "cluster-yast2-online-update" {
+		AutoOnlineUpdate;
+		OnlineUpdate;
+		OnlineUpdateCallbacks;
+	}
+	subgraph "cluster-yast2-slp" {
+		SLP;
+	}
+	subgraph "cluster-yast2-power-management" {
+		PowerManagement;
+	}
+	subgraph "cluster-yast2-transfer" {
+		FTP;
+		HTTP;
+		TFTP;
+	}
+	subgraph "cluster-yast2-inetd" {
+		Inetd;
+	}
+	subgraph "cluster-yast2-update" {
+		RootPart;
+		Update;
+	}
+	subgraph "cluster-yast2-profile-manager" {
+		ProfileManager;
+	}
+	subgraph "cluster-yast2-sound" {
+		Joystick;
+		Sound;
+	}
+	subgraph "cluster-yast2-dhcp-server" {
+		DhcpServerUI;
+		DhcpServer;
+		DhcpTsigKeys;
+	}
+	subgraph "cluster-autoyast2-installation" {
+		AutoInstall;
+		AutoInstallRules;
+		AutoinstClone;
+		AutoinstCompat;
+		AutoinstConfig;
+		AutoinstFile;
+		AutoinstGeneral;
+		AutoinstImage;
+		AutoinstLVM;
+		AutoinstRAID;
+		AutoinstScripts;
+		AutoinstSoftware;
+		AutoinstStorage;
+		Profile;
+		ProfileLocation;
+		Y2ModuleConfig;
+	}
+	subgraph "cluster-yast2-runlevel" {
+		RunlevelEd;
+	}
+	subgraph "cluster-yast2-x11" {
+		AutoinstX11;
+		Display;
+		XMessages;
+		XProposal;
+	}
+	subgraph "cluster-yast2-bootloader" {
+		BootABOOT;
+		BootCommon;
+		BootELILO;
+		BootGRUB;
+		BootLILO;
+		Bootloader;
+		BootMILO;
+		BootPPC;
+		BootS390;
+	}
+	subgraph "cluster-yast2-samba-server" {
+		SambaServer;
+		SambaServerWidgets;
+		SambaServerPassdb;
+	}
+	subgraph "cluster-yast2-installation" {
+		Hooks;
+		Hotplug;
+		HwStatus;
+		Installation;
+		Product;
+		ProductControl;
+		Vendor;
+		X11Version;
+	}
+	subgraph "cluster-yast2-mouse" {
+		Mouse;
+	}
+	subgraph "cluster-yast2-tv" {
+		ModulesComments;
+		Tv;
+	}
+	subgraph "cluster-yast2-repair" {
+		OSR;
+		OSRBoot;
+		OSRCommon;
+		OSRDirect;
+		OSRExecute;
+		OSRFloppy;
+		OSRFsck;
+		OSRFstab;
+		OSRLogFile;
+		OSRMode;
+		OSRModuleLoading;
+		OSRPkg;
+		OSRPkgUI;
+		OSRPkgVerify;
+		OSRPopup;
+		OSRProgress;
+		OSRPtbl;
+		OSRRepairUI;
+		OSRStatus;
+		OSRSummary;
+		OSRSwap;
+		OSRSystem;
+	}
+	subgraph "cluster-yast2-backup" {
+		Backup;
+	}
+	subgraph "cluster-yast2-nfs-server" {
+		NfsServer;
+	}
+	subgraph "cluster-yast2-tune" {
+		Idedma;
+		InitHWinfo;
+	}
+	subgraph "cluster-yast2-phone-services" {
+		Answering_machine;
+		Fax;
+	}
+	subgraph "cluster-yast2-firewall" {
+		SuSEFirewall;
+	}
+	subgraph "cluster-yast2-restore" {
+		Restore;
+	}
+	subgraph "cluster-yast2-testsuite" {
+		Pkg;
+	}
+	subgraph "cluster-yast2-sysconfig" {
+		Sysconfig;
+	}
+	subgraph "cluster-yast2-mail-aliases" {
+		MailAliases;
+	}
+	subgraph "cluster-yast2-users" {
+		UsersUI;
+		Users;
+		UsersCache;
+		UsersLDAP;
+		UsersPluginLDAPAll;
+		UsersPlugins;
+		UsersRoutines;
+		"YaPI::USERS";
+	}
+	subgraph "cluster-yast2-country" {
+		Console;
+		Keyboard;
+		Language;
+		Timezone;
+		XF86Path;
+	}
+	subgraph "cluster-yast2-nis-client" {
+		Nis;
+	}
+	subgraph "cluster-yast2-pam" {
+		Autologin;
+		Pam;
+		PamSettings;
+	}
+	subgraph "cluster-yast2-security" {
+		Security;
+	}
+	subgraph "cluster-yast2-network" {
+		Detection;
+		DNS;
+		DSL;
+		Firewall;
+		Host;
+		Internet;
+		ISDN;
+		Lan;
+		Modem;
+		Network;
+		NetworkConfig;
+		NetworkDevices;
+		NetworkModules;
+		Provider;
+		Proxy;
+		Remote;
+		Routing;
+	}
+	subgraph "cluster-yast2-tftp-server" {
+		TftpServer;
+	}
+	subgraph "cluster-yast2-packager" {
+		DirInstall;
+		InstURL;
+		PackageCallbacks;
+		PackageInstallation;
+		Packages;
+		PackageSelectionIO;
+		PackagesUI;
+		SlideShow;
+		SlideShowCallbacks;
+		SpaceCalculation;
+	}
+	subgraph "cluster-yast2-mail" {
+		Mail;
+	}
+	subgraph "cluster-yast2-storage" {
+		FileSystems;
+		Partitions;
+		Storage;
+		StorageClients;
+		StorageControllers;
+		StorageDevices;
+	}
+	subgraph "cluster-yast2-samba-client" {
+		Samba;
+	}
+	subgraph "cluster-yast2-perl-bindings" {
+		YaPI;
+	}
+	subgraph "cluster-yast2-kerberos-client" {
+		Kerberos;
+	}
+	subgraph "cluster-yast2-dns-server" {
+		DnsServerUI;
+		DnsData;
+		DnsRoutines;
+		DnsServer;
+		DnsTsigKeys;
+		DnsZones;
+	}
+	subgraph "cluster-autoyast2" {
+		Alice;
+		AutoinstClass;
+		Kickstart;
+	}
+	subgraph "cluster-yast2-nis-server" {
+		NisServer;
+	}
+	subgraph "cluster-yast2-http-server" {
+		HttpServer;
+		HttpServerWidgets;
+		"YaPI::HTTPD";
+		"YaPI::HTTPDModules";
+		"YaST::HTTPDData";
+		"YaST::httpdUtils";
+	}
+	subgraph "cluster-yast2-printer" {
+		CUPS;
+		LPRng;
+		Printer;
+		Printerdb;
+		Printerlib;
+		PrinterTest;
+		Spooler;
+	}
+	subgraph "cluster-yast2-ldap-client" {
+		Ldap;
+		LdapPopup;
+	}
+}

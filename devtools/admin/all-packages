@@ -149,6 +149,7 @@ yast2-trans-sr		inst-sys		all
 yast2-trans-sl_SI	inst-sys		all
 yast2-trans-sv		inst-sys		all
 yast2-trans-tr		inst-sys		all
+yast2-trans-uk		inst-sys		all
 yast2-trans-zh_CN	inst-sys		all
 yast2-trans-zh_TW	inst-sys		all
 

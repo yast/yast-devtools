@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jul  9 20:36:48 CEST 2002 - msvec@suse.cz
+
+- reworked config skeleton
+- install skeletons to the correct dir
+- 2.6.7
+
+-------------------------------------------------------------------
 Tue Jul 09 14:44:58 CEST 2002 - arvin@suse.de
 
 - changed call of xgettext (bug #16832)

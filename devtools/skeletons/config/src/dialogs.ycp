@@ -1,0 +1,97 @@
+/**
+ * File:	include/XXpkgXX/dialogs.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Dialogs definitions
+ * Authors:	XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "XXpkgXX";
+
+import "XXPkgXX";
+
+include "ui/common_popups.ycp";
+include "ui/common_messages.ycp";
+
+include "XXpkgXX/helps.ycp";
+include "XXpkgXX/routines.ycp";
+
+/**
+ * Configure1 dialog
+ * @return dialog result
+ */
+global define symbol Configure1Dialog () ``{
+
+    /* XXPkgXX configure1 dialog caption */
+    string caption = _("XXPkgXX configuration");
+
+    /* XXPkg configure1 dialog contents */
+    term contents = `Label (_("First part of configuration of XXpkgXX"));
+
+    Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
+	    BackButtonLabel(), NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+
+	ret = UI::UserInput();
+
+	/* abort? */
+	if(ret == `abort || ret == `cancel) {
+	    if(ReallyAbort()) break;
+	    else continue;
+	}
+        else if(ret == `next || ret == `back) {
+            break;
+        }
+        else {
+            y2error("unexpected retcode: %1", ret);
+            continue;
+        }
+    }
+
+    return ret;
+}
+
+/**
+ * Configure2 dialog
+ * @return dialog result
+ */
+global define symbol Configure2Dialog () ``{
+
+    /* XXPkgXX configure2 dialog caption */
+    string caption = _("XXPkgXX configuration");
+
+    /* XXPkg configure2 dialog contents */
+    term contents = `Label (_("Second part of configuration of XXpkgXX"));
+
+    Wizard::SetContentsButtons(caption, contents, HELPS["c2"]:"",
+	    BackButtonLabel(), NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+
+	ret = UI::UserInput();
+
+	/* abort? */
+	if(ret == `abort || ret == `cancel) {
+	    if(ReallyAbort()) break;
+	    else continue;
+	}
+        else if(ret == `next || ret == `back) {
+            break;
+        }
+        else {
+            y2error("unexpected retcode: %1", ret);
+            continue;
+        }
+    }
+
+    return ret;
+}
+
+/* EOF */
+}

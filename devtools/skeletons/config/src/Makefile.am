@@ -2,6 +2,8 @@
 # Makefile.am for devtools/devtools/skeletons/config/src
 #
 
+yncludedir = @yncludedir@/XXpkgXX
+
 client_DATA =			\
 	XXpkgXX.ycp		\
 	XXpkgXX_auto.ycp	\
@@ -10,8 +12,10 @@ client_DATA =			\
 
 ynclude_DATA =			\
 	helps.ycp		\
-	misc.ycp		\
-	ui.ycp
+	wizards.ycp		\
+	dialogs.ycp		\
+	complex.ycp		\
+	routines.ycp
 
 config_DATA =			\
 	XXpkgXX.y2cc

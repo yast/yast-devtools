@@ -7,7 +7,7 @@
 [Y2Module XXpkgXX]
 
 ; name of the entry, shown in y2cc
-Name = _("XXpkgXX module")
+Name = _("XXPkgXX configuration")
 
 ; "raw" group name to which this module belongs
 ; see /usr/share/YaST2/config/y2cc.groups for valid values
@@ -33,5 +33,11 @@ SortKey =
 
 ; which textdomain to use for translations (important!)
 Textdomain = XXpkgXX 
+
+; Autoinstall features
+Autoinst = 
+
+; Resource in control file
+AutoinstResource = 
 
 ; vim:syntax=dosini

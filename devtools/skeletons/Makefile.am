@@ -2,12 +2,13 @@
 # Makefile.am for devtools/devtools/skeletons
 #
 
-skeletonsdir = @YAST2DEVTOOLS@/skeletons
+skeletonsdir = $(DESTDIR)@YAST2DEVTOOLS@/skeletons
 
 # install the skeletons
 install-data-local:
-	mkdir --parents $(skeletonsdir) ; \
-	distdir=`cd $(distdir) && pwd`; \
+	mkdir --parents $(skeletonsdir); \
+	echo $(srcdir); \
+	ls; \
 	cd $(srcdir); \
 	for D in `ls` ; \
 	do \
@@ -25,6 +26,7 @@ install-data-local:
 dist-hook:
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(srcdir); \
+	ls; \
 	for D in `ls` ; \
 	do \
 	    if [ -d $$D -a "$$D" != "CVS" ] ; \

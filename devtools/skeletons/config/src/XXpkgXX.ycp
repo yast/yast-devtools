@@ -21,7 +21,7 @@ textdomain "XXpkgXX";
 y2milestone ("----------------------------------------");
 y2milestone ("XXPkgXX module started");
 
-include "XXpkgXX/ui.ycp";
+include "XXpkgXX/wizards.ycp";
 
 /* is this proposal or not? */
 boolean propose = false;

@@ -31,7 +31,7 @@ my $base_dir            = ".";
 my $skeletons_dir	= "/usr/share/YaST2/data/devtools/skeletons";
 my $target_dir          = "../dummy";
 my $skeleton		= "config";
-my $new_name            = "y2c_noname";
+my $new_name            = "noname";
 my $raw_name            = "noname";
 my $Raw_name            = "Noname";
 my $maintainer          = "nobody";   
@@ -98,10 +98,6 @@ sub main()
     $Raw_name = $new_name;
     $Raw_name =~ s/^(.)/\u$1/;
 
-    my $skel_first_letter = $skeleton;
-    $skel_first_letter =~ s/^(.).*/$1/;
-    $new_name = "y2" . $skel_first_letter . "_" . $new_name;
-
     $target_dir = $base_dir . "/" . $new_name;
     deb( "target_dir: ", $target_dir );  
     die "EXITING cause:: '$target_dir' already exists!\n" if (-d $target_dir);
@@ -133,7 +129,7 @@ sub main()
        
        unlink ("aclocal.m4", "configure", "Makefile.in", "config.log", "config.cache",
        	       "config.status", "Makefile", "doc/Makefile.in", "doc/Makefile",
-       	       "package/y2c_XXpkgXX.spec", "src/Makefile.in", "src/Makefile",
+       	       "package/XXpkgXX.spec", "src/Makefile.in", "src/Makefile",
        	       "README_skeleton"
 	       );
     }

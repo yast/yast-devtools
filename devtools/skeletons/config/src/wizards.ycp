@@ -1,0 +1,162 @@
+/**
+ * File:	include/XXpkgXX/wizards.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Wizards definitions
+ * Authors:	XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "XXpkgXX";
+
+import "Wizard";
+
+include "ui/common_popups.ycp";
+include "ui/common_messages.ycp";
+include "wizard/sequencer.ycp";
+
+include "XXpkgXX/complex.ycp";
+include "XXpkgXX/dialogs.ycp";
+
+/**
+ * Whole configuration of XXpkgXX
+ * @return sequence result
+ */
+global define symbol XXPkgXXSequence() ``{
+
+    map aliases = $[
+	"read"	: [ ``( ReadDialog() ), true ],
+	"main"	:   ``( MainSequence() ),
+	"write"	: [ ``( WriteDialog() ), true ]
+    ];
+
+    map sequence = $[
+	"ws_start" : "read",
+	"read" : $[
+	    `abort	: `abort,
+	    `next	: "main"
+	],
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: "write"
+	],
+	"write" : $[
+	    `abort	: `abort,
+	    `next	: `next
+	]
+    ];
+
+    string caption = _("XXPkgXX configuration");
+    term contents = `Label(_("Initializing ..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption, contents, "",
+	    BackButtonLabel(), NextButtonLabel());
+
+    any ret = WizardSequencer(aliases, sequence);
+
+    UI::CloseDialog();
+    return ret;
+}
+
+/**
+ * Whole configuration of XXpkgXX but without reading and writing.
+ * For use with autoinstallation.
+ * @return sequence result
+ */
+global define symbol XXPkgXXAutoSequence() ``{
+    string caption = _("XXPkgXX configuration");
+    term contents = `Label(_("Initializing ..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption, contents, "",
+	    BackButtonLabel(), NextButtonLabel());
+
+    any ret = MainSequence();
+
+    UI::CloseDialog();
+    return ret;
+}
+
+/**
+ * Main workflow of the XXpkgXX configuration
+ * @return sequence result
+ */
+global define symbol MainSequence() ``{
+
+    /* FIXME: adapt to your needs */
+    map aliases = $[
+	"summary"	:   ``( SummaryDialog() ),
+	"overview"	:   ``( OverviewDialog() ),
+	"configure"	: [ ``( AddSequence() ), true ],
+	"add"		: [ ``( AddSequence() ), true ],
+	"edit"		: [ ``( AddSequence() ), true ]
+    ];
+
+    /* FIXME: adapt to your needs */
+    map sequence = $[
+	"ws_start" : "summary",
+	"summary" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	    `overview	: "overview",
+	    `configure	: "configure",
+	    `other	: "configure",
+	],
+	"overview" : $[
+	    `abort	: `abort,
+	    `next	: `next,
+	    `add	: "add",
+	    `edit	: "edit",
+	],
+	"configure" : $[
+	    `abort	: `abort,
+	    `next	: "summary",
+	],
+	"add" : $[
+	    `abort	: `abort,
+	    `next	: "overview",
+	],
+	"edit" : $[
+	    `abort	: `abort,
+	    `next	: "overview",
+	]
+    ];
+
+    any ret = WizardSequencer(aliases, sequence);
+
+    return ret;
+}
+
+/**
+ * Add a configuration of XXpkgXX
+ * @return sequence result
+ */
+global define symbol AddSequence() ``{
+
+    /* FIXME: adapt to your needs */
+    map aliases = $[
+	"config1"	: ``( Configure1Dialog() ),
+	"config2"	: ``( Configure2Dialog() )
+    ];
+
+    /* FIXME: adapt to your needs */
+    map sequence = $[
+	"ws_start" : "config1",
+	"config1" : $[
+	    `abort	: `abort,
+	    `next	: "config2"
+	],
+	"config2" : $[
+	    `abort	: `abort,
+	    `next	: `next
+	]
+    ];
+
+    return WizardSequencer( aliases, sequence );
+}
+
+/* EOF */
+}

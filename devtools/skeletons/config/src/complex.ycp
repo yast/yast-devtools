@@ -1,0 +1,178 @@
+/**
+ * File:	include/XXpkgXX/complex.ycp
+ * Package:	Configuration of XXpkgXX
+ * Summary:	Dialogs definitions
+ * Authors:	XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "XXpkgXX";
+
+import "Wizard";
+import "Wizard_hw";
+
+import "XXPkgXX";
+
+include "ui/common_popups.ycp";
+include "ui/common_messages.ycp";
+
+include "XXpkgXX/helps.ycp";
+include "XXpkgXX/routines.ycp";
+
+/**
+ * Return a modification status
+ * @return true if data was modified
+ */
+global define boolean Modified() ``{
+    return XXPkgXX::Modified();
+}
+
+
+/**
+ * Read settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+global define symbol ReadDialog() ``{
+    Wizard::RestoreHelp(HELPS["read"]:"");
+    XXPkgXX::AbortFunction = ``{ return PollAbort();};
+    boolean ret = XXPkgXX::Read();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Write settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+global define symbol WriteDialog() ``{
+    Wizard::RestoreHelp(HELPS["write"]:"");
+    XXPkgXX::AbortFunction = ``{ return PollAbort();};
+    boolean ret = XXPkgXX::Write();
+    return ret ? `next : `abort;
+}
+
+/**
+ * Summary dialog
+ * @return dialog result
+ */
+global define symbol SummaryDialog() ``{
+
+    /* XXPkgXX summary dialog caption */
+    string caption = _("XXPkgXX configuration");
+
+    /* FIXME */
+    list summary = XXPkgXX::Summary();
+    list unconfigured = summary[1]:[];
+    string configured = summary[0]:"";
+
+    /* Frame label */
+    term contents = Wizard_hw::DetectedContent(_("XXPkgXX to configure"),
+	    unconfigured, false, configured);
+
+    Wizard::SetContentsButtons(caption, contents, HELPS["summary"]:"",
+	    BackButtonLabel(), FinishButtonLabel());
+
+    any ret = nil;
+    while(true) {
+
+	ret = UI::UserInput();
+
+	/* abort? */
+	if(ret == `abort || ret == `cancel) {
+	    if(ReallyAbort()) break;
+	    else continue;
+	}
+        /* overview dialog */
+        else if(ret == `edit_button) {
+            ret = `overview;
+            break;
+        }
+        /* configure the selected device */
+        else if(ret == `configure_button) {
+	    // TODO FIXME: check for change of the configuration
+            any selected = UI::QueryWidget(`id(`detected_selbox), `CurrentItem);
+            if(selected == `other) {
+                ret = `other;
+            }
+            else {
+                ret = `configure;
+            }
+            break;
+        }
+        else if(ret == `next || ret == `back) {
+            break;
+        }
+        else {
+            y2error("unexpected retcode: %1", ret);
+            continue;
+        }
+    }
+
+    return ret;
+}
+
+/**
+ * Overview dialog
+ * @return dialog result
+ */
+global define symbol OverviewDialog() ``{
+
+    /* XXPkgXX overview dialog caption */
+    string caption = _("XXPkgXX overview");
+
+    list overview = XXPkgXX::Overview();
+
+    /* FIXME table header */
+    term contents = Wizard_hw::ConfiguredContent(
+	/* Table header */
+	`header(_("Number"), _("XXPkgXX")),
+	overview, nil, nil, nil, nil );
+
+    contents = Wizard_hw::SpacingAround(contents, 1.5, 1.5, 1.0, 1.0);
+
+    Wizard::SetContentsButtons(caption, contents, HELPS["overview"]:"",
+	    BackButtonLabel(), FinishButtonLabel());
+
+    any ret = nil;
+    while(true) {
+
+	ret = UI::UserInput();
+
+	/* abort? */
+	if(ret == `abort || ret == `cancel) {
+	    if(ReallyAbort()) break;
+	    else continue;
+	}
+        /* add */
+        else if(ret == `add_button) {
+	    /* FIXME */
+            ret = `add;
+            break;
+        }
+        /* edit */
+        else if(ret == `edit_button) {
+	    /* FIXME */
+            ret = `edit;
+            break;
+        }
+        /* delete */
+        else if(ret == `delete_button) {
+	    /* FIXME */
+            continue;
+        }
+        else if(ret == `next || ret == `back) {
+            break;
+        }
+        else {
+            y2error("unexpected retcode: %1", ret);
+            continue;
+        }
+    }
+
+    return ret;
+}
+
+/* EOF */
+}

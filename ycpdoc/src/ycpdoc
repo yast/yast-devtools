@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # Authors:
 #  Petr Blahos <pblahos@suse.cz>
@@ -112,6 +112,7 @@ exist.
 =cut
 
 use strict;
+use warnings;
 use File::Basename;
 use Getopt::Long;
 use Pod::Usage;
@@ -317,15 +318,23 @@ my $ycp_qualified_symbol = "(?:$ycp_quad?$ycp_symbol(?:$ycp_quad$ycp_symbol)*)";
 
 my $ycp_simple_type = "(?:any|void|boolean|integer|float|string|byteblock"
     . "|list|map" 		# _syntactically_ simple types
+    . "|${ycp_symbol}_t"	# if it ends with _t, it is a type
     . "|locale|term|path|block|declaration|symbol)";
 
-# Don't bother with deeply nested types yet.
-my $ycp_typedecl = qr{(?: $ycp_simple_type
-    |list  \s* \( \s* $ycp_simple_type \s* \) # old syntax
-    |list  \s* <  \s* $ycp_simple_type \s* >
-    |block \s* <  \s* $ycp_simple_type \s* >
-    |map   \s* <  \s* $ycp_simple_type \s* , \s* $ycp_simple_type \s* >
+sub recursive_type ($)
+{
+    my $t = shift;
+    return qr{(?: $t
+    |list  \s* \( \s* $t \s* \) # old syntax
+    |list  \s* <  \s* $t \s* >
+    |block \s* <  \s* $t \s* >
+    |map   \s* <  \s* $t \s* , \s* $t \s* >
     )}x;
+}
+
+#3 levels of type nesting
+my $ycp_typedecl =
+    recursive_type (recursive_type (recursive_type ($ycp_simple_type)));
 
 # Matches any string not containing '*/'.
 # Helpful for the line-oriented parser not to slurp everything when it
@@ -554,14 +563,18 @@ sub do_shipout ($$$$$@)
 	# just the things inside parens
 	$ok = ($params =~ s/^\s*\(\s*(.*)\s*\)\s*$/$1/);
 	warn "No parentheses? '$params'" unless $ok;
-	foreach my $p (split (/,/, $params))
+
+	my $last_comma = ',';
+	while ($params =~ m/\G\s*($ycp_typedecl)\s+($ycp_symbol)\s*(,?)/ogc)
 	{
-	    $ok = ($p =~ m/\s*($ycp_typedecl)\s+($ycp_symbol)/o);
-	    warn "Bad parameter? '$p'" unless $ok;
+	    warn "Missing comma before '$1 $2'" unless $last_comma;
+	    $last_comma = $3;
 	    # later: "description"
 	    push @parameters, { "name" => $2, "type" => $1 };
 	    $param_infunc{$2} = $2;
 	}
+	$params =~ m/\G(.*)/;
+	warn "Bad parameter? '$1'" unless $1 eq "";
     }
 
     my $last_param;
@@ -786,6 +799,16 @@ sub almost_html ($)
 
 package ycpdoc::HTML;
 
+sub escape_ltgtamp ($)
+{
+    my $text = shift;
+    # ampersand first!
+    $text =~ s:\&:\&amp;:g;
+    $text =~ s:<:\&lt;:g;
+    $text =~ s:>:\&gt;:g;
+    return $text;
+}
+
 # substituted strings: 1,2 = Module, 3,4,5 = links to other pages
 my $intro = "<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n"
     . "<STYLE type=\"text/css\">\n"
@@ -914,7 +937,7 @@ sub create_index ($)
 	    print OUT "#";
 	    print OUT $one->{"name"};
 	    print OUT "\">";
-	    print OUT $one->{"signature"};
+	    print OUT escape_ltgtamp ($one->{"signature"});
 	    print OUT "</a></td><td><a href=\"";
 	    print OUT html_name ($one->{"file"});
 	    print OUT "\">";
@@ -1119,7 +1142,8 @@ sub write_onefile ($$)
 	    {
 		push (@params, $param->{"type"}." ".$param->{"name"});
 	    }
-	    my $sig = $one->{"signature"} = $n ." (". join (", ", @params) .")";
+	    $one->{"signature"} = $n ." (". join (", ", @params) .")";
+	    my $sig = escape_ltgtamp ($one->{"signature"});
 	    if ($one->{"global"})
 	    {
 		push (@global_functions, "<a href=\"#$n\">$sig</a>");
@@ -1163,7 +1187,7 @@ sub write_onefile ($$)
 	    my $gl = $one->{"global"} ? "global":"local";
 	    $one->{"signature"} ||= $one->{"name"};
 	    my $sep = $one->{"type"} ? "-&gt;" : "";
-	    printf OUT $functionhead, $gl, $one->{"signature"}, $one->{"name"}, $sep , $one->{"type"};
+	    printf OUT $functionhead, $gl, escape_ltgtamp ($one->{"signature"}), $one->{"name"}, $sep , escape_ltgtamp ($one->{"type"});
 	}
 
 	if ($one->{"deprecated"} ne "")
@@ -1210,7 +1234,7 @@ sub write_onefile ($$)
 	if ($one->{"return"} ne "")
 	{
 	    print OUT $functionretintro;
-#	    print OUT $one->{"type"}; # uncomment this to see return type in Returns:
+#	    print OUT escape_ltgtamp ($one->{"type"}); # uncomment this to see return type in Returns:
 	    print OUT $functionretfil;
 	    print OUT subst_refs ($one->{"return"});
 	    print OUT $functionretoutro;
@@ -1280,6 +1304,7 @@ sub make_ahref ($)
     return $out;
 }
 
+
 package ycpdoc::XML;
 
 use IO qw(File);

@@ -41,7 +41,7 @@ map cmdline_description = $[
     "options"		: $[
 	// FIXME TODO: fill the option descriptions here
     ],
-    "mapping"		: $[
+    "mappings"		: $[
 	// FIXME TODO: fill the mappings of actions and options here
     ]
 ];

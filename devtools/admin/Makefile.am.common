@@ -12,12 +12,17 @@ modulebindir = $(moduledir)
 # files to clean
 CLEANFILES = $(filter %.ybc,$(modulebin_DATA))
 
+# Needs to be outside "." because of cases
+# where ycpchook contains a symlink to "."
+# Otherwise "." keeps being newer than .dep and we loop.
+NEWDEP=${top_builddir}/.dep.new
 # generate dependencies
 # two steps not to lose the file if the command fails
 # hook: create the links before we look for files
 .dep: $(wildcard *.ycp) ${ycpchook}
-	${YCPMAKEDEP} --prefix=${prefix} ${YCPCFLAGS} > .new.dep
-	mv .new.dep .dep
+	${YCPMAKEDEP} --prefix=${prefix} ${YCPCFLAGS} > ${NEWDEP}
+	cat ${NEWDEP} > .dep
+	rm ${NEWDEP}
 
 dist-hook: check-syntax
 

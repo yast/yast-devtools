@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jun 19 13:43:53 CEST 2003 - mvidner@suse.cz
+
+- check_ycp: check_imports does not look inside strings,
+    fixed backslash handling in strings
+
+-------------------------------------------------------------------
 Tue Jun 17 18:46:48 CEST 2003 - mvidner@suse.cz
 
 - enable YCP testsuites again

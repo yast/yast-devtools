@@ -35,6 +35,8 @@
  inputs and outputs of modules. Note that characters &amp;lt; and &amp;gt;
  are allowed in body.
 </body
+><deprecated
+></deprecated
 ><example
 >&lt;pre&gt; 
   This example shows multiline example tag.
@@ -80,6 +82,8 @@
 ><body
 >
  Convert numeric value to hexadecimal string.</body
+><deprecated
+></deprecated
 ><example
 >&lt;pre&gt;  string hex = tohex(65);&lt;/pre&gt;</example
 ><file
@@ -114,6 +118,8 @@
 >
  Who knows what is this function for?!? Note that there can be couple of
  empty lines between end of comment and define.</body
+><deprecated
+></deprecated
 ><example
 ></example
 ><file
@@ -155,6 +161,8 @@
 ><body
 >
  This function has no return value defined.</body
+><deprecated
+></deprecated
 ><example
 ></example
 ><file
@@ -222,6 +230,8 @@
  Description.
  @param a
  @param c</body
+><deprecated
+></deprecated
 ><example
 ></example
 ><file
@@ -290,6 +300,8 @@
 ><body
 >
  I was just too lazy to fabricate some good name of sample function.</body
+><deprecated
+></deprecated
 ><example
 ></example
 ><file

@@ -72,6 +72,7 @@ kdoc/ydoc.
 	    @see file#function
 	    @see file#
 	    @see <a href="uri">text</a>
+            @deprecated replacement
 
 All tags except @see can be multiline.
 Also processes initial comment of file if it starts at the
@@ -238,6 +239,7 @@ my $g;
 #   see => string of html ahref's
 #   example => "<pre>blahblah...</pre>"
 #   body => description text
+#   deprecated => what to use instead
 
 # parameters map:
 #   name
@@ -508,6 +510,7 @@ sub do_shipout ($$$$$@)
     $entry->{"example"} = "";
     $entry->{"see"} = "";
     $entry->{"body"} = "";
+    $entry->{"deprecated"} = "";
 
     my %param_infunc;	# (declared) parameter names, keyed by themselves
     my %param_incomment; # parameter descriptions
@@ -593,6 +596,18 @@ sub do_shipout ($$$$$@)
 	    $lastwas = "example";
 	    $line =~ s/\@example//; # remove it if it's there
 	    $entry->{"example"} .= almost_html ("\n$line");
+	}
+	elsif($line =~ /\@deprecated\s*(.*)/)
+	{
+	    $lastwas = "deprecated";
+	    if( ($1) ne "" )
+	    {
+		$entry->{"deprecated"} .= almost_html ($1);
+	    }
+	    else
+	    {
+		$entry->{"deprecated"} .= almost_html ("magicnumber");
+	    }
 	}
 	elsif($lastwas eq "return")
 	{
@@ -1090,6 +1105,18 @@ sub write_onefile ($$)
 	    $one->{"signature"} ||= $one->{"name"};
 	    my $sep = $one->{"type"} ? "-&gt;" : "";
 	    printf OUT $functionhead, $gl, $one->{"signature"}, $one->{"name"}, $sep , $one->{"type"};
+	}
+
+	if ($one->{"deprecated"} ne "")
+	{
+	    print OUT "<p><em>This function is deprecated.";
+	    if( $one->{"deprecated"} ne "magicnumber" )
+	    {
+		print OUT " Use ";
+		print OUT $one->{"deprecated"};
+		print OUT " instead.";
+	    }
+	    print OUT "</em></p>\n";
 	}
 
 	print OUT $functiondescintro;

@@ -1,0 +1,19 @@
+//
+{
+    /**
+     * Euthanizes a process
+     * @param pid process
+     */
+    define void Euthanize (integer pid) ``{
+	//...
+    }
+
+    /**
+     * Kills a process
+     * @param pid process
+     * @deprecated Euthanize
+     */
+    define void Kill (integer pid) ``{
+	Euthanize (pid);
+    }
+}

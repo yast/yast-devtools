@@ -101,6 +101,7 @@ y2tool y2autoconf
 y2tool y2automake
 autoreconf --force --install
 
+export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
@@ -113,6 +114,7 @@ y2tool y2autoconf
 y2tool y2automake
 autoreconf --force --install
 
+export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}

@@ -23,9 +23,8 @@ html/index.html: check_ycp.xml
 	$(STYLESHEET_HTML) $<
 
 
-
 html/yast2docs.css: 
-	cp $(srcdir)/../../../docbook/css/yast2docs.css html
+	cp $(srcdir)/../../../docbook/css/yast2docs.css $@
 	cp -a $(srcdir)/../../../docbook/images html
 	find html -name "Makefile*"  | xargs rm
 

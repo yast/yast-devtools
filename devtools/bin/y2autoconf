@@ -105,6 +105,7 @@ desktopdir=\${prefix}/share/applications/YaST2
 STYLESHEET_HTML=${yast2dir}/data/docbook/stylesheets/customize-html.xsl
 STYLESHEET_PDF=${yast2dir}/data/docbook/stylesheets/customize-fo.xsl
 STYLESHEET_CSS=${yast2dir}/data/docbook/css/yast2docs.css
+STYLESHEET_YDOC=${yast2dir}/data/docbook/stylesheets/ydoc.xsl
 
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
@@ -112,6 +113,7 @@ AC_SUBST(MAINTAINER)
 AC_SUBST(STYLESHEET_HTML)
 AC_SUBST(STYLESHEET_PDF)
 AC_SUBST(STYLESHEET_CSS)
+AC_SUBST(STYLESHEET_YDOC)
 
 AC_SUBST(yast2dir)
 

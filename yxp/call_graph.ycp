@@ -1,0 +1,21 @@
+// Sample source to test call graph tools
+{
+    define A () ``{
+    }
+
+    define B () ``{
+	A ();
+    }
+
+    define C () ``{
+	A ();
+    }
+
+    define D () ``{
+	B ();
+	{
+	    C ();
+	    B ();
+	}
+    }
+}

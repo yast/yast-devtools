@@ -33,7 +33,12 @@ extra_COPYRIGHT_files = \
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2
 
+# create bzip2ed tar and make some sanity checks
 $(RPMNAME)-$(VERSION).tar.bz2: checkpo dist-bzip2
+	@if [ `bunzip2 -c $(RPMNAME)-$(VERSION).tar.bz2 | wc --bytes` = 0 ] ; then \
+	    echo "Error: created tar is empty" ; \
+	    exit 1 ; \
+	fi
 
 CLEANFILES = $(RPMNAME).kdoc
 MAINTAINERCLEANFILES = package/$(RPMNAME)-$(VERSION).tar.bz2 package/$(RPMNAME).spec

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Feb 21 17:53:56 CET 2003 - mvidner@suse.de
+
+- ycpdoc:
+   Make separate indices for global and local functions/variables.
+   Fixed the "skip" state removal (Nothing would be parsed after
+   a long define).
+   Added a @deprecated tag (thanks to Stano Visnovsky)
+
+-------------------------------------------------------------------
 Mon Feb  3 16:05:01 CET 2003 - msvec@suse.cz
 
 - generate pot file during make package and include it in tar.bz2

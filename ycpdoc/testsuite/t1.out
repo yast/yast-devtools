@@ -32,12 +32,13 @@
 ><descr
 ></descr
 ><example
->&lt;pre&gt; 
+>
+ 
   This example shows multiline example tag.
      CallModule(
                 io.ycp // &lt;filename&gt;
                );
-&lt;/pre&gt;</example
+</example
 ><example_file
 ></example_file
 ><file
@@ -87,7 +88,8 @@
 ><descr
 ></descr
 ><example
->&lt;pre&gt;  string hex = tohex(65);&lt;/pre&gt;</example
+>
+  string hex = tohex(65);</example
 ><example_file
 ></example_file
 ><file

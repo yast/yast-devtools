@@ -227,18 +227,6 @@ my $execcompdir = "/usr/lib/YaST2";
 
 );
 
-# FIXME: when all packages use create-spec and everything works fine,
-# replace these macros in all sources and remove them here.
-%obsolete_macros =
-(
-    "\@BUILD-AGENT\@" => "\@BUILD-PROGRAM\@",
-    "\@INSTALL-AGENT\@" => "\@INSTALL-PROGRAM\@",
-    "\@BUILD-LIB\@" => "\@BUILD-PROGRAM\@",
-    "\@INSTALL-LIB\@" => "\@INSTALL-PROGRAM\@",
-    "\@BUILD-PROG\@" => "\@BUILD-PROGRAM\@",
-    "\@INSTALL-PROG\@" => "\@INSTALL-PROGRAM\@",
-);
-
 # The main program
 my $warn_defattr = 1;
 my $warn_doc     = 0;
@@ -247,11 +235,6 @@ while (<STDIN>)
 {
     if (! /^##.*/)
     {
-	foreach $macro_name ( keys %obsolete_macros )
-	{
-	    s/$macro_name/$obsolete_macros{$macro_name}/g;
-	}
-
 	foreach $macro_name ( keys %macros )
 	{
 	    s/$macro_name/$macros{$macro_name}/g;

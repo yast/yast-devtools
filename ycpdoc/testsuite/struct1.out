@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ycpdoc
 ><files
-><file_item key="deprecated.ycp"
+><file_item key="struct1.ycp"
 ><header
 ><authors
 ></authors
@@ -12,30 +12,32 @@
 ><provides_item
 ><body
 >
- Euthanizes a process</body
+ A list of services</body
 ><deprecated
 ></deprecated
 ><example
 ></example
 ><file
->deprecated.ycp</file
+>struct1.ycp</file
 ><global
-></global
+>1</global
 ><kind
->function</kind
+>variable</kind
 ><name
->Euthanize</name
+>services</name
 ><parameters
-><description
->process</description
-><name
->pid</name
-><type
->integer</type
 ></parameters
 ><return
 ></return
 ><scruple
+><ITEM
+>service</ITEM
+><ITEM
+>
+ $[
+   "port": integer,
+   "program": string,
+ ]</ITEM
 ></scruple
 ><see
 ></see
@@ -44,34 +46,44 @@
 ><since
 ></since
 ><type
->void</type
+>list(map)</type
+></provides_item
+><provides_item
+><file
+>struct1.ycp</file
+><kind
+>scruple</kind
+><name
+>service</name
+><signature
+>service</signature
 ></provides_item
 ><provides_item
 ><body
 >
- Kills a process</body
+ Starts the service (@ref struct1#service) specified.</body
 ><deprecated
->Euthanize</deprecated
+></deprecated
 ><example
 ></example
 ><file
->deprecated.ycp</file
+>struct1.ycp</file
 ><global
 ></global
 ><kind
 >function</kind
 ><name
->Kill</name
+>StartService</name
 ><parameters
 ><description
->process</description
+>@ref service</description
 ><name
->pid</name
+>svc</name
 ><type
->integer</type
+>map</type
 ></parameters
 ><return
-></return
+>the @ref #service that was started</return
 ><scruple
 ></scruple
 ><see
@@ -81,7 +93,7 @@
 ><since
 ></since
 ><type
->void</type
+>map</type
 ></provides_item
 ></provides
 ><requires

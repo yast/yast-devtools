@@ -2,6 +2,7 @@ $Id$
 Ugh, how does this work...
 
 run make check
+Don't forget to add the files to the examples directory too (and its M.am)
 
 * test-ycpdoc
 Tests parsing (XML).

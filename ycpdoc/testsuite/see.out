@@ -29,6 +29,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -59,6 +61,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -88,6 +92,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ><see_item
 >#foo2</see_item
@@ -125,6 +131,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -154,6 +162,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -183,6 +193,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature

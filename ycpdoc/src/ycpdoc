@@ -78,6 +78,8 @@ kdoc/ydoc.
 	    @see file#
 	    @see <a href="uri">text</a>
 	    @deprecated replacement
+	    @struct name		begins a struct description, <pre>
+	    @ref function		(inline, otherwise like @see)
 
 All tags except @see can be multiline.
 Also processes initial comment of file if it starts at the
@@ -96,9 +98,6 @@ Creates index.html and one html file for each ycp file.
 
 Generate html file to stdout. Skip index:
    ycpdoc - file.ycp
-
-Examples in this directory were generated simply:
-   /usr/lib/YaST2/bin/ycpdoc -n *ycp
 
 For example of comments in ycp file, please see example.ycp and modules.ycp.
 You can also look at generated index.html, intro.html, files.html, example.html
@@ -235,18 +234,21 @@ my $g;
 #   name
 # provides map:
 #   file => "routines"
-#   kind: "function", "variable", ("info")
+#   kind: "function", "variable", "scruple" - struct or tuple ;-), ("info")
+#    scruple is just a stub to generate index entries,
+#    the description itself is in "scruple" fields (below)
 #   global: boolean
 #   name
-#   return (description)
+#   return (description) @ref expanded
 #   type   (variable type or return type)
 #   parameters: list of maps
 #   signature => formatted name (and parameters)
 #   since => version
 #   see => list of "see" strings
+#   scruple => [ name, "blahblah...\nblahhy" ] # will be <pre>'d, @ref expanded
 #   example => "<pre>blahblah...</pre>"
-#   body => description text
-#   deprecated => what to use instead
+#   body => description text, @ref expanded
+#   deprecated => what to use instead (or "magicnumber" if not specified)
 # see string: one of
 #   #item
 #   file
@@ -256,8 +258,7 @@ my $g;
 # parameters map:
 #   name
 #   type
-#   description
-
+#   description => @ref expanded
 
 
 ###
@@ -503,6 +504,7 @@ sub parse_file ($)
 }
 
 # parse_entry
+# returns one entry, or, if there are scruples, a list of them!
 sub do_shipout ($$$$$@)
 {
     # file name,
@@ -520,10 +522,12 @@ sub do_shipout ($$$$$@)
     $entry->{"parameters"} = [];
     $entry->{"since"} = "";
     $entry->{"example"} = "";
+    $entry->{"scruple"} = [];
     $entry->{"see"} = [];
     tie @{$entry->{"see"}}, "see";
     $entry->{"body"} = "";
     $entry->{"deprecated"} = "";
+    my @entries = ($entry);
 
     my %param_infunc;	# (declared) parameter names, keyed by themselves
     my %param_incomment; # parameter descriptions
@@ -603,6 +607,17 @@ sub do_shipout ($$$$$@)
 	    {
 		$entry->{"deprecated"} .= almost_html ("magicnumber");
 	    }
+	}
+	elsif($line =~ /\@(struct|tuple)\s*(.*)/)
+	{
+	    $lastwas = "scruple";
+	    $entry->{"scruple"} = [$2, ""];
+	    push @entries, {"kind" => "scruple", "name" => $2,
+			    "signature" => $2, "file" => $file};
+	}
+	elsif($lastwas eq "scruple")
+	{
+	    $entry->{"scruple"}->[1] .= almost_html ("\n$line");
 	}
 	elsif($lastwas eq "return")
 	{
@@ -685,7 +700,7 @@ sub do_shipout ($$$$$@)
 	}
     }
 
-    return $entry;
+    return @entries;
 }
 
 ##
@@ -1066,6 +1081,8 @@ sub write_onefile ($$)
     my @global_functions = ();
     my @local_variables = ();
     my @local_functions = ();
+    my @scruples = ();
+
     for my $one ( @{$f->{"provides"}} )
     {
 	if ($one->{"kind"} eq "variable")
@@ -1098,8 +1115,14 @@ sub write_onefile ($$)
 		push (@local_functions, "<a href=\"#$n\">$sig</a>");
 	    }
 	}
+	elsif ($one->{"kind"} eq "scruple")
+	{
+	    my $n = $one->{"name"};
+	    push (@scruples, "<a href=\"#$n\">$n</a>");
+	}
     }
 
+    item_index ("Structures", @scruples);
     item_index ("Global Variables", @global_variables);
     item_index ("Global Functions", @global_functions);
     item_index ("Local Variables", @local_variables);
@@ -1112,6 +1135,9 @@ sub write_onefile ($$)
     #
     for my $one ( @{$f->{"provides"}} )
     {
+	# skip scruple stubs
+	next if ($one->{"kind"} eq "scruple");
+
 	if($one->{"kind"} ne "info")
 	{
 	    my $gl = $one->{"global"} ? "global":"local";
@@ -1126,15 +1152,27 @@ sub write_onefile ($$)
 	    if( $one->{"deprecated"} ne "magicnumber" )
 	    {
 		print OUT " Use ";
-		print OUT $one->{"deprecated"};
+		print OUT make_ahref ($one->{"deprecated"});
 		print OUT " instead.";
 	    }
 	    print OUT "</em></p>\n";
 	}
 
 	print OUT $functiondescintro;
-	print OUT $one->{"body"};
+	print OUT subst_refs ($one->{"body"});
 	print OUT $functiondescoutro;
+
+	if (@{$one->{"scruple"}} == 2)
+	{
+	    print OUT ("<p>Structure ",
+		       "<b><a name=\"",
+		       $one->{"scruple"}->[0],
+		       "\">",
+		       $one->{"scruple"}->[0],
+		       "</a></b>\n");
+	    print OUT "<pre>", subst_refs ($one->{"scruple"}->[1]), "</pre>\n";
+	    print OUT "</p>\n";
+	}
 
 	if (@{$one->{"parameters"}} > 0)
 	{
@@ -1144,7 +1182,7 @@ sub write_onefile ($$)
 		print OUT $functionparamintro;
 		print OUT $param->{"name"};
 		print OUT $functionparamfil;
-		print OUT $param->{"description"};
+		print OUT subst_refs ($param->{"description"});
 		print OUT $functionparamoutro;
 	    }
 	    print OUT $functionparamsoutro;
@@ -1154,7 +1192,7 @@ sub write_onefile ($$)
 	    print OUT $functionretintro;
 #	    print OUT $one->{"type"}; # uncomment this to see return type in Returns:
 	    print OUT $functionretfil;
-	    print OUT $one->{"return"};
+	    print OUT subst_refs ($one->{"return"});
 	    print OUT $functionretoutro;
 	}
 
@@ -1175,32 +1213,7 @@ sub write_onefile ($$)
 	    printf OUT $genericintro, "See";
 	    for my $see (@{$one->{"see"}})
 	    {
-		my $out;
-		# <...
-		# HTML ref.
-		if ($see =~ /^</)
-		{
-		    $out = $see;
-		}
-		# file#
-		# ref. to file without function
-		elsif ($see =~ /(.*)\#$/)
-		{
-		    $out = "<a href=\"".html_name($1)."\">".$1."</a>";
-		}
-		# file#item
-		elsif ($see =~ /(\S+)\#(.*)/)
-		{
-		    $out = "<a href=\"".html_name($1)."#".$2."\">".$2." in ".$1."</a>";
-		}
-		# #item
-		# item
-		else
-		{
-		    $see =~ /\#?(.*)/;
-		    $out = "<a href=\"#$1\">$1</a>";
-		}
-		print OUT "$out\n";
+		print OUT make_ahref ($see), "\n";
 	    }
 	    print OUT $genericoutro;
 	}
@@ -1208,6 +1221,43 @@ sub write_onefile ($$)
     print OUT $outro;
 
     close(OUT);
+}
+
+sub subst_refs ($)
+{
+    $_[0] =~ s/\@ref\s+(\S+)/make_ahref($1)/eg;
+    return $_[0];
+}
+
+sub make_ahref ($)
+{
+    my $see = shift;
+    my $out;
+    # <...
+    # HTML ref.
+    if ($see =~ /^</)
+    {
+	$out = $see;
+    }
+    # file#
+    # ref. to file without function
+    elsif ($see =~ /(.*)\#$/)
+    {
+	$out = "<a href=\"".html_name($1)."\">".$1."</a>";
+    }
+    # file#item
+    elsif ($see =~ /(\S+)\#(.*)/)
+    {
+	$out = "<a href=\"".html_name($1)."#".$2."\">".$2." in ".$1."</a>";
+    }
+    # #item
+    # item
+    else
+    {
+	$see =~ /\#?(.*)/;
+	$out = "<a href=\"#$1\">$1</a>";
+    }
+    return $out;
 }
 
 package ycpdoc::XML;

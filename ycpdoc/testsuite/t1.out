@@ -65,6 +65,8 @@
 ><return
 >|map &lt;map&gt; of results or nil.
 </return
+><scruple
+></scruple
 ><see
 ><see_item
 >&lt;a href="http://www.suse.cz"&gt;Suse&lt;/a&gt;</see_item
@@ -108,6 +110,8 @@
 ></parameters
 ><return
 >hexadecimal rep. of i starting by 0x</return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -152,6 +156,8 @@
 ><return
 >? Unknown. Lets show that return value description
   can be multiline.</return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -181,6 +187,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -262,6 +270,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature
@@ -326,6 +336,8 @@
 ></parameters
 ><return
 ></return
+><scruple
+></scruple
 ><see
 ></see
 ><signature

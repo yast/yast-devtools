@@ -19,6 +19,9 @@ ynclude_DATA =			\
 config_DATA =			\
 	XXpkgXX.y2cc
 
+desktop_DATA =			\
+	XXpkgXX.desktop
+
 module_DATA =			\
 	XXPkgXX.ycp
 

@@ -100,6 +100,7 @@ moduledir=\${yast2dir}/modules
 yncludedir=\${yast2dir}/include
 scrconfdir=\${yast2dir}/scrconf
 configdir=\${yast2dir}/config
+desktopdir=\\\${prefix}/usr/share/applications/YaST2
 
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
@@ -126,6 +127,7 @@ AC_SUBST(yncludedir)
 AC_SUBST(scrconfdir)
 AC_SUBST(agentdir)
 AC_SUBST(configdir)
+AC_SUBST(desktopdir)
 ",
 
     # init: prog

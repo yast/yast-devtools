@@ -27,4 +27,5 @@ Summary:	Configuration of XXpkgXX
 @clientdir@/XXpkgXX_*.ycp
 @moduledir@/XXPkgXX.ycp
 @configdir@/XXpkgXX.y2cc
+@desktopdir@/XXpkgXX.desktop
 %doc @docdir@

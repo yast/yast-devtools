@@ -108,6 +108,7 @@ yast2-uml		default			UML
 yast2-users		default			users
 yast2-x11		default			runtime x11
 yast2-you-server	default			YOU server
+yast2-ca-management	default			CA Management
 
 # translations
 yast2-trans-bg		inst-sys		all

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Oct 22 19:16:06 CEST 2002 - mvidner@suse.cz
+
+- Added testsuite for ycpdoc.
+
+-------------------------------------------------------------------
 Tue Oct 22 17:48:29 CEST 2002 - msvec@suse.cz
 
 - removed %ifarch from the generated spec files <arvin>

@@ -66,6 +66,7 @@ yast2-network		default			network
 yast2-nfs-client	default			nfs client
 yast2-nfs-server	default			nfs server
 yast2-nis-client	default			nis client
+yast2-kerberos-client	default		kerberos client
 yast2-nis-server	default			nis server
 yast2-nisplus-client	default			nis+ client
 yast2-online-update	default			YOU

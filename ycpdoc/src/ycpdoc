@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# 
 #
 # Authors:
 #  Petr Blahos <pblahos@suse.cz>
@@ -140,6 +141,7 @@ my $output_dir = ".";
 my $strip_prefix = "";		# both with a trailing slash
 my $new_index_style = 1;
 my $warning_level = 2;
+my $xml_output = "ycpdoc.xml";
 my $warn_return_types = 1;
 my $show_state = 0;		# show which state we are in for each line
 
@@ -157,6 +159,7 @@ sub parse_arguments
 		"outputdir|d=s" => \$output_dir,
 		"strip|s=s" => \$strip_prefix,
 		"oldindex|o" => sub { $new_index_style = 0; },
+		"xml-output|O=s" => \$xml_output,
 		"w=i" => \$warning_level,
 		"wr" => sub { $warn_return_types = 0; },
 		"format|f=s" => \@formats_wanted,
@@ -535,6 +538,7 @@ sub do_shipout ($$$$$@)
     $entry->{"type"} = "";
     $entry->{"signature"} = ""; #TODO better place
     $entry->{"parameters"} = [];
+    tie @{$entry->{"parameters"}}, "parameters";
     $entry->{"since"} = "";
     $entry->{"example"} = "";
     $entry->{"scruple"} = [];
@@ -688,7 +692,7 @@ sub do_shipout ($$$$$@)
 	}
     }
 
-    $entry->{"parameters"} = [ @parameters ];
+    push @{$entry->{"parameters"}}, @parameters;
 
 
     if ($entry->{"kind"} eq "function")
@@ -1316,7 +1320,7 @@ my $writer;
 
 sub write_docs
 {
-    my $output = new IO::File(">ycpdoc.xml");
+    my $output = new IO::File(">$xml_output");
     $writer = new XML::Writer (OUTPUT => $output, NEWLINES => 1);
     $writer->xmlDecl ();
     $writer->startTag ("ycpdoc");
@@ -1388,6 +1392,9 @@ package file;
 
 package provides;
 @provides::ISA = ("Tie::StdArray");
+
+package parameters;
+@parameters::ISA = ("Tie::StdArray");
 
 package see;
 @see::ISA = ("Tie::StdArray");

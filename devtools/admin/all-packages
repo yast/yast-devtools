@@ -54,8 +54,11 @@ yast2-ldap		inst-sys,default	ldap agent (users)
 yast2-pam		inst-sys,default	pam agent (users)
 yast2-transfer		inst-sys		transfer/curl agent (autoinst)
 yast2-xml		inst-sys		xml agent (autoinst)
+yast2-slp		default		        slp agent/browser
 
 # config packages
+yast2-cdcreator		default			create installation CDs
+yast2-instserver	default			configure installation server
 yast2-backup		default			backup
 yast2-bootloader	default			bootloader
 yast2-country		default			keyboard,language,timezone

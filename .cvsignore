@@ -21,4 +21,3 @@ ltmain.sh
 missing
 mkinstalldirs
 stamp-h*
-*.pc

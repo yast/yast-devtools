@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul 19 12:11:46 CEST 2002 - arvin@suse.de
+
+- reduced ydoc to a wrapper for kdoc
+
+-------------------------------------------------------------------
 Tue Jul  9 20:36:48 CEST 2002 - msvec@suse.cz
 
 - reworked config skeleton

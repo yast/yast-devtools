@@ -2,12 +2,12 @@
 
 =head1 NAME
 
-import.pl - makes graphs of YaST dependencies
+ycpmakedep - find out YaST import dependencies
 
 =head1 SYNOPSIS
 
-  import.pl -h|--help|--man
-  import.pl {--modules [--clusters] | --packages} [--y2dir <y2dir>] [--topdown]
+  ycpmakedep -h|--help|--man
+  ycpmakedep {--modules [--clusters] | --packages} [--y2dir <y2dir>] [--topdown]
 
 =head1 AUTHOR
 
@@ -24,10 +24,19 @@ use Pod::Usage;
 
 my $help = 0;
 my $man = 0;
+
+my $y2dir = "/usr/share/YaST2";
+my %search_paths =
+    (
+     "INCLUDE" => [],
+     "MODULE" =>  [],
+    );
+
 # what should be output
+# makefile:
+# dot:
 my ($modgraph, $clusters) = (0, 0);
 my $pkggraph = 0;
-my $y2dir = "/usr/share/YaST2";
 my $topdown = 0;
 
 Getopt::Long::Configure ("bundling");
@@ -39,13 +48,24 @@ GetOptions (
 	    "packages|p" => \$pkggraph,
 	    "y2dir|d=s" => \$y2dir,
 	    "topdown|t" => \$topdown,
+	    "include-path|I=s" => $search_paths{INCLUDE},
+	    "module-path|M=s" => $search_paths{MODULE},
 	   ) or pod2usage (2);
 pod2usage (1) if $help;
 pod2usage (-exitstatus => 0, -verbose => 2) if $man;
 
+my $makefile = !($modgraph || $pkggraph);
+
 # prevent include cycles :-(
 #my %includes;
 
+sub progress (@)
+{
+    if (!$makefile)
+    {
+	print STDERR @_;
+    }
+}
 
 # scans $pathname for import statements, processing includes
 # pathname - current file
@@ -92,55 +112,177 @@ sub get_imports ($$)
     return @result;
 }
 
-print "digraph \"import\" {\n";
-print "rankdir=LR;\n" unless ($topdown);
-print "size=\"16,11\"; rotate=90;\n";
-my %pkg2mod = (); # hash of lists
-my %mod2pkg = (); # hash of strings
-my %dep = (); # hash of lists
-foreach (glob ("$y2dir/modules/{*,*/*}.{ycp,pm}"))
+# type - "INCLUDE" or "IMPORT"
+# if not found in the search path,
+# returns "" and for INCLUDE also reports error
+# TODO check that it corresponds to ycpc search order
+sub find_file ($$)
 {
-    my $module = $_;
-    my $rpm = `rpm -qf --qf \%{name} $module`;
-#    chomp $rpm;
-#    $rpm =~ s/[0-9.-]*$//;
-    chomp $rpm;
-    $module =~ s:$y2dir/modules/(.*)\.[^.]*:$1:;
-    $module =~ s{/}{::}g;
-    print STDERR "M $module\n";
-    $mod2pkg{$module} = $rpm;
-    push @{$pkg2mod{$rpm}}, $module;
-
-    # reset before processing includes
-#    %includes = ();
-    my @imported = get_imports ($_, {});
-    foreach my $i (@imported)
+    my ($type, $what) = @_;
+    my @where = (".", @{$search_paths{$type}});
+    foreach my $path (@where)
     {
-	push @{$dep{$module}}, $i;
+	if (-f "$path/$what")
+	{
+	    return "$path/$what";
+	}
+    }
+    # not found
+    if ($type eq "INCLUDE")
+    {
+	local @, = ":";
+	print STDERR "File '$what' not found in @where\n";
+    }
+    return "";
+}
+
+sub ycp2ybc ($)
+{
+    my $name = shift;
+    $name =~ s/ycp$/ybc/;
+    return $name;
+}
+
+# scans $pathname for import statements, processing includes
+# returns a list of ybc pathnames
+# pathname - current file
+# r_includes - what include files are open in the recursion
+sub mf_imports ($$);
+sub mf_imports ($$)
+{
+    my ($pathname, $r_includes) = @_;
+    my @result;
+
+    progress " I $pathname\n";
+
+    # has this one been processed?
+    if ($r_includes->{$pathname})
+    {
+	progress "  Cycle! Returning.\n";
+	return ();
+    }
+
+    my $F = new IO::File ($pathname) or die "Cannot open $pathname: $!";
+    # we have seen it already
+    $r_includes->{$pathname} = 1;
+
+    while (defined ($_ = <$F>))
+    {
+	# import
+	# what if the module is not in YCP?
+	if (m/^\s*import\s*"(.*)";/)
+	{
+	    my $module = find_file ("MODULE", "$1.ycp");
+	    push (@result, ycp2ybc ($module)) if $module;
+	}
+	elsif (m/^\s*include\s*"(.*)";/)
+	{
+	    my $inc = find_file ("INCLUDE", $1);
+	    push (@result, mf_imports ($inc, $r_includes));
+	}
+    }
+    $F->close ();
+    delete $r_includes->{$pathname};
+    return @result;
+}
+
+# main_module: filename, will be open and output only as is
+sub mf_module ($)
+{
+    my $main_module = shift;
+    my @deps = mf_imports ($main_module, {});
+    print ycp2ybc($main_module), ":";
+    foreach (@deps)
+    {
+	print " \\\n\t$_";
+    }
+    print "\n\n";
+}
+
+# main function for makefile output
+sub output_makefile
+{
+    # not all of these are modules, we have to filter
+    foreach my $ycpfile (glob "*.ycp")
+    {
+	my $is_module = 0;
+	open F, $ycpfile or die $!;
+	while (defined ($_ = <F>))
+	{
+	    if (m/^\s*import\s*"(.*)";/)
+	    {
+		$is_module = 1;
+		last;
+	    }
+	}
+	close F;
+	next unless $is_module;
+
+	mf_module $ycpfile;
     }
 }
 
-while (my ($module, $deps_r) = each %dep)
+sub output_dot
 {
-    foreach (@{$deps_r})
+    print "digraph \"import\" {\n";
+    print "rankdir=LR;\n" unless ($topdown);
+    print "size=\"16,11\"; rotate=90;\n";
+    my %pkg2mod = ();		# hash of lists
+    my %mod2pkg = ();		# hash of strings
+    my %dep = ();		# hash of lists
+    foreach (glob ("$y2dir/modules/{*,*/*}.{ycp,pm}"))
     {
-	print "  \"$module\" -> \"$_\"\n" if $modgraph;
-	print "  \"$mod2pkg{$module}\" -> \"$mod2pkg{$_}\"\n" if $pkggraph;
+	my $module = $_;
+	my $rpm = `rpm -qf --qf \%{name} $module`;
+	#    chomp $rpm;
+	#    $rpm =~ s/[0-9.-]*$//;
+	chomp $rpm;
+	$module =~ s:$y2dir/modules/(.*)\.[^.]*:$1:;
+	$module =~ s{/}{::}g;
+	print STDERR "M $module\n";
+	$mod2pkg{$module} = $rpm;
+	push @{$pkg2mod{$rpm}}, $module;
+
+	# reset before processing includes
+	#    %includes = ();
+	my @imported = get_imports ($_, {});
+	foreach my $i (@imported)
+	{
+	    push @{$dep{$module}}, $i;
+	}
     }
+
+    while (my ($module, $deps_r) = each %dep)
+    {
+	foreach (@{$deps_r})
+	{
+	    print "  \"$module\" -> \"$_\"\n" if $modgraph;
+	    print "  \"$mod2pkg{$module}\" -> \"$mod2pkg{$_}\"\n" if $pkggraph;
+	}
+    }
+
+    print "\n";
+    # rpm clusters
+    if ($clusters)
+    {
+	while (my ($pkg, $modules_r) = each %pkg2mod)
+	{
+	    print "  subgraph \"cluster-$pkg\" {\n";
+	    foreach (@{$modules_r})
+	    {
+		print "    \"$_\";\n";
+	    }
+	    print "  }\n";
+	}
+    }
+    print "}\n";
 }
 
-print "\n";
-# rpm clusters
-if ($clusters)
+if ($makefile)
 {
-  while (my ($pkg, $modules_r) = each %pkg2mod)
-  {
-    print "  subgraph \"cluster-$pkg\" {\n";
-    foreach (@{$modules_r})
-    {
-	print "    \"$_\";\n";
-    }
-    print "  }\n";
-  }
+    output_makefile;
 }
-print "}\n";
+else
+{
+    output_dot;
+}

@@ -6,6 +6,8 @@
 #    (Edit ./SUBDIRS instead)
 #
 
+PREFIX			= /usr
+
 VERSION			= $(shell cat $(srcdir)/VERSION)
 RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
@@ -20,7 +22,7 @@ POTFILES		= $(shell test -e $(srcdir)/POTFILES     && sed 's,^,$(srcdir)/,' < $(
 # do we do Makefile.am for devtools? It is a little special...
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
-DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir)/devtools,/usr/share/YaST2/data/devtools)
+DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir)/devtools,$(PREFIX)/share/YaST2/data/devtools)
 ALL_PACKAGES		= $(DEVTOOLS_DIR)/admin/all-packages
 LEGALESE_DIR		= $(if $(HAS_GPL_LICENSE),$(DEVTOOLS_DIR)/admin/copyright/gpl,$(DEVTOOLS_DIR)/admin/copyright/yast)
 
@@ -165,25 +167,26 @@ install-data-local: # $(if $(IS_DEVTOOLS),,install-pot)
 	    $(INSTALL_DATA) $$EX $(DESTDIR)$(docdir) ;				\
 	done
 
-# TODO "if which y2tool" will be improved when we will have a generated
-#      configure.in...
 package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION).tar.bz2
 	rm -f package/$(RPMNAME)-*.tar.bz2
 	rm -f package/*~
 	rm -f package/*.bak
 	rm -f package/*.auto
 	mv $(RPMNAME)-$(VERSION).tar.bz2 package/
-	if which y2tool 2>/dev/null ; then \
-	    here=`pwd`; \
-	    cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \
-		newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
-		y2tool create-spec < $$i > $$here/package/$${newname} ; \
-	    done ; \
+	if ! test -x $(PREFIX)/bin/y2tool; then \
+	    echo "$(PREFIX)/bin/y2tool: not found."; \
+	    echo "You have to install yast2-devtools to making a package"; \
+	    false; \
 	fi
+	here=`pwd`; \
+	cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \
+	    newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
+	    $(PREFIX)/bin/y2tool create-spec < $$i > $$here/package/$${newname} ; \
+	done
 
 package: check-cvs-up-to-date check-tagversion check-all-packages package-local
 
-TAGVERSION	 = y2tool tagversion
+TAGVERSION	 = $(PREFIX)/bin/y2tool tagversion
 CHECKIN_BASE_DIR = /work/src/done
 
 check-cvs-up-to-date:
@@ -218,7 +221,7 @@ check-all-packages:
 stable: checkin-stable
 
 checkin-stable: package
-	y2tool checkin-stable
+	$(PREFIX)/bin/y2tool checkin-stable
 
 
 # For po/ modules

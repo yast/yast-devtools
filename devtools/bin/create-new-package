@@ -24,11 +24,13 @@ use vars qw( $opt_v $opt_d $opt_s );
 
 # Global variables.
 
+my $prefix		= "/usr";
+
 my $verbose		= 0;
 my $debug		= 0;
 my $tmp			= "$PID.tmp";
 my $base_dir            = ".";
-my $skeletons_dir	= "/usr/share/YaST2/data/devtools/skeletons";
+my $skeletons_dir	= "$prefix/share/YaST2/data/devtools/skeletons";
 my $target_dir          = "../dummy";
 my $skeleton		= "config";
 my $new_name            = "noname";

@@ -3,9 +3,10 @@
 #
 
 LIB = $(shell ./devtools/bin/get-lib)
+PREFIX = /usr
 
 configure: all
-	./configure --libdir=/usr/$(LIB)
+	./configure --prefix=$(PREFIX) --libdir=$(PREFIX)/$(LIB)
 
 all:
 	./devtools/bin/y2autoconf --bootstrap ./devtools/admin

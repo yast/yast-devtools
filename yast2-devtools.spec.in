@@ -1,6 +1,5 @@
 @HEADER-COMMENT@
-
-# neededforbuild  gpp libgpp sgmltool opensp perl-XML-Writer
+# neededforbuild gpp libgpp sgmltool opensp perl-XML-Writer
 
 @HEADER@
 Requires:	yast2 perl
@@ -23,7 +22,7 @@ BuildArchitectures: noarch
 autoreconf --force --install
 
 %{?suse_update_config:%{suse_update_config -f}}
-./configure --libdir=%{_libdir}
+./configure --prefix=%{prefix} --libdir=%{_libdir}
 make
 
 @INSTALL@
@@ -39,9 +38,9 @@ EOF
 
 %files
 %defattr(-,root,root)
-/usr/bin/y2tool
-%dir /usr/lib/YaST2
+%{prefix}/bin/y2tool
+%dir %{prefix}/lib/YaST2
 @ybindir@
-%dir /usr/share/YaST2
+%dir %{prefix}/share/YaST2
 @ydatadir@
 %doc @docdir@

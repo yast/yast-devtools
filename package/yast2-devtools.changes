@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Dec 15 11:57:28 CET 2003 - msvec@suse.cz
+
+- use prefix wher possible to simplify relocation
+- 2.9.3
+
+-------------------------------------------------------------------
 Wed Dec  3 11:17:50 CET 2003 - msvec@suse.cz
 
 - added placeholder for common Makefile.am

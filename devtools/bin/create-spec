@@ -29,6 +29,8 @@ $RPMNAME = `cat RPMNAME`;
 $VERSION = `cat VERSION`;
 $MAINTAINER = `cat MAINTAINER`;
 
+$PREFIX = "/usr";
+
 # Clean them and check them
 chomp $RPMNAME;
 chomp $VERSION;
@@ -39,8 +41,8 @@ if ($VERSION eq "" || $RPMNAME eq "" || $MAINTAINER eq "")
 }
 
 # Default values
-$yast2dir = "/usr/share/YaST2";
-$execcompdir = "/usr/lib/YaST2";
+$yast2dir = "$PREFIX/share/YaST2";
+$execcompdir = "$PREFIX/lib/YaST2";
 
 if ($#ARGV > 0)
 {
@@ -74,7 +76,10 @@ Release:	0
 License:	YaST License
 Group:		System/YaST
 BuildRoot:	%{_tmppath}/%{name}-%{version}-build
-Source0:	$RPMNAME-$VERSION.tar.bz2",
+Source0:	$RPMNAME-$VERSION.tar.bz2
+
+prefix:		/usr
+",
 
 # The group tag is only a dummy entry. The correct one is inserted by
 # prepare_spec.
@@ -98,35 +103,35 @@ Group:		SuSE internal",
 
     "\@BUILD\@" =>
 "\%build
-y2tool y2autoconf
-y2tool y2automake
+%{prefix}/bin/y2tool y2autoconf
+%{prefix}/bin/y2tool y2automake
 autoreconf --force --install
 
 export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir} --mandir=%{_mandir}
+./configure --libdir=%{_libdir} --prefix=%{prefix} --mandir=%{_mandir}
 make %{?jobs:-j%jobs}",
 
     "\@BUILD-QT\@" =>
 "\%build
-y2tool y2autoconf
-y2tool y2automake
+%{prefix}/bin/y2tool y2autoconf
+%{prefix}/bin/y2tool y2automake
 autoreconf --force --install
 
 export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
+./configure --libdir=%{_libdir} --prefix=%{prefix} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
 make %{?jobs:-j%jobs}",
 
     "\@BUILD-PO\@" =>
 "\%build
 autoreconf --force --install
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir}
+./configure --libdir=%{_libdir} --prefix=%{prefix}
 \%if \%ul_version > 0
 for f in po/*.po ; do
   cp \$f \$f.orig
@@ -147,7 +152,7 @@ make %{?jobs:-j%jobs}",
 "\%install
 [ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
 make install DESTDIR=\"\$RPM_BUILD_ROOT\"
-[ -e \"/usr/share/YaST2/data/devtools/NO_MAKE_CHECK\" ] || Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check
+[ -e \"%{prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK\" ] || Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check
 for f in `find \$RPM_BUILD_ROOT/\@desktopdir\@/*.desktop` ; do
     d=\${f##*/}
     \%suse_update_desktop_file \${d\%.desktop}
@@ -174,15 +179,15 @@ make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
     # FIXME: $prefix unfunctional
     #"\@yast2dir@" => "\\\${prefix}/share/YaST2",
 
-    "\@ybindir\@" => "/usr/lib/YaST2/bin",
+    "\@ybindir\@" => "%{prefix}/lib/YaST2/bin",
     "\@plugindir\@" => "%{_libdir}/YaST2/plugin",
-    "\@includedir\@" => "/usr/include/YaST2",
-    "\@docdir\@" => "/usr/share/doc/packages/$RPMNAME",
+    "\@includedir\@" => "%{prefix}/include/YaST2",
+    "\@docdir\@" => "%{prefix}/share/doc/packages/$RPMNAME",
     "\@logdir\@" => "/var/log/YaST2",
     "\@vardir\@" => "/var/lib/YaST2",
     "\@mandir\@" => "%{_mandir}",
 
-    "\@execcompdir\@" => "/usr/lib/YaST2",
+    "\@execcompdir\@" => "%{prefix}/lib/YaST2",
     "\@agentdir\@" => "${execcompdir}/servers_non_y2",
 
     "\@ydatadir\@" => "${yast2dir}/data",

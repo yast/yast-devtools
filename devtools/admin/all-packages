@@ -44,6 +44,7 @@ yast2-slide-show-SLES	inst-sys		install
 # auto installation
 autoyast2		default			all,autoinstall
 autoyast2-installation	inst-sys,default	all,autoinstall
+yast2-schema            default                 all,autoinstall
 
 # development
 yast2-debugger		-			development

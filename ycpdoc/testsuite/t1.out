@@ -66,11 +66,15 @@
 >|map &lt;map&gt; of results or nil.
 </return
 ><see
->&lt;a href="http://www.suse.cz"&gt;Suse&lt;/a&gt;
-&lt;a href="#tohex"&gt;tohex&lt;/a&gt;
-&lt;a href="example.html"&gt;example&lt;/a&gt;
-&lt;a href="example.html#another"&gt;another in example&lt;/a&gt;
-</see
+><see_item
+>&lt;a href="http://www.suse.cz"&gt;Suse&lt;/a&gt;</see_item
+><see_item
+>tohex</see_item
+><see_item
+>example#</see_item
+><see_item
+>example#another</see_item
+></see
 ><signature
 ></signature
 ><since

@@ -73,10 +73,11 @@ kdoc/ydoc.
 	    @since version		html allowed
 	    @example anything		html allowed, <pre>
 	    @see function
+	    @see #function
 	    @see file#function
 	    @see file#
 	    @see <a href="uri">text</a>
-            @deprecated replacement
+	    @deprecated replacement
 
 All tags except @see can be multiline.
 Also processes initial comment of file if it starts at the
@@ -242,10 +243,15 @@ my $g;
 #   parameters: list of maps
 #   signature => formatted name (and parameters)
 #   since => version
-#   see => string of html ahref's
+#   see => list of "see" strings
 #   example => "<pre>blahblah...</pre>"
 #   body => description text
 #   deprecated => what to use instead
+# see string: one of
+#   #item
+#   file
+#   file#item
+#   <a href...>foo</a>
 
 # parameters map:
 #   name
@@ -514,7 +520,8 @@ sub do_shipout ($$$$$@)
     $entry->{"parameters"} = [];
     $entry->{"since"} = "";
     $entry->{"example"} = "";
-    $entry->{"see"} = "";
+    $entry->{"see"} = [];
+    tie @{$entry->{"see"}}, "see";
     $entry->{"body"} = "";
     $entry->{"deprecated"} = "";
 
@@ -575,27 +582,9 @@ sub do_shipout ($$$$$@)
 	    # see section
 	    $line = $1;
 
-	    # Here we cooperate too closely with the html backend.
-	    # This part will need to be fixed if we want other output formats.
-	    # html code
-	    if( $line =~ /^</ )
-	    {
-		$entry->{"see"} .= "$line\n";
-	    }
-	    # ref. to file without function
-	    elsif ( $line =~ /(.*)\#$/ )
-	    {
-		$entry->{"see"} .= "<a href=\"".ycpdoc::HTML::html_name($1)."\">".$1."</a>\n";
-	    }
-	    elsif ( $line =~ /(.*)\#(.*)/ )
-	    {
-		# file#function
-		$entry->{"see"} .= "<a href=\"".ycpdoc::HTML::html_name($1)."#".$2."\">".$2." in ".$1."</a>\n";
-	    }
-	    else
-	    {
-		$entry->{"see"} .= "<a href=\"#".$line."\">".$line."</a>\n";
-	    }
+	    # Simply copy it to the see list and let the backend do the work.
+	    # Maybe do some syntax checks here?
+	    push @{$entry->{"see"}}, $line;
 	}
 	elsif($line =~ /\@example(.*)/ || $lastwas eq "example")
 	{
@@ -1181,10 +1170,38 @@ sub write_onefile ($$)
 	    print OUT $one->{"since"};
 	    print OUT $genericoutro;
 	}
-	if ($one->{"see"} ne "")
+	if (@{$one->{"see"}} > 0)
 	{
 	    printf OUT $genericintro, "See";
-	    print OUT $one->{"see"};
+	    for my $see (@{$one->{"see"}})
+	    {
+		my $out;
+		# <...
+		# HTML ref.
+		if ($see =~ /^</)
+		{
+		    $out = $see;
+		}
+		# file#
+		# ref. to file without function
+		elsif ($see =~ /(.*)\#$/)
+		{
+		    $out = "<a href=\"".html_name($1)."\">".$1."</a>";
+		}
+		# file#item
+		elsif ($see =~ /(\S+)\#(.*)/)
+		{
+		    $out = "<a href=\"".html_name($1)."#".$2."\">".$2." in ".$1."</a>";
+		}
+		# #item
+		# item
+		else
+		{
+		    $see =~ /\#?(.*)/;
+		    $out = "<a href=\"#$1\">$1</a>";
+		}
+		print OUT "$out\n";
+	    }
 	    print OUT $genericoutro;
 	}
     }
@@ -1272,6 +1289,9 @@ package file;
 
 package provides;
 @provides::ISA = ("Tie::StdArray");
+
+package see;
+@see::ISA = ("Tie::StdArray");
 
 package main;
 main ();

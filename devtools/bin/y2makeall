@@ -24,6 +24,8 @@ use vars qw(
 	     $opt_y
 	     $opt_a
 	     $opt_u
+	     $opt_n
+	     $opt_p
 	     );
 
 #
@@ -101,7 +103,7 @@ my $enable_byte_compile_modules	= 0;	# -m
 my $enable_make_ycp_packages	= 0;	# -y
 my $enable_make_all		= 1;	# -a
 my $favourites_only		= 0;	# -u
-
+my $prefix		= "/usr";	# -p
 
 # Verbosity values
 
@@ -118,13 +120,16 @@ my $tty_verbosity		= LOG_PROGRESS;
 my $log_verbosity		= LOG_INFO;
 
 my $make_target			= "";
-my $sudo_cmd			= "/usr/bin/sudo";
+# if we don't install to usr, it is not necessary
+# -n means "no sudo"
+# note the trailing space
+my $sudo_cmd			= "/usr/bin/sudo ";
 my $install_cmd			= "/usr/bin/install";
-my $ycpc_cmd			= "/usr/bin/ycpc";
 
-
-my $modules_dir			= "/usr/share/YaST2/modules";
-my $ycp_include_dir		= "/usr/share/YaST2/include";
+# assigned only after the prefix option could be evaluated
+my $ycpc_cmd;
+my $modules_dir;
+my $ycp_include_dir;
 
 
 # ---- END configuration variables ----------------------------------------
@@ -165,7 +170,7 @@ sub main()
     # This will set a variable opt_? for any option,
     # e.g. opt_v if option '-v' is passed on the command line.
 
-    getopts('hvsdfbmyau');
+    getopts('hvsdfbmyaunp:');
 
     usage()		if $opt_h;
 
@@ -181,7 +186,7 @@ sub main()
 	$log_verbosity	= LOG_DEBUG;
     }
 
-    if ( $opt_s )		# silent
+    if ( $opt_s )		# silent  )))
     {
 	$tty_verbosity	= LOG_MILESTONE;
 	$log_verbosity	= LOG_PROGRESS;
@@ -196,6 +201,15 @@ sub main()
     $disable_make_makefile_cvs		= 1	if $opt_f;
     $favourites_only			= 1	if $opt_u;
 
+    $sudo_cmd = ""				if $opt_n;
+    if ( $opt_p )
+    {
+	$prefix = $opt_p;
+    }
+
+    $ycpc_cmd = "$prefix/bin/ycpc";
+    $modules_dir = "$prefix/share/YaST2/modules";
+    $ycp_include_dir = "$prefix/share/YaST2/include";
 
     #
     # Check if we are in the right directory
@@ -209,7 +223,7 @@ sub main()
     #
 
     $make_target = join( " ", @ARGV );
-    
+
 
     #
     # Read user configuration from ~/.yast2/y2makeallrc (if present)
@@ -250,6 +264,26 @@ sub main()
     close( LOG );
 }
 
+
+#-----------------------------------------------------------------------------
+
+# call "system" and then exit if we got interrupted by a signal
+
+sub system_int($)
+{
+    my $ret = system (shift);
+    my $sig = $ret & 127;
+    if ($sig == 2 || $sig == 15)
+    {
+	die "Got SIGINT or SIGTERM, exiting.\n";
+    }
+    return $ret;
+}
+
+sub sudo_system_int($)
+{
+    return system_int ($sudo_cmd . shift);
+}
 
 #-----------------------------------------------------------------------------
 
@@ -333,7 +367,7 @@ sub byte_compile_modules()
     #
 
     log_progress( "Removing old byte code files" );
-    system( "$sudo_cmd rm -f $modules_dir/*.ybc" );
+    sudo_system_int( "rm -f $modules_dir/*.ybc" );
 
 
     #
@@ -341,7 +375,7 @@ sub byte_compile_modules()
     #
 
     log_progress( "Removing old modules from $modules_dir" );
-    system( "$sudo_cmd rm -f $modules_dir/*.ycp" );
+    sudo_system_int( "rm -f $modules_dir/*.ycp" );
 
 
     #
@@ -483,7 +517,7 @@ sub make()
     {
 
 	log_progress( "\tmake -f Makefile.cvs" );
-	system( "make -f Makefile.cvs >>$make_log 2>&1" );
+	system_int( "make -f Makefile.cvs 2>&1 >>$make_log" );
 
 	if ( $CHILD_ERROR )
 	{
@@ -499,7 +533,7 @@ sub make()
     if ( ! $error )
     {
 	log_progress( "\tmake $make_target" );
-	system( "make $make_target >>$make_log 2>&1" );
+	system_int( "make $make_target 2>&1 >>$make_log" );
 
 	if ( $CHILD_ERROR )
 	{
@@ -515,7 +549,7 @@ sub make()
     if ( $make_target eq "" && ! $error )
     {
 	log_progress( "\t$sudo_cmd make install" );
-	system( "$sudo_cmd make install >>$make_log 2>&1" );
+	sudo_system_int( "make install 2>&1 >>$make_log" );
 
 	if ( $CHILD_ERROR )
 	{
@@ -780,10 +814,10 @@ sub xargs_install()
 sub install_file()
 {
     my ( $src, $target ) = @_;
-    my $cmd = "$sudo_cmd $install_cmd -p -m 644 $src $target";
+    my $cmd = "$install_cmd -p -m 644 $src $target";
 
-    log_info( "$cmd" );
-    system( $cmd );
+    log_info( "$sudo_cmd $cmd" );
+    sudo_system_int( $cmd );
 }
 
 
@@ -797,10 +831,10 @@ sub install_file()
 sub make_install_dir()
 {
     my ( $dir ) = @_;
-    my $cmd = "$sudo_cmd $install_cmd -m 755 -d $dir";
+    my $cmd = "$install_cmd -m 755 -d $dir";
 
-    log_info( "$cmd" );
-    system( $cmd );
+    log_info( "$sudo_cmd $cmd" );
+    sudo_system_int( $cmd );
 }
 
 
@@ -915,10 +949,10 @@ sub byte_compile()
 	$module .= ".ycp";
 	log_info( "Byte-compiling $module" );
 
-	my $cmd = "$sudo_cmd $ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module >>$make_log 2>&1";
+	my $cmd = "$ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module 2>&1 >>$make_log";
 
-	log_debug( $cmd );
-	system( $cmd );
+	log_debug( "$sudo_cmd $cmd" );
+	sudo_system_int( $cmd );
     }
 
     chdir( $work_root );
@@ -1059,6 +1093,8 @@ sub usage()
 	"\t-y YCP - make YCP packages\n"					.
 	"\t-u favourites only - stop processing after favourites list is done\n".
 	"\t-f fast - no \"make -f Makefile.cvs\" if it can be avoided\n"	.
+	"\t-p <prefix> - use <prefix> instead of /usr\n"			.
+	"\t-n no-sudo - useful with -p, do not sudo certain commands\n"		.
 	"\n"									.
 	"\t-v verbose\n"							.
 	"\t-d debug - even more verbose\n"					.

@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Mar 10 15:50:25 CET 2004 - mvidner@suse.cz
+
+- y2makeall:
+    recognize command failure from SIGINT
+    -n: no sudo
+    -p: prefix
+
+-------------------------------------------------------------------
 Mon Mar  8 16:17:23 CET 2004 - mvidner@suse.cz
 
 - fixed 'make pot' when POTFILES is empty

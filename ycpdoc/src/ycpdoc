@@ -1,32 +1,115 @@
 #!/usr/bin/perl -w
 #
-# File:
-#  ycpdoc
-#
-# Module:
-#  Documentation creation.
-#
-# Summary:
-#  Creates html files based on comments in ycp file.
-#
 # Authors:
 #  Petr Blahos <pblahos@suse.cz>
 #  Martin Vidner <mvidner@suse.cz>
 #
 # $Id$
-#
-# This script reads ycp file. If it finds comment stating /** it processes
-# that comment as function description. It understands to tags
-# @param paramname description
-# @return <type> description
-# It takes function name from  following define command.
-#
-# Additionally it undestands tofile header described in
-# doc/public/Developers/Coding/rules.html
-#
+
+=head1 NAME
+
+ycpdoc - Creates html files based on comments in ycp file.
+
+=head1 SYNOPSIS
+
+  ycpdoc -h|--help|--man
+  ycpdoc [-d <dir>] [-s <dir>] [-f html|xml] [-i] [-] [-o] [-wr] files.ycp...
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item B<-h>
+
+Show this help screen
+
+=item B<-d> I<dir>
+
+Output files are placed to directory I<dir>
+
+=item B<-s> I<dir>
+
+Strip only I<dir> when generating output files (default all).
+Remaining slashes are converted to double underscores.
+
+=item B<-f> I<format>
+
+Produce output in given format, html or xml. The option may be repeated.
+HTML is the default. XML produces ycpdoc.xml, the DTD is not stable yet.
+
+=item B<-i>
+
+Do not generate index.html (intro.html, files.html)
+
+=item B<->
+
+Write output to stdout. Do not generate indexes.
+If there are more input files, generate only one
+output html file
+
+=item B<-o>
+
+Old style of index: creates only index.html
+
+=item B<-wr>
+
+Do not warn about undeclared return types
+
+=back
+
+=head1 DESCRIPTION
+
+Processes special comments in ycp file and creates
+html file from them. Uses the same comment syntax as
+kdoc/ydoc.
+
+	Supported tags:
+	    @param name description	html allowed
+	    @return type description	html allowed
+	    @since version		html allowed
+	    @example anything		html allowed, <pre>
+	    @see function
+	    @see file#function
+	    @see file#
+	    @see <a href="uri">text</a>
+
+All tags except @see can be multiline.
+Also processes initial comment of file if it starts at the
+first line, html allowed.
+Supports intro via /*** , html allowed.
+
+See YaST2 Documentation public/Developers/Coding/rules.html
+for example.
+
+=head1 EXAMPLES
+
+The most common use (I believe):
+   cd doc/autodocs
+   ycpdoc -d. ../../src/printconf*ycp
+Creates index.html and one html file for each ycp file.
+
+Generate html file to stdout. Skip index:
+   ycpdoc - file.ycp
+
+Examples in this directory were generated simply:
+   /usr/lib/YaST2/bin/ycpdoc -n *ycp
+
+For example of comments in ycp file, please see example.ycp and modules.ycp.
+You can also look at generated index.html, intro.html, files.html, example.html
+and modules.html.
+
+=head1 PARANOISM
+
+ycpdoc reports functions without comment and functions that have
+undocumented arguments and arguments that are documented but do not
+exist.
+
+=cut
 
 use strict;
 use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
 use XML::Writer;
 use Tie::Hash;
 
@@ -41,6 +124,9 @@ sub main
 
 my @sources = ();
 
+my @formats_wanted = ();
+my $help = 0;
+my $man = 0;
 my $skip_index = 0;
 my $output_stdout = 0;
 my $output_dir = "";
@@ -54,106 +140,63 @@ sub parse_arguments
 ##
 ## find switches
 ##
+    Getopt::Long::Configure ("bundling");
+    GetOptions (
+		"help|h" => \$help,
+		"man" => \$man,
+		"i" => \$skip_index,
+		"" => \$output_stdout,
+		"d=s" => \$output_dir,
+		"s=s" => \$strip_prefix,
+		"o" => sub { $new_index_style = 0; },
+		"w=i" => \$warning_level,
+		"wr" => sub { $warn_return_types = 0; },
+		"format|f=s" => \@formats_wanted,
+	       ) or pod2usage (2);
+    pod2usage (1) if $help;
+    pod2usage (-exitstatus => 0, -verbose => 2) if $man;
 
-    foreach my $arg (@ARGV)
+
+    if ($output_stdout)
     {
-	if ($arg =~ /^-/)	# switch
-	{
-	    if ( ( $arg eq "-h" ) || ( $arg eq "--help" ) )
-	    {
-		usage();
-	    }
-	    elsif ( $arg eq "-i" )
-	    {
-		$skip_index = 1;
-	    }
-	    elsif ( $arg eq "-" )
-	    {
-		$skip_index = 1;
-		$output_stdout = 1;
-	    }
-	    elsif ( $arg =~ /^-d(.*)/ )
-	    {
-		$output_dir = $1;
-		if ($output_dir !~ /\/$/ )
-		{
-		    $output_dir .= "/";
-		}
-	    }
-	    elsif ( $arg =~ /^-s(.*)/ )
-	    {
-		$strip_prefix = $1;
-		if ($strip_prefix !~ /\/$/ )
-		{
-		    $strip_prefix .= "/";
-		}
-	    }
-	    elsif ( $arg eq "-o" )
-	    {
-		$new_index_style = 0;
-	    }
-	    elsif ($arg =~ /^-w(\d)/)
-	    {
-		$warning_level = $1;
-	    }
-	    elsif ($arg eq "-wr")
-	    {
-		$warn_return_types = 0;
-	    }
-	}
-	else
-	{
-	    push @sources, $arg;
-	}
+	$skip_index = 1;
+    }
+    if ($output_dir !~ /\/$/ )
+    {
+	$output_dir .= "/";
+    }
+    if ($strip_prefix !~ /\/$/ )
+    {
+	$strip_prefix .= "/";
+    }
+    if (@formats_wanted == 0)
+    {
+	@formats_wanted = ("html");
     }
 
+    @sources = @ARGV;
     if (@sources == 0)
     {
-	usage() ;
+	pod2usage (2);
     }
 }
 
+my %formats =
+    (
+     "html" => "ycpdoc::HTML",
+     "xml" => "ycpdoc::XML",
+    );
 
-sub usage
+sub write_docs
 {
-die<<EOF;
-
-ycpdoc: The YaST2 ycp Documentation Tool.
-	Processes special comments in ycp file and creates
-	html file from them. Uses the same comment syntax as
-	kdoc/ydoc. Supported tags:
-	    \@param name description	html allowed
-	    \@return type description	html allowed
-	    \@since version		html allowed
-	    \@example anything		html allowed, <pre>
-	    \@see function
-	    \@see file\#function
-	    \@see file\#
-	    \@see <a href="uri">text</a>
-
-	Also processes initial comment of file if it starts at the
-	first line, html allowed.
-	Supports intro via /*** , html allowed.
-
-	See YaST2 Documentation public/Developers/Coding/rules.html
-	for example.
-
-Usage:
-	ycpdoc -h
-	ycpdoc [-d<dir>] [-s<dir>] [-i] [-] [-o] [-wr] files.ycp...
-
-	-h      Show this help screen
-	-d<dir> Output files are placed to directory <dir>
-	-s<dir> Strip only <dir> when generating output files (default all).
-		Remaining slashes are converted to double underscores.
-	-i      Do not generate index.html (intro.html, files.html)
-	-       Write output to stdout. Do not generate indexes.
-		If there are more input files, generate only one
-		output html file
-	-o      Old style of index: creates only index.html
-	-wr	Do not warn about undeclared return types
-EOF
+    no strict "refs";
+    foreach my $format (@formats_wanted)
+    {
+	my $fun = $formats{$format} ."::write_docs";
+	&$fun;
+    }
 }
+
 
 ###
 ### information shared between parsing and writing
@@ -523,18 +566,23 @@ sub do_shipout ($$$$$@)
 	    $lastwas = "see";  # it is an error, we do not allow multiline see...
 	    # see section
 	    $line = $1;
+
+	    # Here we cooperate too closely with the html backend.
+	    # This part will need to be fixed if we want other output formats.
+	    # html code
 	    if( $line =~ /^</ )
-	    { # html code
+	    {
 		$entry->{"see"} .= "$line\n";
 	    }
+	    # ref. to file without function
 	    elsif ( $line =~ /(.*)\#$/ )
-	    { # ref. to file without function
-		$entry->{"see"} .= "<a href=\"".html_name($1)."\">".$1."</a>\n";
+	    {
+		$entry->{"see"} .= "<a href=\"".ycpdoc::HTML::html_name($1)."\">".$1."</a>\n";
 	    }
 	    elsif ( $line =~ /(.*)\#(.*)/ )
 	    {
 		# file#function
-		$entry->{"see"} .= "<a href=\"".html_name($1)."#".$2."\">".$2." in ".$1."</a>\n";
+		$entry->{"see"} .= "<a href=\"".ycpdoc::HTML::html_name($1)."#".$2."\">".$2." in ".$1."</a>\n";
 	    }
 	    else
 	    {
@@ -704,6 +752,7 @@ sub almost_html ($)
 ### writing
 ###
 
+package ycpdoc::HTML;
 
 # substituted strings: 1,2 = Module, 3,4,5 = links to other pages
 my $intro = "<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n"
@@ -981,7 +1030,6 @@ sub write_onefile ($$)
 	    push (@imports, $one->{"name"});
 	}
 	elsif ($one->{"kind"} eq "include")
-
 	{
 	    push (@includes, $one->{"name"});
 	}

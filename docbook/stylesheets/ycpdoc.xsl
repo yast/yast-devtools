@@ -3,46 +3,78 @@
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" indent="yes"/> 
+    <xsl:param name="module" />
+    <xsl:variable name="moduleName" select="substring-before($module,'.')"/>
+    <xsl:param name="include" />
 
     <xsl:template match="/">
         <xsl:apply-templates/> 
     </xsl:template>
 
+    <xsl:template match="//file_item[@key=$include]">
+        <xsl:apply-templates/> 
+    </xsl:template>
+
+    <xsl:template match="header">
+    </xsl:template>
+    
     <xsl:template match="intro_html">
     </xsl:template>
 
     <xsl:template match="files">
-        <xsl:apply-templates select="file_item"/>
+            <xsl:apply-templates select="file_item"/>
     </xsl:template>
 
     <xsl:template match="file_item">
-        <xsl:apply-templates select="provides"/>
+        <xsl:if test="@key = $module">
+        <reference>
+               <xsl:attribute name="id">
+                    <xsl:text>Module_</xsl:text>
+                    <xsl:value-of select="$moduleName"/>
+                    <xsl:text>_</xsl:text>
+                    <xsl:text>reference</xsl:text>
+                </xsl:attribute>
+            <title>
+                <xsl:apply-templates select="header/summary"/>
+            </title>
+            
+            <xsl:apply-templates select="provides"/>
+            <xsl:apply-templates select="requires"/> 
+        </reference>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="provides">
             <xsl:if test="count(provides_item) > 0">
-                <reference>
                     <xsl:apply-templates select="provides_item"/>
-                </reference>
             </xsl:if>
     </xsl:template>
 
     <xsl:template match="requires">
+        <xsl:apply-templates select="requires_item"/> 
     </xsl:template>
+
+   <xsl:template match="requires_item">
+      <xsl:if test="kind = 'include'">
+          <xsl:variable name="include" select="substring-after(name,'/')"/>
+          <xsl:apply-templates select="//file_item[@key=$include]"/>
+      </xsl:if>
+    </xsl:template>
+
 
     <xsl:template match="provides_item">
         <xsl:if test="kind = 'function'">
             <refentry>
                 <xsl:attribute name="id">
                     <xsl:text>Module_</xsl:text>
-                    <xsl:value-of select="../../requires/name"/>
+                    <xsl:value-of select="$moduleName"/>
                     <xsl:text>_</xsl:text>
                     <xsl:value-of select="name"/>
                 </xsl:attribute>
 
                 <refmeta>
                     <refentrytitle>
-                        <xsl:value-of select="../../requires/name"/>
+                        <xsl:value-of select="$moduleName"/>
                         <xsl:text>::</xsl:text>
                         <xsl:value-of select="name"/>
                     </refentrytitle>
@@ -50,7 +82,7 @@
                 </refmeta>
                 <refnamediv>
                     <refname>
-                        <xsl:value-of select="../../requires/name"/>
+                        <xsl:value-of select="$moduleName"/>
                         <xsl:text>::</xsl:text>
                         <xsl:value-of select="name"/>
                         
@@ -60,14 +92,15 @@
                 <refsynopsisdiv>
 
                     <funcsynopsis>
-                        <funcsynopsisinfo>Import <xsl:value-of select="../../requires/name"/><xsl:text>;</xsl:text></funcsynopsisinfo>
+                        <funcsynopsisinfo>Import <xsl:value-of
+                                select="$moduleName"/><xsl:text>;</xsl:text></funcsynopsisinfo>
                         <funcprototype>
                             <funcdef>
                                 <type>
                                     <xsl:value-of select="type"/>
                                 </type>
                                 <function>
-                                    <xsl:value-of select="../../requires/name"/>
+                                    <xsl:value-of select="$moduleName"/>
                                     <xsl:text>::</xsl:text>
                                     <xsl:value-of select="name"/>
                                 </function>

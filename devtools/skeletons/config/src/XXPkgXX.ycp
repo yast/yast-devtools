@@ -65,7 +65,7 @@ global define boolean Modified() ``{
  */
 global define boolean Read() ``{
 
-    /* XXXpkgXX read dialog caption */
+    /* XXPkgXX read dialog caption */
     string caption = _("Initializing XXpkgXX configuration");
 
     // TODO FIXME Set the right number of stages
@@ -128,7 +128,7 @@ global define boolean Read() ``{
  */
 global define boolean Write() ``{
 
-    /* XXXpkgXX read dialog caption */
+    /* XXPkgXX read dialog caption */
     string caption = _("Saving XXpkgXX configuration");
 
     // TODO FIXME And set the right number of stages

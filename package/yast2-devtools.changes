@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct 22 17:48:29 CEST 2002 - msvec@suse.cz
+
+- removed %ifarch from the generated spec files <arvin>
+- 2.7.0
+
+-------------------------------------------------------------------
 Fri Oct 11 15:19:30 CEST 2002 - arvin@suse.de
 
 - enhance create-spec on account of SLES.

@@ -6,38 +6,38 @@ SUBDIRS = skeletons
 
 htmldir = $(docdir)/devtools
 
-XSLTPROC="/usr/bin/xsltproc"
-BUILD=html
 STYLESHEET_HTML=../../docbook/stylesheets/customize-html.xsl
 
+XSLTPROC=@XSLTPROC@
+XSLTPROC_FLAGS=@XSLTPROC_FLAGS@
+DOCBOOK_ROOT=@DOCBOOK_ROOT@
+XML_CATALOG=@XML_CATALOG@
 xml_files =  $(wildcard *.xml) 
 
 html_DATA = $(wildcard html/*.html) \
 	    rny2rnc.html \
-	    $(BUILD)/index.html \
-	    $(BUILD)/susebooks.css
-
-$(html_DATA): $(xml_files) 
-	xsltproc \
-	-stringparam base.dir "$(BUILD)/" \
-	--xinclude \
-	$(STYLESHEET_HTML) \
-	yast2-devtools.xml
+	    html/index.html \
+	    html/susebooks.css
 
 
-$(BUILD)/susebooks.css:
-	cp ../../docbook/css/susebooks.css $(BUILD)
-	cp -a ../../docbook/images $(BUILD)
-	find $(BUILD) -name "Makefile*"  | xargs rm
+html/index.html: yast2-devtools.xml
+	XML_CATALOG_FILES=$(XML_CATALOG)\
+	$(XSLTPROC) $(XSLTPROC_FLAGS) --xinclude \
+	$(STYLESHEET_HTML) $<
+
+
+
+html/susebooks.css: 
+	cp ../../docbook/css/susebooks.css html
+	cp -a ../../docbook/images html
+	find html -name "Makefile*"  | xargs rm
 
 clean-local:
-	rm -rf $(BUILD)/*.html
-	rm -rf $(BUILD)/images
-	rm -rf $(BUILD)/susebooks.css
+	rm -rf html
 
 install-data-local:
 	mkdir -p $(DESTDIR)$(htmldir)
-	cp -a $(srcdir)/$(BUILD)/images $(DESTDIR)$(htmldir)
+	cp -a $(srcdir)/html/images $(DESTDIR)$(htmldir)
 
 EXTRA_DIST =  $(xml_files) rny2rnc.html
 

@@ -2,11 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0">
 
-                <!--
-   <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
-   -->
    <xsl:import
-       href="file:///usr/share/xml/docbook/stylesheet/nwalsh/current/html/chunk.xsl"/>
+       href="http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl"/>
 
   <!-- Output directory -->
   <xsl:param name="base.dir" select="'html/'"/>
@@ -15,8 +12,8 @@
   <xsl:param name="section.autolabel" select="1"/>
   <xsl:param name="section.label.includes.component.label" select="1"/>
 
-  <!-- add sections to toc up to depth 5 -->
-  <xsl:param name="toc.section.depth">5</xsl:param>
+  <!-- add sections to toc up to depth 4 -->
+  <xsl:param name="toc.section.depth">4</xsl:param>
 
   <!-- use ids as filename instead of numbers -->
   <xsl:param name="use.id.as.filename" select="'1'"></xsl:param>
@@ -52,7 +49,7 @@
 
   <!-- Use own stylesheet, adopted version of susebook.css -->
   <!-- I'm not sure whether this is really an improvement -->
-  <xsl:param name="html.stylesheet">susebooks.css</xsl:param>
+  <xsl:param name="html.stylesheet">yast2docs.css</xsl:param>
   <xsl:param name="header.rule" select="0"></xsl:param>
   <xsl:param name="footer.rule" select="0"></xsl:param>
 

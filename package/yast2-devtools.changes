@@ -1,4 +1,17 @@
 -------------------------------------------------------------------
+Sat Oct 23 06:24:06 CEST 2004 - nashif@suse.de
+
+-  Removed dependency on sgmltoo, sp
+-  Added nfb for sgml-skel
+
+-------------------------------------------------------------------
+Sat Oct 23 06:22:49 CEST 2004 - nashif@suse.de
+
+- Add check for xsltproc, XML catalogs
+- Added AC macro for docbook
+- adapted macros for stylesheets
+
+-------------------------------------------------------------------
 Thu Oct 14 13:35:33 CEST 2004 - jsrain@suse.cz
 
 - added missing AC_SUBST(ystartupdir) to y2autoconf

@@ -102,10 +102,16 @@ yncludedir=${yast2dir}/include
 schemadir=${yast2dir}/schema
 scrconfdir=${yast2dir}/scrconf
 desktopdir=\${prefix}/share/applications/YaST2
+STYLESHEET_HTML=${yast2dir}/data/docbook/stylesheets/customize-html.xsl
+STYLESHEET_PDF=${yast2dir}/data/docbook/stylesheets/customize-fo.xsl
+STYLESHEET_CSS=${yast2dir}/data/docbook/css/yast2docs.css
 
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
 AC_SUBST(MAINTAINER)
+AC_SUBST(STYLESHEET_HTML)
+AC_SUBST(STYLESHEET_PDF)
+AC_SUBST(STYLESHEET_CSS)
 
 AC_SUBST(yast2dir)
 

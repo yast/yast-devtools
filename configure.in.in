@@ -36,6 +36,7 @@ fi
 rm -f $TMPFILE
 ])
 
+AX_CHECK_DOCBOOK
 
 ## needed for documentation
 CHECK_PERL_MODULE(XML::Writer, XMLWRITER)

@@ -1,5 +1,5 @@
 @HEADER-COMMENT@ 
-# neededforbuild gpp libgpp sgmltool opensp perl-XML-Writer libxml2 libxslt docbook-xsl-stylesheets docbook_4 libgcrypt libgpg-error
+# neededforbuild gpp libgpp  perl-XML-Writer libxml2 libxslt docbook-xsl-stylesheets docbook_4 libgcrypt libgpg-error sgml-skel
 
 @HEADER@
 Requires:	yast2 perl
@@ -44,4 +44,5 @@ EOF
 @ybindir@
 %dir %{prefix}/share/YaST2
 @ydatadir@
+/usr/share/aclocal/*.m4
 %doc @docdir@

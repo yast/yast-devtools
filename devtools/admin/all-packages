@@ -59,6 +59,7 @@ yast2-xml		inst-sys		xml agent (autoinst)
 
 # config packages
 yast2-backup		default			backup
+yast2-bluetooth		default			bluetooth
 yast2-bootloader	default			bootloader
 yast2-ca-management	default			CA management
 yast2-cd-creator	default			create installation CDs

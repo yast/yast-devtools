@@ -85,7 +85,7 @@ yast2-printer		default			printer
 yast2-profile-manager	default			profile-manager
 yast2-repair		inst-sys,default	repair
 yast2-restore		default			restore
-yast2-runlevel		default			runlevel editor
+yast2-runlevel		inst-sys,default	runlevel editor
 yast2-samba		slcs			samba
 yast2-samba-client	default                 samba client
 yast2-samba-server	default                 samba server

@@ -16,7 +16,8 @@ pkgdata_SCRIPTS = 				\
 	create-spec				\
 	for-proofread				\
 	kill-leftover-stuff			\
-	get-lib
+	get-lib					\
+	version
 
-EXTRA_DIST = $(bin_SCRIPTS) $(pkgdata_SCRIPTS)
+EXTRA_DIST = $(bin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
 

@@ -1,7 +1,5 @@
-## configure.in.in for debugger.
-## Use y2tool y2autoconf to get configure.in
 
-## Initialize
+## initialize
 @YAST2-INIT-COMMON@
 @YAST2-INIT-PROGRAM@
 @YAST2-INIT-YCP@
@@ -28,5 +26,6 @@ AC_PATH_PROG(SGML2TXT,   sgml2txt,   false)
 AC_PATH_PROG(SGML2INFO,  sgml2info,  false)
 AC_PATH_PROG(SGML2LATEX, sgml2latex, false)
 
-## and generate the output...
+## and generate the output
+AC_OUTPUT(devtools/bin/version)
 @YAST2-OUTPUT@

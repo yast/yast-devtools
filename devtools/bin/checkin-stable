@@ -2,12 +2,12 @@
 #
 # check in package to /work/src/done/STABLE or NOARCH
 #
-# Originally written by		Klaus Kaempf <kkaempf@suse.de>,
+# Originally written by		Klaus Kaempf <kkaempf@suse.de>
 # modified / beautified by	Stefan Hundhammer <sh@suse.de>
+#				Arvin Schnell <arvin@suse.de>
 #
 # $Id$
 
-branch=`cvs status VERSION | grep branch`
 self=`basename $0`
 force=0
 
@@ -15,35 +15,38 @@ if [ "$1" == "-f" -o "$1" == "--force" ]; then
     force=1
 fi
 
-if [ ! -f RPMNAME ]; then
-    echo "${self}: FATAL: ./RPMNAME not found" >&2
+if [ ! -f RPMNAME -o ! -f VERSION ]; then
+    echo "${self}: FATAL: ./RPMNAME or ./VERSION not found" >&2
     exit 1
 fi
 
+pkg_rpmname=`cat RPMNAME`
+pkg_version=`cat VERSION`
 
-if grep -q "2.7" VERSION; then
-    echo "${self}: FATAL: Trying to check in a post-8.1 version into STABLE." >&2
-    echo ""
-    echo "If you get this after the 8.1 master, your yast2-devtools are outdated." >&2
-
-    exit 1
+# check that the devtools version match
+if [ "$pkg_rpmname" != "yast2-devtools" ] ; then
+    v1=`echo $pkg_version | cut -d . -f 1,2`
+    v2=`y2tool version | cut -d . -f 1,2`
+    if [ "$v1" != "$v2" ] ; then
+	echo "${self}: FATAL: The major version of your yast2-devtools and this" >&2
+	echo "package don't match. Maybe your yast2-devtools is outdated or you" >&2
+	echo "want to build a package for an old distribution." >&2
+	exit 1
+    fi
 fi
 
-
-pkg_name=`cat RPMNAME`
 src_dir=package
-spec_file=$src_dir/${pkg_name}.spec
+spec_file=$src_dir/${pkg_rpmname}.spec
 
 dist=NOARCH
-if [ -z "`grep BuildArchitectures package/${pkg_name}.spec | grep noarch`" ]; then
+if [ -z "`grep BuildArchitectures package/${pkg_rpmname}.spec | grep noarch`" ]; then
     dist=STABLE
 fi
 
-target_dir=/work/src/done/$dist/$pkg_name
-# target_dir=/tmp/done/$dist/$pkg_name	# DEBUG
+target_dir=/work/src/done/$dist/$pkg_rpmname
+# target_dir=/tmp/done/$dist/$pkg_rpmname	# DEBUG
 
 if [ -d $target_dir ]; then
-
     if [ $force -ne 0 ]; then
 	echo "Force mode - deleting old $target_dir"
 	rm -rf $target_dir
@@ -53,15 +56,13 @@ if [ -d $target_dir ]; then
     fi
 fi
 
-
 mkdir $target_dir
 cp $spec_file			$target_dir
-cp $src_dir/${pkg_name}.changes	$target_dir
+cp $src_dir/${pkg_rpmname}.changes	$target_dir
 
 sources=`gawk -F : '/^Source/ || /^Patch/ { print $2; }' $spec_file | sed -e 's/^[[:space:]]*/package\//'`
 
 for source in $sources; do
-
     if [ -f $source ]; then
 	cp $source $target_dir
     else
@@ -73,12 +74,11 @@ done
 
 echo ""
 echo ""
-echo "Package \"$pkg_name\" checked into $dist:"
+echo "Package \"$pkg_rpmname\" checked into $dist:"
 echo ""
-echo "ls -l $target_dir" 
+echo "ls -l $target_dir"
 echo ""
 ( cd $target_dir; LANG=C ls -l )
 echo ""
-
 
 # EOF

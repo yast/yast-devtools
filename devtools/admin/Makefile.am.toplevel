@@ -95,6 +95,11 @@ $(POT_DST) pot: $(POT_SRC)
 	do \
 	    D=`grep '^[[:space:]]*[Tt]extdomain' $$F | head -n 1 | \
 	       sed 's/^[[:space:]]*[Tt]extdomain[[:space:]]*[="][[:space:]]*\([-_a-zA-Z0-9]*\).*/\1'/` ; \
+	    if [ -z $$D ] ; \
+	    then \
+		echo "Error: empty textdomain in $$F" ; \
+		exit 1 ; \
+	    fi ; \
 	    DOMAINS="$$D:$$F\n$$DOMAINS" ; \
 	done ; \
 	DOMAINS=`echo -en $$DOMAINS | sort` ; \

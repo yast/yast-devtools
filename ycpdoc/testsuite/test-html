@@ -1,12 +1,13 @@
 #! /bin/sh
 # for each FOO.drv, parse FOO*.ycp and compare the output
+# Or run only $1.
 YCPDOC=../src/ycpdoc
 
 echo
 echo $0
 
 FAIL=""
-for DRV in *.drv; do
+for DRV in ${1-*.drv}; do
     CASE=${DRV%.drv}
     echo
     echo Running $CASE:

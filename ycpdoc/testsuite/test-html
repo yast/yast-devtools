@@ -1,0 +1,33 @@
+#! /bin/sh
+# for each FOO.drv, parse FOO*.ycp and compare the output
+YCPDOC=../src/ycpdoc
+
+echo
+echo $0
+
+FAIL=""
+for DRV in *.drv; do
+    CASE=${DRV%.drv}
+    echo
+    echo Running $CASE:
+    # prepare the expected results
+    EXP=test-html-exp
+    rm -rf $EXP
+    mkdir $EXP
+    for HTML in $CASE*.html; do
+	cp -a $HTML $EXP/${HTML#$CASE-}
+    done
+    # produce the actual test results
+    ACT=test-html-act
+    rm -rf $ACT
+    mkdir $ACT
+    $YCPDOC --format=html --outputdir=$ACT $CASE*.ycp
+    if ! diff -ur $EXP $ACT; then
+	FAIL=1
+	break
+    fi
+done
+
+if [ $FAIL ]; then
+    exit 1
+fi

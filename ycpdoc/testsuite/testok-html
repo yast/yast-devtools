@@ -1,0 +1,14 @@
+#! /bin/sh
+# bless the test output as OK
+# $1: test case, FOO or FOO.drv
+CASE=$1
+if [ -z "$CASE" ]; then
+    echo "Must specify the test case."
+    exit 1
+fi
+CASE=${CASE%.drv}
+ACT=test-html-act
+for HTML in $ACT/*; do
+    cp $HTML $CASE-${HTML#$ACT/}
+done
+

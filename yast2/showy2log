@@ -206,7 +206,7 @@ function Usage() {
 	  $PROGNAME tail -f
 
 	File selection:
-	By default /var/log/y2log is processed, unless you're not root
+	By default /var/log/YaST2/y2log is processed, unless you're not root
 	and ~/.y2log exists.
 
 	  -f FILE	use FILE as y2log file
@@ -250,7 +250,7 @@ p=""
 P=""
 b=""
 B=""
-Y2LOG=/var/log/y2log
+Y2LOG=/var/log/YaST2/y2log
 if [ $(id -u) != 0 -a -f ~/.y2log ]; then
 	Y2LOG=~/.y2log
 fi

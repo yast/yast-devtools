@@ -18,8 +18,8 @@
 # set up logging:
 # the voluminous output of make and cvs will go to a log file,
 # overall status messages will go to stderr via fd 3
-if [ -d /var/log -a -w /var/log ]; then
-    LOGDIR=/var/log
+if [ -d /var/log/YaST2 -a -w /var/log/YaST2 ]; then
+    LOGDIR=/var/log/YaST2
 else
     LOGDIR=~
 fi

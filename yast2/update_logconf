@@ -10,7 +10,7 @@
 #	-s	silent (turn verbose off)
 #	-d	debug
 #	-a	scan all logfiles - ~/.y2log-*, not just ~/.y2log
-#	-r	"root" mode: scan /var/log/y2log*, 
+#	-r	"root" mode: scan /var/log/YaST2/y2log*,
 #		write to /root/.yast2/logconf.ycp
 #
 # Author: Stefan Hundhammer <sh@suse.de>
@@ -29,7 +29,7 @@ my @logfiles		= <~/.y2log>;
 my @all_logfiles	= <~/.y2log*>;
 my $logconf		= <~/.yast2/logconf.ycp>;
 my $root_logconf	= </root/.yast2/logconf.ycp>;
-my @all_root_logfiles	= </var/log/y2log*>;
+my @all_root_logfiles	= </var/log/YaST2/y2log*>;
 my %components;
 my %old_settings;
 
@@ -419,7 +419,7 @@ sub usage()
 	"\t-a scan all logfiles, i.e. ~/.y2log-* , not just ~/.y2log\n" .
 	"\t-d debug\n"							.
 	"\t-h help (this message)\n"					.
-	"\t-r \"root\" mode: scan /var/log/y2log*, write to $root_logconf\n" .
+	"\t-r \"root\" mode: scan /var/log/YaST2/y2log*, write to $root_logconf\n" .
 	"\t-s silent (turn verbose off)\n"				.
 	"\t-v verbose (default)\n";
 }

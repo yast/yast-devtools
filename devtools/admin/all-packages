@@ -122,6 +122,7 @@ yast2-trans-it		inst-sys		all
 yast2-trans-ja		inst-sys		all
 yast2-trans-ko		inst-sys		all
 yast2-trans-lt		inst-sys		all
+yast2-trans-nb		inst-sys		all
 yast2-trans-nl		inst-sys		all
 yast2-trans-pt_BR	inst-sys		all
 yast2-trans-ru		inst-sys		all

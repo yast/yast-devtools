@@ -313,7 +313,7 @@ sub parse_comments (@)
                     $oentry->{description} = $prop[0]; 
                     push @properties_collect, $oentry;
                 }
-                push @{$entry->{"properties"}}, $oentry
+                push @{$entry->{"properties"}}, @properties_collect
 
             }
             $entry->{"class"} = $c;

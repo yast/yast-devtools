@@ -54,12 +54,12 @@ $OUTPUT = qx(SUBDIRS=`cat SUBDIRS 2> /dev/null` ;
 (
 
     # common variables
-    "\@RPMNAME\@" => "$RPMNAME",
-    "\@VERSION\@" => "$VERSION",
-    "\@MAINTAINER\@" => "$MAINTAINER",
+    '@RPMNAME@' => $RPMNAME,
+    '@VERSION@' => $VERSION,
+    '@MAINTAINER@' => $MAINTAINER,
 
     # init: common stuff
-    "\@YAST2-INIT-COMMON\@" =>
+    '@YAST2-INIT-COMMON@' =>
 "AC_INIT($RPMNAME, $VERSION, http://www.suse.de/feedback)
 dnl Check for presence of file 'RPMNAME'
 AC_CONFIG_SRCDIR([RPMNAME])
@@ -77,29 +77,29 @@ dnl Important YaST2 variables
 VERSION=\"$VERSION\"
 RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
+". '
+yast2dir=\${prefix}/share/YaST2
 
-yast2dir=\\\${prefix}/share/YaST2
+ybindir=\${prefix}/lib/YaST2/bin
+plugindir=\${libdir}/YaST2/plugin
+includedir=\${prefix}/include/YaST2
+potdir=\${docdir}/pot
 
-ybindir=\\\${prefix}/lib/YaST2/bin
-plugindir=\\\${libdir}/YaST2/plugin
-includedir=\\\${prefix}/include/YaST2
-potdir=\\\${docdir}/pot
+docdir=\${prefix}/share/doc/packages/$RPMNAME
+mandir=\${prefix}/share/man
 
-docdir=\\\${prefix}/share/doc/packages/\$RPMNAME
-mandir=\\\${prefix}/share/man
+execcompdir=\${prefix}/lib/YaST2
+agentdir=${execcompdir}/servers_non_y2
 
-execcompdir=\\\${prefix}/lib/YaST2
-agentdir=\${execcompdir}/servers_non_y2
-
-ydatadir=\${yast2dir}/data
-imagedir=\${yast2dir}/images
-themedir=\${yast2dir}/theme
-localedir=\${yast2dir}/locale
-clientdir=\${yast2dir}/clients
-moduledir=\${yast2dir}/modules
-yncludedir=\${yast2dir}/include
-scrconfdir=\${yast2dir}/scrconf
-desktopdir=\\\${prefix}/share/applications/YaST2
+ydatadir=${yast2dir}/data
+imagedir=${yast2dir}/images
+themedir=${yast2dir}/theme
+localedir=${yast2dir}/locale
+clientdir=${yast2dir}/clients
+moduledir=${yast2dir}/modules
+yncludedir=${yast2dir}/include
+scrconfdir=${yast2dir}/scrconf
+desktopdir=\${prefix}/share/applications/YaST2
 
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
@@ -126,57 +126,57 @@ AC_SUBST(yncludedir)
 AC_SUBST(scrconfdir)
 AC_SUBST(agentdir)
 AC_SUBST(desktopdir)
-",
+',
 
     # init: prog
-    "\@YAST2-INIT-PROGRAM\@" =>
-"",
+    '@YAST2-INIT-PROGRAM@' =>
+'',
 
     # init: translation
-    "\@YAST2-INIT-PO\@" =>
-"dnl ALL_LINGUAS=\"ar bg br ca cs da de en_GB en_US es fr gl hu id it ja ko lt nl pt pt_BR ru sk sv tr zh\"
-dnl Y2TEXTDOMAIN=\`cat \${srcdir}/Y2TEXTDOMAIN\`
+    '@YAST2-INIT-PO@' =>
+'dnl ALL_LINGUAS="ar bg br ca cs da de en_GB en_US es fr gl hu id it ja ko lt nl pt pt_BR ru sk sv tr zh"
+dnl Y2TEXTDOMAIN=`cat ${srcdir}/Y2TEXTDOMAIN`
 dnl AC_SUBST(ALL_LINGUAS)
 dnl AC_SUBST(Y2TEXTDOMAIN)
 
 AC_ARG_WITH(own_compendium, [  --with-own_compendium=FILE  Location of compendium file],
    y2compendium=yes, y2compendium=no)
-if test \"x\$with_own_compendium\" = \"x\" ; then
-  COMPENDIUM=\'../../memory/yast2.\$(LL).po\'
+if test "x$with_own_compendium" = "x" ; then
+  COMPENDIUM=\'../../memory/yast2.$(LL).po\'
 else
-  COMPENDIUM=\${with_own_compendium}
+  COMPENDIUM=${with_own_compendium}
 fi
 AC_SUBST(COMPENDIUM)
-",
+',
 
     # init: YCP sources
-    "\@YAST2-INIT-YCP\@" =>
-"",
+    '@YAST2-INIT-YCP@' =>
+'',
 
     # check: common stuff
-    "\@YAST2-CHECKS-COMMON\@" =>
-"dnl Checks for programs.
+    '@YAST2-CHECKS-COMMON@' =>
+'dnl Checks for programs.
 AC_PROG_INSTALL
-INSTALL=\"\${INSTALL} -p\"
+INSTALL="${INSTALL} -p"
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 AC_PROGRAM_PATH(XGETTEXT, xgettext)
-if test -z \"\$XGETTEXT\" ; then
+if test -z "$XGETTEXT" ; then
     AC_MSG_ERROR(xgettext is missing; please install gettext.)
 fi
 AC_SUBST(XGETTEXT)
-",
+',
 
     # check: program
-    "\@YAST2-CHECKS-PROGRAM\@" =>
-"AC_PROG_CXX
+    '@YAST2-CHECKS-PROGRAM@' =>
+'AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
-CFLAGS=\"\${CFLAGS} -Wall -Wformat -Wmissing-prototypes\"
-CXXFLAGS=\"\${CXXFLAGS} -Wall -Wformat\"
+CFLAGS="${CFLAGS} -Wall -Wformat -Wmissing-prototypes"
+CXXFLAGS="${CXXFLAGS} -Wall -Wformat"
 
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -187,81 +187,81 @@ AM_CONFIG_HEADER(config.h) dnl at the distribution this done
 
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-",
+',
 
     # check: qt
-    "\@YAST2-CHECKS-QT\@" =>
-"dnl Check qt paths
-QTDIR=\"/usr/lib/qt3\"
-QTLIBDIR=\"/usr/lib/qt3/lib\"
+    '@YAST2-CHECKS-QT@' =>
+'dnl Check qt paths
+QTDIR="/usr/lib/qt3"
+QTLIBDIR="/usr/lib/qt3/lib"
 AC_ARG_WITH(qt-dir,
     [ --with-qt-dir=DIR       where the root of Qt is installed.],
-    [ QTDIR=\"\$withval\" ])
+    [ QTDIR="$withval" ])
 AC_ARG_WITH(qt-libdir,
     [ --with-qt-libdir=DIR    where the Qt library is installed.],
-    [ QTLIBDIR=\"\$withval\" ])
+    [ QTLIBDIR="$withval" ])
 AC_SUBST(QTDIR)
 AC_SUBST(QTLIBDIR)
 
 dnl Try to find the X includes and libraries
 AC_PATH_X
-if test -n \"\$x_includes\"; then
-        CPPFLAGS=\"\$CPPFLAGS -I\$x_includes\"
+if test -n "$x_includes"; then
+        CPPFLAGS="$CPPFLAGS -I$x_includes"
 fi
-if test -n \"\$x_libraries\"; then
-        LDFLAGS=\"\$LDFLAGS -L\$x_libraries\"
+if test -n "$x_libraries"; then
+        LDFLAGS="$LDFLAGS -L$x_libraries"
 fi
-",
+',
 
     # check: qt
-    "\@YAST2-CHECKS-TESTSUITE\@" =>
-"dnl Check packages expect and dejagnu
+    '@YAST2-CHECKS-TESTSUITE@' =>
+'dnl Check packages expect and dejagnu
 AC_PATH_PROG(MYEXPECT, expect, false)
-if test \"\$MYEXPECT\" = \"false\"; then
+if test "$MYEXPECT" = "false"; then
         AC_MSG_ERROR([expect not installed])
 fi
 AC_PATH_PROG(MYRUNTEST, runtest, false)
-if test \"\$MYRUNTEST\" = \"false\"; then
+if test "$MYRUNTEST" = "false"; then
         AC_MSG_ERROR([dejagnu not installed])
 fi
-",
+',
 
     # check: translations
-    "\@YAST2-CHECKS-PO\@" =>
-"dnl searches for some needed programs
+    '@YAST2-CHECKS-PO@' =>
+'dnl searches for some needed programs
 AC_PROGRAM_PATH(MSGFMT, msgfmt, no, /usr/bin)
-if test x\$MSGFMT != x\"/usr/bin/msgfmt\"; then
+if test x$MSGFMT != x"/usr/bin/msgfmt"; then
   AC_MSG_ERROR(msgfmt is missing; please install gettext.)
 fi
 AC_SUBST(MSGFMT)
 AC_PROGRAMS_PATH(MSGCAT, msgcat pmsgcat, no)
-if test x\$MSGCAT = xno; then
+if test x$MSGCAT = xno; then
   AC_MSG_ERROR(msgcat is missing; please install gettext-0.11pre or better.)
 fi
 AC_SUBST(MSGCAT)
 
 AC_PROGRAM_PATH(MSGMERGE, msgmerge, no, /usr/bin)
-if test x\$MSGMERGE != x\"/usr/bin/msgmerge\"; then
+if test x$MSGMERGE != x"/usr/bin/msgmerge"; then
   AC_MSG_ERROR(msgmerge is missing; please install gettext.)
 fi
 AC_SUBST(MSGMERGE)
 
 AC_PROGRAM_PATH(MSGCONV, msgconv, no, /usr/bin)
-if test x\$MSGCONV != x\"/usr/bin/msgconv\"; then
+if test x$MSGCONV != x"/usr/bin/msgconv"; then
   AC_MSG_ERROR(msgconv is missing; please install gettext.)
 fi
-",
+',
 
     # check: YCP sources
-    "\@YAST2-CHECKS-YCP\@" =>
-"AC_PATH_PROG(YCPDOC, ycpdoc, false, \$PATH:/usr/lib/YaST2/bin)
-if test \"\$YCPDOC\" = \"false\"; then
+    '@YAST2-CHECKS-YCP@' =>
+'AC_PATH_PROG(YCPDOC, ycpdoc, false, $PATH:/usr/lib/YaST2/bin)
+if test "$YCPDOC" = "false"; then
     AC_MSG_ERROR([ycpdoc is not installed])
 fi
-",
+',
 
     # generate output
-    "\@YAST2-OUTPUT\@" =>
+    '@YAST2-OUTPUT@' =>
 "AC_CONFIG_FILES(Makefile $OUTPUT)
 AC_OUTPUT
 "
@@ -283,12 +283,12 @@ print OUTPUT
 # replace these macros in all sources and remove them here.
 %obsolete_macros =
 (
-    "\@YAST2-INIT-AGENT\@" => "\@YAST2-INIT-PROGRAM\@",
-    "\@YAST2-CHECKS-AGENT\@" => "\@YAST2-CHECKS-PROGRAM\@",
-    "\@YAST2-INIT-LIB\@" => "\@YAST2-INIT-PROGRAM\@",
-    "\@YAST2-CHECKS-LIB\@" => "\@YAST2-CHECKS-PROGRAM\@",
-    "\@YAST2-INIT-PROG\@" => "\@YAST2-INIT-PROGRAM\@",
-    "\@YAST2-CHECKS-PROG\@" => "\@YAST2-CHECKS-PROGRAM\@",
+    '@YAST2-INIT-AGENT@' => '@YAST2-INIT-PROGRAM@',
+    '@YAST2-CHECKS-AGENT@' => '@YAST2-CHECKS-PROGRAM@',
+    '@YAST2-INIT-LIB@' => '@YAST2-INIT-PROGRAM@',
+    '@YAST2-CHECKS-LIB@' => '@YAST2-CHECKS-PROGRAM@',
+    '@YAST2-INIT-PROG@' => '@YAST2-INIT-PROGRAM@',
+    '@YAST2-CHECKS-PROG@' => '@YAST2-CHECKS-PROGRAM@',
 );
 
 $unknown_macro = 0;

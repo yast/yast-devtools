@@ -10,6 +10,7 @@
 # - email	E-mail server
 # - firewall	Firewall CD
 # - expert_user Expert configuration - not available e.g. in personal edition
+# - rop		SLES8 Retail Option Pack
 # - internal	internal package
 #
 # package		where			when
@@ -54,6 +55,8 @@ yast2-transfer	inst-sys		transfer/curl agent (autoinst)
 yast2-backup		default			backup
 yast2-bootloader	default			bootloader
 yast2-country		default			keyboard,language,timezone
+yast2-dhcp-server	rop			DHCP server
+yast2-dns-server	default			DNS server
 yast2-firewall		default			firewall
 yast2-firewall-cd	firewall		firewall CD
 yast2-imap-server	email			IMAP server
@@ -73,7 +76,6 @@ yast2-online-update	default			YOU
 yast2-phone-services	default			isdn
 yast2-powertweak	expert_user		powertweak configuration
 yast2-printer		default			printer
-yast2-printerdb		default			printer
 yast2-profile-manager	default			profile-manager
 yast2-repair		inst-sys,default	repair
 yast2-restore		default			restore
@@ -85,6 +87,7 @@ yast2-sound		default			sound
 yast2-storage		inst-sys,default	storage
 yast2-support		default			support
 yast2-sysconfig		default			sysconfig editor
+yast2-tftp-server	rop			TFTP server
 yast2-tune		default			hardware info and tune
 yast2-tv		default			TV card
 yast2-users		default			users

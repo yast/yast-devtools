@@ -81,6 +81,7 @@ MAINTAINER=\"$MAINTAINER\"
 yast2dir=\${prefix}/share/YaST2
 
 ybindir=\${prefix}/lib/YaST2/bin
+ystartupdir=\${prefix}/lib/YaST2
 plugindir=\${libdir}/YaST2/plugin
 includedir=\${prefix}/include/YaST2
 potdir=\${docdir}/pot

@@ -180,6 +180,7 @@ rm -rf \"\$RPM_BUILD_ROOT\""
     #"\@yast2dir@" => "\\\${prefix}/share/YaST2",
 
     "\@ybindir\@" => "%{prefix}/lib/YaST2/bin",
+	"\@ystartupdir\@" => "%{prefix}/lib/YaST2",
     "\@plugindir\@" => "%{_libdir}/YaST2/plugin",
     "\@includedir\@" => "%{prefix}/include/YaST2",
     "\@docdir\@" => "%{prefix}/share/doc/packages/$RPMNAME",

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 31 13:55:44 CEST 2004 - sh@suse.de
+
+- Added yast2-firstboot to all-packages 
+
+-------------------------------------------------------------------
 Fri Aug 20 05:14:54 CEST 2004 - nashif@suse.de
 
 - added schemadir macro

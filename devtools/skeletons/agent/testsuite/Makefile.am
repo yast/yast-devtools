@@ -1,5 +1,5 @@
 #
-# Makefile.am for devtools/devtools/skeletons/agent/testsuite
+# Makefile.am for .../agent-XXpkgXX/testsuite
 #
 
 AUTOMAKE_OPTIONS = dejagnu

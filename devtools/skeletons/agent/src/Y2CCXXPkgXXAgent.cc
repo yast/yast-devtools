@@ -1,9 +1,11 @@
-
-
-/*
- *  Author: Arvin Schnell <arvin@suse.de>
+/* Y2CCXXPkgXXAgent.cc
+ *
+ * XXPkgXX agent implementation
+ *
+ * Authors: XXmaintainerXX <XXemailXX>
+ *
+ * $Id$
  */
-
 
 #include <scr/Y2AgentComponent.h>
 #include <scr/Y2CCAgentComponent.h>
@@ -11,8 +13,6 @@
 
 #include "XXPkgXXAgent.h"
 
+typedef Y2AgentComp <XXPkgXXAgent> Y2XXPkgXXAgentComp;
 
-typedef Y2AgentComp <XXAgent> Y2XXAgentComp;
-
-Y2CCAgentComp <Y2XXAgentComp> g_y2ccag_xxagent ("ag_xxagent");
-
+Y2CCAgentComp <Y2XXPkgXXAgentComp> g_y2ccag_XXpkgXX ("ag_XXpkgXX");

@@ -1,11 +1,8 @@
-/*
- * YaST2: Core system
+/* XXPkgXXAgent.cc
  *
- * Description:
- *   YaST2 SCR: XXPkgXX agent implementation
+ * An agent for reading the XXpkgXX configuration file.
  *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * Authors: XXmaintainerXX <XXemailXX>
  *
  * $Id$
  */

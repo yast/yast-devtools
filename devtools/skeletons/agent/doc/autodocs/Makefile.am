@@ -1,5 +1,5 @@
 #
-# Makefile.am for devtools/devtools/skeletons/agent/doc/autodocs
+# Makefile.am for .../agent-XXpkgXX/doc/autodocs
 #
 
 htmldir = $(docdir)/autodocs

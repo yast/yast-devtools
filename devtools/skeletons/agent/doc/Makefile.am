@@ -1,5 +1,5 @@
 #
-# Makefile.am for devtools/devtools/skeletons/agent/doc
+# Makefile.am for .../agent-XXpkgXX/doc
 #
 
 SUBDIRS = autodocs

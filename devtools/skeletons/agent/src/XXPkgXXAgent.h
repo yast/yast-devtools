@@ -1,20 +1,14 @@
-/*
- * YaST2: Core system
+/* XXPkgXXAgent.h
  *
- * Description:
- *   YaST2 SCR: XXPkgXX agent implementation
+ * XXPkgXX agent implementation
  *
- * Authors:
- *   XXmaintainerXX <XXemailXX>
+ * Authors: XXmaintainerXX <XXemailXX>
  *
  * $Id$
  */
 
 #ifndef _XXPkgXXAgent_h
 #define _XXPkgXXAgent_h
-
-#undef y2log_component
-#define y2log_component "ag_XXpkgXX"
 
 #include <Y2.h>
 #include <scr/SCRAgent.h>

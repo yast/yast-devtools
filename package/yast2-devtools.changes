@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Nov 28 10:30:03 CET 2003 - ma@suse.de
+
+- builtindoc: allow comment end to contain more than one '*';
+  e.g. '**/'
+
+-------------------------------------------------------------------
 Tue Nov 18 12:49:24 CET 2003 - mvidner@suse.cz
 
 - Fixed a problem with escaped newlines in ydoxygen, really.
@@ -22,7 +28,7 @@ Thu Nov  6 16:49:57 CET 2003 - mvidner@suse.cz
 Mon Oct  6 14:10:45 CEST 2003 - sh@suse.de
 
 - V 2.9.0
-- Removed generated HTML doc from dist tarball 
+- Removed generated HTML doc from dist tarball
 
 -------------------------------------------------------------------
 Fri Sep 19 16:30:30 CEST 2003 - sh@suse.de
@@ -30,13 +36,13 @@ Fri Sep 19 16:30:30 CEST 2003 - sh@suse.de
 - V 2.8.9
 - Support for GPL license
 - Moved YaST license to separate subdir
-- New subdir for GPL 
+- New subdir for GPL
 
 -------------------------------------------------------------------
 Thu Aug 28 13:37:34 CEST 2003 - sh@suse.de
 
 - V 2.8.8
-- Changed feedback address to http://www.suse.de/feedback 
+- Changed feedback address to http://www.suse.de/feedback
 
 -------------------------------------------------------------------
 Tue Aug 26 14:02:33 CEST 2003 - lnussel@suse.de
@@ -52,7 +58,7 @@ Wed Aug 20 15:52:50 CEST 2003 - jsuchome@suse.de
 -------------------------------------------------------------------
 Tue Aug 12 07:31:59 CEST 2003 - visnov@suse.de
 
-- merged in proofread texts into the config skeleton 
+- merged in proofread texts into the config skeleton
 
 -------------------------------------------------------------------
 Fri Aug 01 15:27:49 CEST 2003 - arvin@suse.de

@@ -43,7 +43,7 @@ while (<>)
     }
     elsif ($state eq "comment")
     {
-	if (/^\s*\*\/\s*$/)
+	if (/^\s*\*+\/\s*$/)
 	{
 	    $state = "boring";
 	    if ($entry)

@@ -2,7 +2,8 @@
 # Makefile.am for devtools/doxygen
 #
 
-ydata_DATA = Doxyfile
+devtoolsdatadir = $(ydatadir)/devtools
+devtoolsdata_DATA = Doxyfile
 ybin_SCRIPTS = ydoxygen
 
-EXTRA_DIST = $(ydata_DATA) $(ybin_SCRIPTS)
+EXTRA_DIST = $(devtoolsdata_DATA) $(ybin_SCRIPTS)

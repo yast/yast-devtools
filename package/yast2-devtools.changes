@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jan 07 11:40:01 CET 2005 - arvin@suse.de
+
+- adding default entities names in desktop files for doc team
+
+-------------------------------------------------------------------
 Thu Dec  2 13:31:37 CET 2004 - mvidner@suse.cz
 
 - ycpdoc: Do not warn if the types differ only in whitespace
@@ -57,7 +62,7 @@ Tue Oct 26 09:40:40 CEST 2004 - locilka@suse.cz
 -------------------------------------------------------------------
 Mon Oct 25 13:37:46 CEST 2004 - visnov@suse.cz
 
-- Removed Requires: yast2 
+- Removed Requires: yast2
 
 -------------------------------------------------------------------
 Sat Oct 23 06:24:06 CEST 2004 - nashif@suse.de
@@ -82,14 +87,14 @@ Thu Oct 14 13:35:33 CEST 2004 - jsrain@suse.cz
 -------------------------------------------------------------------
 Thu Oct 14 13:26:50 CEST 2004 - visnov@suse.de
 
-- Update skeleton version numbers 
+- Update skeleton version numbers
 
 -------------------------------------------------------------------
 Mon Sep 27 14:35:52 CEST 2004 - sh@suse.de
 
 - V 2.10.10
 - (adrian) fixed "find" for *.desktop in create-spec
-- (adrian) fixed "clean" in create-spec (obsolete check) 
+- (adrian) fixed "clean" in create-spec (obsolete check)
 
 -------------------------------------------------------------------
 Mon Sep 27 10:57:35 CEST 2004 - arvin@suse.de

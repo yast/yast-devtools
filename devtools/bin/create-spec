@@ -156,7 +156,7 @@ make install DESTDIR=\"\$RPM_BUILD_ROOT\"
 [ -e \"%{prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK\" ] || Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check DESTDIR=\"\$RPM_BUILD_ROOT\"
 for f in `find \$RPM_BUILD_ROOT/\@desktopdir\@/ -name \"*.desktop\"` ; do
     d=\${f##*/}
-    \%suse_update_desktop_file \${d\%.desktop}
+    \%suse_update_desktop_file -d ycc_\${d\%.desktop} \${d\%.desktop}
 done
 ",
 

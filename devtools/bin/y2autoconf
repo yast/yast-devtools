@@ -76,14 +76,6 @@ VERSION=\"$VERSION\"
 RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
 
-# YAST2DIR is obsolete - don't use it anymore
-YAST2DIR=/usr/lib/YaST2
-# DOCDIR is obsolete - use docdir instead
-DOCDIR=\\\${prefix}/share/doc/packages/\$RPMNAME
-
-AC_SUBST(YAST2DIR)
-AC_SUBST(DOCDIR)
-
 yast2dir=\\\${prefix}/lib/YaST2
 
 ybindir=\\\${prefix}/lib/YaST2/bin
@@ -187,8 +179,6 @@ AM_PROG_LIBTOOL dnl for libraries
 dnl generate the config header
 AM_CONFIG_HEADER(config.h) dnl at the distribution this done
 
-AC_DEFINE_UNQUOTED(YAST2DIR, \"\${YAST2DIR}\", [YAST2DIR])
-
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 
@@ -249,7 +239,7 @@ fi
 
     # check: YCP sources
     "\@YAST2-CHECKS-YCP\@" =>
-"AC_PATH_PROG(YCPDOC, ycpdoc, false, \$PATH:\$YAST2DIR/bin)
+"AC_PATH_PROG(YCPDOC, ycpdoc, false, \$PATH:/usr/lib/YaST2/bin)
 if test \"\$YCPDOC\" = \"false\"; then
     AC_MSG_ERROR([ycpdoc is not installed])
 fi

@@ -1,8 +1,8 @@
 @HEADER-COMMENT@
-# neededforbuild  autoconf automake ycpdoc yast2-testsuite dejagnu expect tcl yast2-base libycp liby2 libyui libscr yast2-core-wfm yast2-core-scr yast2-agent-system libycp-devel yast2-devtools
+# neededforbuild yast2-devel-packages
 
 @HEADER@
-Requires:	yast2 yast2-trans-XXpkgXX yast2-lib-wizard yast2-lib-sequencer
+Requires:	yast2
 BuildArchitectures:	noarch
 
 Summary:	Configuration of XXpkgXX
@@ -21,10 +21,10 @@ configure XXpkgXX.
 
 %files
 %defattr(-,root,root)
-%dir @YAST2DIR@/include/XXpkgXX
-@YAST2DIR@/include/XXpkgXX/*
-@YAST2DIR@/clients/XXpkgXX.ycp
-@YAST2DIR@/clients/XXpkgXX_*.ycp
-@YAST2DIR@/modules/XXPkgXX.ycp
-@YAST2DIR@/menuentries/menuentry_XXpkgXX.y2cc
-%doc @DOCDIR@
+%dir @yncludedir@/XXpkgXX
+@yncludedir@/XXpkgXX/*
+@clientdir@/XXpkgXX.ycp
+@clientdir@/XXpkgXX_*.ycp
+@moduledir@/XXPkgXX.ycp
+@configdir@/XXpkgXX.y2cc
+%doc @docdir@

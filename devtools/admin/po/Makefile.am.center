@@ -10,7 +10,6 @@ EXTRA_DIST = $(POFILES)
 POFILES = $(wildcard *.po)
 MOFILES = $(POFILES:%.po=%.mo)
 POXFILES = $(POFILES:%.po=%.pox)
-YAST2DIR = @YAST2DIR@
 LL = $(shell sed 's:.*-::' ../RPMNAME)
 compendium = @COMPENDIUM@
 
@@ -107,7 +106,6 @@ checkin:
 install-data-local: $(MOFILES)
 	for l in $(MOFILES); do \
           m=$${l/$(LL).mo/mo}; \
-	  localedir=$(DESTDIR)$(YAST2DIR)/locale; \
 	  locale_lang_msg_dir=$$localedir/$(LL)/LC_MESSAGES; \
 	  [ -d $$locale_lang_msg_dir ] \
 	    || install -d -m 755 $$locale_lang_msg_dir; \

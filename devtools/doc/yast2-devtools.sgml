@@ -415,7 +415,7 @@ same content.
 But it is not all, of course :-)
 
 The new feature is, that you can use more 'macros' (than just @RPMNAME@,
-@VERSION@, @MAINTAINER, @YAST2DIR@, @DOCDIR@) in the *.spec.in:
+@VERSION@, @MAINTAINER@) in the *.spec.in:
 
   @HEADER-COMMENT@ - writes the SuSE .spec comment
   @HEADER@         - writes the usual header except BuildArch:,
@@ -450,7 +450,7 @@ configure XXpkgXX.
 @CLEAN@
 
 %files
-%dir @YAST2DIR@/include/XXpkgXX
+%dir @yncludedir@/XXpkgXX
 /...
 ------------------------------------------------------------------
 
@@ -509,17 +509,14 @@ A: - checkout the newest devtools and install them
 	|
 	|%files
 	|%defattr(-,root,root)
-	|%dir @YAST2DIR@/plugin
-	|@YAST2DIR@/plugin/libpy2ag_rcconfig.so.*
-	|%dir @YAST2DIR@/scrconf
-	|@YAST2DIR@/scrconf/*.scr
+	|@plugindir@/libpy2ag_rcconfig.so.*
+	|@scrconfdir@/*.scr
 	|
 	|%files devel
 	|%defattr(-,root,root)
-	|%dir @YAST2DIR@/plugin
-	|@YAST2DIR@/plugin/libpy2ag_rcconfig.so
-	|@YAST2DIR@/plugin/libpy2ag_rcconfig.la
-	|%doc @DOCDIR@
+	|@plugindir@/libpy2ag_rcconfig.so
+	|@plugindir@/libpy2ag_rcconfig.la
+	|%doc @docdir@
      Instead of @BUILD-PROGRAM@ and @INSTALL-PROGRAM@ you may want to use
      the similar @*-YCP@, or @*-PO@.
    - Some packages most probably  do not have a "-devel" package, so you

@@ -20,4 +20,4 @@ Summary:	YaST2 translations for XXpkgXX localization
 
 %files
 %defattr(-,root,root)
-@YAST2DIR@/locale/*/*/*
+@localedir@/*/*/*

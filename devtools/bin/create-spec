@@ -1,7 +1,6 @@
 #! /usr/bin/perl -w
 #####
-#create-spec [-h] [YAST2DIR [DOCDIR [YAST2INC [YAST2DOC]]]] \
-#            < xxx.spec.in > package/xxx.spec
+#create-spec [-h] < xxx.spec.in > package/xxx.spec
 #
 #Create a spec file for YaST2 package
 #
@@ -9,11 +8,6 @@
 #  @RPMNAME@        - reads it from file RPMNAME
 #  @VERSION@        - reads it from file VERSION
 #  @MAINTAINER@     - reads it from file MAINTAINER
-#
-#  @YAST2DIR@       - writes the first parameter of create-spec
-#  @DOCDIR@         - writes the second parameter of create-spec
-#  @YAST2INC@       - writes the third parameter of create-spec
-#  @YAST2DOC@       - writes the fourth parameter of create-spec
 #
 #  @HEADER-COMMENT@ - writes the SuSE .spec comment
 #  @HEADER@         - writes the usual header except BuildArch:,
@@ -47,17 +41,9 @@ if ($VERSION eq "" || $RPMNAME eq "" || $MAINTAINER eq "")
 }
 
 # Default values
-$YAST2DIR = "/usr/lib/YaST2";
-$DOCDIR = "/usr/share/doc/packages/$RPMNAME";
-$YAST2INC = "/usr/include/YaST2";
-$YAST2DOC = "/usr/share/doc/packages/$RPMNAME";
+$yast2dir = "/usr/lib/YaST2";
 
-# Import the parameters
-($YAST2DIR, $DOCDIR, $YAST2INC, $YAST2DOC) = @ARGV if ($#ARGV == 3);
-($YAST2DIR, $DOCDIR, $YAST2INC) = @ARGV            if ($#ARGV == 2);
-($YAST2DIR, $DOCDIR) = @ARGV                       if ($#ARGV == 1);
-($YAST2DIR) = @ARGV                                if ($#ARGV == 0);
-if ($#ARGV > 3 || $YAST2DIR eq "-h" || $YAST2DIR eq "--help")
+if ($#ARGV > 0)
 {
     # Isn't the following too anti-perl? :-)
     my $message = `sed -e '/^#####/,/^#####/!d' -e 's/^#*//' $0`;
@@ -72,14 +58,6 @@ if ($#ARGV > 3 || $YAST2DIR eq "-h" || $YAST2DIR eq "--help")
     "\@VERSION\@" => "$VERSION",
 
     "\@MAINTAINER\@" => "$MAINTAINER",
-
-    "\@YAST2DIR\@" => "$YAST2DIR",
-
-    "\@DOCDIR\@" => "$DOCDIR",
-
-    "\@YAST2INC\@" => "$YAST2INC",
-
-    "\@YAST2DOC\@" => "$YAST2DOC",
 
     "\@HEADER-COMMENT\@" =>
 "#
@@ -201,7 +179,7 @@ make",
 [ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
 make install-strip DESTDIR=\"\$RPM_BUILD_ROOT\"
 for f in `find \$RPM_BUILD_ROOT -name \"lib*.so.*.*\"` ; do strip --strip-debug \$f ; done
-Y2DIR=\"\$RPM_BUILD_ROOT$YAST2DIR\" make check",
+Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check",
 
     "\@INSTALL-PROGRAM\@" =>
 "\%install
@@ -223,7 +201,7 @@ make install DESTDIR=\"\$RPM_BUILD_ROOT\"",
 "\%install
 [ \"\$RPM_BUILD_ROOT\" -a \"\$RPM_BUILD_ROOT\" != \"/\" ] && rm -rf \"\$RPM_BUILD_ROOT\"
 make install DESTDIR=\"\$RPM_BUILD_ROOT\"
-Y2DIR=\"\$RPM_BUILD_ROOT$YAST2DIR\" make check",
+Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check",
 
 ##### CLEAN #####
 

@@ -197,9 +197,7 @@ map_elements:
 
 term:
 	QUOTED_SYMBOL '(' tuple_elements ')' { XML; }
-|	UI other_builtin { XML; }
-|	SCR other_builtin { XML; }
-|	WFM other_builtin { XML; }
+|	special_namespace other_builtin { XML; }
 |	identifier '(' tuple_elements ')' { XML; }
 |	I18N YCP_STRING ',' YCP_STRING ',' expression ')' { XML; }
 |	I18N YCP_STRING ')' { XML; }
@@ -211,12 +209,14 @@ term:
 /* -------------------------------------------------------------- */
 /* after UI, SCR, or WFM */
 
+special_namespace:
+	UI
+|	SCR
+|	WFM
+;
+
 other_builtin:
-	DCOLON SYMBOL { XML; }
-|	DCOLON SYMBOL '(' tuple_elements ')' { XML; }
-|	DCOLON SYMBOL DCOLON SYMBOL { XML; }
-|	DCOLON SYMBOL DCOLON SYMBOL '(' tuple_elements ')' { XML; }
-|	DCOLON quoted_block { XML; }
+	DCOLON quoted_block { XML; }
 |	DCOLON block { XML; } /* another syntactic sugar, sigh */
 |	'(' expression ')' { XML; }
 ;
@@ -226,6 +226,7 @@ other_builtin:
 
 identifier:
 	SYMBOL DCOLON SYMBOL { XML; }
+|	special_namespace DCOLON SYMBOL { XML; }
 |	DCOLON SYMBOL { XML; }
 |	SYMBOL { XML; }
 ;

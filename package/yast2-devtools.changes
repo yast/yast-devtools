@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 14 13:35:33 CEST 2004 - jsrain@suse.cz
+
+- added missing AC_SUBST(ystartupdir) to yěautoconf
+- updated neededforbuild due to changed dependencies of docbook
+
+-------------------------------------------------------------------
 Thu Oct 14 13:26:50 CEST 2004 - visnov@suse.de
 
 - Update skeleton version numbers 

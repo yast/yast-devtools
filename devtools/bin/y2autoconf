@@ -110,6 +110,7 @@ AC_SUBST(MAINTAINER)
 AC_SUBST(yast2dir)
 
 AC_SUBST(ybindir)
+AC_SUBST(ystartupdir)
 AC_SUBST(plugindir)
 AC_SUBST(includedir)
 AC_SUBST(potdir)

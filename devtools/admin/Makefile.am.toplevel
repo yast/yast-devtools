@@ -50,7 +50,7 @@ MAINTAINERCLEANFILES = package/$(RPMNAME)-$(VERSION).tar.bz2 package/$(RPMNAME).
 
 # all the .ycp and .pm files, we should separate texts from (exclude testsuite directory)
 POT_SRC = $(shell find $(srcdir) -type d -name testsuite -prune , \
-	-type f -name "*.ycp" -o -name "*.pm" | xargs grep -l '^<?[[:space:]]*[Tt]extdomain>?') \
+	-type f -name "*.ycp" -o -name "*.pm" | xargs egrep -l '^<?[[:space:]]*[Tt]extdomain>?') \
 	$(POTFILES)
 
 # all the textdomains for .pot creation

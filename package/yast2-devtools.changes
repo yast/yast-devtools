@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Mar  8 16:17:23 CET 2004 - mvidner@suse.cz
+
+- fixed 'make pot' when POTFILES is empty
+
+-------------------------------------------------------------------
 Fri Mar  5 12:55:56 CET 2004 - lnussel@suse.de
 
 - add package y2pmsh 

@@ -26,7 +26,7 @@ include "XXpkgXX/routines.ycp";
 global define symbol Configure1Dialog () ``{
 
     /* XXPkgXX configure1 dialog caption */
-    string caption = _("XXPkgXX configuration");
+    string caption = _("XXPkgXX Configuration");
 
     /* XXPkgXX configure1 dialog contents */
     term contents = `Label (_("First part of configuration of XXpkgXX"));
@@ -63,7 +63,7 @@ global define symbol Configure1Dialog () ``{
 global define symbol Configure2Dialog () ``{
 
     /* XXPkgXX configure2 dialog caption */
-    string caption = _("XXPkgXX configuration");
+    string caption = _("XXPkgXX Configuration");
 
     /* XXPkgXX configure2 dialog contents */
     term contents = `Label (_("Second part of configuration of XXpkgXX"));

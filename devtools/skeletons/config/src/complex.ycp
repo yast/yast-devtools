@@ -58,7 +58,7 @@ global define symbol WriteDialog() ``{
 global define symbol SummaryDialog() ``{
 
     /* XXPkgXX summary dialog caption */
-    string caption = _("XXPkgXX configuration");
+    string caption = _("XXPkgXX Configuration");
 
     /* FIXME */
     list summary = XXPkgXX::Summary();
@@ -66,7 +66,7 @@ global define symbol SummaryDialog() ``{
     string configured = summary[0]:"";
 
     /* Frame label */
-    term contents = Wizard_hw::DetectedContent(_("XXPkgXX to configure"),
+    term contents = Wizard_hw::DetectedContent(_("XXPkgXX to Configure"),
 	    unconfigured, false, configured);
 
     Wizard::SetContentsButtons(caption, contents, HELPS["summary"]:"",
@@ -118,7 +118,7 @@ global define symbol SummaryDialog() ``{
 global define symbol OverviewDialog() ``{
 
     /* XXPkgXX overview dialog caption */
-    string caption = _("XXPkgXX overview");
+    string caption = _("XXPkgXX Overview");
 
     list overview = XXPkgXX::Overview();
 

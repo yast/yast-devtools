@@ -47,9 +47,9 @@ global define symbol XXPkgXXSequence() ``{
     ];
 
     /* Initialization dialog caption */
-    string caption = _("XXPkgXX configuration");
+    string caption = _("XXPkgXX Configuration");
     /* Initialization dialog contents */
-    term contents = `Label(_("Initializing ..."));
+    term contents = `Label(_("Initializing..."));
 
     Wizard::CreateDialog();
     Wizard::SetContentsButtons(caption, contents, "",
@@ -68,9 +68,9 @@ global define symbol XXPkgXXSequence() ``{
  */
 global define symbol XXPkgXXAutoSequence() ``{
     /* Initialization dialog caption */
-    string caption = _("XXPkgXX configuration");
+    string caption = _("XXPkgXX Configuration");
     /* Initialization dialog contents */
-    term contents = `Label(_("Initializing ..."));
+    term contents = `Label(_("Initializing..."));
 
     Wizard::CreateDialog();
     Wizard::SetContentsButtons(caption, contents, "",

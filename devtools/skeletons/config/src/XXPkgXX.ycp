@@ -71,7 +71,7 @@ global define boolean Modified() ``{
 global define boolean Read() ``{
 
     /* XXPkgXX read dialog caption */
-    string caption = _("Initializing XXpkgXX configuration");
+    string caption = _("Initializing XXpkgXX Configuration");
 
     // TODO FIXME Set the right number of stages
     integer steps = 4;
@@ -105,28 +105,28 @@ global define boolean Read() ``{
     if(Abort()) return false;
     Progress::NextStage();
     // translators: error message
-    if(false) Report::Error(_("Cannot read the database1!"));
+    if(false) Report::Error(_("Cannot read the database1."));
     sleep(sl);
 
     // read another database
     if(Abort()) return false;
     Progress::NextStep();
     // translators: error message
-    if(false) Report::Error(_("Cannot read the database2"));
+    if(false) Report::Error(_("Cannot read the database2."));
     sleep(sl);
 
     // read current settings
     if(Abort()) return false;
     Progress::NextStage();
     // translators: error message
-    if(false) Report::Error(_("Cannot read current settings!"));
+    if(false) Report::Error(_("Cannot read current settings."));
     sleep(sl);
 
     // detect devices
     if(Abort()) return false;
     Progress::NextStage();
     // translators: error message
-    if(false) Report::Warning(_("Cannot detect device"));
+    if(false) Report::Warning(_("Cannot detect devices."));
     sleep(sl);
 
     if(Abort()) return false;
@@ -146,7 +146,7 @@ global define boolean Read() ``{
 global define boolean Write() ``{
 
     /* XXPkgXX read dialog caption */
-    string caption = _("Saving XXpkgXX configuration");
+    string caption = _("Saving XXpkgXX Configuration");
 
     // TODO FIXME And set the right number of stages
     integer steps = 2;
@@ -176,14 +176,14 @@ global define boolean Write() ``{
     if(Abort()) return false;
     Progress::NextStage();
     // translators: error message
-    if(false) Report::Error (_("Cannot write settings!"));
+    if(false) Report::Error (_("Cannot write settings."));
     sleep(sl);
 
     // run SuSEconfig
     if(Abort()) return false;
     Progress::NextStage ();
     // translators: error message
-    if(false) Report::Error (_("SuSEconfig script failed!"));
+    if(false) Report::Error (_("SuSEconfig script failed."));
     sleep(sl);
 
     if(Abort()) return false;

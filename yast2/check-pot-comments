@@ -1,0 +1,21 @@
+#! /usr/bin/perl -w
+# report translatable strings that do not have a comment for the translator
+# mvidner@suse.cz, 2002-07-29
+# usage: cd source/foo; $0 foo.pot
+
+$/ = "";			# empty lines as separators
+<>;				# skip the initial comment
+
+while (<>)
+{
+    # look for "#." at the beginning of a line
+    if (! m/^\#\./m)
+    {
+	# if there is location information, output it in emacs error format
+	while (m/^\#\: (.*)$/mg)
+	{
+	    (my $pos = $1) =~ s/\s/:\n/g;
+	    print "$pos:\n";
+	}
+    }
+}

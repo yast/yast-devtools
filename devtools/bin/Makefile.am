@@ -15,6 +15,7 @@ pkgdata_SCRIPTS = 				\
 	for-proofread				\
 	get-lib					\
 	kill-leftover-stuff			\
+	rny2rnc					\
 	tagversion 				\
 	version					\
 	y2autoconf 				\

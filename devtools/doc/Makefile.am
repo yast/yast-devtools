@@ -10,7 +10,7 @@ htmldir	= $(docdir)/html
 sgml_DATA =	\
 	yast2-devtools.sgml
 
-html_DATA =					\
+ghtml_DATA =					\
 	index.html				\
 	yast2-devtools.html			\
 	yast2-devtools-1.html			\
@@ -23,13 +23,17 @@ html_DATA =					\
 	yast2-devtools-8.html			\
 	yast2-devtools-9.html
 
-
-$(html_DATA): $(sgml_DATA)
+$(ghtml_DATA): $(sgml_DATA)
 	$(SGML2HTML) $^
 	ln -sf yast2-devtools.html index.html
 
 
-html: $(html_DATA)
+nhtml_DATA = \
+	rny2rnc.html 
+
+html_DATA = $(ghtml_DATA) $(nhtml_DATA)
+
+html: $(ghtml_DATA)
 
 
 text:
@@ -45,11 +49,11 @@ ps: latex
 	dvips yast2-devtools.dvi
 
 
-EXTRA_DIST = $(sgml_DATA)
+EXTRA_DIST = $(sgml_DATA) $(nhtml_DATA)
 # Intentionally omitting generated $(html_DATA)
 
 
-CLEANFILES = $(html_DATA) 			\
+CLEANFILES = $(ghtml_DATA) 			\
 	yast2-devtools.dvi			\
 	yast2-devtools.ps			\
 	yast2-devtools.txt			\

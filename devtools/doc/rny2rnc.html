@@ -1,0 +1,75 @@
+<title>How to write schema files for autoyast</title>
+<h1>How to write schema files for autoyast</h1>
+
+<small>Martin Vidner, mvidner@suse.cz</small>
+
+<p>RNY, which stands for Relax NG for YaST, is a slight modification of the
+<a href="http://relaxng.org/compact-tutorial-20030326.html">compact syntax</a>
+of the <a href="http://relaxng.org/">Relax NG</a> schema language.</p>
+
+<p>You should understand it from the following example.
+It should roughly remind you of C structs.</p>
+
+<pre># the syntax is Relax NG for YaST, RNY
+
+nis_domain =
+  STRING  nis_domain
+
+nis_servers = 
+  LIST nis_servers {
+    STRING nis_server*
+  }
+
+nis_broadcast =
+  BOOLEAN nis_broadcast
+
+nis =
+  MAP nis {
+    BOOLEAN start_nis? &
+    BOOLEAN nis_by_dhcp? &
+    nis_domain? &		# may be set by dhcp
+    nis_servers? &
+    nis_broadcast? &
+    LIST nis_other_domains {
+      MAP nis_other_domain {
+        nis_domain &		# here it is mandatory
+        nis_servers? &
+        nis_broadcast?
+      }*
+    }? &
+    BOOLEAN nis_broken_server? &
+    BOOLEAN nis_local_only? &
+    STRING nis_options? &
+
+    BOOLEAN start_autofs?
+  }
+</pre>
+
+<p>
+Simple data types: BOOLEAN, INTEGER, STRING, SYMBOL.
+Complex data types: LIST, MAP.
+</p>
+
+<h3>LIST</h3>
+<p>
+The initial line must have the form "LIST <i>name</i> {". The brace must be on
+the same line as LIST and only a comment can follow it.
+</p>
+
+<p>
+You can specify whether the list can be empty or not by using <b>*</b> or <b>+</b>:
+</p>
+<pre>LIST can_be_empty {
+  STRING item*
+}
+LIST cannot_be_empty {
+  STRING item+
+}
+</pre>
+
+<h3>MAP</h3>
+Join the members of the map by <b>&amp;</b>.
+Mark optional members by <b>?</b>.
+
+<h3>More info</h3>
+<p>How to name the file, how to install it, test it...</p>

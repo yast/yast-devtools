@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 14 12:58:38 CEST 2004 - mvidner@suse.cz
+
+- Convertor from Relax NG for YaST to Relax NG Compact
+- 2.10.6
+
+-------------------------------------------------------------------
 Mon Sep 13 15:46:21 CEST 2004 - arvin@suse.de
 
 - use option tar-ustar to allow "long" filenames in tar-balls
@@ -6,7 +12,7 @@ Mon Sep 13 15:46:21 CEST 2004 - arvin@suse.de
 -------------------------------------------------------------------
 Mon Sep 13 02:12:23 CEST 2004 - nashif@suse.de
 
-- ycodoc: parameters in xml output are lists, every parameter
+- ycpdoc: parameters in xml output are lists, every parameter
   description appears as an item
 - added ycpdoc.xsl for generating docbook refentries from ycpdoc
   xml output

@@ -1,0 +1,26 @@
+#! /bin/sh
+# $Id$
+# mvidner@suse.cz
+# Convert from Relax NG for YaST to Relax NG Compact
+# The substituted uppercase words are defined in common.rnc
+# See also ../doc/rny2rnc.html
+# GNU sed needed
+s='[[:space:]]\+'
+id1='\([^[:space:]?*+&,]\+\)'
+el1='element \1'
+sed "
+# if any substitution succeeds, append a line containing '    LIST,'
+# so this must be the first substitution specified
+s/LIST$s$id1/$el1/
+T nolist
+a \\
+    LIST,
+: nolist
+
+s/MAP$s$id1/$el1/
+
+s/BOOLEAN$s$id1/$el1 { BOOLEAN }/
+s/INTEGER$s$id1/$el1 { INTEGER }/
+s/SYMBOL$s$id1/$el1 { SYMBOL }/
+s/STRING$s$id1/$el1 { text }/
+" "$@"

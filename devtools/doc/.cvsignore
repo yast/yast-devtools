@@ -1,6 +1,6 @@
 Makefile
 Makefile.in
-*.html
+yast2-devtools*.html
 *.dvi
 *.txt
 *.ps

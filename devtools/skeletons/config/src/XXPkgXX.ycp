@@ -97,25 +97,25 @@ global define boolean Read() ``{
     // read database
     if(Abort()) return false;
     Progress::NextStage();
-    if(false) Report::Error(_("Can not read the database1!"));
+    if(false) Report::Error(_("Cannot read the database1!"));
     sleep(sl);
 
     // read another database
     if(Abort()) return false;
     Progress::NextStep();
-    if(false) Report::Error(_("Can not read the database2"));
+    if(false) Report::Error(_("Cannot read the database2"));
     sleep(sl);
 
     // read current settings
     if(Abort()) return false;
     Progress::NextStage();
-    if(false) Report::Error(_("Can not read current settings!"));
+    if(false) Report::Error(_("Cannot read current settings!"));
     sleep(sl);
 
     // detect devices
     if(Abort()) return false;
     Progress::NextStage();
-    if(false) Report::Warning(_("Can not detect device"));
+    if(false) Report::Warning(_("Cannot detect device"));
     sleep(sl);
 
     if(Abort()) return false;
@@ -158,7 +158,7 @@ global define boolean Write() ``{
     // write settings
     if(Abort()) return false;
     Progress::NextStage();
-    if(false) Report::Error (_("Can not write settings!"));
+    if(false) Report::Error (_("Cannot write settings!"));
     sleep(sl);
 
     // run SuSEconfig

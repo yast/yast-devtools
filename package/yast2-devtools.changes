@@ -1,9 +1,10 @@
 -------------------------------------------------------------------
-Fri Apr  2 14:30:05 CEST 2004 - sh@suse.de
+Fri Apr  2 16:28:01 CEST 2004 - mvidner@suse.cz
 
 - Changed default license to GPL
   Packages with YaST license now need a file YAST_LICENSE
   in their package toplevel directory to indicate that 
+- 2.9.18
 
 -------------------------------------------------------------------
 Mon Mar 29 18:14:45 CEST 2004 - sh@suse.de

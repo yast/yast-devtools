@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  3 16:05:01 CET 2003 - msvec@suse.cz
+
+- generate pot file during make package and include it in tar.bz2
+- 2.7.3
+
+-------------------------------------------------------------------
 Fri Jan 17 15:17:57 CET 2003 - arvin@suse.de
 
 - added sanity check for make package (bug #21578)

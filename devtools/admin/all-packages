@@ -96,7 +96,7 @@ yast2-storage		inst-sys,default	storage
 yast2-support		default			support
 yast2-sysconfig		default			sysconfig editor
 yast2-tftp-server	default			TFTP server
-yast2-tune		default			hardware info and tune
+yast2-tune		inst-sys,default	hardware info and tune
 yast2-tv		default			TV card
 yast2-users		default			users
 yast2-x11		default			runtime x11

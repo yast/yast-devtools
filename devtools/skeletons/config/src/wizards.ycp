@@ -13,8 +13,6 @@ textdomain "XXpkgXX";
 
 import "Wizard";
 
-include "ui/common_popups.ycp";
-include "ui/common_messages.ycp";
 include "wizard/sequencer.ycp";
 
 include "XXpkgXX/complex.ycp";
@@ -53,7 +51,7 @@ global define symbol XXPkgXXSequence() ``{
 
     Wizard::CreateDialog();
     Wizard::SetContentsButtons(caption, contents, "",
-	    BackButtonLabel(), NextButtonLabel());
+	    Label::BackButton(), Label::NextButton());
 
     any ret = WizardSequencer(aliases, sequence);
 
@@ -72,7 +70,7 @@ global define symbol XXPkgXXAutoSequence() ``{
 
     Wizard::CreateDialog();
     Wizard::SetContentsButtons(caption, contents, "",
-	    BackButtonLabel(), NextButtonLabel());
+	    Label::BackButton(), Label::NextButton());
 
     any ret = MainSequence();
 

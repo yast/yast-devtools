@@ -14,8 +14,7 @@ textdomain "XXpkgXX";
 import "XXPkgXX";
 import "Wizard";
 
-include "ui/common_popups.ycp";
-include "ui/common_messages.ycp";
+import "Label";
 
 include "XXpkgXX/helps.ycp";
 include "XXpkgXX/routines.ycp";
@@ -33,7 +32,7 @@ global define symbol Configure1Dialog () ``{
     term contents = `Label (_("First part of configuration of XXpkgXX"));
 
     Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
-	    BackButtonLabel(), NextButtonLabel());
+	    Label::BackButton(), Label::NextButton());
 
     any ret = nil;
     while(true) {
@@ -70,7 +69,7 @@ global define symbol Configure2Dialog () ``{
     term contents = `Label (_("Second part of configuration of XXpkgXX"));
 
     Wizard::SetContentsButtons(caption, contents, HELPS["c2"]:"",
-	    BackButtonLabel(), NextButtonLabel());
+	    Label::BackButton(), Label::NextButton());
 
     any ret = nil;
     while(true) {

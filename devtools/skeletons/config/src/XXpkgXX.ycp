@@ -17,6 +17,25 @@
 
 textdomain "XXpkgXX";
 
+include "commandline/commandline.ycp";
+
+map cmdline_description = $[
+    "id" 	: "XXpkgXX",
+    "help"	: _("Configuration of XXpkgXX"),
+    "guihandler"        : ``(XXPkgXXSequence()),
+    "initialize"        : ``(XXPkgXX::Read()),
+    "finish"            : ``(XXPkgXX::Write()),
+    "actions"           : $[
+	// FIXME TODO: fill the functionality description here
+    ],
+    "options"		: $[
+	// FIXME TODO: fill the option descriptions here
+    ],
+    "mapping"		: $[
+	// FIXME TODO: fill the mappings of actions and options here
+    ]
+];
+
 /* The main () */
 y2milestone ("----------------------------------------");
 y2milestone ("XXPkgXX module started");
@@ -31,15 +50,13 @@ if(size(args) > 0) {
         y2milestone("Using PROPOSE mode");
         propose = true;
     }
-    else
-        y2error("Bad argument for XXpkgXX: %1", WFM::Args(0));
 }
 
 /* main ui function */
 any ret = nil;
 
 if(propose) ret = XXPkgXXAutoSequence();
-else ret = XXPkgXXSequence();
+else ret = CommandLineRun(cmdline_description);
 y2debug("ret=%1", ret);
 
 /* Finish */

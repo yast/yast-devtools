@@ -16,8 +16,7 @@ import "Wizard_hw";
 
 import "XXPkgXX";
 
-include "ui/common_popups.ycp";
-include "ui/common_messages.ycp";
+import "Label";
 
 include "XXpkgXX/helps.ycp";
 include "XXpkgXX/routines.ycp";
@@ -71,7 +70,7 @@ global define symbol SummaryDialog() ``{
 	    unconfigured, false, configured);
 
     Wizard::SetContentsButtons(caption, contents, HELPS["summary"]:"",
-	    BackButtonLabel(), FinishButtonLabel());
+	    Label::BackButton(), Label::FinishButton());
 
     any ret = nil;
     while(true) {
@@ -132,7 +131,7 @@ global define symbol OverviewDialog() ``{
     contents = Wizard_hw::SpacingAround(contents, 1.5, 1.5, 1.0, 1.0);
 
     Wizard::SetContentsButtons(caption, contents, HELPS["overview"]:"",
-	    BackButtonLabel(), FinishButtonLabel());
+	    Label::BackButton(), Label::FinishButton());
 
     any ret = nil;
     while(true) {

@@ -13,10 +13,10 @@ include_DATA =			\
 	misc.ycp		\
 	ui.ycp
 
-menu_DATA =			\
-	menuentry_XXpkgXX.y2cc
+condig_DATA =			\
+	XXpkgXX.y2cc
 
 modules_DATA =			\
 	XXPkgXX.ycp
 
-EXTRA_DIST = $(clients_DATA) $(include_DATA) $(menu_DATA) $(modules_DATA)
+EXTRA_DIST = $(clients_DATA) $(include_DATA) $(config_DATA) $(modules_DATA)

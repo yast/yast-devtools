@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Nov 18 12:49:24 CET 2003 - mvidner@suse.cz
+
+- Fixed a problem with escaped newlines in ydoxygen, really.
+
+-------------------------------------------------------------------
 Thu Nov 13 18:37:16 CET 2003 - mvidner@suse.cz
 
 - ycpdoc can now parse the angle-bracket syntax list<string>, block<string>.

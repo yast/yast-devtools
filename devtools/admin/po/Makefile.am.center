@@ -1,6 +1,6 @@
 # Emacs: -*- makefile -*-
 
-LL = $(shell sed 's:.*-::' ../RPMNAME)
+LL = @LL@
 POTDIR = ../../pot/pot
 POTFILES = $(wildcard $(POTDIR)/*.pot)
 GENERATED = $(MOFILES)

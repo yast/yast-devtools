@@ -16,7 +16,9 @@
 #  @PREP@		- writes %prep with %setup
 #  @BUILD@		- writes %build with usual make
 #  @BUILD-QT@		- writes %build with usual make for qt stuff
+#  @BUILD-PO@		- writes %build with special make for translations
 #  @INSTALL@		- writes %install with usual make install and make check
+#  @INSTALL-PO@		- writes %install with special make install for translations
 #  @CLEAN@		- writes %clean with removing RPM_BUILD_ROOT
 #####
 # Author: Jan Holesovsky <kendy@suse.cz>, 2001

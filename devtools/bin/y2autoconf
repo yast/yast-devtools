@@ -1,5 +1,5 @@
 #! /usr/bin/perl -w
-#####
+my $message = << 'END';
 #y2autoconf [-h|--help]
 #
 #Create YaST2 configure.in from configure.in.in
@@ -22,7 +22,7 @@
 #  @YAST2-CHECKS-TESTSUITE@ - Checks for expect and dejagnu
 #
 #  @YAST2-OUTPUT@           - Creates list of Makefiles to be generated
-#####
+END
 #Authors:
 #  Jan Holesovsky <kendy@suse.cz>, 2001
 #  Michal Svec <msvec@suse.cz>
@@ -31,9 +31,8 @@
 
 if ($#ARGV >= 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help"))
 {
-    # Isn't the following too anti-perl? :-)
-    my $message = `sed -e '/^#####/,/^#####/!d' -e 's/^#*//' $0`;
-    die "$message";
+    $message =~ s/^#//gm;	# there used to be sed here
+    die $message;
 }
 
 $RPMNAME = `cat RPMNAME`;
@@ -78,6 +77,8 @@ VERSION=\"$VERSION\"
 RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
 ". '
+dnl pkgconfig honors lib64
+pkgconfigdir=\${libdir}/pkgconfig
 yast2dir=\${prefix}/share/YaST2
 
 ybindir=\${prefix}/lib/YaST2/bin
@@ -105,6 +106,8 @@ desktopdir=\${prefix}/share/applications/YaST2
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
 AC_SUBST(MAINTAINER)
+
+AC_SUBST(pkgconfigdir)
 
 AC_SUBST(yast2dir)
 

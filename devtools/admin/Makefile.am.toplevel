@@ -74,10 +74,13 @@ POT_DOMAINS = \
 # the names of the actual .pot files
 POT_DST = $(addprefix $(srcdir)/,$(addsuffix .pot,$(POT_DOMAINS)))
 
+pkgconfig_DATA = $RPMNAME.pc
+
 EXTRA_DIST = \
 	VERSION RPMNAME MAINTAINER configure.in.in		\
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
 	$(Y2TEXTDOMAIN_FILE) $(POTFILES_FILE)			\
+	$(RPMNAME).pc.in					\
 	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))
 
 show-extra-dist:
@@ -189,7 +192,6 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 package: check-cvs-up-to-date check-tagversion check-all-packages package-local
 
 TAGVERSION	 = $(PREFIX)/bin/y2tool tagversion
-CHECKIN_BASE_DIR = /work/src/done
 
 check-cvs-up-to-date:
 	cd $(srcdir) && ! cvs -q -n up 2>/dev/null | grep '^[MCAR] '

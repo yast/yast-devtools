@@ -26,6 +26,33 @@ AC_PATH_PROG(SGML2TXT,   sgml2txt,   false)
 AC_PATH_PROG(SGML2INFO,  sgml2info,  false)
 AC_PATH_PROG(SGML2LATEX, sgml2latex, false)
 
+# perl checks
+AC_CHECK_PROG(PERL, perl, perl, no)
+
+AC_DEFUN([CHECK_PERL_MODULE],[
+AC_MSG_CHECKING([for perl module $1])
+TMPFILE=conftest.pl
+rm -f $TMPFILE
+cat >$TMPFILE <<'EOT'
+use $1;
+EOT
+$PERL $TMPFILE 2> /dev/null
+if test $? -eq 0 ; then
+    $2="true"
+    AC_MSG_RESULT(found)
+else
+    $2="false"
+    AC_MSG_RESULT(not found)
+fi
+rm -f $TMPFILE
+])
+
+CHECK_PERL_MODULE(XML::Writer, XMLWRITER)
+if test "$XMLWRITER" = "false"; then
+	AC_MSG_ERROR([perl xml writer not installed])
+	exit
+fi
+
 ## and generate the output
 AC_OUTPUT(devtools/bin/version)
 @YAST2-OUTPUT@

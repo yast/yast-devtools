@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Mar 06 17:04:21 CET 2003 - arvin@suse.de
+
+- added configure test for perl xml writer (bug #24429)
+
+-------------------------------------------------------------------
 Fri Feb 21 17:53:56 CET 2003 - mvidner@suse.de
 
 - ycpdoc:

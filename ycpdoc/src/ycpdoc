@@ -112,6 +112,7 @@ use Getopt::Long;
 use Pod::Usage;
 use XML::Writer;
 use Tie::Hash;
+use Tie::Array;
 
 sub main
 {
@@ -318,6 +319,7 @@ sub parse_file ($)
 
     my $f = {};
     $f->{"requires"} = [];
+    tie @{$f->{"provides"}}, "provides";
 
     my @header_lines = ();	# list of header lines (first /** */)
 
@@ -1171,11 +1173,27 @@ sub dump_data
     }
     elsif (ref ($node) eq "ARRAY")
     {
+	my $t = tied(@{$node});
 	foreach (@{$node})
 	{
-	    $writer->startTag ("ITEM")	if (!ref ($_));
+	    my $end = 1;
+	    if (defined ($t))
+	    {
+		$writer->startTag (ref ($t)."_item");
+	    }
+	    elsif (!ref ($_))
+	    {
+		$writer->startTag ("ITEM");
+	    }
+	    else
+	    {
+		$end = 0;
+	    }
 	    dump_data ($_);
-	    $writer->endTag ()		if (!ref ($_));
+	    if ($end)
+	    {
+		$writer->endTag ();
+	    }
 	}
     }
     elsif (ref ($node) eq "HASH")
@@ -1203,6 +1221,9 @@ sub dump_data
 
 package file;
 @file::ISA = ("Tie::StdHash");
+
+package provides;
+@provides::ISA = ("Tie::StdArray");
 
 package main;
 main ();

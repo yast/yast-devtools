@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 01 15:27:49 CEST 2003 - arvin@suse.de
+
+- added support for handling desktop files
+
+-------------------------------------------------------------------
 Fri Aug  1 12:30:37 CEST 2003 - mvidner@suse.cz
 
 - ycpdoc: don't expose perl-internal hash ordering (fixes build).

@@ -22,12 +22,13 @@
   <xsl:param name="draft.mode" select="'no'"></xsl:param>
   <xsl:param name="draft.watermark.image" select="'images/draft.png'"></xsl:param>
   -->
-<xsl:param name="shade.verbatim" select="1"/>
+  <!-- deprecated
 <xsl:attribute-set name="shade.verbatim.style">
   <xsl:attribute name="border">0</xsl:attribute>
   <xsl:attribute name="width">100%</xsl:attribute>
   <xsl:attribute name="bgcolor">#E0E0E0</xsl:attribute>
 </xsl:attribute-set>
+-->
 
   <xsl:param name="navig.showtitles">1</xsl:param>
   <xsl:param name="html.extra.head.links" select="1"></xsl:param>

@@ -189,7 +189,7 @@ check-tagversion:
 	@cd $(srcdir) && cvs -q up -p -r `$(TAGVERSION) -n` VERSION >/dev/null || ( echo "ERROR: Please run 'tagversion' first"; false )
 
 check-parse:
-	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "libycp" ]; then	\
+	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "yast2-core" ]; then	\
 		parseycp -q -R;	\
 	fi
 

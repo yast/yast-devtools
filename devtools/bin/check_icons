@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+#
+# File:		check_icons.pl
+# Summary:	Check whether all icons included in *.desktop files
+#               are available in three different sizes
+# Author:	Holger Macht <hmacht@suse.de>
+#
+# Call this from your toplevel yast2/source CVS or Subversion working directory.
+# a ./check_icons.pl | grep missing gives you a list with missing icons
+
+use strict;
+use Getopt::Long;
+
+# 
+# set global variables and paths
+#
+
+# the path to the icons. It consists of the prefix, the size and the suffix
+# one complete path could look like this:
+# $basepath/$icondir_prefix/22x22/$icondir_suffix
+my $icondir_prefix = './theme/SuSELinux/icons';
+my @icon_sizes = ( '22x22', '32x32', '48x48' );
+my $icondir_suffix = 'apps';
+
+# the svn/yast base path
+my $basepath = '.';
+
+my $help = 0;
+
+# check if basepath is given
+my $result = GetOptions( "basepath=s"   => \$basepath,
+			 "help"         => \$help );
+
+if ( $help == 1) {
+    print "Options:\n";
+    print "--basepath <path> \t Specify the yast/svn/trunk base path\n";
+    exit 0;
+}
+
+# check whether we are in the yast base path
+if ( ! -d "$basepath/$icondir_prefix/$icon_sizes[0]/$icondir_suffix" ) {
+    print "Could not find icon directories. Please specify yast base path\n";
+    print "with --basepath <path>\n";
+    print "Default is $basepath/\n";
+    exit 1;
+}
+
+
+#
+# prepare files to check
+#
+
+# find all desktop files under the current directory
+open(FIND, "find $basepath -name *.desktop | xargs grep Icon= |");
+my @items = <FIND>;
+close(FIND);
+
+foreach my $item (@items) {
+    # remove the trailing \n
+    chop($item);
+    # append the icon suffix (e.g. .png) to the filename
+    $item .= '.png';
+}
+my @icons  = ();
+    
+foreach my $item (@items) {
+    my %hash;
+    
+    # split the found desktopfiles and their Icon= entries
+    my @parts = split(/:/, $item);
+    $hash{desktopfile} = $parts[0];
+    $hash{icon} = $parts[1];
+    $hash{icon} =~ s/^Icon=//;
+    
+    push(@icons, \%hash);
+}
+
+
+#
+# now check all desktop files
+#
+
+# counter for available and missing icons
+my $success = 0;
+my $failed = 0;
+
+# iterate over the list of icon-entries in the desktop files
+# and search for their corresponding icon file
+foreach my $item (@icons) {
+    print "Checking $item->{desktopfile}\n";
+    
+    # check all icon sizes
+    foreach my $size (@icon_sizes) {
+	print "icon: $item->{icon} , size $size... ";
+	
+	# is the icon present?
+	if ( -e "$basepath/$icondir_prefix/$size/$icondir_suffix/$item->{icon}" ) {
+	    print "OK\n";
+	    $success++;
+	}
+	# found icon
+	else {
+	    print "missing\n";
+	    $failed++;
+	}
+    }
+    
+    print "--------------------------\n";
+}
+    
+
+
+#
+# print summary of check
+#
+my $total = $success + $failed;
+my $nr_of_desktopfiles = @icons;
+
+print "\n";
+print "Checked $total icons in $nr_of_desktopfiles desktop files\n";
+print "Success: $success\n";
+print "Failed: $failed\n";
+print "\n";
+
+

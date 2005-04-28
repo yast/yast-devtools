@@ -166,6 +166,9 @@ install-pot: $(POT_DST)
 	    done ; \
 	fi
 
+spellcheck: $(POT_DST)
+	y2tool pot-spellcheck
+
 # all-local: $(if $(IS_DEVTOOLS),,$(POT_DST))
 
 install-data-local: # $(if $(IS_DEVTOOLS),,install-pot)

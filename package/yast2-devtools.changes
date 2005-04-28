@@ -1,6 +1,8 @@
 -------------------------------------------------------------------
-Thu Apr 28 13:52:01 CEST 2005 - mvidner@suse.cz
+Thu Apr 28 14:13:23 CEST 2005 - mvidner@suse.cz
 
+- Added a script to spellcheck pot files (locilka):
+  use "make spellcheck" in $(top_srcdir).
 - Added aminclude, a directory for automakefile fragments
   to be copied to $(top_srcdir). Then they can be used by "include"
   in Makefile.am. First user: pluglib-bindings.

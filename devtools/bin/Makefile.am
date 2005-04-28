@@ -15,6 +15,7 @@ pkgdata_SCRIPTS = 				\
 	for-proofread				\
 	get-lib					\
 	kill-leftover-stuff			\
+	pot-spellcheck				\
 	rny2rnc					\
 	svnall					\
 	tagversion 				\

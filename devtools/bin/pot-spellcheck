@@ -1,0 +1,22 @@
+#! /bin/sh
+# Author: Lukas Ocilka <locilka@suse.cz>
+
+# Check spelling of *.pot files to reveal obvious mistakes
+# before sneding them to proofreading or translation.
+# Uses ispell
+
+# FIXME: only considers the first line of a message
+
+for context in `grep "^msgid " *.pot | sed '
+s/msgid \"//
+s/\"$//
+s/&//g
+s/%[1-9]//g
+' | grep -v "^\(\t \)*$"`; do \
+  WRONG=`echo -n $context | \
+  ispell -H | \
+  grep "how about: "`;
+  if [ "$WRONG" != "" ]; then
+    echo $context" -> "$WRONG;
+  fi;
+done;

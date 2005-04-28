@@ -1,0 +1,6 @@
+aminclude contains *.ami files to be included via the "include"
+directive of Automake. The files need to be present in the source tree
+of the affected package, so y2automake copies all *.ami files it
+finds from the system directory.
+
+info "(automake)Include"

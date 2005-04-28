@@ -2,7 +2,7 @@
 # Makefile.am for devtools/devtools/admin
 #
 
-SUBDIRS = po copyright aclocal
+SUBDIRS = po copyright aclocal aminclude
 
 admindir = @YAST2DEVTOOLS@/admin
 

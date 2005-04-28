@@ -34,7 +34,8 @@ function append_lines()
 #
 
 self=`basename $0`
-y2adminpath=/usr/share/YaST2/data/devtools/admin
+devtoolsprefix=/usr # pkgconfig?
+y2adminpath=$devtoolsprefix/share/YaST2/data/devtools/admin
 
 if [ "$1" == "--bootstrap" ]; then
     y2adminpath=$2
@@ -77,9 +78,12 @@ fi
 #     mv Makefile.am ${result}.old
 # fi
 
-echo "${self}: Creating common Makefile.am"
-cp -f $common Makefile.am.common
-chmod u+w Makefile.am.common
+echo "${self}: Copying automakefiles for inclusion"
+AMIS="$common `find $y2adminpath/aminclude -name \*.ami`"
+for AMI in $AMIS; do
+    cp -f $AMI .
+    chmod u+w ${AMI##*/}
+done
 
 echo "${self}: Generating toplevel Makefile.am"
 cp -f $template Makefile.am
@@ -146,6 +150,7 @@ echo -n "${self}: Disabling testsuites via SUBDIRS... "
 # only ycp testsuites should be deleted, keep others
 KEEPLIST="liby2util yast2-packager yast2-packagemanager yast2-core yast2-ncurses yast2-qt yast2-testsuite"
 #  only do it in autobuild
+#  (and /usr is not the prefix here)
 case `pwd` in /usr/src/packages/BUILD/*)
 	for KEEPRPM in $KEEPLIST; do
 	    if [ "$RPMNAME" = "$KEEPRPM" ]; then

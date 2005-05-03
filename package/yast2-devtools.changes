@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue May  3 17:15:46 CEST 2005 - mvidner@suse.cz
+
+- Added YCP mode for Emacs.
+
+-------------------------------------------------------------------
 Thu Apr 28 14:13:23 CEST 2005 - mvidner@suse.cz
 
 - Added a script to spellcheck pot files (locilka):

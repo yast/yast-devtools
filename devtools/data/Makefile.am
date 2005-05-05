@@ -7,4 +7,4 @@ pkgdatadir = @YAST2DEVTOOLS@/data
 pkgdata_DATA = 				\
 	YaST2.dict.txt
 
-EXTRA_DIST = $(pkgdata_DATA) version.in
+EXTRA_DIST = $(pkgdata_DATA)

@@ -2,21 +2,126 @@
 # Author: Lukas Ocilka <locilka@suse.cz>
 
 # Check spelling of *.pot files to reveal obvious mistakes
-# before sneding them to proofreading or translation.
+# before sending them to proofreading or translation.
 # Uses ispell
 
-# FIXME: only considers the first line of a message
+LC_ALL="en_US.UTF-8"
+LANG="en_US.UTF-8"
+WORDS=""
 
-for context in `grep "^msgid " *.pot | sed '
-s/msgid \"//
-s/\"$//
-s/&//g
-s/%[1-9]//g
-' | grep -v "^\(\t \)*$"`; do \
-  WRONG=`echo -n $context | \
-  ispell -H | \
-  grep "how about: "`;
-  if [ "$WRONG" != "" ]; then
-    echo $context" -> "$WRONG;
+SUSE_DICT_TXT="/usr/share/YaST2/data/devtools/data/YaST2.dict.txt"
+SUSE_DICT="/usr/share/YaST2/data/devtools/data/YaST2.dict.hash"
+ISPELL_AFFIX="/usr/lib/ispell/american.aff"
+BUILD_DICT_HASH="/usr/bin/buildhash"
+
+PRIM_DICT="american"
+SPELLCHECK_PROG="/usr/bin/ispell"
+
+### Initial pre-runs ###
+
+echo "Testing environment..."
+# Testing existency of script for building hash dictionary
+if [ ! -e ${BUILD_DICT_HASH} ]; then
+    echo "Please install ispell, '${BUILD_DICT_HASH}' does not exist"
+    exit 1;
+fi;
+
+# Testing existency of default affix file
+if [ ! -e ${ISPELL_AFFIX} ]; then
+    echo "Please update ispell, affix file '${ISPELL_AFFIX}' does not exist"
+    exit 1;
+fi;
+
+# Testing existency of YaST dictionary txt file
+if [ ! -e ${SUSE_DICT_TXT} ]; then
+    echo "Please update devtools, '${SUSE_DICT_TXT}' does not exist"
+    exit 1;
+fi;
+
+echo "Building YaST2 dictionary file"
+${BUILD_DICT_HASH} ${SUSE_DICT_TXT} ${ISPELL_AFFIX} ${SUSE_DICT} 1>/dev/null 2>/dev/null
+
+### Initial environment testings ###
+
+# Testing whether the secondary dictionary file file exists
+if [ ! -e ${SUSE_DICT} ]; then
+    echo "Dictionary $SUSE_DICT does not exist"
+    exit 1;
+fi;
+
+# Testing whether ispell exists
+if [ ! -e $SPELLCHECK_PROG ]; then
+    echo "Please install ispell, '$SPELLCHECK_PROG' does not exist"
+    exit 1;
+fi;
+
+# Testing for other commands
+for COMMAND in /usr/bin/msginit /usr/bin/msgexec /usr/bin/sed /usr/bin/sort /usr/bin/uniq /bin/mktemp /usr/bin/grep; do
+    if [ ! -x $COMMAND ]; then
+	echo "Please install '${COMMAND}'"
+	exit 1;
+    fi;    
+done;
+
+### Run the spellcheck ###
+
+TEMPFILE=`/bin/mktemp`
+
+echo -n "Creating list of words... "
+# Creating list of words
+for FILENAME in `ls -1 *.pot`; do
+    for WORD in `msginit -i ${FILENAME} -l en_US.UTF-8 --output-file=- --no-translator 2>/dev/null | /usr/bin/msgexec sort | \
+	/usr/bin/sed '
+	    s/&//g
+	    s/<[^>]\+>/ /gi
+	    s/|/ /g
+	    s/?/ /g
+	    s/%[1-9]/ /g
+	    
+	    s/^Content-Transfer-Encoding: .*//
+	    s/^Content-Type: .*//
+	    s/^Language-Team: .*//
+	    s/^Last-Translator: .*//
+	    s/^MIME-Version: .*//
+	    s/^PO-Revision-Date: .*//
+	    s/^POT-Creation-Date: .*//
+	    s/^Plural-Forms: .*//
+	    s/^Project-Id-Version: .*//
+	    s/^Report-Msgid-Bugs-To: .*//
+	'`; do
+
+	echo $WORD >> ${TEMPFILE}
+    done;
+done;
+echo "done"
+
+# Minimizing number of words
+WORDS=`/usr/bin/sort ${TEMPFILE} | uniq`
+rm -rf ${TEMPFILE}
+
+echo
+# Every single word
+for WORD in [ $WORDS ]; do
+  # First test using the primary dictionary
+  WRONG1=`echo -n $WORD | \
+    $SPELLCHECK_PROG -H -d $PRIM_DICT | \
+    /usr/bin/grep "\(word: how about: \|word: not found\)"`;
+  # If primary dictionary doesn't know the word
+  if [ "$WRONG1" != "" ]; then
+    # Test using the secondary dictionary
+    WRONG2=`echo -n $WORD | \
+	$SPELLCHECK_PROG -H -d $SUSE_DICT | \
+	/usr/bin/grep "\(word: how about: \|word: not found\)"`;
+    if [ "$WRONG2" != "" ]; then
+        # If also secondary dictionary doesn't know that
+	# Print the primary dictionary's suggestions
+	echo $WORD" -> "$WRONG1;
+    fi;
   fi;
 done;
+echo
+
+### Spellchecking is done ###
+
+echo "Spellcheck completed"
+echo

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May  5 14:09:32 CEST 2005 - locilka@suse.cz
+
+- Rewritten spellcheck script to check all lines of messages
+- Added YaST2-dictionary support
+- Added YaST2-dictionary text-file
+
+-------------------------------------------------------------------
 Tue May  3 17:15:46 CEST 2005 - mvidner@suse.cz
 
 - Added YCP mode for Emacs.

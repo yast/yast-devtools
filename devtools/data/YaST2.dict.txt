@@ -22,7 +22,6 @@ SSL
 TLS
 TSIG
 NetBIOS
-logon
 SMB
 MySQL
 IMAP

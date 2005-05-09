@@ -58,3 +58,5 @@ WebDAV
 MBR
 LVM
 JFS
+xntp
+sysconfig

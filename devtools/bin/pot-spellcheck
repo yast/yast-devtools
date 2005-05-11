@@ -39,7 +39,7 @@ if [ ! -e ${SUSE_DICT_TXT} ]; then
 fi;
 
 echo "Building YaST2 dictionary file"
-${BUILD_DICT_HASH} ${SUSE_DICT_TXT} ${ISPELL_AFFIX} ${SUSE_DICT}
+${BUILD_DICT_HASH} ${SUSE_DICT_TXT} ${ISPELL_AFFIX} ${SUSE_DICT} 1>/dev/null 2>/dev/null
 
 ### Initial environment testings ###
 

@@ -12,8 +12,6 @@ Obsoletes:	yast2-config-newmodule yast2-trans-newmodule
 
 Summary:	YaST2 development tools
 
-BuildArchitectures: noarch
-
 %description
 -
 

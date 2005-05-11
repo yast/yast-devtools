@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May 11 14:36:20 CEST 2005 - mvidner@suse.cz
+
+- The package is no longer noarch because it contains pkgconfig files
+  and these are in /usr/{lib,lib64}. (#83201, sbrabec).
+
+-------------------------------------------------------------------
 Thu May  5 14:09:32 CEST 2005 - locilka@suse.cz
 
 - Rewritten spellcheck script to check all lines of messages

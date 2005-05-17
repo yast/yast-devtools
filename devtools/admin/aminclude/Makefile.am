@@ -4,6 +4,8 @@
 
 amidir = @YAST2DEVTOOLS@/admin/aminclude
 
-ami_DATA = README
+ami_DATA = \
+	autodocs-ycp.ami \
+	README
 
 EXTRA_DIST = $(admin_DATA)

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Tue May 17 18:51:05 CEST 2005 - mvidner@suse.cz
+
+- Install pkgconfig file under /usr/share so that we can
+  stay noarch. (#83201)
+  Other yast packages can choose to do so too by setting
+  CREATE_PKGCONFIG=noarch in configure.in.in
+- Added automakefile fragment for ycpdoc.
+
+-------------------------------------------------------------------
 Wed May 11 14:36:20 CEST 2005 - mvidner@suse.cz
 
 - The package is no longer noarch because it contains pkgconfig files

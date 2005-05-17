@@ -78,7 +78,8 @@ RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
 ". '
 dnl pkgconfig honors lib64
-pkgconfigdir=\${libdir}/pkgconfig
+pkgconfiglibdir=\${libdir}/pkgconfig
+pkgconfigdatadir\${datadir}/pkgconfig
 yast2dir=\${prefix}/share/YaST2
 
 ybindir=\${prefix}/lib/YaST2/bin
@@ -109,7 +110,8 @@ AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
 AC_SUBST(MAINTAINER)
 
-AC_SUBST(pkgconfigdir)
+AC_SUBST(pkgconfiglibdir)
+AC_SUBST(pkgconfigdatadir)
 
 AC_SUBST(yast2dir)
 
@@ -184,7 +186,8 @@ devtools_ybindir=`pkg-config --variable=ybindir yast2-devtools`
 devtools_yast2dir=`pkg-config --variable=yast2dir yast2-devtools`
 
 dnl producing pkg-config for others?
-AM_CONDITIONAL(CREATE_PKGCONFIG, test x${CREATE_PKGCONFIG} = xtrue)
+AM_CONDITIONAL(CREATE_PKGCONFIG, test x${CREATE_PKGCONFIG} != xfalse)
+AM_CONDITIONAL(CREATE_PKGCONFIG_NOARCH, test x${CREATE_PKGCONFIG} = xnoarch)
 
 dbdir=${devtools_yast2dir}/data/docbook
 STYLESHEET_HTML=${dbdir}/stylesheets/customize-html.xsl

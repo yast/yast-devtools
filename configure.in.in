@@ -10,7 +10,7 @@ AC_SUBST(YAST2DEVTOOLS)
 YCPDOC=${srcdir}/ycpdoc/src/ycpdoc
 AC_SUBST(YCPDOC)
 
-CREATE_PKGCONFIG=true
+CREATE_PKGCONFIG=noarch
 
 ## some common checks
 @YAST2-CHECKS-COMMON@

@@ -95,7 +95,12 @@ $(RPMNAME).pc.in: $(DEVTOOLS_DIR)/admin/generic.pc.in
 $(RPMNAME).pc: $(RPMNAME).pc.in
 	./config.status --file=$@:$<
 
-pkgconfig_DATA = $(RPMNAME).pc
+if CREATE_PKGCONFIG_NOARCH
+pkgconfigdata_DATA = $(RPMNAME).pc
+else
+pkgconfiglib_DATA = $(RPMNAME).pc
+endif
+
 EXTRA_DIST += $(RPMNAME).pc.in
 endif
 

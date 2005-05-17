@@ -5,12 +5,16 @@
 Requires:	perl
 Requires:	perl-XML-Writer
 Requires:       libxslt
+# we install our .pc under $prefix/share
+Requires:	pkgconfig >= 0.16
 Provides:	ycpdoc ydoc
 Obsoletes:	ycpdoc ydoc
 Provides:	yast2-config-newmodule yast2-trans-newmodule
 Obsoletes:	yast2-config-newmodule yast2-trans-newmodule
 
 Summary:	YaST2 development tools
+
+BuildArchitectures: noarch
 
 %description
 -
@@ -44,5 +48,5 @@ EOF
 %dir %{prefix}/share/YaST2
 @ydatadir@
 %{prefix}/share/aclocal/*.m4
-@pkgconfigdir@/@RPMNAME@.pc
+@pkgconfigdatadir@/@RPMNAME@.pc
 %doc @docdir@

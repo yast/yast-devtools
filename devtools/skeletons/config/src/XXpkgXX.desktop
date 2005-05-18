@@ -20,5 +20,5 @@ Icon=yast-XXpkgXX
 Exec=/sbin/yast2 XXpkgXX 
 
 Name=XXPkgXX
-GenericName=Configure XXpkgXX
+GenericName=XXpkgXX
 X-KDE-SubstituteUID=true

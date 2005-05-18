@@ -123,14 +123,14 @@ global boolean Read() {
     if(Abort()) return false;
     Progress::NextStage();
     /* Error message */
-    if(false) Report::Error(_("Cannot read the database1."));
+    if(false) Report::Error(_("Cannot read database1."));
     sleep(sl);
 
     // read another database
     if(Abort()) return false;
     Progress::NextStep();
     /* Error message */
-    if(false) Report::Error(_("Cannot read the database2."));
+    if(false) Report::Error(_("Cannot read database2."));
     sleep(sl);
 
     // read current settings
@@ -241,7 +241,7 @@ global map Export () {
 global list Summary() {
     // TODO FIXME: your code here...
     /* Configuration summary text for autoyast */
-    return [ _("Configuration summary ..."), [] ];
+    return [ _("Configuration summary..."), [] ];
 }
 
 /**

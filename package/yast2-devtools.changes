@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed May 18 09:22:40 CEST 2005 - visnov@suse.cz
+
+- merge back proofread skeleton 
+
+-------------------------------------------------------------------
 Tue May 17 18:51:05 CEST 2005 - mvidner@suse.cz
 
 - Install pkgconfig file under /usr/share so that we can

@@ -14,6 +14,7 @@ DNS
 DSL
 DTD
 DVD
+DVDs
 FireWire
 GDM
 GNOME
@@ -46,7 +47,6 @@ Mozilla
 MySQL
 NFS
 NIS
-NIS
 NS
 NetBIOS
 Novell
@@ -72,7 +72,6 @@ SaX
 SuSEconfig
 SuSEfirewall
 TLS
-TSIG
 TSIG
 TSL
 UDP

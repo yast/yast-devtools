@@ -320,7 +320,7 @@ sub find_ycp_files()
     my $ycp_file;
     my $basename;
 
-    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" -o -name "*.pm" -o -name "*.cc" \\) -print` )
+    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" -o -name "*.pm" -o -name "*.cc" -o -name "*.glade" \\) -print` )
     {
 	chomp $ycp_file;
 
@@ -378,6 +378,14 @@ sub replace_ycp_messages()
     my $msg;
     my $norm_msg;
     my $line;
+    my $is_glade_file = 0;
+
+    # check if the source file is a *.glade file
+    my $file_extension = (reverse( split( /\./, $ycp_file ) ))[0];
+    if ( defined $file_extension && $file_extension eq "glade" )
+    {
+	$is_glade_file = 1;
+    }
 
     # read the entire input file
 
@@ -410,14 +418,31 @@ sub replace_ycp_messages()
     {
 	# split src at first message beginning: _("
 
-	( $head, $src ) = split ( /_\(\s*"/ms, $src, 2 );	# ") for emacs
+	if ( ! $is_glade_file )
+	{
+	    ( $head, $src ) = split ( /_\(\s*"/ms, $src, 2 );	# ") for emacs
+	}
+	else 
+	{
+	    ( $head, $src ) = split ( /<label>\s*/ms, $src, 2 );    # ") for emacs
+	}
+
 	print OUT $head;
 
+	
 	if ( defined $src && length ( $src ) > 0 )		# any message found?
 	{
 	    # split src at message end: ")
 
-	    ( $msg, $src ) = split ( /"\s*\)/ms, $src, 2 );	# ") for emacs
+	    if ( ! $is_glade_file )
+	    {	    
+		( $msg, $src ) = split ( /"\s*\)/ms, $src, 2 );	        # ") for emacs
+	    }
+	    else 
+	    {
+		( $msg, $src ) = split ( /\s*<\/label>/ms, $src, 2 );	# ") for emacs
+	    }
+
 	    $norm_msg = normalize ( $msg );
 
 	    if ( defined $trans{ $norm_msg } )
@@ -471,7 +496,14 @@ sub replace_ycp_messages()
 		deb ( "\nNormalized: \n\"" . $norm_msg . "\"\n\n" );
 	    }
 
-	    print OUT '_("' . $msg . '")';
+	    if ( ! $is_glade_file ) 
+	    {
+		print OUT '_("' . $msg . '")';
+	    }
+	    else
+	    {
+		print OUT '<label>' . $msg . '</label>';
+	    }
 	}
     }
 }

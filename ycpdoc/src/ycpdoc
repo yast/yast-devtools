@@ -870,79 +870,219 @@ sub almost_html ($)
 ### writing
 ###
 
-package ycpdoc::HTML;
+package xhtml;
 
-sub escape_ltgtamp ($)
+sub new ($)
 {
-    my $text = shift;
-    # ampersand first!
-    $text =~ s:\&:\&amp;:g;
-    $text =~ s:<:\&lt;:g;
-    $text =~ s:>:\&gt;:g;
-    return $text;
+    my $class = shift;
+    my ($fh) = @_;
+    # DATA_*: insert whitespace automatically
+    my $xw = new XML::Writer (OUTPUT => $fh, DATA_MODE => 1, DATA_INDENT => 1, UNSAFE => 1);
+    $xw->xmlDecl ();
+    $xw->doctype ("html",
+		  "-//W3C//DTD XHTML 1.1//EN",
+		  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
+
+    return bless { fh => $fh, xw => $xw }, $class;
 }
 
-# substituted strings: 1,2 = Module, 3,4,5 = links to other pages
-my $intro = "<HTML>\n<HEAD>\n<TITLE>%s</TITLE>\n"
-    . "<STYLE type=\"text/css\">\n"
-    . "H1 {color: #e00000}\n"
-    . "</STYLE>\n"
-    . "</HEAD>\n"
-    . "<BODY bgcolor=\"#c8c8c8\">\n"
-    . "<TABLE WIDTH=\"100%%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation:</i>\n"
-    . "<a href=\"index.html\"><b>%s</b></a></TD>\n"
-    . "<TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
-    . "<hr>\n<TABLE><TR><td valign=top align=center>\n"
-    . "<img src=\"/usr/share/doc/packages/yast2-devtools/images/yast2-half.png\"><br><br>\n"
-    . "%s<br>\n%s<br>\n%s\n</td>\n"
-    . "<TD VALIGN=TOP><TD VALIGN=TOP>\n";
+sub bye
+{
+    my $self = shift;
+    $self->{xw}->end ();
+}
 
-my $outro = "</td></tr></table><HR>\n"
-    . "<TABLE WIDTH=\"100%\"><TR><TD ALIGN=\"left\" VALIGN=\"top\"><i>YaST2 Developers Documentation </i></TD><TD ALIGN=\"RIGHT\" VALIGN=\"TOP\"><img src=\"/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png\" border=0></TD></TR></TABLE>\n"
-    . "</BODY>\n</HTML>\n";
+sub elem
+{
+    my $self = shift;
+    $self->{xw}->startTag (@_);
+}
 
-my $infohead = "<p>\n"
-    . "<table bgcolor=\"#f96500\" cellpadding=1 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
-    . "<table bgcolor=\"#ffc080\" cellpadding=3 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
-    . "Info:\n"
-    . "</td></tr></table>\n"
-    . "</td></tr></table>\n";
-# 0: global/local 1:function, 2:anchor 3:-> 4:returntype
-my $functionhead = "<p>\n"
-    . "<table bgcolor=\"#f96500\" cellpadding=1 cellspacing=0 border=0 width=\"100%%\"><tr><td>\n"
-    . "<table bgcolor=\"#ffc080\" cellpadding=3 cellspacing=0 border=0 width=\"100%%\"><tr><td><font size=\"+1\">\n"
-    . "<tt>%s <b>%s<a name=\"%s\"></a><font color=\"#606060\"> %s </font><font color=\"#c05000\"> %s</font></b></tt>\n"
-    . "</font></td></tr></table>\n"
-    . "</td></tr></table>\n";
+sub close
+{
+    my $self = shift;
+    $self->{xw}->endTag ();
+}
 
-my $functiondescintro = "<p>";
-my $functiondescoutro = "</p>\n";
+sub char
+{
+    my $self = shift;
+    $self->{xw}->characters (@_);
+}
 
-my $functionparamsintro = "<dl><dt><b>Parameters</b>:<dd><table width=\"100%\" border=\"0\">\n";
-my $functionparamsoutro = "</table></dl>\n";
+sub raw
+{
+    my $self = shift;
+    $self->{xw}->raw (@_);
+}
 
-my $functionparamintro = "<tr><td align=\"left\" valign=\"top\" width=\"20%\"><font color=\"#c05000\">\n";
-my $functionparamfil = "</font></td>\n<td align=\"left\" valign=\"top\">";
-my $functionparamoutro = "</td></tr>\n";
+# Arg is an array ref containing either of:
+# "-" and character data
+# "tag name", optional attributes, nested Args
+sub tree
+{
+    my $self = shift;
+    my @elem = @{$_[0]};
+    if ($elem[0] eq "-")	# character data
+    {
+	shift @elem;
+	$self->char (@elem);
+    }
+    else
+    {
+	my ($i, @tag);
+	while (defined ($i = shift @elem))
+	{
+	    last if (ref $i);
+	    push (@tag, $i);
+	}
+	# now $i is undef and @elem empty or $i is a reference
+	if (!defined ($i))
+	{
+	    $self->{xw}->emptyTag (@tag);
+	}
+	else
+	{
+	    $self->elem (@tag);
+	    while (defined $i)
+	    {
+		if (ref ($i) eq "ARRAY")
+		{
+		    $self->tree ($i);
+		}
+#		elsif (ref ($i) eq "CODE")
+#		{
+#		    &$i;
+#		}
+		$i = shift @elem;
+	    }
+	    $self->close ();
+	}
+    }
+}
 
-my $functionretintro = "<dl><dt><b>Return value</b>:<dd><table width=\"100%\" border=\"0\">\n"
-    . "<tr><td align=\"left\" valign=\"top\" width=\"20%\"><font color=\"#c05000\">\n";
-my $functionretfil = "</font></td>\n<td align=\"left\" valign=\"top\">";
-my $functionretoutro = "</td></tr>\n</table></dl>\n";
+sub h1
+{
+    my $self = shift;
+    $self->elem ("h1");
+    $self->char (@_);
+    $self->close ();
+}
 
-# header of a ycp file, with a list of includes and exports
-my $headintro = "\n<table cellspacing=0 BGCOLOR=\"#f96500\" width=\"100%\"><tr><td>\n"
-    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR><TD>\n"
-    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR>\n";
-my $headfil = "</td></tr></table></td></tr></table>\n"
-    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR><td>\n"
-    . "<table width=\"100%\" bgcolor=\"#ffc080\" cellpadding=10><TR><TD>\n";
-my $headoutro = "\n</td></tr></table></td></tr></table></td></tr></table>\n";
+sub link_t
+{
+    my $self = shift;
+    my ($href, $text) = @_;
+    return ["a", "href" => $href, ["-", $text]];
+}
 
-# 1:title
-my $genericintro = "<dl><dt><b>%s:</b><dd>\n"
-    . "<table width=\"100%%\" border=\"0\"><tr><td align=\"left\" valign=\"top\">\n";
-my $genericoutro = "</td></tr></table>\n</dl>\n";
+sub link
+{
+    my $self = shift;
+    $self->tree ($self->link_t (@_));
+}
+
+package ycpdoc::HTML;
+
+use IO qw(File);
+
+my $css_style = <<'END';
+body { background-color: #c8c8c8 }
+h1 { color: #e00000 }
+table { width: 100%/ border: none }
+img { border: 0px }
+.sigbox { background-color: #ffc080; border: solid thin #f96500 }
+.sig { font: larger monospace }
+.padtbl { background-color: #ffc080; padding: 10px; margin: 10px }
+/* arrow */
+.a { color: #606060 }
+/* type, parameter */
+.t, .p { color: #c05000 }
+.pbox { width: 20% }
+.descbox { }
+.right { align: right }
+.header {}
+.footer { clear: both}
+.menu { width: 10%; float: left }
+.main { width: 90%; float: left }
+END
+
+
+sub make_menu ($)
+{
+    my ($O) = @_;
+    $O->tree (["div", "class" => 'menu',
+	       ["img", "alt" => 'YaST', "src" => '/usr/share/doc/packages/yast2-devtools/images/yast2-half.png'],
+	       ["br"], ["br"],
+	       $O->link_t ("index.html", "functions"),
+	       ["br"],
+	       $O->link_t ("files.html", "files"),
+	       ["br"],
+	       $O->link_t ("intro.html", "intro"),
+	       ]);
+}
+
+sub make_intro ($$$)
+{
+    my ($O, $module_name, $make_links) = @_;
+    # doc elem
+    $O->elem ("html");
+    $O->tree (["head",
+	       ["title", ["-", $module_name]],
+	       ["style", "type" => 'text/css', ["-", $css_style]]
+	      ]);
+    $O->elem ("body");
+    $O->tree (["div", "class", 'header',
+	       ["i", ["-", "YaST2 Developers Documentation:"]],
+	       ["a", "href", 'index.html',
+		["b", ["-", $module_name]]
+		],
+	       ["img", "class", 'right', "alt", '', "src", '/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png'],
+	       ["hr"],
+	       ]);
+    make_menu ($O) if ($make_links);
+    $O->elem ("div", "class", 'main');
+}
+
+sub make_outro ($)
+{
+    my ($O) = @_;
+    $O->close (); #div.main
+#    $O->{xw}->comment ("page footer");
+    $O->tree (["div", class => 'footer',
+	       ["hr"],
+	       ["i", ["-", "YaST2 Developers Documentation"]],
+	       ["img", class => 'right', alt => '', src => '/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png'],
+	       ]);
+#    $O->{xw}->comment ("the end");
+    $O->close ("body");
+    $O->close ("html");
+}
+
+sub make_generic ($$$$)
+{
+    my ($O, $title, $text, $format) = @_;
+
+    $O->elem ("dl");
+    $O->tree (["dt", ["b", ["-", $title]]]);
+    $O->elem ("dd");
+    $O->elem ("table");
+    $O->elem ("tr");
+    $O->elem ("td", align => 'left', valign => 'top');
+    if ($format eq "HTML")
+    {
+	$O->raw ($text);
+    }
+    else
+    {
+	$O->char ($text);
+    }
+    $O->close ("td");
+    $O->close ("tr");
+    $O->close ("table");
+    $O->close ("dd");
+    $O->close ("dl");
+}
 
 ##
 ##
@@ -982,19 +1122,16 @@ sub create_index ($)
 
     my $index = $output_dir."index.html";
     print STDERR "Writing $index\n";
-    open(OUT,">$index") or die "Cannot open file $index: $!";
+    my $OUT = new IO::File(">$index") or die "Cannot open file $index: $!";
+    my $O = new xhtml ($OUT);
 
-    if ($new)
-    {
-	printf OUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
-    }
-    else
-    {
-	printf OUT $intro , $any_module  , $any_module , "" , "", "";
-    }
-
-    print OUT "<H3>Function index:</H3>";
-    print OUT "<table><tr><td><b>Function name</b></td><td><b>File name</b></td></tr>";
+    make_intro ($O, $any_module, $new);
+    $O->tree (["h3", ["-", "Function index:"]]);
+    $O->elem ("table", "class", 'funcidx');
+    $O->tree (["tr",
+	       ["th", ["-", "Function name"]],
+	       ["th", ["-", "File name"]],
+	      ]);
 
     my @entries = ();
     foreach my $f (values %{$g->{"files"}})
@@ -1006,50 +1143,60 @@ sub create_index ($)
     {
 	if($one->{"kind"} ne "info")
 	{
-	    print OUT "<tr><td><a href=\"";
-	    print OUT html_name ($one->{"file"});
-	    print OUT "#";
-	    print OUT $one->{"name"};
-	    print OUT "\">";
-	    print OUT escape_ltgtamp ($one->{"signature"});
-	    print OUT "</a></td><td><a href=\"";
-	    print OUT html_name ($one->{"file"});
-	    print OUT "\">";
-	    print OUT $one->{"file"};
-	    print OUT "</a></td></tr>\n";
+	    my $hfile = html_name ($one->{"file"});
+	    $O->tree(["tr",
+		      ["td",
+		       $O->link_t ($hfile ."#". $one->{"name"}, $one->{"signature"}),
+		      ],
+		      ["td",
+		       $O->link_t ($hfile, $one->{"file"}),
+		      ]
+		     ]);
 	}
     }
-    print OUT "</table>";
+    $O->close ("table");
 
     # files.html, or into index.html
+    my ($FO, $FOUT);
     if ($new)
     {
 	$index = $output_dir."files.html";
 
 	print STDERR "Writing $index\n";
-	open(FOUT,">$index") or die "Cannot open file $index: $!";
-	printf FOUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
+	$FOUT = new IO::File(">$index") or die "Cannot open file $index: $!";
+	$FO = new xhtml ($FOUT);
+	make_intro ($FO, $any_module, 1);
     }
     else
     {
-	open (FOUT, ">&OUT");
+	$FOUT = new IO::File;
+	$FO = $O;
     }
-    print FOUT "<H3>File index:</H3>";
-    print FOUT "<table><tr><td><b>File name</b></td></tr>";
-    for my $one ( sort keys %{$g->{"files"}} )
+
+    $FO->tree (["h3", ["-", "File index:"]]);
+    $FO->elem ("table", "class", 'fileidx');
+    $FO->tree (["tr",
+		["th", ["-", "File name"]],
+	       ]);
+    for ( sort keys %{$g->{"files"}} )
     {
-	printf FOUT "<tr><td><a href=\"%s\">%s</a></td></tr>", html_name($one), $one;
+	$FO->tree(["tr",
+		   ["td",
+		    $O->link_t (html_name ($_), $_)
+		   ]
+		  ]);
     }
+    $FO->close ("table");
     if ($new)
     {
-	print FOUT "</table>";
-	print FOUT $outro;
+	make_outro ($FO);
+	$FO->bye ();
+	$FOUT->close ();
     }
-    close FOUT;
 
-    print OUT "</table>";
-    print OUT $outro;
-    close OUT;
+    make_outro ($O);
+    $O->bye ();
+    $OUT->close ();
 
     # intro.html
     if ($new)
@@ -1057,27 +1204,51 @@ sub create_index ($)
 	$index = $output_dir."intro.html";
 
 	print STDERR "Writing $index\n";
-	open(OUT,">$index") or die "Cannot open file $index: $!";
+	my $IOUT = new IO::File(">$index") or die "Cannot open file $index: $!";
+	my $IO = new xhtml ($IOUT);
+	make_intro ($IO, $any_module, 1);
 
-	printf OUT $intro , $any_module  , $any_module , "<a href=\"index.html\">functions</a>", "<a href=\"files.html\">files</a>", "<a href=\"intro.html\">intro</a>";
-	print OUT "<H3>Introduction:</H3>";
-	print OUT $g->{"intro_html"};
-	print OUT $outro;
-	close OUT;
+	$IO->tree (["h3", ["-", "Introduction:"]]);
+	print $IOUT $g->{"intro_html"};
+
+	make_outro ($IO);
+	$IO->bye ();
+	$IOUT->close ();
     }
 }
 
-sub item_index ($@)
+sub item_list ($$@)
 {
-    my ($title, @items) = @_;
+    my ($O, $title, @items) = @_;
     if (@items > 0)
     {
-	print OUT "<H1>$title</H1>\n<ul>\n";
+	$O->h1 ($title);
+	$O->elem ("ul");
 	for my $one ( sort @items )
 	{
-	    print OUT "<li>$one</li>\n";
+	    $O->elem ("li");
+	    $O->char ($one);
+	    $O->close ();
 	}
-	print OUT "</ul>\n";
+	$O->close ();
+    }
+}
+
+# items are [$href, $text]
+sub item_index ($$@)
+{
+    my ($O, $title, @items) = @_;
+    if (@items > 0)
+    {
+	$O->h1 ($title);
+	$O->elem ("ul");
+	for my $one ( sort { $a->[0] cmp $b->[0] } @items )
+	{
+	    $O->elem ("li");
+	    $O->link ($one->[0], $one->[1]);
+	    $O->close ();
+	}
+	$O->close ();
     }
 }
 
@@ -1090,68 +1261,82 @@ sub write_onefile ($$)
     my $parsed_header = $f->{"header"};
     my $htmlfn = $output_dir . html_name ($file);
 
+    my $OUT;
     if ( $output_stdout )
     {
-	open(OUT,">>/dev/fd/1");
+	$OUT = new_from_fd IO::Handle (1, "wa");
     }
     else
     {
 	print STDERR "Writing $htmlfn\n";
-	open(OUT,">$htmlfn") or die "Cannot open file $htmlfn: $!";
+	$OUT = new IO::File(">$htmlfn") or die "Cannot open file $htmlfn: $!";
     }
+    my $O = new xhtml ($OUT);
 
     $parsed_header->{"module"} ||= "Unknown YCP Module";
-
-    if($new_index_style)
-    {
-	printf OUT ($intro,
-		    $parsed_header->{"module"}, $parsed_header->{"module"},
-		    "<a href=\"index.html\">functions</a>",
-		    "<a href=\"files.html\">files</a>",
-		    "<a href=\"intro.html\">intro</a>");
-    }
-    else
-    {
-	printf OUT ($intro,
-		    $parsed_header->{"module"} , $parsed_header->{"module"},
-		    "", "", "");
-    }
+    make_intro ($O, $parsed_header->{"module"}, $new_index_style);
 
     #
     # create header
     #
-    print OUT $headintro;
 
-    print OUT "<TD><H1>$parsed_header->{\"module\"}</H1></TD>\n";
+    # headintro
+    $O->elem ("div", "class" => 'sigbox');
+    $O->elem ("table", "class" => 'padtbl');
+
+    $O->elem ("tr");
+    $O->tree (["td",
+	       ["h1", ["-", $parsed_header->{module}]]
+	      ]);
     if ( defined $parsed_header->{"file"} )
     {
-	print OUT "<TD VALIGN=\"top\" ALIGN=\"right\"><TT>$parsed_header->{\"file\"}</TT></TD>\n";
+	$O->tree (["td", "class", "filecell",
+		   ["-", $parsed_header->{file}]
+		  ]);
     }
-    print OUT "</tr>\n<tr><td>";
-    if ( defined $parsed_header->{"summary"} )
+    $O->close ("tr");
+
+    $O->elem ("tr");
+    $O->elem ("td");
+    if( defined $parsed_header->{"summary"} )
     {
-	print OUT "$parsed_header->{\"summary\"}";
+	# HTML
+	print $OUT "$parsed_header->{summary}";
     }
-    print OUT "</td></tr>\n<tr><td>";
+    $O->close ("td");
+    $O->close ("tr");
+
+    $O->elem ("tr");
+    $O->elem ("td");
     if ( @{$parsed_header->{"authors"}} )
     {
-	print OUT "<ul>\n";
+	$O->elem ("ul");
 	foreach ( @{$parsed_header->{"authors"}} )
 	{
-	    print OUT "<li>$_</li>\n";
+	    $O->elem ("li");
+	    print $OUT $_;
+	    $O->close ();
 	}
-	print OUT "</ul>\n";
+	$O->close ("ul");
     }
-    print OUT $headfil;
+    $O->close ("td");
+    $O->close ("tr");
+
+    $O->close ("table", "class" => 'padtbl');
+
+    $O->elem ("table", "class" => 'padtbl');
+    $O->elem ("tr");
+    $O->elem ("td");
     if ( defined $parsed_header->{"descr"} )
     {
-	print OUT "$parsed_header->{\"descr\"}\n";
+	# TODO HTML?
+	print $OUT "$parsed_header->{descr}\n";
     }
 
     if ( defined $parsed_header->{"depends"} )
     {
-	print OUT "<H1>Depends on</H1>\n";
-	print OUT "$parsed_header->{\"depends\"}\n";
+	$O->h1 ("Depends on");
+	$O->char ($parsed_header->{depends});
     }
 
     #
@@ -1184,8 +1369,8 @@ sub write_onefile ($$)
     }
 
 
-    item_index ("Imports", @imports);
-    item_index ("Includes", @includes);
+    item_list ($O, "Imports", @imports);
+    item_list ($O, "Includes", @includes);
 
     #
     # Create variable and function index
@@ -1198,16 +1383,21 @@ sub write_onefile ($$)
 
     for my $one ( @{$f->{"provides"}} )
     {
-	if ($one->{"kind"} eq "variable")
+	if ($one->{"kind"} eq "variable" || $one->{"kind"} eq "scruple")
 	{
 	    my $n = $one->{"name"};
-	    if ($one->{"global"})
+	    my $item = ["#$n", $n];
+	    if ($one->{"kind"} eq "scruple")
 	    {
-		push (@global_variables, "<a href=\"#$n\">$n</a>");
+		push (@scruples, $item);
+	    }
+	    elsif ($one->{"global"})
+	    {
+		push (@global_variables, $item);
 	    }
 	    else
 	    {
-		push (@local_variables, "<a href=\"#$n\">$n</a>");
+		push (@local_variables, $item);
 	    }
 	}
 	elsif ($one->{"kind"} eq "function")
@@ -1218,31 +1408,35 @@ sub write_onefile ($$)
 	    {
 		push (@params, $param->{"type"}." ".$param->{"name"});
 	    }
+	    # why put back?
 	    $one->{"signature"} = $n ." (". join (", ", @params) .")";
-	    my $sig = escape_ltgtamp ($one->{"signature"});
+	    my $item = ["#$n", $one->{"signature"}];
 	    if ($one->{"global"})
 	    {
-		push (@global_functions, "<a href=\"#$n\">$sig</a>");
+		push (@global_functions, $item);
 	    }
 	    else
 	    {
-		push (@local_functions, "<a href=\"#$n\">$sig</a>");
+		push (@local_functions, $item);
 	    }
-	}
-	elsif ($one->{"kind"} eq "scruple")
-	{
-	    my $n = $one->{"name"};
-	    push (@scruples, "<a href=\"#$n\">$n</a>");
 	}
     }
 
-    item_index ("Structures", @scruples);
-    item_index ("Global Variables", @global_variables);
-    item_index ("Global Functions", @global_functions);
-    item_index ("Local Variables", @local_variables);
-    item_index ("Local Functions", @local_functions);
+    item_index ($O, "Structures", @scruples);
+    item_index ($O, "Global Variables", @global_variables);
+    item_index ($O, "Global Functions", @global_functions);
+    item_index ($O, "Local Variables", @local_variables);
+    item_index ($O, "Local Functions", @local_functions);
 
-    print OUT $headoutro;
+    # headoutro
+    $O->close ("td");
+    $O->close ("tr");
+    $O->close ("table", class => 'padtbl');
+
+    $O->close ("div", class => 'sigbox');
+
+    # space after the index box
+    $O->tree (["p"]);
 
     #
     # for each export...
@@ -1256,97 +1450,142 @@ sub write_onefile ($$)
 	{
 	    # if we did not print the header, the info text could be
 	    # mistaken to belong to another function
-	    printf OUT $infohead;
+	    $O->tree (["div", class => 'sigbox',
+		       ["-", "Info:"]
+		      ]);
 	}
 	else
 	{
+	    # functionhead
 	    my $gl = $one->{"global"} ? "global":"local";
 	    $one->{"signature"} ||= $one->{"name"};
-	    my $sep = $one->{"type"} ? "-&gt;" : "";
-	    printf OUT $functionhead, $gl, escape_ltgtamp ($one->{"signature"}), $one->{"name"}, $sep , escape_ltgtamp ($one->{"type"});
+	    my $sep = $one->{"type"} ? "->" : "";
+	    $O->tree (["div", class => 'sigbox',
+		       ["span", class => 'sig', id => $one->{name},
+			["-", $gl, " "],
+			["b",
+			 ["-", $one->{signature}],
+			 ["span", class => 'a', ["-", " $sep "]],
+			 ["span", class => 't', ["-", $one->{type}]],
+			],
+		       ],
+		      ]);
 	}
 
 	if ($one->{"deprecated"} ne "")
 	{
-	    print OUT "<p><em>This function is deprecated.";
+	    $O->elem ("p");
+	    $O->elem ("em");
+	    $O->char ("This function is deprecated.");
 	    if( $one->{"deprecated"} ne "magicnumber" )
 	    {
-		print OUT " Use ";
-		print OUT make_ahref ($one->{"deprecated"});
-		print OUT " instead.";
+		$O->char (" Use ");
+		# TODO HTML (subst_refs...)
+		$O->raw (make_ahref ($one->{"deprecated"}));
+		$O->char (" instead.");
 	    }
-	    print OUT "</em></p>\n";
+	    $O->close ("em");
+	    $O->close ("p");
 	}
 
-        print OUT $functiondescintro;
-        print OUT subst_refs ($one->{"short"});
-        print OUT $functiondescoutro;
-        foreach my $para (@{$one->{"descr"}})
+	#functiondesc
+	$O->elem ("p");
+	#TODO HTML
+	$O->raw (subst_refs ($one->{short}));
+	$O->close ("p");
+        foreach my $para (@{$one->{descr}})
         {
-            print OUT $functiondescintro;
-            print OUT $para;
-            print OUT $functiondescoutro;
+	    $O->elem ("p");
+	    #TODO HTML. no subst refs?
+	    $O->raw ($para);
+	    $O->close ("p");
         }
 
 	if (@{$one->{"scruple"}} == 2)
 	{
-	    print OUT ("<p>Structure ",
-		       "<b><a name=\"",
-		       $one->{"scruple"}->[0],
-		       "\">",
-		       $one->{"scruple"}->[0],
-		       "</a></b>\n");
-	    print OUT "<pre>", subst_refs ($one->{"scruple"}->[1]), "</pre>\n";
-	    print OUT "</p>\n";
+	    $O->tree (["p",
+		       ["-", "Structure "],
+		       ["b",
+			["a", id => $one->{scruple}->[0],
+			 ["-", $one->{scruple}->[0]]
+			]
+		       ]
+		      ]);
+	    $O->tree (["pre",
+		       ["-", subst_refs ($one->{scruple}->[1])]
+		      ]);
 	}
 
 	if (@{$one->{"parameters"}} > 0)
 	{
-	    print OUT $functionparamsintro;
+	    #functionparams
+	    $O->elem ("dl");
+	    $O->tree (["dt", ["b", ["-", "Parameters:"]]]);
+	    $O->elem ("dd");
+	    $O->elem ("table");
 	    foreach my $param (@{$one->{"parameters"}})
 	    {
-		print OUT $functionparamintro;
-		print OUT $param->{"name"};
-		print OUT $functionparamfil;
-		print OUT subst_refs ($param->{"description"});
-		print OUT $functionparamoutro;
+		$O->elem ("tr");
+		$O->tree (["td", class => 'pbox',
+			   ["span", class => 'p',
+			    ["-", $param->{name}]
+			   ]
+			  ]);
+		$O->elem ("td", class => 'descbox');
+		#TODO HTML
+		$O->raw (subst_refs ($param->{description}));
+		$O->close ();
+		$O->close ("tr");
 	    }
-	    print OUT $functionparamsoutro;
+	    $O->close ("table");
+	    $O->close ("dd");
+	    $O->close ("dl");
 	}
 	if ($one->{"return"} ne "")
 	{
-	    print OUT $functionretintro;
-#	    print OUT escape_ltgtamp ($one->{"type"}); # uncomment this to see return type in Returns:
-	    print OUT $functionretfil;
-	    print OUT subst_refs ($one->{"return"});
-	    print OUT $functionretoutro;
+	    #functionret
+	    $O->elem ("dl");
+	    $O->tree (["dt", ["b", ["-", "Return value:"]]]);
+	    $O->elem ("dd");
+	    $O->elem ("table");
+	    {
+		$O->elem ("tr");
+		$O->tree (["td", class => 'pbox',
+			   ["span", class => 't',
+# uncomment this to see return type in Returns:
+#			    ["-", $one->{type}]
+			   ]
+			  ]);
+		$O->elem ("td", class => 'descbox');
+		#TODO HTML
+		$O->raw (subst_refs ($one->{return}));
+		$O->close ();
+		$O->close ("tr");
+	    }
+	    $O->close ("table");
+	    $O->close ("dd");
+	    $O->close ("dl");
 	}
 
 	if ($one->{"example"} ne "")
 	{
-	    printf OUT $genericintro, "Example";
-	    print OUT '<pre>' . $one->{"example"} . '</pre>';
-	    print OUT $genericoutro;
+	    make_generic ($O, "Example", '<pre>'. $one->{example} .'</pre>', "HTML");
 	}
 	if ($one->{"since"} ne "")
 	{
-	    printf OUT $genericintro, "Since";
-	    print OUT $one->{"since"};
-	    print OUT $genericoutro;
+	    make_generic ($O, "Since", $one->{since}, "TXT");
 	}
 	if (@{$one->{"see"}} > 0)
 	{
-	    printf OUT $genericintro, "See";
-	    for my $see (@{$one->{"see"}})
-	    {
-		print OUT make_ahref ($see), "\n";
-	    }
-	    print OUT $genericoutro;
+	    make_generic ($O, "See",
+			  join ("\n", map {make_ahref ($_)} @{$one->{"see"}}),
+			  "HTML");
 	}
     }
-    print OUT $outro;
 
-    close(OUT);
+    make_outro ($O);
+    $O->bye ();
+    $OUT->close ();
 }
 
 sub subst_refs ($)

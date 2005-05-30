@@ -167,6 +167,8 @@ AC_SUBST(COMPENDIUM)
     '@YAST2-CHECKS-COMMON@' =>
 'dnl Checks for programs.
 AC_PROG_INSTALL
+dnl The YCP interpreter checks whether dependent ybc files are older
+dnl so we must preserve their timestamps
 INSTALL="${INSTALL} -p"
 AC_PROG_LN_S
 AC_PROG_MAKE_SET

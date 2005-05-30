@@ -1,78 +1,137 @@
-<HTML>
-<HEAD>
-<TITLE>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html>
+ <head>
+  <title>
 
    ycpdoc tool
-</TITLE>
-<STYLE type="text/css">
-H1 {color: #e00000}
-</STYLE>
-</HEAD>
-<BODY bgcolor="#c8c8c8">
-<TABLE WIDTH="100%"><TR><TD ALIGN="left" VALIGN="top"><i>YaST2 Developers Documentation:</i>
-<a href="index.html"><b>
+</title>
+  <style type="text/css">body { background-color: #c8c8c8 }
+h1 { color: #e00000 }
+table { width: 100%/ border: none }
+img { border: 0px }
+.sigbox { background-color: #ffc080; border: solid thin #f96500 }
+.sig { font: larger monospace }
+.padtbl { background-color: #ffc080; padding: 10px; margin: 10px }
+/* arrow */
+.a { color: #606060 }
+/* type, parameter */
+.t, .p { color: #c05000 }
+.pbox { width: 20% }
+.descbox { }
+.right { align: right }
+.header {}
+.footer { clear: both}
+.menu { width: 10%; float: left }
+.main { width: 90%; float: left }
+</style>
+ </head>
+ <body>
+  <div class="header">
+   <i>YaST2 Developers Documentation:</i>
+   <a href="index.html">
+    <b>
 
    ycpdoc tool
-</b></a></TD>
-<TD ALIGN="RIGHT" VALIGN="TOP"><img src="/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png" border=0></TD></TR></TABLE>
-<hr>
-<TABLE><TR><td valign=top align=center>
-<img src="/usr/share/doc/packages/yast2-devtools/images/yast2-half.png"><br><br>
-<a href="index.html">functions</a><br>
-<a href="files.html">files</a><br>
-<a href="intro.html">intro</a>
-</td>
-<TD VALIGN=TOP><TD VALIGN=TOP>
-
-<table cellspacing=0 BGCOLOR="#f96500" width="100%"><tr><td>
-<table width="100%" bgcolor="#ffc080" cellpadding=10><TR><TD>
-<table width="100%" bgcolor="#ffc080" cellpadding=10><TR>
-<TD><H1>
+</b>
+   </a>
+   <img class="right" alt="" src="/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png" />
+   <hr />
+  </div>
+  <div class="menu">
+   <img alt="YaST" src="/usr/share/doc/packages/yast2-devtools/images/yast2-half.png" />
+   <br />
+   <br />
+   <a href="index.html">functions</a>
+   <br />
+   <a href="files.html">files</a>
+   <br />
+   <a href="intro.html">intro</a>
+  </div>
+  <div class="main">
+   <div class="sigbox">
+    <table class="padtbl">
+     <tr>
+      <td>
+       <h1>
 
    ycpdoc tool
-</H1></TD>
-<TD VALIGN="top" ALIGN="right"><TT>
+</h1>
+      </td>
+      <td class="filecell">
    mis.ycp
-</TT></TD>
-</tr>
-<tr><td>
+</td>
+     </tr>
+     <tr>
+      <td>
    Documentation for ycpdoc.
-</td></tr>
-<tr><td><ul>
-<li>   Petr Blahos &lt;<a href="mailto:pblahos@suse.cz">pblahos@suse.cz</a>&gt;</li>
-</ul>
-</td></tr></table></td></tr></table>
-<table width="100%" bgcolor="#ffc080" cellpadding=10><TR><td>
-<table width="100%" bgcolor="#ffc080" cellpadding=10><TR><TD>
-
+</td>
+     </tr>
+     <tr>
+      <td>
+       <ul>
+        <li>   Petr Blahos &lt;<a href="mailto:pblahos@suse.cz">pblahos@suse.cz</a>&gt;</li>
+       </ul>
+      </td>
+     </tr>
+    </table>
+    <table class="padtbl">
+     <tr>
+      <td>
 
  Shows ycpdoc capability to report undocumented
  functions and misdocumented params.
-<H1>Local Functions</H1>
-<ul>
-<li><a href="#misdocumented">misdocumented (string a, string b)</a></li>
-</ul>
 
-</td></tr></table></td></tr></table></td></tr></table>
-<p>
-<table bgcolor="#f96500" cellpadding=1 cellspacing=0 border=0 width="100%"><tr><td>
-<table bgcolor="#ffc080" cellpadding=3 cellspacing=0 border=0 width="100%"><tr><td><font size="+1">
-<tt>local <b>misdocumented (string a, string b)<a name="misdocumented"></a><font color="#606060"> -&gt; </font><font color="#c05000"> void</font></b></tt>
-</font></td></tr></table>
-</td></tr></table>
-<p>
+       <h1>Local Functions</h1>
+       <ul>
+        <li>
+         <a href="#misdocumented">misdocumented (string a, string b)</a>
+        </li>
+       </ul>
+      </td>
+     </tr>
+    </table>
+   </div>
+   <p />
+   <div class="sigbox">
+    <span class="sig" id="misdocumented">local
+     <b>misdocumented (string a, string b)
+      <span class="a"> -&gt; </span>
+      <span class="t">void</span>
+     </b>
+    </span>
+   </div>
+   <p>
  Description.
  @param a
  @param c</p>
-<dl><dt><b>Parameters</b>:<dd><table width="100%" border="0">
-<tr><td align="left" valign="top" width="20%"><font color="#c05000">
-a</font></td>
-<td align="left" valign="top"></td></tr>
-<tr><td align="left" valign="top" width="20%"><font color="#c05000">
-b</font></td>
-<td align="left" valign="top"></td></tr>
-</table></dl>
-</td></tr></table><HR>
-<TABLE WIDTH="100%"><TR><TD ALIGN="left" VALIGN="top"><i>YaST2 Developers Documentation </i></TD><TD ALIGN="RIGHT" VALIGN="TOP"><img src="/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png" border=0></TD></TR></TABLE>
-</BODY>
-</HTML>
+   <dl>
+    <dt>
+     <b>Parameters:</b>
+    </dt>
+    <dd>
+     <table>
+      <tr>
+       <td class="pbox">
+        <span class="p">a</span>
+       </td>
+       <td class="descbox"></td>
+      </tr>
+      <tr>
+       <td class="pbox">
+        <span class="p">b</span>
+       </td>
+       <td class="descbox"></td>
+      </tr>
+     </table>
+    </dd>
+   </dl>
+  </div>
+  <div class="footer">
+   <hr />
+   <i>YaST2 Developers Documentation</i>
+   <img class="right" alt="" src="/usr/share/doc/packages/yast2-devtools/images/yast2-mini.png" />
+  </div>
+ </body>
+</html>

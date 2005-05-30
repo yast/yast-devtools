@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon May 30 18:03:38 CEST 2005 - mvidner@suse.cz
+
+- Rewrote ycpdoc HTML output to xhtml+css.
+
+-------------------------------------------------------------------
 Wed May 18 09:22:40 CEST 2005 - visnov@suse.cz
 
 - merge back proofread skeleton 

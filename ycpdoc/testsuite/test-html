@@ -15,6 +15,7 @@ for DRV in ${1-*.drv}; do
     EXP=test-html-exp
     rm -rf $EXP
     mkdir $EXP
+    cp -a $DRV $EXP
     for HTML in $CASE*.html; do
 	cp -a $HTML $EXP/${HTML#$CASE-}
     done
@@ -22,8 +23,9 @@ for DRV in ${1-*.drv}; do
     ACT=test-html-act
     rm -rf $ACT
     mkdir $ACT
+    cp -a $DRV $ACT
     $YCPDOC --format=html --outputdir=$ACT $CASE*.ycp
-    if ! diff -ur $EXP $ACT; then
+    if test $? != 0 || ! diff -ur $EXP $ACT; then
 	FAIL=1
 	break
     fi

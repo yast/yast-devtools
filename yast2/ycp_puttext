@@ -136,9 +136,31 @@ sub ycp_puttext()
 	open ( OUT, ">$ycp_file.tmp" )	or die "FATAL: Can't open $ycp_file.tmp";
 
 	replace_ycp_messages ( $ycp_file );
-
 	close ( OUT );
 	close ( IN );
+
+	# open the new file for reading 
+ 	open ( IN, "$ycp_file.tmp" )		or die "FATAL: Can't open $ycp_file";
+	# this file will contain $ycp_file.tmp with fixed comments
+	open ( COMMENT_CLEAN, ">$ycp_file.comment_clean" ) or die "FATAL: Can't open $ycp_file.rejected";
+	my $num_comments = move_comments();
+	close ( COMMENT_CLEAN );
+	close( IN );
+
+	# we have some suspicious comments
+	if ( $num_comments > 0 ) {
+	    open ( OUT, ">$ycp_file.rejected" );
+	    open ( IN, "$ycp_file.comment_clean" ) or die "FATAL: Can't open $ycp_file.removed_comments";
+
+	    # do not print out replaced messages while creating the diff file
+	    my $verbose_tmp = $verbose;
+	    $verbose = 0;
+	    replace_ycp_messages ( $ycp_file );
+	    $verbose = $verbose_tmp;
+	    close ( OUT );
+	    close ( IN );
+	}
+
     }
 
     dump_trans_refs( $po_file, 1 );
@@ -149,6 +171,22 @@ sub ycp_puttext()
 	$ycp_file = $ycp_files{ $ycp_file_basename };
 	rename ( $ycp_file, $ycp_file . ".old" );
 	rename ( $ycp_file . ".tmp", $ycp_file ) or warning ( "Can't rename $ycp_file.tmp to $ycp_file" );
+
+	unless ( system ( 'rm', '-f', $ycp_file . ".comment_clean" ) == 0 ) 
+	{
+	    warning ( "Can't remove $ycp_file.comment_clean" );
+	}
+
+	# create the diff file with fixed comments
+	my $ret = system( "diff -u $ycp_file $ycp_file.rejected > $ycp_file.diff");
+	if ( $ret == 256 ) 
+	{
+	    printf ("Wrote diff file for suspicious comments to $ycp_file.diff\n");
+	}
+	elsif ( $ret > 1 )
+	{
+	    warning ( "Can't create diff file for suspicious comments $ycp_file.diff" );
+	}
     }
 
     undef %trans;
@@ -408,7 +446,7 @@ sub replace_ycp_messages()
     {
 	warning ( "WARNING: $ycp_file contains comments in texts to translate:\n\n",
 		  shorten ( $1, 2*80 ),
-		  "\n\nThis text will most likely be ignored!\n" );
+		  "\n\nThe changes made to this part will be stored as a diff file ($ycp_file.diff)\n" );
     }
 
 
@@ -416,6 +454,7 @@ sub replace_ycp_messages()
 
     while ( defined $src && length ( $src ) > 0 )
     {
+
 	# split src at first message beginning: _("
 
 	if ( ! $is_glade_file )
@@ -424,15 +463,15 @@ sub replace_ycp_messages()
 	}
 	else 
 	{
-	    ( $head, $src ) = split ( /<label>\s*/ms, $src, 2 );    # ") for emacs
+	    ( $head, $src ) = split ( /<label>\s*/msi, $src, 2 );    # ") for emacs
 	}
 
 	print OUT $head;
 
-	
+
 	if ( defined $src && length ( $src ) > 0 )		# any message found?
 	{
-	    # split src at message end: ")
+	    # split src at message end: ") or </label>
 
 	    if ( ! $is_glade_file )
 	    {	    
@@ -440,7 +479,7 @@ sub replace_ycp_messages()
 	    }
 	    else 
 	    {
-		( $msg, $src ) = split ( /\s*<\/label>/ms, $src, 2 );	# ") for emacs
+		( $msg, $src ) = split ( /\s*<\/label>/msi, $src, 2 );	# ") for emacs
 	    }
 
 	    $norm_msg = normalize ( $msg );
@@ -509,6 +548,41 @@ sub replace_ycp_messages()
 }
 
 
+# Reads one file pointed to by IN and moves all comments which are embedded in
+# a translation environment, eg.
+#        _( // this is a comment 
+#           "message")
+# to the front of the function
+#        // this is a comment
+#       _("message")
+#
+# writes its output to $ycp_file.comment_clean and returns the number of comments
+# found
+#
+# Parameters:
+#
+sub move_comments() {
+    my $src;
+    my $line;
+    my $comments = 0;
+
+    # read the entire input file
+
+    while ( $line = <IN> )
+    {
+	$src .= $line;
+    }
+
+    while ( $src =~ s:_\(\s*(//|/\*)((.*?)")(.*):$1$3_\("$4:gms )
+    {
+	$comments++;
+    }
+
+    print COMMENT_CLEAN $src;
+
+    return $comments;
+}
+
 #-----------------------------------------------------------------------------
 
 
@@ -530,7 +604,7 @@ sub normalize()
     $str =~ s/\s+/ /g;  # replace all whitespace (including newline) with one blank
     $str =~ s/^\s+//;	# remove all leading whitespace
     $str =~ s/\s+$//;	# remove all trailing whitespace
-
+    
     return $str;
 }
 

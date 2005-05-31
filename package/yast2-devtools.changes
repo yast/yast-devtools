@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue May 31 10:55:19 CEST 2005 - visnov@suse.cz
+
+- rename XXPkgXX.pm to XXPkgXX2.pm to make skeleton work out of box 
+
+-------------------------------------------------------------------
 Mon May 30 18:03:38 CEST 2005 - mvidner@suse.cz
 
 - Rewrote ycpdoc HTML output to xhtml+css.

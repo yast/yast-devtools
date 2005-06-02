@@ -78,7 +78,7 @@ RPMNAME=\"$RPMNAME\"
 MAINTAINER=\"$MAINTAINER\"
 ". '
 dnl pkgconfig honors lib64
-pkgconfiglibdir=\${libdir}/pkgconfig
+pkgconfigdir=\${libdir}/pkgconfig
 pkgconfigdatadir=\${datadir}/pkgconfig
 yast2dir=\${prefix}/share/YaST2
 
@@ -110,7 +110,7 @@ AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
 AC_SUBST(MAINTAINER)
 
-AC_SUBST(pkgconfiglibdir)
+AC_SUBST(pkgconfigdir)
 AC_SUBST(pkgconfigdatadir)
 
 AC_SUBST(yast2dir)

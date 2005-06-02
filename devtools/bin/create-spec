@@ -178,7 +178,7 @@ rm -rf \"\$RPM_BUILD_ROOT\""
     # FIXME: kind of double definition of paths
     # FIXME: $prefix unfunctional
     #"\@yast2dir@" => "\\\${prefix}/share/YaST2",
-    "\@pkgconfiglibdir\@" => "%{_libdir}/pkgconfig",
+    "\@pkgconfigdir\@" => "%{_libdir}/pkgconfig",
     "\@pkgconfigdatadir\@" => "%{prefix}/share/pkgconfig",
 
     "\@ybindir\@" => "%{prefix}/lib/YaST2/bin",

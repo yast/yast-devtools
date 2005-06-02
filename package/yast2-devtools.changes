@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Tue May 31 11:23:20 CEST 2005 - mvidner@suse.cz
+Thu Jun  2 18:45:44 CEST 2005 - mvidner@suse.cz
 
+- Restored pkgconfigdir to keep compatibility.
 - Remove .dep at make distclean.
 
 -------------------------------------------------------------------

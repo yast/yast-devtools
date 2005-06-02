@@ -98,7 +98,7 @@ $(RPMNAME).pc: $(RPMNAME).pc.in
 if CREATE_PKGCONFIG_NOARCH
 pkgconfigdata_DATA = $(RPMNAME).pc
 else
-pkgconfiglib_DATA = $(RPMNAME).pc
+pkgconfig_DATA = $(RPMNAME).pc
 endif
 
 EXTRA_DIST += $(RPMNAME).pc.in

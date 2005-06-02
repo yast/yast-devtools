@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue May 31 11:23:20 CEST 2005 - mvidner@suse.cz
+
+- Remove .dep at make distclean.
+
+-------------------------------------------------------------------
 Tue May 31 10:55:19 CEST 2005 - visnov@suse.cz
 
 - rename XXPkgXX.pm to XXPkgXX2.pm to make skeleton work out of box 

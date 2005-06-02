@@ -13,6 +13,7 @@ ${ybcfiles}: %.ybc: %.ycp $(ycpchook)
 
 # files to clean
 CLEANFILES = ${ybcfiles}
+DISTCLEANFILES = .dep
 
 # Needs to be outside "." because of cases
 # where ycpchook contains a symlink to "."

@@ -1,0 +1,184 @@
+#!/bin/bash
+#
+# File:		y2makepot
+# Package:	devtools
+# Summary:	Build all translation files (*.pot) from a module
+# Authors:	Holger Macht <hmacht@suse.de>
+#
+# Call this from a module toplevel directory to generate all
+# translation files (*.pot)
+
+
+# ##############################################################################
+# -- function defininitions -- start -------------------------------------------
+# ##############################################################################
+
+function xgettext_call() {
+    MODULE=$1
+    FILES=$2
+
+    if test -e "./$MODULE.pot"; then
+	if test "$OVERWRITE" == "0"; then
+	    echo "potfile $MODULE.pot exists already. Replacing it..."
+	    cp "$MODULE.pot" "$MODULE.pot.old"
+	    echo "Wrote backup file to $MODULE.pot.old"
+	else
+	    echo "potfile $MODULE.pot exists already. Leaving it untouched."
+	    echo "Override this setting by giving -f as parameter."
+	    return
+	fi
+    fi
+
+    echo "Creating ./$MODULE.pot from $FILES..." ;
+    $XGETTEXT --no-wrap --add-comments --add-location --keyword=_:1,2 \
+	--keyword=__ --foreign-user \
+	--copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
+	--default-domain=$MODULE --output=$MODULE.pot $FILES
+}
+
+function usage() {
+    echo
+    echo -e "create *.pot files from a source tree.";
+    echo -e "\nOptions:\n\t-c\t\t Checkin the newly created files to svn"
+    echo -e "\t-f\t\t Overwrite potfiles which exist already"
+    echo -e "\nYou can specify additional files to .pot creation in $SRCDIR/POTFILES"
+    echo
+
+    exit 0
+}
+
+
+function generate_potfiles() {
+    # we can specify additional files to .pot creation
+    POTFILES_FILE=`test -e $SRCDIR/POTFILES && echo POTFILES`
+    POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`
+    
+    # all the .ycp and .pm files, we should separate texts from
+    # (exclude testsuite directory)
+    POT_SRC=`find $SRCDIR -type d -name testsuite -prune , \
+        -type f -name "*.ycp" -o -name "*.pm" | \
+        xargs egrep -l '^<?[[:space:]]*[Tt]extdomain>?' \
+	$POTFILES`
+
+    if test "$?" != "0"; then
+	echo "You have to start this script in a module directory"
+	exit 1
+    fi
+
+    DOMAINS="" ;
+    for F in $POT_SRC; do
+	D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
+            sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[= \
+              "(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`;
+	if [ -z $D ]; then
+	    echo "Error: empty textdomain in $F" ;
+	    exit 1 ;
+	fi ;
+	
+	DOMAINS="$D:$F\n$DOMAINS" ;
+    done
+    
+    DOMAINS=`echo -en $DOMAINS | LC_COLLATE=C sort` ;
+    MODULE=${DOMAINS%%:*};
+    
+    FILES="";
+    for I in $DOMAINS; do
+	D=${I%%:*} ;
+	F=${I#*:} ;
+	
+	if [ "$D" != "$MODULE" ]; then
+	    POT_DST="$POT_DST $MODULE.pot"
+
+	    xgettext_call "$MODULE" "$FILES";
+	    echo
+	    MODULE=$D;
+	    FILES=$F;
+	else 
+	    FILES="$FILES $F" ;
+	fi
+
+    done
+    
+    POT_DST="$POT_DST $MODULE.pot"
+    xgettext_call "$MODULE" "$FILES"
+    echo
+}
+
+
+
+function checkin_potfiles() {
+    ADDED=""
+    CHANGED=""
+
+    for f in $POT_DST; do
+	MODIFIER="`svn status $f | cut -d' ' -f1`"
+
+        # file has changed in repository
+	if test "$MODIFIER" == "M"; then
+	    echo "$f is already under version control and has changed."
+	    CHANGED="$CHANGED $f"
+        # file has been added already
+	elif test "$MODIFIER" == "A"; then
+	    echo "$f has already been added."
+	    ADDED="$ADDED $f"
+	# file is not under version control
+	else
+	    if test "`svn add $f | cut -d' ' -f1`" == "A"; then
+		echo "Added $f to svn repository."
+		ADDED="$ADDED $f"
+	    else
+		echo "warning: Could not add $f to svn repository"
+	    fi
+	fi
+    done
+
+    if test -n "$ADDED" -o -n "$CHANGED"; then
+        # commit the added or changed files now
+	svn commit --message "Committed potfile(s) $f to repository" $ADDED $CHANGED
+
+	if test "$?" == "0"; then
+	    echo "Committed files $ADDED $CHANGED to repository"
+	else
+	    echo "Error while committing files to repository";
+	fi
+    fi
+}
+
+# -- function defininitions -- end ---------------------------------------------
+
+
+# ##############################################################################
+# -- main -- start -------------------------------------------------------------
+# ##############################################################################
+
+# define global variables
+CHECKIN=1
+OVERWRITE=1
+XGETTEXT="xgettext"
+SRCDIR="src"
+POT_DST=""
+
+
+# parse command line options
+while getopts "chf" opt; do
+    case $opt in
+	c)
+	    CHECKIN=0;;
+	f)
+	    OVERWRITE=0;;
+	*)
+	    usage;;
+    esac
+done;
+
+
+generate_potfiles
+
+if test $CHECKIN = 0; then
+    checkin_potfiles
+fi
+
+echo
+exit 0
+
+# -- main -- end ---------------------------------------------------------------

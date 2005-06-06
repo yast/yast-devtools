@@ -15,10 +15,6 @@ ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
 
 HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
 
-# we can specify additional files to .pot creation
-POTFILES_FILE		= $(shell test -e $(srcdir)/POTFILES     && echo POTFILES)
-POTFILES		= $(shell test -e $(srcdir)/POTFILES     && sed 's,^,$(srcdir)/,' < $(srcdir)/POTFILES)
-
 # do we do Makefile.am for devtools? It is a little special...
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
@@ -48,35 +44,12 @@ $(RPMNAME)-$(VERSION).tar.bz2: checkpo dist-bzip2
 CLEANFILES =
 MAINTAINERCLEANFILES = package/$(RPMNAME)-$(VERSION).tar.bz2 package/$(RPMNAME).spec
 
-# all the .ycp and .pm files, we should separate texts from (exclude testsuite directory)
-POT_SRC = $(shell find $(srcdir) -type d -name testsuite -prune , \
-	-type f -name "*.ycp" -o -name "*.pm" | xargs egrep -l '^<?[[:space:]]*[Tt]extdomain>?') \
-	$(POTFILES)
-
-# all the textdomains for .pot creation
-POT_DOMAINS = \
-	$(shell \
-	    PSRC="$(POT_SRC)" ; \
-	    if [ "$$PSRC" ] ; \
-	    then \
-		DOMAINS="" ; \
-		for F in $$PSRC ; \
-		do \
-		    D="`egrep '^[[:space:]]*<?[Tt]extdomain>?' $$F | head -n 1 | \
-		        sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[="(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`" ; \
-		    DOMAINS="$$D\n$$DOMAINS" ; \
-		done ; \
-		echo -en $$DOMAINS | LC_COLLATE=C sort | uniq ; \
-	    fi ; : \) \
-	)
-
-# the names of the actual .pot files
-POT_DST = $(addprefix $(srcdir)/,$(addsuffix .pot,$(POT_DOMAINS)))
+POT_DST = $(shell find -type d -name testsuite -prune , \
+	-type f -name "*.pot") 
 
 EXTRA_DIST = \
 	VERSION RPMNAME MAINTAINER configure.in.in		\
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
-	$(POTFILES_FILE)			\
 	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))
 
 show-extra-dist:
@@ -120,52 +93,22 @@ dist-hook:
 	    cp $$EX "$(distdir)" ;						\
 	done
 
-xgettext_call = \
-	echo "Creating $(srcdir)/$$MODULE.pot from $$FILES..." ;		\
-	$(XGETTEXT) --no-wrap --add-comments --add-location --keyword=_:1,2	\
-		--keyword=__							\
-		--foreign-user --copyright-holder="SuSE Linux AG, Nuernberg"	\
-		--default-domain=$$MODULE --output=$$MODULE.pot $$FILES
+pot:
+	y2tool y2makepot -f
 
-# we need a "dummy" pot target for the case, when $(POT_DST) is empty
-$(POT_DST) pot: $(POT_SRC)
-	@DOMAINS="" ; \
-	for F in $^ ; \
-	do \
-	    D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $$F | head -n 1 | \
-	       sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[="(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'` ; \
-	    if [ -z $$D ] ; \
-	    then \
-		echo "Error: empty textdomain in $$F" ; \
-		exit 1 ; \
-	    fi ; \
-	    DOMAINS="$$D:$$F\n$$DOMAINS" ; \
-	done ; \
-	DOMAINS=`echo -en $$DOMAINS | LC_COLLATE=C sort` ; \
-	MODULE=$${DOMAINS%%:*} ; \
-	FILES="" ; \
-	for I in $$DOMAINS ; \
-	do \
-	    D=$${I%%:*} ; \
-	    F=$${I#*:} ; \
-	    if [ "$$D" != "$$MODULE" ] ; \
-	    then \
-		$(xgettext_call) ; \
-		MODULE=$$D ; \
-		FILES=$$F ; \
-	    else \
-		FILES="$$FILES $$F" ; \
-	    fi ; \
-	done ; \
-	$(xgettext_call)
-
-install-pot: $(POT_DST)
-	@if [ -n "$^" ] ; then \
+install-pot: pot
+	@POT_DST=`find -type d -name testsuite -prune , \
+		-type f -name "*.pot"` ; \
+	if [ -n "$$POT_DST" ] ; then \
 	    echo "mkdir -p $(DESTDIR)$(potdir)" ; \
 	    mkdir -p $(DESTDIR)$(potdir) ; \
-	    list="$^"; \
+	    list="$$POT_DST"; \
 	    for I in $$list ; \
 	    do \
+		echo $$I ; \
+		if [ "$$I" == "pot" ] ; then \
+			continue ; \
+		fi ; \
 		echo "$(INSTALL_DATA) $$I $(DESTDIR)$(potdir)" ; \
 		$(INSTALL_DATA) $$I $(DESTDIR)$(potdir) ; \
 	    done ; \

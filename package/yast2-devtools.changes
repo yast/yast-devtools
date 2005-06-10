@@ -1,6 +1,8 @@
 -------------------------------------------------------------------
-Fri Jun 10 18:38:25 CEST 2005 - mvidner@suse.cz
+Fri Jun 10 19:34:16 CEST 2005 - mvidner@suse.cz
 
+- Added autodocs-cc.ami for doxygen.
+  Used autodocs-*.ami in skeletons.
 - Added fillupdir(as configure parameter --with-fillupdir)
 
 -------------------------------------------------------------------

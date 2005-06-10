@@ -1,0 +1,24 @@
+# -*- makefile -*- Automake include file
+# $Id$
+
+# Builds source documentation for C++ sources
+# Uses doxygen (ydoxygen)
+# PARAMETERS:
+#   AUTODOCS_CC: Directories that the C++ autodocs is built from
+#		 Optional - the default is $(srcdir)/../../src
+#   AUTODOCS_DEPS: dependencies of the docs, default is $(AUTODOCS_CC)/*.h
+#   AUTODOCS_SUBDIR: htmldir will be $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
+#   AUTODOCS_PARAMS: more params for ydoxygen
+
+AUTODOCS_CC ?= $(srcdir)/../../src
+AUTODOCS_DEPS ?= $(AUTODOCS_CC)/*.h
+
+htmldir = $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
+
+html_DATA = index.html $(wildcard *.html *.png) doxygen.css @RPMNAME@.tag
+CLEANFILES = $(html_DATA) doxygen.log doxygen.conf installdox
+
+doxygen.css @RPMNAME@.tag: index.html
+
+index.html: $(AUTODOCS_DEPS)
+	${YDOXYGEN} PROJECT_NAME=@RPMNAME@ INPUT=$(AUTODOCS_CC) $(AUTODOCS_PARAMS)

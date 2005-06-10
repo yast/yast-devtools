@@ -4,6 +4,12 @@ Fri Jun 10 18:38:25 CEST 2005 - mvidner@suse.cz
 - Added fillupdir(as configure parameter --with-fillupdir)
 
 -------------------------------------------------------------------
+Mon Jun  6 16:05:22 CEST 2005 - hmacht@suse.de
+
+- added script y2makepot and removed potfile creation from
+  Makefile.am's
+
+-------------------------------------------------------------------
 Thu Jun  2 18:45:44 CEST 2005 - mvidner@suse.cz
 
 - Restored pkgconfigdir to keep compatibility.
@@ -18,6 +24,13 @@ Tue May 31 10:55:19 CEST 2005 - visnov@suse.cz
 Mon May 30 18:03:38 CEST 2005 - mvidner@suse.cz
 
 - Rewrote ycpdoc HTML output to xhtml+css.
+
+-------------------------------------------------------------------
+Mon May 23 16:46:49 CEST 2005 - hmacht@suse.de
+
+- ycp_puttext: added handling of *.glade source files (#65591),
+  handle comments in texts to translate and write
+  the "suspicious" changes to a diff file
 
 -------------------------------------------------------------------
 Wed May 18 09:22:40 CEST 2005 - visnov@suse.cz

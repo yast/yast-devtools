@@ -26,6 +26,7 @@ END
 #Authors:
 #  Jan Holesovsky <kendy@suse.cz>, 2001
 #  Michal Svec <msvec@suse.cz>
+#  Martin Vidner <mvidner@suse.cz>
 #
 # $Id$
 
@@ -136,6 +137,14 @@ AC_SUBST(schemadir)
 AC_SUBST(scrconfdir)
 AC_SUBST(agentdir)
 AC_SUBST(desktopdir)
+
+fillupdir_d="/var/adm/fillup-templates"
+AC_ARG_WITH(fillupdir,
+    AS_HELP_STRING([--with-fillupdir=DIR],
+		   [where to place fillup templates (default $fillupdir_d.]),
+    [ fillupdir="$withval" ],
+    [ fillupdir="$fillupdir_d" ])
+AC_SUBST(fillupdir)
 ',
 
     # init: prog

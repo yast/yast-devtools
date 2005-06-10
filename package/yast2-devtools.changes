@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jun 10 18:38:25 CEST 2005 - mvidner@suse.cz
+
+- Added fillupdir(as configure parameter --with-fillupdir)
+
+-------------------------------------------------------------------
 Thu Jun  2 18:45:44 CEST 2005 - mvidner@suse.cz
 
 - Restored pkgconfigdir to keep compatibility.

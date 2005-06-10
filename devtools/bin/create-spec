@@ -176,6 +176,9 @@ rm -rf \"\$RPM_BUILD_ROOT\""
 %tiny_macros =
 (
     # FIXME: kind of double definition of paths
+    # we should use configure to create a mapping of paths
+    # and use it here. (cannot use configure directly because
+    # makefile has ${prefix} and spec file has %{prefix}
     # FIXME: $prefix unfunctional
     #"\@yast2dir@" => "\\\${prefix}/share/YaST2",
     "\@pkgconfigdir\@" => "%{_libdir}/pkgconfig",
@@ -203,7 +206,7 @@ rm -rf \"\$RPM_BUILD_ROOT\""
     "\@schemadir\@" => "${yast2dir}/schema",
     "\@scrconfdir\@" => "${yast2dir}/scrconf",
     "\@desktopdir\@" => "%{prefix}/share/applications/YaST2",
-
+    '@fillupdir@' => '/var/adm/fillup-templates',
 );
 
 # The main program

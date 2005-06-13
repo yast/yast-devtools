@@ -187,13 +187,13 @@ check-all-packages:
 	@if [ ! -e "$(ALL_PACKAGES)" ]; then				\
 		echo ERROR: "Can't find $(ALL_PACKAGES)"; false;	\
 	fi
-	@if ! grep -q "^$(RPMNAME)	" $(ALL_PACKAGES); then		\
+	@if ! grep -q "^$(RPMNAME)[[:space:]]" $(ALL_PACKAGES); then		\
 		echo ERROR: "$(RPMNAME) not in $(ALL_PACKAGES)"; false;	\
 	fi
-	@if grep -q "^$(RPMNAME)	.*?" $(ALL_PACKAGES); then	\
+	@if grep -q "^$(RPMNAME)[[:space:]]\+.*?" $(ALL_PACKAGES); then	\
 		echo ERROR: "$(RPMNAME) info in $(ALL_PACKAGES) contains some unknown (?) fields:";	\
 		echo;							\
-		grep "^$(RPMNAME)	.*?" $(ALL_PACKAGES);		\
+		grep "^$(RPMNAME)[[:space:]]\+.*?" $(ALL_PACKAGES);	\
 		echo;							\
 		false;							\
 	fi

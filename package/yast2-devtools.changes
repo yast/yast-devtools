@@ -1,11 +1,12 @@
 -------------------------------------------------------------------
-Mon Jun 13 12:27:21 CEST 2005 - mvidner@suse.cz
+Wed Jun 15 13:24:30 CEST 2005 - mvidner@suse.cz
 
 - Makefile.am.toplevel:check-all-packages: separate by any whitespace,
   not only tabs.
 - Added autodocs-cc.ami for doxygen.
   Used autodocs-*.ami in skeletons.
 - Added fillupdir (as configure parameter --with-fillupdir)
+- 2.12.2
 
 -------------------------------------------------------------------
 Mon Jun  6 16:05:22 CEST 2005 - hmacht@suse.de

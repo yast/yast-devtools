@@ -1,6 +1,9 @@
 -------------------------------------------------------------------
-Wed Jun 15 13:24:30 CEST 2005 - mvidner@suse.cz
+Thu Jun 16 17:32:53 CEST 2005 - mvidner@suse.cz
 
+- Better finding of subdirs for configure.in: do not do "find" since
+  that does not honor SUBDIRS in Makefiles.am and so for example tries
+  to work with the skeletons.
 - Makefile.am.toplevel:check-all-packages: separate by any whitespace,
   not only tabs.
 - Added autodocs-cc.ami for doxygen.

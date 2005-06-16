@@ -56,6 +56,7 @@ if [ ! -e VERSION ]; then
     exit 1
 fi
 
+# synchronize with y2autoconf
 if [ ! -e SUBDIRS ]; then
     subdirs=`ls */Makefile.am | sed -e 's:/Makefile.am::' | sort | grep -v "^$RPMNAME-" | tr '\n' ' '`
     comment="No ./SUBDIRS file found - assuming default: All direct subdirs with Makefile.am"

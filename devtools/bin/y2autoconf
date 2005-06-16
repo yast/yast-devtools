@@ -50,6 +50,54 @@ $OUTPUT = qx(SUBDIRS=`cat SUBDIRS 2> /dev/null` ;
 	     done;
 	     [ -d "po" ] && echo "po/Makefile");
 
+# Better finding of subdirs: do not do "find" since that does not
+# honor SUBDIRS in Makefiles.am and that messes with the skeletons
+
+# http://www.faqs.org/faqs/editor-faq/sed/ 3.2 #13:
+# join lines ending with backslashes
+# we want '/\\$/N; s/\\\n//; ta' in the shell
+my $unbackslashify = q{-e :a -e '/\\\\$/N; s/\\\\\\n//; ta'};
+
+# Given a list of directories, filter and recursively find those
+# that should be processed by automake: look at SUBDIRS in Makefile.am
+# Example: qw(autom4te.cache src) -> qw(src src/foo src/bar)
+sub find_subdirs {
+    my @dirs = @_;
+
+    my @outdirs = ();
+    @dirs = grep { -f "$_/Makefile.am" } @dirs;
+    foreach my $dir (@dirs) {
+	my $subdirs = `sed -n $unbackslashify -e '/SUBDIRS/{P;q}' $dir/Makefile.am`; # find SUBDIRS
+	$subdirs =~ s/#.*//;		# strip comment
+	$subdirs =~ s/SUBDIRS\s*=\s*//;	# leave only the value
+	my @subdirs = split (/\s+/, $subdirs);
+	@subdirs = map { "$dir/$_" } @subdirs; # add the full path
+	push @outdirs, find_subdirs (@subdirs), $dir;
+    }
+    return @outdirs;
+}
+
+# synchronize with y2automake
+@SUBDIRS = split (/\s+/, (`cat SUBDIRS 2> /dev/null` ||
+			`ls */Makefile.am | sed -e 's:/Makefile.am::' | sort | grep -v "^$RPMNAME-" | tr '\n' ' '`));
+# "po" hacking: y2automake runs after us so "po" may not have Makefile.am yet
+@SUBDIRS = grep { $_ ne "po" } @SUBDIRS;
+push (@SUBDIRS, "po") if (-d "po");
+
+$OUTPUT2 = join ("\n", map { "$_/Makefile" } find_subdirs (@SUBDIRS));
+
+# interim debugging:
+if ($OUTPUT ne $OUTPUT2) {
+    print STDERR "New style Makefile list:\n";
+    open TMP, ">OUTPUT";
+    print TMP $OUTPUT;
+    close TMP;
+    open TMP, ">OUTPUT2";
+    print TMP $OUTPUT2;
+    close TMP;
+    system q{bash -c 'sort OUTPUT | sed -e "s:^./::" | diff -u - <(sort OUTPUT2)'};
+}
+
 %macros =
 (
 
@@ -320,7 +368,7 @@ fi
 
     # generate output
     '@YAST2-OUTPUT@' =>
-"AC_CONFIG_FILES(Makefile $OUTPUT)
+"AC_CONFIG_FILES(Makefile $OUTPUT2)
 AC_OUTPUT
 "
 );

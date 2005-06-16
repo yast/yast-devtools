@@ -9,4 +9,4 @@ ami_DATA = \
 	autodocs-cc.ami \
 	README
 
-EXTRA_DIST = $(admin_DATA)
+EXTRA_DIST = $(ami_DATA)

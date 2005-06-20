@@ -71,8 +71,9 @@ sub find_subdirs {
 	$subdirs =~ s/#.*//;		# strip comment
 	$subdirs =~ s/SUBDIRS\s*=\s*//;	# leave only the value
 	my @subdirs = split (/\s+/, $subdirs);
+	@subdirs = grep { $_ ne "." } @subdirs; # avoid infinite recursion
 	@subdirs = map { "$dir/$_" } @subdirs; # add the full path
-	push @outdirs, find_subdirs (@subdirs), $dir;
+	push @outdirs, find_subdirs (@subdirs), $dir; # recurse+add current dir
     }
     return @outdirs;
 }

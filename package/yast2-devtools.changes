@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Jun 20 10:25:01 CEST 2005 - mvidner@suse.cz
+
+- y2autoconf: Avoid infinite recursion if SUBDIRS contains ".".
+- ycpdoc:
+  Print the current line together with its parsing state (--state).
+  Documented --xml-output, die if the file cannot be opened.
+- 2.12.3
+
+-------------------------------------------------------------------
 Thu Jun 16 17:32:53 CEST 2005 - mvidner@suse.cz
 
 - Better finding of subdirs for configure.in: do not do "find" since

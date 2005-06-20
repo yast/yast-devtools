@@ -38,6 +38,11 @@ Remaining slashes are converted to double underscores.
 Produce output in given format, html or xml. The option may be repeated.
 HTML is the default. XML produces ycpdoc.xml, the DTD is not stable yet.
 
+=item B<-O> I<file>, B<--xml-output>=I<file>
+
+For xml output, write to I<file>. The default is C<ycpdoc.xml>, I<not>
+respecting I<outputdir>.
+
 =item B<-i>, B<--noindex>
 
 Do not generate index.html (intro.html, files.html)
@@ -379,8 +384,11 @@ sub parse_file ($)
     while (<INYCP>)
     {
 	$lines_read = $lines_read + 1;
+	if ($show_state) {
+	    print STDERR "--$state\n";
+	    print STDERR $_;
+	}
 	chomp;
-	print STDERR "--$state\n" if ($show_state);
 
 	if ("aftercomment" eq $state)
 	{
@@ -1634,7 +1642,7 @@ my $writer;
 
 sub write_docs
 {
-    my $output = new IO::File(">$xml_output");
+    my $output = new IO::File(">$xml_output") or die "Cannot open file $xml_output: $!";
     $writer = new XML::Writer (OUTPUT => $output, NEWLINES => 1);
     $writer->xmlDecl ();
     $writer->startTag ("ycpdoc");

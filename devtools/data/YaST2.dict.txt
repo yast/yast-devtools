@@ -87,6 +87,8 @@ WebDAV
 XFS
 XFree
 YaST
+autodetect
+autodetected
 autoinstallation
 bootable
 chipset

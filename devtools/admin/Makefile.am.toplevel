@@ -114,7 +114,7 @@ install-pot: pot
 	    done ; \
 	fi
 
-spellcheck: $(POT_DST)
+spellcheck: pot
 	y2tool pot-spellcheck
 
 # all-local: $(if $(IS_DEVTOOLS),,$(POT_DST))

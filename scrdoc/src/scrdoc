@@ -73,8 +73,8 @@ Usage: $0 [OPTION] [FILE [FILE [...]]]
   -o DIR                 all generated files go in the specified
 			 directory (instead of the current)
   -d DIR                 look for input files in DIR
-  -p PATTERN             when searching directories (with -d) use the
   -f FORMAT		 output format html or xml
+  -p PATTERN             when searching directories (with -d) use the
 			 specified pattern (RegExp) instead of the
 			 default (.*\\.scr)
   -h                     show this help page

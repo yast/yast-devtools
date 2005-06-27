@@ -18,6 +18,8 @@
 use strict;
 use Getopt::Std;
 use File::Find;
+use IO::File;
+use XML::Writer;
 
 use vars ('$VERSION','$Options');
 my $VERSION = "0.2.0";
@@ -32,7 +34,7 @@ exit(0);
 
 sub main {
     #my $Options = {};
-    getopts("o:d:hp:vVD:", $Options) || usage() || exit(1);
+    getopts("f:o:d:hp:vVD:", $Options) || usage() || exit(1);
 
     if ($Options->{h}) {
 	usage();
@@ -54,9 +56,13 @@ sub main {
 	$FileInfo->{$FileName} = $SingleFileInfo;
     }
 
-    #generateIndex($FileInfo, $Options);
-    #generateDoc($FileInfo);
-    generateSCRDoc($FileInfo);
+    if (defined $Options->{f} && $Options->{f} =~ /^xml$/) {
+	generateSCRXMLDoc($FileInfo);
+    } else {
+	#generateIndex($FileInfo, $Options);
+	#generateDoc($FileInfo);
+	generateSCRDoc($FileInfo);
+    }
 }
 
 #----------------------------------------------------------------------
@@ -68,6 +74,7 @@ Usage: $0 [OPTION] [FILE [FILE [...]]]
 			 directory (instead of the current)
   -d DIR                 look for input files in DIR
   -p PATTERN             when searching directories (with -d) use the
+  -f FORMAT		 output format html or xml
 			 specified pattern (RegExp) instead of the
 			 default (.*\\.scr)
   -h                     show this help page
@@ -260,7 +267,7 @@ sub generateIndex {
 	    print "\n";
 	}
 	print "====================================================\n";
-
+ 
 
     }
 
@@ -553,3 +560,92 @@ sub expandNameToLink {
 
 }
 #----------------------------------------------------------------------
+###
+ # Function generates XML document from the internal parsed data
+ # and prints it to the stdout
+ #
+ # @param $FileInfo hash
+ ##
+sub generateSCRXMLDoc {
+    my $FileInfos = shift;
+
+    my $output = new IO::File(">output.xml") || do {
+	warn "Cannot open file output.xml: ".$!."\n";
+	exit 1;
+    };
+    print "File 'output.xml' has been created\n";
+
+    my $writer = new XML::Writer(OUTPUT => $output, NEWLINES => 0, UNSAFE => 1);
+    $writer->startTag('scrdoc');
+    $writer->startTag('mountpoints');
+
+    foreach my $FileName (sort {
+	    $FileInfos->{$a}->{Mount}->[0]->{MountPoint}
+	    cmp
+	    $FileInfos->{$b}->{Mount}->[0]->{MountPoint};
+    } keys %$FileInfos) {
+	my $FI = $FileInfos->{$FileName};
+	    foreach my $MP (@{$FI->{'Mount'}}) {
+		$writer->startTag('mountpoint_item');
+
+		if (defined $FI->{'FileName'}) {
+		$writer->startTag('file');
+		$writer->characters($FI->{'FileName'});
+		$writer->endTag('file');
+		}
+	    
+		if (defined $MP->{'MountPoint'}) {
+		$writer->startTag('mountpoint');
+		$writer->characters($MP->{'MountPoint'});
+		$writer->endTag('mountpoint');
+		}
+
+		if (defined $MP->{'Summary'}) {
+		$writer->startTag('summary');
+		$writer->characters($MP->{'Summary'});
+		$writer->endTag('summary');
+		}
+
+		if (defined $MP->{'General'}) {
+		$writer->startTag('general');
+		$writer->characters($MP->{'General'});
+		$writer->endTag('general');
+		}
+
+		if (defined $MP->{'Authors'}) {
+		$writer->startTag('authors');
+		$writer->characters($MP->{'Authors'});
+		$writer->endTag('authors');
+		}
+
+		if (defined $MP->{'Example'}) {
+		$writer->startTag('example');
+		$writer->characters($MP->{'Example'});
+		$writer->endTag('example');
+		}
+
+		if (defined $MP->{'Access'}) {
+		$writer->startTag('access');
+		$writer->characters($MP->{'Access'});
+		$writer->endTag('access');
+		}
+
+		if (defined $MP->{'See'}) {
+		$writer->startTag('see');
+		$writer->characters($MP->{'See'});
+		$writer->endTag('see');
+		}
+
+		$writer->endTag('mountpoint_item');
+	    }
+    }
+
+    $writer->endTag('mountpoints');
+    $writer->endTag('scrdoc');
+    $writer->end();
+    $output->close() || do {
+	warn "Cannot save output.xml file";
+	exit 1;
+    };
+    print "File 'output.xml' has been saved\n\n";
+}

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jun 27 15:38:45 CEST 2005 - locilka@suse.cz
+
+- adding new option -f = output format, is supports xml and html
+  output formats
+
+-------------------------------------------------------------------
 Mon Jun 27 11:13:15 CEST 2005 - locilka@suse.cz
 
 - adding lost dependency on .pot creation before the spellcheck

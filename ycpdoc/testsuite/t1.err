@@ -1,6 +1,8 @@
 Parsing t1-example.ycp
 Parsing t1-mis.ycp
 t1-mis.ycp: 21: Warning: Function undocumented has no comment.
+t1-mis.ycp: 30: Warning: Unknown tag @param
+t1-mis.ycp: 30: Warning: Unknown tag @param
 t1-mis.ycp: 30: Warning: Parameter a declared in function header but not documented.
 t1-mis.ycp: 30: Warning: Parameter b declared in function header but not documented.
 Parsing t1-modules.ycp

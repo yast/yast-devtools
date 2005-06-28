@@ -263,7 +263,8 @@ my $g;
 #   see => list of "see" strings
 #   scruple => [ name, "blahblah...\nblahhy" ] # will be <pre>'d, @ref expanded
 #   example => "<pre>blahblah...</pre>"
-#   body => description text, @ref expanded
+#   short => short description, @ref expanded
+#   descr => list of description paragraphs, @ref expanded
 #   deprecated => what to use instead (or "magicnumber" if not specified)
 # see string: one of
 #   #item
@@ -543,8 +544,6 @@ sub do_shipout ($$$$$@)
     # file name,
     my ($file, $isglobal, $declared_type, $name, $params, @comments) = @_;
 
-    my $lastwas = "";
-
     my $entry = {};
     $entry->{"file"} = $file;
     $entry->{"name"} = $name;
@@ -562,7 +561,6 @@ sub do_shipout ($$$$$@)
     $entry->{"scruple"} = [];
     $entry->{"see"} = [];
     tie @{$entry->{"see"}}, "see";
-    $entry->{"body"} = "";
     $entry->{"short"} = "";
     $entry->{"descr"} = [];
     tie @{$entry->{"descr"}}, "descr";
@@ -573,8 +571,6 @@ sub do_shipout ($$$$$@)
     my %param_incomment; # parameter descriptions
 
     my @parameters = ();
-    my @descr = ();
-    my @example_file = ();
 
     if ($name eq "")
     {
@@ -607,113 +603,102 @@ sub do_shipout ($$$$$@)
 
     my $last_param;
     my $documented_type = "";
-    my $para = "";
+    my $para = "";		# paragraph. collects description lines
+    my $lastwas = "";
+    my $addto;			# reference to a string var
     foreach my $line (@comments)
     {
-        my $empty_line = $line;
-        $empty_line =~ s/\s+//;
-	if($line =~ /\@param\s+($ycp_symbol)\s+(.*)/o)
-	{
-	    $lastwas = "param";
+	my $line_is_blank = ($line =~ /^\s*$/);
 
+	my ($tag, $spaces, $arg) = ("", "", "");
+	if ($line =~ /\@(\S+)(\s*)(.*)/ && $1 ne "ref")
+	    # ref is an inline tag so it does not count here
+	{
+	    ($tag, $spaces, $arg) = ($1, $2, $3);
+	    $lastwas = $tag;
+	}
+
+	if ($tag eq "param" && $arg =~ /($ycp_symbol)\s+(.*)/o)
+	{
 	    $last_param = $1;
-	    $param_incomment{$last_param} = almost_html ($2);
+	    $addto = \ $param_incomment{$last_param};
+	    $$addto = almost_html ($2);
 	}
-	elsif($line =~ /\@return\s+($ycp_typedecl)?\s*(.*)/o)
+	elsif ($tag eq "return" && $arg =~ /($ycp_typedecl)?\s*(.*)/o)
 	{
-	    $lastwas = "return";
 	    $documented_type = $1 || "";
-	    $entry->{"return"} = almost_html ($2);
+	    $addto = \ $entry->{$tag};
+	    $$addto = almost_html ($2);
 	}
-	elsif ($line =~ /\@since\s+(.*)/)
+	elsif ($tag eq "since")
 	{
-	    $lastwas = "since";
-	    $entry->{"since"} = almost_html ($1);
+	    $entry->{$tag} = almost_html ($arg);
+	    $addto = undef;
 	}
-	elsif ($line =~ /\@short\s+(.*)/)
+	elsif ($tag eq "see")
 	{
-	    $lastwas = "short";
-	    $entry->{"short"} = almost_html ($1);
-	}
-	elsif ($line =~ /\@descr\s+(.*)/)
-	{
-	    $lastwas = "descr";
-            $para .= almost_html("\n$1");
-	}
-	elsif($line =~ /\@see\s+(.*)/)
-	{
-	    $lastwas = "see";  # it is an error, we do not allow multiline see...
-	    # see section
-	    $line = $1;
-
 	    # Simply copy it to the see list and let the backend do the work.
 	    # Maybe do some syntax checks here?
-	    push @{$entry->{"see"}}, $line;
+	    push @{$entry->{$tag}}, $arg;
+	    $addto = undef;
 	}
-	elsif($line =~ /\@example_file(.*)/)
+	elsif ($tag eq "example_file")
 	{
-	    $lastwas = "example_file";
-	    $line =~ s/\@example_file//; # remove it if it's there
-	    $line =~ s/\s+//; # remove empty spaces
-            push @example_file, $line;
+            push @{$entry->{$tag}}, $arg;
+	    $addto = undef;
 	}
-	elsif($line =~ /\@screenshot(.*)/)
+	elsif ($tag eq "screenshot") # who uses this? nashif?
 	{
-	    $lastwas = "screenshot";
-	    $line =~ s/\@screenshot//; # remove it if it's there
-	    $line =~ s/\s+//; # remove empty spaces
-	    $entry->{"screenshot"} .= $line;
+	    $entry->{$tag} .= $arg;
+	    $addto = undef;
 	}
-	elsif($line =~ /\@example(.*)/ || $lastwas eq "example")
+	elsif ($tag eq "example")
 	{
-	    $lastwas = "example";
-	    $line =~ s/\@example//; # remove it if it's there
-	    $entry->{"example"} .= almost_html ("\n$line");
+	    $addto = \ $entry->{$tag};
+	    $$addto .= almost_html ("\n$spaces$arg");
 	}
-	elsif($line =~ /\@deprecated\s*(.*)/)
+	elsif ($tag eq "deprecated")
 	{
-	    $lastwas = "deprecated";
-	    if( ($1) ne "" )
-	    {
-		$entry->{"deprecated"} .= almost_html ($1);
-	    }
-	    else
-	    {
-		$entry->{"deprecated"} .= almost_html ("magicnumber");
-	    }
+	    $arg ||= "magicnumber";
+	    $entry->{$tag} .= almost_html ($arg);
+	    $addto = undef;
 	}
-	elsif($line =~ /\@(struct|tuple)\s*(.*)/)
+	elsif ($tag eq "struct" || $tag eq "tuple")
 	{
-	    $lastwas = "scruple";
-	    $entry->{"scruple"} = [$2, ""];
-	    push @entries, {"kind" => "scruple", "name" => $2,
-			    "signature" => $2, "file" => $file};
+	    $tag = $lastwas = "scruple";
+	    $entry->{$tag} = [$arg, ""];
+	    $addto = \ $entry->{$tag}->[1];
+	    push @entries, {"kind" => "scruple", "name" => $arg,
+			    "signature" => $arg, "file" => $file};
 	}
-	elsif($lastwas eq "scruple")
+	elsif ($tag eq "short")
 	{
-	    $entry->{"scruple"}->[1] .= almost_html ("\n$line");
+	    $addto = \ $entry->{$tag};
+	    $$addto = almost_html ($arg);
 	}
-	elsif($lastwas eq "return")
+	elsif ($tag eq "descr")
 	{
-	    $entry->{"return"}.= almost_html ("\n$line");
+            $para .= almost_html("\n$arg");
+	    # ? addto
 	}
-	elsif($lastwas eq "param")
+	#
+	elsif ($tag ne "")
 	{
-	    $param_incomment{$last_param} .= almost_html ("\n$line");
+	    warning ("Unknown tag \@$tag");
 	}
-	elsif($lastwas eq "short" && $empty_line ne "")
+	elsif ($lastwas eq "short" && !$line_is_blank)
         {
-            $lastwas = "short";
-	    $entry->{"short"} .= almost_html ("\n$line");
+	    $$addto .= almost_html ("\n$line");
         }
-	elsif($lastwas eq "short" || $lastwas eq "descr")
+	# descr may be separated from short by an empty line
+	elsif ($lastwas eq "short" || $lastwas eq "descr")
 	{
             $lastwas = "descr";
-            if ($empty_line eq "")
+            if ($line_is_blank)
             { 
                 if ($para ne "")
                 {
-	            push @descr, $para;
+		    push @{$entry->{"descr"}}, $para;
                 }
                 $para = "";
             }
@@ -722,15 +707,19 @@ sub do_shipout ($$$$$@)
                 $para .= almost_html("\n$line");
             }
 	}
+	elsif (defined $addto)
+	{
+	    $$addto .= almost_html ("\n$line");
+	}
+	# no tag so far = short description
 	else
 	{
             $lastwas = "short";
-	    $entry->{"short"} .= almost_html ("\n$line");
+	    $addto = \ $entry->{"short"};
+	    $$addto .= almost_html ("\n$line");
 	}
     }
     $entry->{"type"} = $declared_type || $documented_type;
-    push @{$entry->{"descr"}}, @descr;
-    push @{$entry->{"example_file"}}, @example_file;
 
 
     # check arguments

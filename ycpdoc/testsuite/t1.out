@@ -33,7 +33,7 @@
 ></descr
 ><example
 >
- 
+
   This example shows multiline example tag.
      CallModule(
                 io.ycp // &lt;filename&gt;
@@ -89,7 +89,7 @@
 ></descr
 ><example
 >
-  string hex = tohex(65);</example
+ string hex = tohex(65);</example
 ><example_file
 ></example_file
 ><file
@@ -260,9 +260,7 @@
 ></see
 ><short
 >
- Description.
- @param a
- @param c</short
+ Description.</short
 ><type
 >void</type
 ></provides_item

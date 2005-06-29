@@ -9,7 +9,7 @@ ybcfiles = $(filter %.ybc,$(modulebin_DATA))
 # suffix mapping: info '(make)Static Usage'
 # apply only to our modules, not external ones
 ${ybcfiles}: %.ybc: %.ycp $(ycpchook)
-	$(bindir)/ycpc -c -M. -I. -q $(YCPCFLAGS) $<
+	LD_LIBRARY_PATH=$(YCPC_LD_LIBRARY_PATH) $(bindir)/ycpc -c -M. -I. -q $(YCPCFLAGS) $<
 
 # files to clean
 CLEANFILES = ${ybcfiles}

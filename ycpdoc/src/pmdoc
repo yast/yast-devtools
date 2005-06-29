@@ -4,6 +4,7 @@
 # Use TYPEINFO lines to create function entries with headings and signatures
 
 use strict;
+use Data::Dumper;
 
 
 sub typeinfo_to_signature ($;$);
@@ -11,6 +12,7 @@ sub typeinfo_to_signature ($;$)
 {
     my ($ti, $fname) = @_;
 #print STDERR "fname: '$fname'\n" if ($fname);
+#print STDERR Dumper ($ti);
     my $rti = ref ($ti);
     if (! $rti)
     {
@@ -51,17 +53,25 @@ sub typeinfo_to_signature ($;$)
 while (defined ($_ = <>))
 {
     print;
-    if (m/^BEGIN\s*\{\s*\$TYPEINFO\s*\{\s*(\S*)\s*\}\s*=\s*(.*);/)
+    if (m/^BEGIN\s*\{\s*\$TYPEINFO\s*\{\s*(\S*)\s*\}\s*=\s*([^};]*)/)
     {
 	my ($name, $ti) = ($1, $2);
-	my $sig = typeinfo_to_signature (eval($ti), $name);
-	chomp;
-	print "\n";
-	print "=head2 $name\n";
-	print "\n";
-	print "C< $sig >\n";
-	print "\n";
-	print "=cut\n";
-	print "\n";
+	my $eti = eval($ti);
+	if (!defined $eti)
+	{
+	    warn "Could not parse '$ti'";
+	}
+	else
+	{
+	    my $sig = typeinfo_to_signature ($eti, $name);
+	    chomp;
+	    print "\n";
+	    print "=head2 $name\n"; # TODO or =item
+	    print "\n";
+	    print "C< $sig >\n";
+	    print "\n";
+	    print "=cut\n";
+	    print "\n";
+	}
     }
 }

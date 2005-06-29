@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jun 29 11:33:38 CEST 2005 - arvin@suse.de
+
+- allow setting LD_LIBRARY_PATH for ycpc (needed in storage)
+
+-------------------------------------------------------------------
 Tue Jun 28 15:43:50 CEST 2005 - mvidner@suse.cz
 
 - ycpdoc: rewrote @tag parsing for clarity.
@@ -51,7 +56,7 @@ Thu Jun  2 18:45:44 CEST 2005 - mvidner@suse.cz
 -------------------------------------------------------------------
 Tue May 31 10:55:19 CEST 2005 - visnov@suse.cz
 
-- rename XXPkgXX.pm to XXPkgXX2.pm to make skeleton work out of box 
+- rename XXPkgXX.pm to XXPkgXX2.pm to make skeleton work out of box
 
 -------------------------------------------------------------------
 Mon May 30 18:03:38 CEST 2005 - mvidner@suse.cz
@@ -68,7 +73,7 @@ Mon May 23 16:46:49 CEST 2005 - hmacht@suse.de
 -------------------------------------------------------------------
 Wed May 18 09:22:40 CEST 2005 - visnov@suse.cz
 
-- merge back proofread skeleton 
+- merge back proofread skeleton
 
 -------------------------------------------------------------------
 Tue May 17 18:51:05 CEST 2005 - mvidner@suse.cz
@@ -111,7 +116,7 @@ Thu Apr 28 14:13:23 CEST 2005 - mvidner@suse.cz
 Wed Apr  6 08:25:02 CEST 2005 - visnov@suse.cz
 
 - added gettext-devel to NFB
-- 2.12.0 
+- 2.12.0
 
 -------------------------------------------------------------------
 Fri Feb 18 09:57:22 CET 2005 - ke@suse.de

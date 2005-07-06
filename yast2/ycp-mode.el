@@ -12,11 +12,11 @@
 
 ;; This package is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; along with GNU Emacs; see the file COPYING.	If not, write to the
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
@@ -73,14 +73,20 @@
        (ycp-ui-widgets
 	(eval-when-compile
 	 (regexp-opt '(
+		       "`BarGraph"
 		       "`Bottom"
 		       "`CheckBox"
+		       "`ColoredLabel"
 		       "`ComboBox"
+		       "`Date"
 		       "`DownloadProgress"
+		       "`DumbTab"
+		       "`DummySpecialWidget"
 		       "`Empty"
 		       "`Frame"
 		       "`HBox"
 		       "`HCenter"
+		       "`HMultiProgressMeter"
 		       "`HSpacing"
 		       "`HSquash"
 		       "`HStretch"
@@ -89,17 +95,23 @@
 		       "`HVStretch"
 		       "`HWeight"
 		       "`Heading"
+		       "`IconButton"
 		       "`Image"
 		       "`IntField"
 		       "`Label"
 		       "`Left"
 		       "`LogView"
+		       "`MarginBox"
 		       "`MenuButton"
+		       "`MinHeight"
+		       "`MinSize"
+		       "`MinWidth"
 		       "`MultiLineEdit"
 		       "`MultiSelectionBox"
 		       "`PackageSelector"
-		       "`PkgSpecial"
+		       "`PartitionSplitter"
 		       "`Password"
+		       "`PkgSpecial"
 		       "`ProgressBar"
 		       "`PushButton"
 		       "`RadioButton"
@@ -108,22 +120,19 @@
 		       "`RichText"
 		       "`Right"
 		       "`SelectionBox"
+		       "`Slider"
 		       "`Table"
 		       "`TextEntry"
+		       "`Time"
 		       "`Top"
 		       "`Tree"
 		       "`VBox"
 		       "`VCenter"
+		       "`VMultiProgressMeter"
 		       "`VSpacing"
 		       "`VSquash"
 		       "`VStretch"
 		       "`VWeight"
-		       "`DummySpecialWidget"
-		       "`BarGraph"
-		       "`ColoredLabel"
-		       "`DumbTab"
-		       "`Slider"
-		       "`PartitionSplitter"
 		       "`Wizard"
 		       ))))
 
@@ -131,15 +140,25 @@
 	(eval-when-compile
 	  (regexp-opt '(
 			"`id"
+			"`opt"
+			"`icon"
 			"`item"
 			"`menu"
-			"`opt"
+			"`header"
 			"`rgb"
+			"`leftMargin"
+			"`rightMargin"
+			"`topMargin"
+			"`bottomMargin"
+			"`BackgroundPixmap"
 
 			"`animated"
 			"`autoScrollDown"
+			"`autoAdvance"
 			"`autoShortcut"
+			"`boldFont"
 			"`countShowDelta"
+			"`centered"
 			"`debugLayout"
 			"`decorated"
 			"`default"
@@ -152,14 +171,19 @@
 			"`immediate"
 			"`infocolor"
 			"`keepSorting"
+			"`keyEvents"
 			"`notify"
 			"`outputField"
 			"`plainText"
 			"`scaleToFit"
+			"`searchMode"
+			"`summaryMode"
 			"`shrinkable"
+			"`smallDecorations"
 			"`stepsEnabled"
 			"`testMode"
 			"`tiled"
+			"`treeEnabled"
 			"`updateMode"
 			"`vstretch"
 			"`warncolor"
@@ -179,6 +203,19 @@
 			"`key_F10"
 			"`key_F11"
 			"`key_F12"
+			"`key_F13"
+			"`key_F14"
+			"`key_F15"
+			"`key_F16"
+			"`key_F17"
+			"`key_F18"
+			"`key_F19"
+			"`key_F20"
+			"`key_F21"
+			"`key_F22"
+			"`key_F23"
+			"`key_F24"
+			"`key_none"
 		       ))))
 
        (ycp-ui-widget-properties
@@ -186,6 +223,8 @@
 	 (regexp-opt '(
 		       "`CurrentButton"
 		       "`CurrentItem"
+		       "`DebugLabel"
+		       "`DialogDebugLabel"
 		       "`EasterEgg"
 		       "`Enabled"
 		       "`ExpectedSize"
@@ -196,11 +235,14 @@
 		       "`Labels"
 		       "`LastLine"
 		       "`Notify"
+		       "`OpenItems"
 		       "`SelectedItems"
 		       "`ValidChars"
 		       "`Value"
 		       "`Values"
+		       "`WidgetClass"
 		       "`WindowID"
+		       "`InputMaxLength"
 		       ))))
 
        (ycp-ui-glyphs
@@ -234,6 +276,7 @@
 		       "GetDisplayInfo"
 		       "GetLanguage"
 		       "GetModulename"
+		       "GetProductName"
 		       "Glyph"
 		       "HasSpecialWidget"
 		       "MakeScreenShot"
@@ -249,13 +292,18 @@
 		       "RedrawScreen"
 		       "ReplaceWidget"
 		       "RunPkgSelection"
+		       "SCR"
 		       "SetConsoleFont"
 		       "SetFocus"
+		       "SetFunctionKeys"
+		       "SetKeyboard"
 		       "SetLanguage"
 		       "SetModulename"
+		       "SetProductName"
 		       "StopRecordMacro"
 		       "TimeoutUserInput"
 		       "UserInput"
+		       "WFM"
 		       "WaitForEvent"
 		       "WidgetExists"
 		       "WizardCommand"
@@ -281,13 +329,13 @@
   '((c-basic-offset . 4)
     (c-offsets-alist
      ;; Half indentation for toplevel statements
-     (defun-block-intro     . *)
+     (defun-block-intro	    . *)
      ;; ???
-     (arglist-intro         . c-lineup-arglist-intro-after-paren)
+     (arglist-intro	    . c-lineup-arglist-intro-after-paren)
      ;; ???
-     (arglist-close         . c-lineup-arglist)
+     (arglist-close	    . c-lineup-arglist)
      ;; Open "substatement" indicates the line after an `if', `else', `while', `do' statement.
-     (substatement-open     . 0)))
+     (substatement-open	    . 0)))
 
   "Association list of syntactic element symbols and indentation offsets.
 

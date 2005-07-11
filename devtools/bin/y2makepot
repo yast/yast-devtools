@@ -41,6 +41,7 @@ function usage() {
     echo -e "create *.pot files from a source tree.";
     echo -e "\nOptions:\n\t-c\t\t Checkin the newly created files to svn"
     echo -e "\t-f\t\t Overwrite potfiles which exist already"
+    echo -e "\t-s\t\t Specify the source dir where to look for translatable files (recursive)"
     echo -e "\nYou can specify additional files to .pot creation in $SRCDIR/POTFILES"
     echo
 
@@ -56,7 +57,7 @@ function generate_potfiles() {
     # all the .ycp and .pm files, we should separate texts from
     # (exclude testsuite directory)
     POT_SRC=`find $SRCDIR -type d -name testsuite -prune , \
-        -type f -name "*.ycp" -o -name "*.pm" | \
+        -type f -name "*.ycp" -o -name "*.pm" -o -name "*.cc" | \
         xargs egrep -l '^<?[[:space:]]*[Tt]extdomain>?' \
 	$POTFILES`
 
@@ -155,22 +156,22 @@ function checkin_potfiles() {
 CHECKIN=1
 OVERWRITE=1
 XGETTEXT="xgettext"
-SRCDIR="src"
+SRCDIR="."
 POT_DST=""
 
-
 # parse command line options
-while getopts "chf" opt; do
+while getopts "chfs::" opt; do
     case $opt in
 	c)
 	    CHECKIN=0;;
 	f)
 	    OVERWRITE=0;;
+    s)
+        SRCDIR="$OPTARG";;
 	*)
 	    usage;;
     esac
-done;
-
+done
 
 generate_potfiles
 
@@ -182,3 +183,4 @@ echo
 exit 0
 
 # -- main -- end ---------------------------------------------------------------
+

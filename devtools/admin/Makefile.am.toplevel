@@ -94,7 +94,7 @@ dist-hook:
 	done
 
 pot:
-	y2tool y2makepot -f -s $(srcdir)
+	y2tool y2makepot -s $(srcdir)
 
 install-pot: pot
 	@POT_DST=`find -type d -name testsuite -prune , \

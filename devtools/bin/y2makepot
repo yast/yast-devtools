@@ -13,21 +13,10 @@
 # -- function defininitions -- start -------------------------------------------
 # ##############################################################################
 
-function xgettext_call() {
+function xgettext_call()
+{
     MODULE=$1
     FILES=$2
-
-    if test -e "./$MODULE.pot"; then
-	if test "$OVERWRITE" == "0"; then
-	    echo "potfile $MODULE.pot exists already. Replacing it..."
-	    cp "$MODULE.pot" "$MODULE.pot.old"
-	    echo "Wrote backup file to $MODULE.pot.old"
-	else
-	    echo "potfile $MODULE.pot exists already. Leaving it untouched."
-	    echo "Override this setting by giving -f as parameter."
-	    return
-	fi
-    fi
 
     echo "Creating ./$MODULE.pot from $FILES..." ;
     $XGETTEXT --no-wrap --add-comments --add-location --keyword=_:1,2 \
@@ -36,12 +25,12 @@ function xgettext_call() {
 	--default-domain=$MODULE --output=$MODULE.pot $FILES
 }
 
-function usage() {
+function usage()
+{
     echo
     echo -e "create *.pot files from a source tree.";
-    echo -e "\nOptions:\n\t-c\t\t Checkin the newly created files to svn"
-    echo -e "\t-f\t\t Overwrite potfiles which exist already"
-    echo -e "\t-s\t\t Specify the source dir where to look for translatable files (recursive)"
+    echo -e "\nOptions:\n\t-c\t Check in the newly created files to SVN"
+    echo -e "\t-s\t Specify the source dir where to look for translatable files (recursive)"
     echo -e "\nYou can specify additional files to .pot creation in $SRCDIR/POTFILES"
     echo
 
@@ -49,11 +38,12 @@ function usage() {
 }
 
 
-function generate_potfiles() {
+function generate_potfiles()
+{
     # we can specify additional files to .pot creation
     POTFILES_FILE=`test -e $SRCDIR/POTFILES && echo POTFILES`
     POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`
-    
+
     # all the .ycp and .pm files, we should separate texts from
     # (exclude testsuite directory)
     POT_SRC=`find $SRCDIR -type d -name testsuite -prune , \
@@ -69,24 +59,24 @@ function generate_potfiles() {
     DOMAINS="" ;
     for F in $POT_SRC; do
 	D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
-            sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[= \
+            sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
               "(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`;
 	if [ -z $D ]; then
 	    echo "Error: empty textdomain in $F" ;
 	    exit 1 ;
 	fi ;
-	
+
 	DOMAINS="$D:$F\n$DOMAINS" ;
     done
-    
+
     DOMAINS=`echo -en $DOMAINS | LC_COLLATE=C sort` ;
     MODULE=${DOMAINS%%:*};
-    
+
     FILES="";
     for I in $DOMAINS; do
 	D=${I%%:*} ;
 	F=${I#*:} ;
-	
+
 	if [ "$D" != "$MODULE" ]; then
 	    POT_DST="$POT_DST $MODULE.pot"
 
@@ -94,12 +84,12 @@ function generate_potfiles() {
 	    echo
 	    MODULE=$D;
 	    FILES=$F;
-	else 
+	else
 	    FILES="$FILES $F" ;
 	fi
 
     done
-    
+
     POT_DST="$POT_DST $MODULE.pot"
     xgettext_call "$MODULE" "$FILES"
     echo
@@ -107,7 +97,8 @@ function generate_potfiles() {
 
 
 
-function checkin_potfiles() {
+function checkin_potfiles()
+{
     ADDED=""
     CHANGED=""
 
@@ -154,7 +145,6 @@ function checkin_potfiles() {
 
 # define global variables
 CHECKIN=1
-OVERWRITE=1
 XGETTEXT="xgettext"
 SRCDIR="."
 POT_DST=""
@@ -163,13 +153,17 @@ POT_DST=""
 while getopts "chfs::" opt; do
     case $opt in
 	c)
-	    CHECKIN=0;;
+	    CHECKIN=0
+            ;;
 	f)
-	    OVERWRITE=0;;
-    s)
-        SRCDIR="$OPTARG";;
+	    echo "y2makepot: ignoring obsolete option -f"
+            ;;
+        s)
+            SRCDIR="$OPTARG"
+            ;;
 	*)
-	    usage;;
+	    usage
+            ;;
     esac
 done
 

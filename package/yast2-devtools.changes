@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jul 22 14:52:57 CEST 2005 - sh@suse.de
+
+- Relaxed y2makepot syntax checking: Allow "Textdomain:", too
+- Overwrite existing .pot file by default
+- Made -f option to y2makepot obsolete (throw warning, but continue) 
+
+-------------------------------------------------------------------
 Wed Jun 29 11:33:38 CEST 2005 - arvin@suse.de
 
 - allow setting LD_LIBRARY_PATH for ycpc (needed in storage)

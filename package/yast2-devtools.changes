@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 26 18:42:08 CEST 2005 - mir@suse.de
+
+- added packagemanager-test and online-update-test to all-packages
+- 2.12.6
+
+-------------------------------------------------------------------
 Fri Jul 22 14:52:57 CEST 2005 - sh@suse.de
 
 - Relaxed y2makepot syntax checking: Allow "Textdomain:", too

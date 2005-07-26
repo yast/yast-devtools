@@ -54,7 +54,7 @@ yast2-devtools		-			development
 yast2-testsuite		-			development
 y2pmsh			-			development
 yast2-packagemanager-test -			internal
-yast2-online-update	-			internal
+yast2-online-update-test  -			internal
 
 # agents
 yast2-ldap		inst-sys,default	ldap agent (users)

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 26 18:55:07 CEST 2005 - mir@suse.de
+
+- fixed my typo in all-packages
+- 2.12.7
+
+-------------------------------------------------------------------
 Tue Jul 26 18:42:08 CEST 2005 - mir@suse.de
 
 - added packagemanager-test and online-update-test to all-packages

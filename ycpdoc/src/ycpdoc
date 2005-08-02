@@ -875,7 +875,7 @@ sub new ($)
     my ($fh) = @_;
     # DATA_*: insert whitespace automatically
     my $xw = new XML::Writer (OUTPUT => $fh, DATA_MODE => 1, DATA_INDENT => 1, UNSAFE => 1);
-    $xw->xmlDecl ();
+    $xw->xmlDecl ("UTF-8");
     $xw->doctype ("html",
 		  "-//W3C//DTD XHTML 1.1//EN",
 		  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
@@ -1633,7 +1633,7 @@ sub write_docs
 {
     my $output = new IO::File(">$xml_output") or die "Cannot open file $xml_output: $!";
     $writer = new XML::Writer (OUTPUT => $output, NEWLINES => 1);
-    $writer->xmlDecl ();
+    $writer->xmlDecl ("UTF-8");
     $writer->startTag ("ycpdoc");
     dump_data ($g);
     $writer->endTag ();

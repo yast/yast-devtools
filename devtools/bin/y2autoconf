@@ -239,7 +239,7 @@ dnl ...
 dnl no need for AC_ARG_VAR
 AC_PATH_PROG(XGETTEXT, xgettext)
 if test -z "$XGETTEXT" ; then
-    AC_MSG_ERROR(xgettext is missing; please install gettext.)
+    AC_MSG_ERROR(xgettext is missing; please install gettext-devel.)
 fi
 
 devtools_ybindir=`pkg-config --variable=ybindir yast2-devtools`

@@ -4,7 +4,7 @@
 #
 # This can check one or more YaST2 YCP scripts for common errors.
 # Checked YCP scripts are required to be syntactically correct.
-# Check with "parseycp" if you are unsure about this.
+# Check with "ycpc -Eq" if you are unsure about this.
 #
 # Usage:
 #	check_ycp [-options] <ycp-file> [<ycp-file> ...]
@@ -1944,7 +1944,7 @@ sub usage()
 	"\t-x example mode - relaxed checking for YCP examples: -ckmpt\n"	.
 	"\n"									.
 	"Checked YCP scripts are required to be syntactically correct.\n"	.
-	"Check with \"parseycp\" if you are unsure about this.\n"		.
+	"Check with \"ycpc -Eq\" if you are unsure about this.\n"		.
 	"\n";
 }
 

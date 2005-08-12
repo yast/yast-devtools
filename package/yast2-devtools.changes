@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug 12 12:34:25 CEST 2005 - lslezak@suse.cz
+
+- added yast2-vm into list of all yast packages
+- 2.12.11
+
+-------------------------------------------------------------------
 Fri Aug 12 09:21:16 CEST 2005 - visnov@suse.cz
 
 - don't check imports by default 

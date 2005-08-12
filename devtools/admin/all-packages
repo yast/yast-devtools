@@ -118,6 +118,7 @@ yast2-tftp-server	default			TFTP server
 yast2-tune		inst-sys,default	hardware info and tune
 yast2-tv		default			TV card
 yast2-uml		default			UML
+yast2-vm		default			Configure and start installation in a virtual machine 
 yast2-users		default			users
 yast2-x11		default			runtime x11
 yast2-you-server	default			YOU server

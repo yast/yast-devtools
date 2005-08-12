@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 12 09:21:16 CEST 2005 - visnov@suse.cz
+
+- don't check imports by default 
+
+-------------------------------------------------------------------
 Thu Aug 11 13:19:02 CEST 2005 - visnov@suse.cz
 
 - don't mention parseycp in check_ycp 

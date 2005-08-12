@@ -58,7 +58,7 @@ my $dont_check_keyboard_shortcuts	= 0;	# -k (keyboard)
 my $dont_force_translations		= 0;	# -t (translations)
 my $dont_check_obsolete_functions	= 0;	# -b (oBsolete)
 my $dont_check_predefined_messages	= 0;	# -m (messages)
-my $dont_check_imports			= 0;	# -i (imports)
+my $check_imports			= 0;	# -i (imports)
 
 
 # Other command line switches:
@@ -115,7 +115,7 @@ sub main()
     $dont_check_alternate_declarations	= 1	if $opt_a;
     $dont_check_obsolete_functions	= 1	if $opt_b;
     $dont_check_header			= 1	if $opt_c;
-    $dont_check_imports			= 1	if $opt_i;
+    $check_imports			= 1	if $opt_i;
     $dont_check_keyboard_shortcuts	= 1	if $opt_k;
     $dont_check_predefined_messages	= 1	if $opt_m;
     $dont_force_textdomain		= 1	if $opt_o;
@@ -211,7 +211,7 @@ sub check_ycp_file()
     check_widget_params( $ycp_code )		unless $dont_check_keyboard_shortcuts && $dont_force_translations;
     check_obsolete_functions( $ycp_code )	unless $dont_check_obsolete_functions;
     check_predefined_messages( $ycp_code )	unless $dont_check_predefined_messages;
-    check_imports( $ycp_code )			unless $dont_check_imports;
+    check_imports( $ycp_code )			if $check_imports;
 
     # print count_lines( $ycp_code ) . "\n" ;
 }
@@ -1933,7 +1933,7 @@ sub usage()
 	"\t-c don't check file header comments\n"				.
 	"\t-d debug\n"								.
 	"\t-h help (this message)\n"						.
-	"\t-i don't check for using non-imported symbols\n"						.
+	"\t-i check for using non-imported symbols\n"						.
 	"\t-k don't check keyboard shortcuts\n"					.
 	"\t-o don't enforce textdomain statement\n"				.
 	"\t-p multiple <p> / </p> paragraphs are OK in HTML messages\n"		.

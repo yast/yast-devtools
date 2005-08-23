@@ -4,7 +4,7 @@
 
 SUBDIRS = check_ycp
 
-ybin_SCRIPTS = ycp_puttext
+ybin_SCRIPTS = ycp_puttext showy2log
 
 emacsdir = $(prefix)/share/emacs/site-lisp
 emacs_DATA = ycp-mode.el suse-start-ycp-mode.el

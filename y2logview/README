@@ -1,0 +1,118 @@
+Brief intro how to use y2logview.tcl
+====================================
+
+Usage: y2logview.tcl LOGFILE
+----------------------------
+
+  Reads and displays LOGFILE (defaults to 'y2log').
+
+
+If LOGFILE happens to be a fifo, the log window is cleared each time the
+fifo is opened for writing. I usg. use this when testing the packagemanager:
+
+  # launch y2logview reading the fifo
+  mkfifo Y2LOGFILE
+  y2logview.tcl Y2LOGFILE &
+
+  # make YaST log to stderr
+  export Y2SLOG_FILE=-
+  export Y2SLOG_DEBUG=1
+
+  # now run the tests redirecting '2>Y2LOGFILE' ...
+  ./ma_test.bin 2>Y2LOGFILE
+  ...
+  ./ma_test.bin 2>Y2LOGFILE
+
+That way running ma_test.bin clears any old content and y2logview always
+shows the last runs log.
+
+
+The log window
+--------------
+
+It's a two level tree. A new section is created whenever 'Launched YaST2
+component' is parsed. A whole sections can be collapsed/expanded by double
+clicking the plus/minus sign. Use <Shift-Page_Up>/<Shift-Page_Down> to
+jump to the previous/next section beginning.
+
+The 1st column shows the section and the line number within this section.
+The remaining columns show Date, Time, LogLevel, Host/Pid, LogClass,
+File/Fnc/Line and the LogText. Clicking the corresponding button in the
+headline hides/shows the column. Date, Time, LogLevel, Host/Pid and
+LogClass are hidden per default. You can't hide the LogText.
+
+Loglines can be selected the usual way. Drag while <Button-1> is pressed.
+<Shift-Button-1> extends the selection. <Ctrl-Button-1> to select disjoint
+lines. Use the [Dump Selection] button to dump the selection on stdout.
+
+
+The log level selection
+-----------------------
+
+Use the checkbuttons at the top to select which lines to show or hide in
+the log window. The buttons in the 1st row will will show/hide all lines
+of a certain loglevel. Coding is:
+
+  blue        - debug
+  white       - milestone
+  pale yellow - warning
+  red         - error
+  magenta     - security
+  green       - internal
+  yellow      - user (in case the new LOG_USER level gets number '6')
+
+  greenyellow - besides the section headline (which can't be hidden), this
+                is used for special lines. Packagemanagers 'timecount' will
+                be colored this way. And at leas the last time I tried,
+                messages from valgrind got this color.
+
+As the logfile is parsed, entries for each log class are created (in order
+of appearance). You can hide all messages of a certain class using the
+corresponding checkbutton. The remaining buttons operate on individual
+combinations of class and loglevel.
+
+
+-f button
+---------
+
+At bottom right side, where the scrollbars meet, is a small square
+unlabeled checkbutton button. If it's sunken, the log window will always
+jump to the end, if new loglines arrive. I like this when reading from a
+fifo. If you uncheck the button, the log view stays where it is, and you
+can navigate, even if new line are read.
+
+
+Missing stuff
+-------------
+
+- Show/hide based on file/function. Eg. hide logclass mediaacess, but show
+  messages from Mount.cc.
+
+- Searching and highlighting. Based on regex in LogText. For specific files
+  or functions in File/Fnc/Line. Easy navigation from match to match.
+  Optional unhide matches in otherwise hidden lines or vice versa.
+
+- Show/hide sets of lines regardless of their content. Operate on current
+  selection, range of line numbers, search result or
+
+- Optional dim lines instead of hiding them. E.g. by using a gray
+  background and a colored text.
+
+- Try to figure out which YaST component is shown in a section. Maybe
+  that's superfluous once we have proper user level loglines.
+
+- Reading multiple files. Per default splited y2logs in correct order.
+
+- An rcfile which stores different profiles (search terms and hide/show settings).
+  Viewing bugzilla logs for a packagemanager problem, I usually start
+  turning off everything except YCP and the packagemanager classes. If
+  show/hide based on file/function would be available the preferred settings
+  would slightly differ, dependent on whether it's a YOU, install or
+  InstSource problem.
+  Another common setup is turning on everything except for debug and
+  milestones.
+
+- Sometimes handy would be an editor window. Instead of dumping selected
+  lines to stdout, they could be appended to the editor, and commented.
+  Such an abstract could be passed back to bugzilla to explain what you
+  read from the log. Esp. if you reassign or needinfo.

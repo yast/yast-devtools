@@ -891,8 +891,8 @@ set log(newopen) 0
 
 proc log_addline { t } {
 	set ldat {}
-	## ------    |-date---------------------|    |-time---------------------|     |-leve-|     |-hos-|  |-pid--|        |-cla-|  |-file-|  |-fnc---|     |-line-|
-	if [regexp {^([0-9]{4}-[0-9]{2}-[0-9]{2})[ ]+([0-9]{2}:[0-9]{2}:[0-9]{2})[ ]+<([0-9]+)>[ ]+([^ ]*)\(([0-9]+)\)[ ]+\[([^]]+)] ([^( ]+)(\(([^ :]+)\))?:([0-9]+) (.*)} \
+	## ------    |-date---------------------|    |-time---------------------|     |-leve-|     |-hos-|  |-pid--|        |-cla-|  |-file-|    |-fnc-|     |-line-|
+	if [regexp {^([0-9]{4}-[0-9]{2}-[0-9]{2})[ ]+([0-9]{2}:[0-9]{2}:[0-9]{2})[ ]+<([0-9]+)>[ ]+([^ ]*)\(([0-9]+)\)[ ]+\[([^]]+)] ([^( ]+)?(\(([^)]+)\))?:([0-9]+) (.*)} \
 			$t lne(dummy) lne(date) lne(time) lne(level) lne(host) lne(pid) lne(class) lne(file) lne(dummy) lne(fnc) lne(lne) lne(text)] {
 		if [string match "*++" $lne(class)] {
 			set lne(class) [string range $lne(class) 0 end-2]

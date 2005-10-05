@@ -28,6 +28,7 @@ yast2-packagemanager	inst-sys,default	all
 liby2util		inst-sys,default	all
 yast2-pkg-bindings	inst-sys,default	all
 yast2-cim		default			all
+yast2-hardware-detection	inst-sys,default	all
 
 # language bindings
 yast2-perl-bindings	default			all

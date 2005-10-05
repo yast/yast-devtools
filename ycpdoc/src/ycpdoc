@@ -73,6 +73,19 @@ Processes special comments in ycp file and creates
 html file from them. Uses the same comment syntax as
 kdoc/ydoc.
 
+=head2 File Description
+
+Format:
+
+	Attribute: value
+	Flag.
+
+Attributes: Module Package File Summary Depends Authors Author
+
+Flags: Stable Unstable
+
+=head2 Function Description
+
 	Supported tags:
             @short very short description
             @descr complete description
@@ -87,6 +100,7 @@ kdoc/ydoc.
 	    @see file#
 	    @see <a href="uri">text</a>
 	    @deprecated replacement
+	    @stable or @unstable
 	    @struct name		begins a struct description, <pre>
 	    @ref function		(inline, otherwise like @see)
 
@@ -98,6 +112,9 @@ All tags except @see can be multiline.
 Also processes initial comment of file if it starts at the
 first line, html allowed.
 Supports intro via /*** , html allowed.
+
+Interface stability is marked by @stable or @unstable. The default is
+@unstable.
 
 See YaST2 Documentation public/Developers/Coding/rules.html
 for example.
@@ -245,6 +262,7 @@ my $g;
 #   descr
 #   summary
 #   depends
+#   stability: unstable (default) | stable
 # requires map:
 #   kind: include or import or (yuck! provides!) module
 #   name
@@ -266,6 +284,7 @@ my $g;
 #   short => short description, @ref expanded
 #   descr => list of description paragraphs, @ref expanded
 #   deprecated => what to use instead (or "magicnumber" if not specified)
+#   stability => unstable (default) | stable, overrides the file global setting
 # see string: one of
 #   #item
 #   file
@@ -663,6 +682,11 @@ sub do_shipout ($$$$$@)
 	    $entry->{$tag} .= almost_html ($arg);
 	    $addto = undef;
 	}
+	elsif ($tag eq "stable" || $tag eq "unstable")
+	{
+	    $entry->{stability} = $tag;
+	    $addto = undef;
+	}
 	elsif ($tag eq "struct" || $tag eq "tuple")
 	{
 	    $tag = $lastwas = "scruple";
@@ -817,10 +841,15 @@ sub parse_header (@)
 	    # Module is old style, Package is new style. TODO, define meaning
 	    $key = "module" if $key eq "package";
 	}
+	elsif ($a =~ /^\s*(Stable|Unstable)\./)
+	{
+	    $key = "stability";
+	    $a = lc $1;
+	}
 	elsif ($a =~ /^\s*\$Id/)
 	{
 	    $a = "";
-	    $key = "descr";
+	    $key = "descr";	# Id marks the start of description
 	}
 
 	if ( $key eq "authors")
@@ -1316,6 +1345,17 @@ sub write_onefile ($$)
 	}
 	$O->close ("ul");
     }
+    $O->close ("td");
+    $O->close ("tr");
+
+    $O->elem ("tr");
+    $O->elem ("td");
+    my $stability = $parsed_header->{stability} || "unstable";
+    if ($stability eq "unstable")
+    {
+	$O->tree (["p", ["-", "This module has an unstable interface."]]);
+    }
+    #TODO maybe add something about "stable"
     $O->close ("td");
     $O->close ("tr");
 

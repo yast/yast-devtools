@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct  5 16:48:37 CEST 2005 - mvidner@suse.cz
+
+- ycpdoc: interface stability markup (incomplete)
+- 2.13.0
+
+-------------------------------------------------------------------
 Tue Aug 23 13:19:46 CEST 2005 - jsuchome@suse.cz
 
 - added yast2-trans-fi to all-packages

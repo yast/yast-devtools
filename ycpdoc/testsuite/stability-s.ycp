@@ -1,0 +1,21 @@
+/**
+ * Interface stability markup
+ * Stable.
+ */
+{
+	/**
+	* A function with default stability
+	*/
+	void Default () {
+		//...
+	}
+
+    /**
+     * An unstable function in an otherwise stable module
+     * @param a foo
+     * @unstable
+     */
+    void Foo (list a) {
+	//...
+    }
+}

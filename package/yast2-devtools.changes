@@ -1,7 +1,9 @@
 -------------------------------------------------------------------
-Thu Oct 13 10:50:01 CEST 2005 - mvidner@suse.cz
+Thu Oct 13 11:09:50 CEST 2005 - mvidner@suse.cz
 
+- y2autoconf: Do not clutter . with OUTPUT and OUTPUT2.
 - ycp_puttext: Do not complain if $ycp_file.rejected does not exist.
+- 2.13.1
 
 -------------------------------------------------------------------
 Wed Oct  5 16:48:37 CEST 2005 - mvidner@suse.cz

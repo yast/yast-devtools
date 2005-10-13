@@ -43,13 +43,6 @@ chomp $RPMNAME;
 chomp $VERSION;
 chomp $MAINTAINER;
 
-$OUTPUT = qx(SUBDIRS=`cat SUBDIRS 2> /dev/null` ;
-	     [ -z "\$SUBDIRS" ] && SUBDIRS="./" ;
-	     for DIR in \$SUBDIRS ;
-	       do find \$DIR -name 'Makefile.am' | grep -v "^./$RPMNAME-" | grep -v '^\\./Makefile.am\$' | grep -v '^po/' | sed 's/.am\$//' ;
-	     done;
-	     [ -d "po" ] && echo "po/Makefile");
-
 # Better finding of subdirs: do not do "find" since that does not
 # honor SUBDIRS in Makefiles.am and that messes with the skeletons
 
@@ -85,19 +78,7 @@ sub find_subdirs {
 @SUBDIRS = grep { $_ ne "po" } @SUBDIRS;
 push (@SUBDIRS, "po") if (-d "po");
 
-$OUTPUT2 = join ("\n", map { "$_/Makefile" } find_subdirs (@SUBDIRS));
-
-# interim debugging:
-if ($OUTPUT ne $OUTPUT2) {
-    print STDERR "New style Makefile list:\n";
-    open TMP, ">OUTPUT";
-    print TMP $OUTPUT;
-    close TMP;
-    open TMP, ">OUTPUT2";
-    print TMP $OUTPUT2;
-    close TMP;
-    system q{bash -c 'sort OUTPUT | sed -e "s:^./::" | diff -u - <(sort OUTPUT2)'};
-}
+$OUTPUT = join ("\n", map { "$_/Makefile" } find_subdirs (@SUBDIRS));
 
 %macros =
 (
@@ -369,7 +350,7 @@ fi
 
     # generate output
     '@YAST2-OUTPUT@' =>
-"AC_CONFIG_FILES(Makefile $OUTPUT2)
+"AC_CONFIG_FILES(Makefile $OUTPUT)
 AC_OUTPUT
 "
 );

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Oct 13 10:50:01 CEST 2005 - mvidner@suse.cz
+
+- ycp_puttext: Do not complain if $ycp_file.rejected does not exist.
+
+-------------------------------------------------------------------
 Wed Oct  5 16:48:37 CEST 2005 - mvidner@suse.cz
 
 - ycpdoc: interface stability markup (incomplete)

@@ -38,9 +38,10 @@ my %trans_ref_count;	# reference counts:	$trans_ref_count{"orig"} = 4;
 # your own. This script, however, will do its work even in such
 # commented-out code no matter what - even if it complains.
 
+# ycp files to patch:
+# $ycp_files{"src/installation.ycp"} = "/.../installation/src/installation.ycp";
+my %ycp_files;
 
-my %ycp_files;		# ycp files to patch:
-			# $ycp_files{"installation.ycp"} = "y2m_inst/ycp/general/installation.ycp";
 
 
 
@@ -65,8 +66,8 @@ exit 0;
 
 sub main()
 {
-    my $ycp_base_path;
-    my $po_file;
+    my $ycp_base_path;		# to be prepended to file names in the po file
+    my $po_file;		# the file to be merged
 
     # Extract command line options.
     # This will set a variable opt_? for any option,
@@ -100,14 +101,15 @@ sub main()
 #-----------------------------------------------------------------------------
 
 
-# Process one YCP file:
-# Take the translations from $po_file and patch them into $ycp_file.
+# Process all YCP files:
+# Take the translations from $po_file and patch them
+# to files under $ycp_base_path
 #
 # Parameters:
 #	po_file
 #	ycp_base_path
 
-sub ycp_puttext()
+sub ycp_puttext($$)
 {
     my ( $po_file, $ycp_base_path ) = @_;
     my $trans_count;
@@ -142,15 +144,15 @@ sub ycp_puttext()
 	# open the new file for reading 
  	open ( IN, "$ycp_file.tmp" )		or die "FATAL: Can't open $ycp_file";
 	# this file will contain $ycp_file.tmp with fixed comments
-	open ( COMMENT_CLEAN, ">$ycp_file.comment_clean" ) or die "FATAL: Can't open $ycp_file.rejected";
+	open ( COMMENT_CLEAN, ">$ycp_file.comment_clean" ) or die "FATAL: Can't open $ycp_file.comment_clean";
 	my $num_comments = move_comments();
 	close ( COMMENT_CLEAN );
 	close( IN );
 
 	# we have some suspicious comments
 	if ( $num_comments > 0 ) {
-	    open ( OUT, ">$ycp_file.rejected" );
-	    open ( IN, "$ycp_file.comment_clean" ) or die "FATAL: Can't open $ycp_file.removed_comments";
+	    open ( OUT, ">$ycp_file.rejected" ) or die "FATAL: Can't open $ycp_file.rejected";
+	    open ( IN, "$ycp_file.comment_clean" ) or die "FATAL: Can't open $ycp_file.comment_clean";
 
 	    # do not print out replaced messages while creating the diff file
 	    my $verbose_tmp = $verbose;
@@ -177,15 +179,18 @@ sub ycp_puttext()
 	    warning ( "Can't remove $ycp_file.comment_clean" );
 	}
 
-	# create the diff file with fixed comments
-	my $ret = system( "diff -u $ycp_file $ycp_file.rejected > $ycp_file.diff");
-	if ( $ret == 256 ) 
+	if (-f "$ycp_file.rejected")
 	{
-	    printf ("Wrote diff file for suspicious comments to $ycp_file.diff\n");
-	}
-	elsif ( $ret > 1 )
-	{
-	    warning ( "Can't create diff file for suspicious comments $ycp_file.diff" );
+	    # create the diff file with fixed comments
+	    my $ret = system( "diff -u $ycp_file $ycp_file.rejected > $ycp_file.diff");
+	    if ( $ret == 256 )
+	    {
+		printf ("Wrote diff file for suspicious comments to $ycp_file.diff\n");
+	    }
+	    elsif ( $ret > 1 )
+	    {
+		warning ( "Can't create diff file for suspicious comments $ycp_file.diff" );
+	    }
 	}
     }
 
@@ -201,7 +206,7 @@ sub ycp_puttext()
 #	%trans			the translations themselves
 #	%trans_ref_count	reference count for each translation
 #
-# Parameters: ---
+# Parameters: global file handle PO
 #
 # Return value: The number of non-empty translations
 
@@ -210,12 +215,10 @@ sub read_po()
     my @line_numbers;
     my $msgid;
     my $msgstr;
-    my $in_msgid  = 0;
-    my $in_msgstr = 0;
-    my $multi_line = 0;
+    my $in_msgid  = 0;		# parser state
+    my $in_msgstr = 0;		# parser state
+    my $multi_line = 0;		# parser state
     my $line;
-    my @line_no_infos;
-    my $line_no_info;
     my $fuzzy = 0;
     my $trans_count = 0;
 
@@ -244,14 +247,15 @@ sub read_po()
 	    $line =~ s/^#://;	# remove line header
 	    $line =~ s/^\s+//;	# remove leading  whitespace
 	    $line =~ s/\s+$//;	# remove trailing whitespace
-	    @line_no_infos = split ( '\s+', $line );
+	    my @line_no_infos = split ( '\s+', $line );
 
-	    foreach $line_no_info ( @line_no_infos )
+	    foreach my $line_no_info ( @line_no_infos )
 	    {
 		my ( $filename, $line_no ) = split ( ':', $line_no_info, 2 );
 		# use the filename in the pot file instead of the basename
 		# bug 23297
 		# $filename = basename( $filename );
+		# mark the file as needing to be patched
 		$ycp_files{ $filename } = "";
 		push @line_numbers, $line_no;
 	    }
@@ -283,6 +287,8 @@ sub read_po()
 
 	my $quoted_string = $line;
 	chomp $quoted_string;
+	# extract what is inside the quotes
+	# but don't bother unescaping
 	$quoted_string =~ s:^[^"]*"(.*)".*$:$1:;	# "] (for emacs)
 
 	if ( $in_msgid )
@@ -291,6 +297,7 @@ sub read_po()
 	}
         if ( $in_msgstr )
 	{
+	    # interpret trailing escaped newline
 	    if ( $multi_line && defined $msgstr && length ( $msgstr ) > 0 )
 	    {
 		$msgstr =~ s/\\n$//;
@@ -318,10 +325,13 @@ sub read_po()
 # Empty translations will be silently ignored.
 #
 # Parameters:
-#	$msgid		the original message
-#	$msgstr		the translated message
+#	$msgid		the original message (will be normalized)
+#	$msgstr		the translated message (will not be normalized, ugh)
 #	$fuzzy		fuzzy flag - ignore this message
+#	$trans_count	number of translations stored so far
 #	@line_numbers	the line numbers where this translation occurs
+# Return:
+#	the current number of stored translations
 
 sub store_translation()
 {

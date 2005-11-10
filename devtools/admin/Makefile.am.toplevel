@@ -6,7 +6,8 @@
 #    (Edit ./SUBDIRS instead)
 #
 
-PREFIX			= /usr
+#where devtools are
+PREFIX := $(shell pkg-config --print-errors --variable=prefix yast2-devtools)
 
 VERSION			= $(shell cat $(srcdir)/VERSION)
 RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
@@ -30,6 +31,10 @@ COPYRIGHT_files_yast	= YAST_LICENSE README COPYING COPYRIGHT.english \
 extra_COPYRIGHT_files =  $(if $(HAS_YAST_LICENSE), $(COPYRIGHT_files_yast), $(COPYRIGHT_files_gpl))
 
 AUTOMAKE_OPTIONS = foreign dist-bzip2
+# where devtools instal m4 snippets
+# argh, executed literally
+#ACLOCAL_AMFLAGS = -I $(PREFIX)/share/aclocal
+ACLOCAL_AMFLAGS = -I `pkg-config --print-errors --variable=prefix yast2-devtools`/share/aclocal
 
 Makefile.am.common: $(DEVTOOLS_DIR)/admin/Makefile.am.common
 	cmp -s $< $@ || cp -f $< $@

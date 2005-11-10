@@ -34,11 +34,14 @@ function append_lines()
 #
 
 self=`basename $0`
-devtoolsprefix=/usr # pkgconfig?
-y2adminpath=$devtoolsprefix/share/YaST2/data/devtools/admin
 
 if [ "$1" == "--bootstrap" ]; then
     y2adminpath=$2
+else
+    # assuming that pkg-config can find it because presumably we're running
+    # with pfx
+    devtoolsprefix=`pkg-config --print-errors --variable=prefix yast2-devtools`
+    y2adminpath=$devtoolsprefix/share/YaST2/data/devtools/admin
 fi
 
 

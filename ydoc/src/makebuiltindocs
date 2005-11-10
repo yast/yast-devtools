@@ -9,7 +9,9 @@ else
     TITLE="The YCP standard built-in functions"
 fi
 
+SELF=`type -p $0`
+SELFDIR=${SELF%/*}
 {
  echo $TITLE
- /usr/lib/YaST2/bin/builtindoc "$@"
-} | /usr/lib/YaST2/bin/makehtml
+ $SELFDIR/builtindoc "$@"
+} | $SELFDIR/makehtml

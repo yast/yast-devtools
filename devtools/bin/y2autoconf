@@ -223,8 +223,8 @@ if test -z "$XGETTEXT" ; then
     AC_MSG_ERROR(xgettext is missing; please install gettext-devel.)
 fi
 
-devtools_ybindir=`pkg-config --variable=ybindir yast2-devtools`
-devtools_yast2dir=`pkg-config --variable=yast2dir yast2-devtools`
+devtools_ybindir=`pkg-config --print-errors --variable=ybindir yast2-devtools`
+devtools_yast2dir=`pkg-config --print-errors --variable=yast2dir yast2-devtools`
 
 dnl producing pkg-config for others?
 AM_CONDITIONAL(CREATE_PKGCONFIG, test "x${CREATE_PKGCONFIG}" != x)
@@ -345,6 +345,10 @@ fi
 AC_PATH_PROG(YCPMAKEDEP, ycpmakedep, false, $PATH:$devtools_ybindir)
 if test "$YCPMAKEDEP" = "false"; then
     AC_MSG_ERROR([ycpmakedep is not installed])
+fi
+AC_PATH_PROG(YCPC, ycpc, false, $PATH:$bindir)
+if test "$YCPC" = "false"; then
+    AC_MSG_ERROR([ycpc is not installed])
 fi
 ',
 

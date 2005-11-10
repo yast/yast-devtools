@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Nov 10 19:00:27 CET 2005 - mvidner@suse.cz
+
+- Devtools now work in a custom prefix
+- Added autoconf variable YCPC
+- Running pkg-config with --print-errors
+- 2.13.3
+
+-------------------------------------------------------------------
 Thu Oct 27 18:18:58 CEST 2005 - mvidner@suse.cz
 
 - Added a stylesheet for converting the CLI XML help to docbook.

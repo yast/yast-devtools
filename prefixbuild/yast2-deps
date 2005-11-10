@@ -1,0 +1,100 @@
+#! /bin/bash
+
+# Find NFB dependencies of $@
+# See do_deps
+
+set -o errexit
+# to signal failure when we are called in $()
+trap "touch .yast2-deps-failed" ERR
+
+# $1: a yast rpm name
+# stdout: the corresponding module in SVN
+function rpm_to_svn() {
+    RPM="${1%-devel}"
+    case "$RPM" in
+	yast2|liby2util)
+	    echo "$RPM" ;;
+	yast2-mail-aliases)
+	    echo mail ;;
+	yast2-storage-lib)
+	    echo storage ;;
+	yast2-*)
+	    echo "${RPM#yast2-}" ;;
+	*)
+	    echo "_unknown-$RPM" ;;
+    esac
+}
+
+# $1: what to update
+# $2: what to echo
+function cond_up_helper() {
+    echo Updating "$2" >&2
+    svn up "$1" >&2
+    touch "$1"/$TS
+}
+
+# Conditional update: only if not updated within the last hour
+# Careful not to pollute stdout
+# $1 the submodule to update
+function cond_up() {
+    TS=.$FUNCNAME.last
+    if [ -d "$1" ]; then
+	pushd "$1" >/dev/null
+
+	T=$(mktemp /tmp/$FUNCNAME.XXXXXX) || exit
+	touch -d '1 hour ago' $T
+	if [ $TS -ot $T ]; then
+	    cond_up_helper . "$1"
+	fi
+	rm $T
+
+	popd >/dev/null
+    else
+	cond_up_helper "$1" "$1"
+    fi
+}
+
+# $1: svn module
+# stdout: svn modules of its NFB
+function get_deps() {
+    NFB=$(sed -n -e '/^#[[:space:]]*neededforbuild[[:space:]]*\(.*\)/{;s//\1/;p;q;}' "$1"/*.spec.in)
+    # expand macros (/work/abuild/lib/abuild/etc/needed_packages.fixes)
+    NFB=${NFB/yast2-devel-packages/yast2-core-devel-packages yast2-pkg-bindings}
+    NFB=${NFB/yast2-core-devel-packages/yast2-devtools liby2util yast2-core yast2-packagemanager yast2-testsuite yast2-perl-bindings yast2}
+
+    for nfb in $NFB; do
+	case "$nfb" in
+	    liby2util|yast2*) rpm_to_svn "$nfb";;
+	esac
+	# others are assumed installed
+    done
+}
+
+# Recursively find dependent modules for neededforbuild of $1
+# Output them in tsort format (lines of pairs: TARGET PREREQUISITE).
+# Update each module from svn if older than a hour.
+# The recursion is terminated by empty DEPS,
+# DEPS_* just caches the results
+function do_deps() {
+    local TARGET DEP		# must be local or recursion does not work
+    TARGET=$1
+    DEPSTARGET=DEPS_`echo $TARGET |tr - _`
+    if [ "${!DEPSTARGET-unset}" != unset ]; then
+	return
+    fi
+
+    cond_up "$TARGET"
+
+    DEPS=$(get_deps "$TARGET")
+    eval $DEPSTARGET=\"$DEPS\"
+    for DEP in $DEPS; do
+	echo "$TARGET" "$DEP"
+	do_deps $DEP
+    done
+}
+
+for i in "$@"; do
+    do_deps $i
+done
+
+echo "${!DEPS_*}" >&2

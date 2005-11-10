@@ -1,0 +1,9 @@
+#! /bin/sh
+# set environment for prefixed yast
+PREFIX=$HOME/pfx
+PATH=$PREFIX/bin:$PATH
+export Y2DIR=$PREFIX/share/YaST2
+# FOO=BAR${FOO+:$FOO}
+# if there was something, append it after a colon
+export PKG_CONFIG_PATH=$PREFIX/share/pkgconfig:$PREFIX/lib/pkgconfig${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}
+"$@"

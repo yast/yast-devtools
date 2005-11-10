@@ -1,0 +1,125 @@
+#! /bin/bash -x
+# mvidner@suse.cz, 2005-03-17
+# recreate prefix installation of yast
+set -o errexit
+
+while getopts d FLAG; do
+    case $FLAG in
+	d) RESOLVE_DEPS=1;;
+	*) echo Ugh;;
+    esac
+done
+shift $((OPTIND-1))
+
+#check that we are  in the right directory: .../trunk or .../branches/$B
+test -f extra-packages || exit
+
+# the prefix
+PREFIX=$HOME/pfx
+
+# $1 package directory
+# configure arguments are take from MODULE_ARGUMENTS_$1
+function build_module() {
+    local MODULE="$1"; shift
+    local MODULE_ARGUMENTS_r=`echo MODULE_ARGUMENTS_$MODULE | tr - _`
+#    svn update "$MODULE"
+    condup "$MODULE"
+    pushd "$MODULE"
+
+    if [ -f configure ]; then
+	make -f Makefile.cvs reconf
+    else
+	make -f Makefile.cvs all
+	# pfx: pick up prefixed pkg-config
+	# pfx ./configure "${MODULE_ARGUMENTS_foo[@]}"
+	eval pfx ./configure "\"\${${MODULE_ARGUMENTS_r}[@]}\""
+    fi
+    dmake	       # distributed make; can just use "make" instead
+    make install
+    popd
+}
+
+# helper variables
+PFX="--prefix=$PREFIX"
+CFLAGS="CXXFLAGS=-O0 -g3"
+WCFLAGS="CXXFLAGS=-O0 -g3 -W"
+FILLUPDIR='--with-fillupdir=$(prefix)/var/adm/fillup-templates'
+
+# not devtools, currently they have to be in /usr
+
+# comment out the rest as needed
+
+# $1 package directory
+# rest: configure arguments
+function module() {
+    local MODULE="$1"; shift
+    local MODULE_ARGUMENTS_r=`echo MODULE_ARGUMENTS_$MODULE | tr - _`
+    eval "$MODULE_ARGUMENTS_r=(\"\$@\")"
+}
+
+module liby2util	"$PFX" "$WCFLAGS"
+module core		"$PFX" "$WCFLAGS"
+module hardware-detection	"$PFX" "$WCFLAGS"
+module packagemanager	"$PFX" "$FILLUPDIR" "$CFLAGS"
+module testsuite	"$PFX"
+module pkg-bindings	"$PFX" "$CFLAGS"
+module yast2		"$PFX" "$FILLUPDIR" '--sbindir=$(prefix)/sbin' '--sysconfdir=$(prefix)/etc'
+
+module ncurses		"$PFX" "$CFLAGS"
+module qt		"$PFX" "$CFLAGS"
+
+module scanner		"$PFX"
+module xml		"$PFX" "$CFLAGS"
+module tune		"$PFX"
+module mail		"$PFX"
+module nfs-client	"$PFX"
+module nfs-server	"$PFX"
+module tftp-server	"$PFX"
+
+module country		"$PFX"
+
+module mouse		"$PFX"
+
+## yast2-deps says installation needs xml
+## but apparently that's not the case
+module installation	"$PFX"
+module firewall		"$PFX"
+
+module perl-bindings	"$PFX" "$CFLAGS"
+
+module storage		"$PFX" "$CFLAGS" # "SWIG=$HOME/pfx-swig-1.3.24/bin/swig"
+module bootloader	"$PFX" "$FILLUPDIR"
+
+module x11		"$PFX" "$CFLAGS"
+module packager		"$PFX"
+module update		"$PFX"
+module transfer		"$PFX" "$CFLAGS"
+module autoinstallation	"$PFX" "$FILLUPDIR" '--sysconfdir=$(prefix)/etc'
+
+module network		"$PFX"
+
+## for packaging mail: users
+module pam		"$PFX"
+module security		"$PFX"
+module ldap-client	"$PFX" "$FILLUPDIR"
+module users		"$PFX" "$CFLAGS"
+
+module ldap		"$PFX" "$CFLAGS"
+module dns-server	"$PFX"
+
+module schema		"$PFX"
+
+module runlevel		"$PFX"
+
+if [ "$RESOLVE_DEPS" = 1 ]; then
+    echo >&2 "Getting dependencies"
+    MODULES=`yast2-deps $1 | tsort | tac | grep -v devtools`
+    test ! -f .yast2-deps-failed
+else
+    MODULES="$@"
+fi
+
+echo >&2 "$MODULES"
+for M in $MODULES; do
+    build_module $M
+done

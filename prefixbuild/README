@@ -1,0 +1,10 @@
+$Id$
+
+This is a collection of scripts that I use to build YaST from SVN.
+The main feature is that everyting is installed to ~/pfx, not /usr.
+The prefix is not used everywhere yet, and RPMs don't work with it
+either.
+
+The scripts normaly live in my ~/bin.
+
+mvidner@suse.cz

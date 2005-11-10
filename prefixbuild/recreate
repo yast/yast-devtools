@@ -1,12 +1,18 @@
-#! /bin/bash -x
+#! /bin/bash
 # mvidner@suse.cz, 2005-03-17
 # recreate prefix installation of yast
 set -o errexit
 
-while getopts d FLAG; do
+RESOLVE_DEPS=false
+NETWORK=true
+AUTORECONF=true
+while getopts dnaC FLAG; do
     case $FLAG in
-	d) RESOLVE_DEPS=1;;
-	*) echo Ugh;;
+	d) RESOLVE_DEPS=true;;
+	n) NETWORK=false;;
+	a) AUTORECONF=false;;
+	C) CACHE=-C;;
+	*) echo Ugh; exit 1;;
     esac
 done
 shift $((OPTIND-1))
@@ -16,26 +22,39 @@ test -f extra-packages || exit
 
 # the prefix
 PREFIX=$HOME/pfx
+# distributed make; can just use "make" instead
+for MAKE in dmake make false; do
+    type $MAKE >/dev/null 2>/dev/null && break
+done
+if [ $MAKE = false ]; then
+    echo make is missing
+    exit 1
+fi
 
 # $1 package directory
 # configure arguments are take from MODULE_ARGUMENTS_$1
 function build_module() {
     local MODULE="$1"; shift
     local MODULE_ARGUMENTS_r=`echo MODULE_ARGUMENTS_$MODULE | tr - _`
-#    svn update "$MODULE"
-    condup "$MODULE"
+    $NETWORK && condup "$MODULE"
     pushd "$MODULE"
 
-    if [ -f configure ]; then
-	make -f Makefile.cvs reconf
-    else
-	make -f Makefile.cvs all
-	# pfx: pick up prefixed pkg-config
-	# pfx ./configure "${MODULE_ARGUMENTS_foo[@]}"
-	eval pfx ./configure "\"\${${MODULE_ARGUMENTS_r}[@]}\""
+    if $AUTORECONF || ! test -x ./configure; then
+        pfx y2tool y2autoconf
+        pfx y2tool y2automake
+        pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
     fi
-    dmake	       # distributed make; can just use "make" instead
-    make install
+
+    if [ -x ./config.status ]; then
+        pfx ./config.status --recheck
+        pfx ./config.status
+    else
+	# pfx: pick up prefixed pkg-config
+	# pfx ./configure $CACHE "${MODULE_ARGUMENTS_foo[@]}"
+	eval pfx ./configure \$CACHE "\"\${${MODULE_ARGUMENTS_r}[@]}\""
+    fi
+    pfx $MAKE
+    pfx make install
     popd
 }
 
@@ -45,10 +64,6 @@ CFLAGS="CXXFLAGS=-O0 -g3"
 WCFLAGS="CXXFLAGS=-O0 -g3 -W"
 FILLUPDIR='--with-fillupdir=$(prefix)/var/adm/fillup-templates'
 
-# not devtools, currently they have to be in /usr
-
-# comment out the rest as needed
-
 # $1 package directory
 # rest: configure arguments
 function module() {
@@ -57,6 +72,7 @@ function module() {
     eval "$MODULE_ARGUMENTS_r=(\"\$@\")"
 }
 
+module devtools		"$PFX"
 module liby2util	"$PFX" "$WCFLAGS"
 module core		"$PFX" "$WCFLAGS"
 module hardware-detection	"$PFX" "$WCFLAGS"
@@ -111,15 +127,16 @@ module schema		"$PFX"
 
 module runlevel		"$PFX"
 
-if [ "$RESOLVE_DEPS" = 1 ]; then
+if $RESOLVE_DEPS; then
     echo >&2 "Getting dependencies"
-    MODULES=`yast2-deps $1 | tsort | tac | grep -v devtools`
+    MODULES=`yast2-deps $1 | tsort | tac`
     test ! -f .yast2-deps-failed
 else
     MODULES="$@"
 fi
 
 echo >&2 "$MODULES"
+set -x
 for M in $MODULES; do
     build_module $M
 done

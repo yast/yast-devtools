@@ -1,6 +1,8 @@
 -------------------------------------------------------------------
-Thu Nov 10 19:00:27 CET 2005 - mvidner@suse.cz
+Thu Dec  1 17:09:29 CET 2005 - mvidner@suse.cz
 
+- ycpdoc: @-tags are only recognized at the start of a comment line.
+  Improved error reporting for incomplete @param and @return.
 - Devtools now work in a custom prefix
 - Added autoconf variable YCPC
 - Running pkg-config with --print-errors

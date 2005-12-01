@@ -630,21 +630,23 @@ sub do_shipout ($$$$$@)
 	my $line_is_blank = ($line =~ /^\s*$/);
 
 	my ($tag, $spaces, $arg) = ("", "", "");
-	if ($line =~ /\@(\S+)(\s*)(.*)/ && $1 ne "ref")
+	if ($line =~ /^\s*\@(\S+)(\s*)(.*)/ && $1 ne "ref")
 	    # ref is an inline tag so it does not count here
 	{
 	    ($tag, $spaces, $arg) = ($1, $2, $3);
 	    $lastwas = $tag;
 	}
 
-	if ($tag eq "param" && $arg =~ /($ycp_symbol)\s+(.*)/o)
+	if ($tag eq "param")
 	{
+	    $arg =~ /($ycp_symbol)\s*(.*)/o;
 	    $last_param = $1;
 	    $addto = \ $param_incomment{$last_param};
 	    $$addto = almost_html ($2);
 	}
-	elsif ($tag eq "return" && $arg =~ /($ycp_typedecl)?\s*(.*)/o)
+	elsif ($tag eq "return")
 	{
+	    $arg =~ /($ycp_typedecl)?\s*(.*)/o;
 	    $documented_type = $1 || "";
 	    $addto = \ $entry->{$tag};
 	    $$addto = almost_html ($2);

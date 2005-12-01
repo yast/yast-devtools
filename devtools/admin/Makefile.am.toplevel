@@ -34,7 +34,7 @@ AUTOMAKE_OPTIONS = foreign dist-bzip2
 # where devtools instal m4 snippets
 # argh, executed literally
 #ACLOCAL_AMFLAGS = -I $(PREFIX)/share/aclocal
-ACLOCAL_AMFLAGS = -I `pkg-config --print-errors --variable=prefix yast2-devtools`/share/aclocal
+ACLOCAL_AMFLAGS = -I `if test -d ./devtools/admin; then echo ./devtools/admin; else pkg-config --print-errors --variable=datadir yast2-devtools; fi`/aclocal
 
 Makefile.am.common: $(DEVTOOLS_DIR)/admin/Makefile.am.common
 	cmp -s $< $@ || cp -f $< $@

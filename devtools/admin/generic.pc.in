@@ -1,6 +1,7 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
+datadir=@datadir@
 includedir=@includedir@
 yast2dir=@yast2dir@
 ybindir=@ybindir@

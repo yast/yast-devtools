@@ -6,19 +6,23 @@ set -o errexit
 RESOLVE_DEPS=false
 NETWORK=true
 AUTORECONF=true
-while getopts dnaC FLAG; do
+DIRECTORY_CHECK=true
+while getopts dnaCD FLAG; do
     case $FLAG in
 	d) RESOLVE_DEPS=true;;
 	n) NETWORK=false;;
 	a) AUTORECONF=false;;
 	C) CACHE=-C;;
+	D) DIRECTORY_CHECK=false;;
 	*) echo Ugh; exit 1;;
     esac
 done
 shift $((OPTIND-1))
 
 #check that we are  in the right directory: .../trunk or .../branches/$B
-test -f extra-packages || exit
+if $DIRECTORY_CHECK; then
+    test -f extra-packages || exit
+fi
 
 # the prefix
 PREFIX=$HOME/pfx
@@ -49,9 +53,10 @@ function build_module() {
         pfx ./config.status --recheck
         pfx ./config.status
     else
+	# if no MODULE_ARGUMENTS_foo are given, assume $PFX
 	# pfx: pick up prefixed pkg-config
-	# pfx ./configure $CACHE "${MODULE_ARGUMENTS_foo[@]}"
-	eval pfx ./configure \$CACHE "\"\${${MODULE_ARGUMENTS_r}[@]}\""
+	# pfx ./configure $CACHE "${MODULE_ARGUMENTS_foo[@]-$PFX}"
+	eval pfx ./configure \$CACHE "\"\${${MODULE_ARGUMENTS_r}[@]-\$PFX}\""
     fi
     pfx $MAKE
     pfx make install

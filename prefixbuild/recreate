@@ -43,9 +43,13 @@ function build_module() {
     $NETWORK && condup "$MODULE"
     pushd "$MODULE"
 
+    if [ "$MODULE" = devtools ]; then
+	local BOOTSTRAP="--bootstrap ./devtools/admin"
+    fi
+
     if $AUTORECONF || ! test -x ./configure; then
-        pfx y2tool y2autoconf
-        pfx y2tool y2automake
+        pfx y2tool y2autoconf $BOOTSTRAP
+        pfx y2tool y2automake $BOOTSTRAP
         pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
     fi
 

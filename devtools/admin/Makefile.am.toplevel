@@ -62,12 +62,8 @@ show-extra-dist:
 
 # info '(automake)Conditionals'
 if CREATE_PKGCONFIG
-# pkg-config
-# if a package does not have its own pc, copy the generic one
-$(RPMNAME).pc.in: $(DEVTOOLS_DIR)/admin/generic.pc.in
-	test -f $@ || cp -p $< $@
 # create the file here instead of by configure
-# because the prerequisite is made here
+# because the prerequisite is made here (not anymore!)
 # and we don't want any paths in y2autoconf
 # info '(autoconf)config.status Invocation'
 $(RPMNAME).pc: $(RPMNAME).pc.in

@@ -74,11 +74,11 @@ sub find_subdirs {
 # synchronize with y2automake
 @SUBDIRS = split (/\s+/, (`cat SUBDIRS 2> /dev/null` ||
 			`ls */Makefile.am | sed -e 's:/Makefile.am::' | sort | grep -v "^$RPMNAME-" | tr '\n' ' '`));
+@SUBDIRS = find_subdirs (@SUBDIRS);
 # "po" hacking: y2automake runs after us so "po" may not have Makefile.am yet
-@SUBDIRS = grep { $_ ne "po" } @SUBDIRS;
 push (@SUBDIRS, "po") if (-d "po");
 
-$OUTPUT = join ("\n", map { "$_/Makefile" } find_subdirs (@SUBDIRS));
+$OUTPUT = join ("\n", map { "$_/Makefile" } @SUBDIRS);
 
 %macros =
 (

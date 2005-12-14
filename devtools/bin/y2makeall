@@ -58,7 +58,7 @@ my @core_binaries =
 #
 #	push @exclude_list, ( "dontwantthis", "dontwantthat" );
 
-my @exclude_list =
+our @exclude_list =
     (
      "CVS",
      ".svn",
@@ -75,7 +75,7 @@ my @exclude_list =
 # All other directories (except of course those from the exclude list) will be
 # processed automatically after those.
 
-my @ycp_favourites =
+our @ycp_favourites =
     (
      "yast2",
      "xml",

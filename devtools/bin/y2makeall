@@ -1037,7 +1037,7 @@ sub print_summary()
 sub find_files()
 {
     my ( $dir, $pattern, $exclude_regexp ) = @_;
-    my $cmd = "find $dir -name \"$pattern\" -print | egrep -v \"$exclude_regexp\"";
+    my $cmd = "find -H $dir -name \"$pattern\" -print | egrep -v \"$exclude_regexp\"";
 
     log_debug( "$cmd" );
     my @files = split( '\n', `$cmd`);

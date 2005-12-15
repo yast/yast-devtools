@@ -93,8 +93,9 @@ our @ycp_favourites =
 
 
 
-my $work_root = $ENV{'PWD'};
-my $make_log  = $work_root . "/make.log";
+my $work_root	= $ENV{'PWD'};
+my $make_log	= $work_root . "/make.log";
+my $failed_log	= $work_root . "/failed-packages.log";
 
 
 #
@@ -241,10 +242,12 @@ sub main()
 
 
     #
-    # Set up log file
+    # Set up logs
     #
 
-    open( LOG, ">" . $make_log ) or warn "Couldn't open $make_log";
+    open( LOG,        ">" . $make_log   ) or warn "Couldn't open $make_log";
+    open( FAILED_LOG, ">" . $failed_log ) or warn "Couldn't open $failed_log";
+    $OUTPUT_AUTOFLUSH = 1;
 
     #
     # Make a hash from the exclude list
@@ -267,6 +270,9 @@ sub main()
 
     print_summary()		if $enable_print_summary;
     close( LOG );
+    close( FAILED_LOG );
+
+    unlink( $failed_log ) if ( scalar( @failed_dirs ) < 1 );
 }
 
 
@@ -589,6 +595,7 @@ sub make()
     if ( $error )
     {
 	push( @failed_dirs, basename( $pkg  ) );
+	print FAILED_LOG "$pkg\n";
     }
     else
     {

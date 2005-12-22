@@ -111,6 +111,7 @@ yast2-samba-client	default                 samba client
 yast2-samba-server	default                 samba server
 yast2-scanner		default			scanner
 yast2-security		default			security
+yast2-slp-server	default			slp daemon
 yast2-sound		default			sound
 yast2-storage		inst-sys,default	storage
 yast2-support		default			support

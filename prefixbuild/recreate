@@ -48,14 +48,14 @@ function build_module() {
     fi
 
     if $AUTORECONF || ! test -x ./configure; then
-        pfx y2tool y2autoconf $BOOTSTRAP
-        pfx y2tool y2automake $BOOTSTRAP
-        pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
+	pfx y2tool y2autoconf $BOOTSTRAP
+	pfx y2tool y2automake $BOOTSTRAP
+	pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
     fi
 
     if [ -x ./config.status ]; then
-        pfx ./config.status --recheck
-        pfx ./config.status
+	pfx ./config.status --recheck
+	pfx ./config.status
     else
 	# if no MODULE_ARGUMENTS_foo are given, assume $PFX
 	# pfx: pick up prefixed pkg-config

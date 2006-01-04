@@ -109,14 +109,16 @@ foreach (@ARGV)
 open (IN, "<$template") or die "Cannot open $template: $!";
 
 # open output - pipe
+# man perlipc
+$SIG{PIPE} = 'IGNORE';
 my $run_doxygen = "|doxygen -";
 if ($debug)
 {
     $run_doxygen = "|tee doxygen.conf ". $run_doxygen;
 }
-open (OUT, $run_doxygen) or die;
+open (OUT, $run_doxygen) or die "can't fork doxygen: $!";
 
-# $_ holds the whole definitioin of a parameter
+# $_ holds the whole definition of a parameter
 # that may be split over multiple lines
 
 # a single physical line
@@ -151,9 +153,9 @@ while (defined ($single = <IN>))
 
 	$_ = "$param$ws= $value";
     }
-    print OUT "$_\n";
+    print OUT "$_\n" or die "can't write to doxygen: $!";
     $_ = "";			# this line does not continue
 }
 
-close(OUT);
+close(OUT) or die "can't close pipe to doxygen: status=$?";
 close(IN);

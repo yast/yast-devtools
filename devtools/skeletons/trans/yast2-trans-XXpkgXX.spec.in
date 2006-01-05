@@ -1,5 +1,5 @@
 @HEADER-COMMENT@
-# neededforbuild  autoconf automake gettext yast2-devtools
+# neededforbuild  autoconf automake gettext pkgconfig yast2-devtools
 
 @HEADER@
 BuildArchitectures:	noarch

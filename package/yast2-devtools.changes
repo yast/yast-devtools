@@ -1,7 +1,9 @@
 -------------------------------------------------------------------
-Wed Jan  4 14:05:24 CET 2006 - mvidner@suse.cz
+Tue Jan 10 12:28:37 CET 2006 - mvidner@suse.cz
 
 - Check error codes in ydoxygen so that we know if doxygen fails (#141384).
+- Bumped versions in skeletons.
+- 2.13.5
 
 -------------------------------------------------------------------
 Tue Dec 13 17:03:47 CET 2005 - mvidner@suse.cz

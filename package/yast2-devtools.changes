@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Jan 13 19:46:18 CET 2006 - od@suse.de
+
+- showy2log: moved switching back to normal to the end of lines --
+  after CTRL-C and after leaving "showy2log | o -r" now the prompt
+  appears in normal colors
+- 2.13.6
+
+-------------------------------------------------------------------
 Tue Jan 10 12:28:37 CET 2006 - mvidner@suse.cz
 
 - Check error codes in ydoxygen so that we know if doxygen fails (#141384).

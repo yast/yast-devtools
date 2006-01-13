@@ -166,7 +166,7 @@ BEGIN {
 		}
 	}
 
-	print normal color[level,bold] $0
+	print color[level,bold] $0 normal
 }
 END {
 	print normal

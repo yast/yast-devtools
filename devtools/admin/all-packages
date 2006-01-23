@@ -84,6 +84,7 @@ yast2-instserver	default			installation server
 yast2-ipsec		default			IPsec
 yast2-irda		default			IrDA
 yast2-iscsi-client	default			iSCSI initiator
+yast2-iscsi-server	default			iSCSI target
 yast2-kerberos-client	default			kerberos client
 yast2-ldap-client	default			ldap client
 yast2-ldap-server	default			LDAP server

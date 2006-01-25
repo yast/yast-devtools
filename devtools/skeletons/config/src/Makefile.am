@@ -20,6 +20,11 @@ module_DATA =			\
 	XXPkgXX.ycp		\
 	XXPkgXX2.pm
 
+# create a symlink for local build, #145327
+XXpkgXX:
+	ln -sf . $@
+ycpchook = XXpkgXX
+
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common

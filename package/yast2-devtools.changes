@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 25 15:53:40 CET 2006 - mvidner@suse.cz
+
+- Config skeleton: create a symlink for local build, #145327.
+- 2.13.7
+
+-------------------------------------------------------------------
 Fri Jan 13 19:46:18 CET 2006 - od@suse.de
 
 - showy2log: moved switching back to normal to the end of lines --

@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
-# neededforbuild  autoconf automake gettext pkgconfig yast2-devtools
 
 @HEADER@
+BuildRequires:		pkgconfig yast2-devtools
 BuildArchitectures:	noarch
 
 Summary:	YaST2 translations for XXpkgXX localization

@@ -1,7 +1,7 @@
 @HEADER-COMMENT@ 
-# neededforbuild gpp libgpp  perl-XML-Writer libxml2 libxslt docbook-xsl-stylesheets docbook_4 libgcrypt libgpg-error sgml-skel gettext-devel
 
 @HEADER@
+BuildRequires:	docbook-xsl-stylesheets gcc-c++ libxslt perl-XML-Writer sgml-skel
 Requires:	perl
 Requires:	perl-XML-Writer
 Requires:       libxslt

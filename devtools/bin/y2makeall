@@ -49,7 +49,17 @@ my @core_binaries =
      "qt",
      "ncurses",
      "testsuite",
-     "perl-bindings"
+     "perl-bindings",
+     "storage"
+     );
+
+
+# Mixed packages that belong to the core binaries but still have YCP code that
+# should be built after modules are byte-compiled
+
+my @core_and_ycp =
+    (
+     "storage"
      );
 
 # Directories to exclude from building - unmaintained packages, packages that
@@ -565,6 +575,17 @@ sub make_ycp_packages()
     # Add the contents of @core_binaries to that hash
     @dont_process{ @core_binaries } = (); # Black magic - see Perl cook book chapter 4.7
 
+
+    # Remove the contents of @core_and_ycp from %dont_process
+
+    my $pkg;
+
+    foreach $pkg ( @core_and_ycp )
+    {
+	undef( $dont_process{ $pkg } );
+    }
+
+
     log_debug( "Excluding packages " . join( " ", sort ( keys( %dont_process ) ) ) );
 
     #
@@ -582,8 +603,6 @@ sub make_ycp_packages()
     #
     # Process packages
     #
-
-    my $pkg;
 
     foreach $pkg ( @packages )
     {

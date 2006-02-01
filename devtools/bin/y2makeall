@@ -14,18 +14,19 @@ use English;
 use Getopt::Std;
 use File::Basename;
 use vars qw(
-	     $opt_h
-	     $opt_v
-	     $opt_s
+	     $opt_a
+	     $opt_b
 	     $opt_d
 	     $opt_f
-	     $opt_b
+	     $opt_h
+	     $opt_l
 	     $opt_m
-	     $opt_y
-	     $opt_a
-	     $opt_u
 	     $opt_n
 	     $opt_p
+	     $opt_s
+	     $opt_u
+	     $opt_v
+	     $opt_y
 	     );
 
 #
@@ -102,14 +103,15 @@ my $failed_log	= $work_root . "/failed-packages.log";
 # Other global variables.
 #
 
-my $disable_make_makefile_cvs	= 0;		# -f
-my $enable_make_core_binaries	= 0;		# -b
-my $enable_byte_compile_modules	= 0;		# -m
-my $enable_make_ycp_packages	= 0;		# -y
-my $enable_make_all		= 1;		# -a
-my $favourites_only		= 0;		# -u
-my $prefix			= "/usr";	# -p
-my $enable_print_summary	= 1;
+my $disable_make_makefile_cvs			= 0;		# -f
+my $enable_make_core_binaries			= 0;		# -b
+my $enable_byte_compile_modules			= 0;		# -m
+my $enable_byte_compile_leftover_modules	= 0;		# -l
+my $enable_make_ycp_packages			= 0;		# -y
+my $enable_make_all				= 1;		# -a
+my $favourites_only				= 0;		# -u
+my $prefix					= "/usr";	# -p
+my $enable_print_summary			= 1;
 
 # Verbosity values
 
@@ -178,7 +180,7 @@ sub main()
     # This will set a variable opt_? for any option,
     # e.g. opt_v if option '-v' is passed on the command line.
 
-    getopts('hvsdfbmyaunp:');
+    getopts('hvsdfbmylaunp:');
 
     usage()		if $opt_h;
 
@@ -201,13 +203,14 @@ sub main()
     }
 
 
-    $enable_make_all			= 0	if $opt_b or $opt_m or $opt_y;
-    $enable_make_core_binaries		= 1	if $opt_b;
-    $enable_byte_compile_modules	= 1	if $opt_m;
-    $enable_make_ycp_packages		= 1	if $opt_y or $opt_u;
+    $enable_make_all				= 0	if $opt_b or $opt_m or $opt_y or $opt_l;
+    $enable_make_core_binaries			= 1	if $opt_b;
+    $enable_byte_compile_modules		= 1	if $opt_m;
+    $enable_byte_compile_leftover_modules	= 1	if $opt_l or $opt_m;
+    $enable_make_ycp_packages			= 1	if $opt_y or $opt_u;
 
-    $disable_make_makefile_cvs		= 1	if $opt_f;
-    $favourites_only			= 1	if $opt_u;
+    $disable_make_makefile_cvs			= 1	if $opt_f;
+    $favourites_only				= 1	if $opt_u;
 
     $sudo_cmd = ""				if $opt_n;
     $prefix = $opt_p				if $opt_p;
@@ -260,9 +263,10 @@ sub main()
     # Build phases
     #
 
-    make_core_binaries()	if $enable_make_all or $enable_make_core_binaries;
-    byte_compile_modules()	if $enable_make_all or $enable_byte_compile_modules;
-    make_ycp_packages()		if $enable_make_all or $enable_make_ycp_packages;
+    make_core_binaries()		if $enable_make_all or $enable_make_core_binaries;
+    byte_compile_modules()		if $enable_make_all or $enable_byte_compile_modules;
+    byte_compile_leftover_modules()	if $enable_make_all or $enable_byte_compile_leftover_modules;
+    make_ycp_packages()			if $enable_make_all or $enable_make_ycp_packages;
 
     #
     # Clean up
@@ -443,6 +447,103 @@ sub byte_compile_modules()
 
 
     log_milestone( "--- Byte-compiling YCP modules done.\n" );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Byte-compile leftover YCP modules - everything that didn't get compiled by
+# byte_compile_modules(), maybe because 'ycpc' in calc_ycp_compilation_order
+# did not report the correct compilation order.
+
+sub byte_compile_leftover_modules()
+{
+    log_milestone( "\n--- Phase 2b (-l): Byte-compiling leftover YCP modules..." );
+
+    my @missing;
+    my $missing_count	  = 0;
+    my $old_missing_count = 0;
+    my $loop_count	  = 0;
+
+    do
+    {
+	$loop_count++;
+	$old_missing_count = $missing_count;
+	@missing = ();
+
+	chdir( $modules_dir );
+	my @src_modules		= <*.ycp>;
+	my @compiled_modules	= <*.ybc>;
+
+	my %compiled;
+	my $mod;
+
+	foreach $mod ( @compiled_modules )
+	{
+	    $mod = basename( $mod, ".ybc" );
+	    $compiled{ $mod } = 1;
+	}
+
+
+	foreach $mod ( @src_modules )
+	{
+	    $mod = basename( $mod, ".ycp" );
+
+	    push( @missing, $mod )
+		if ( ! defined( $compiled{ $mod } ) );
+	}
+
+	$missing_count = $#missing + 1;
+
+	if ( $loop_count == 1 )
+	{
+	    log_milestone( "$missing_count modules left over" );
+	    log_info( @missing );
+	}
+	else
+	{
+	    log_progress( "Iteration #" . $loop_count
+			  . ": $missing_count modules left over" );
+	}
+
+	# Brute-force approach:
+	#
+	# Simply try to byte-compile all modules that are left over - even if
+	# the compilation order is screwed, at least one of them should compile.
+
+	foreach $mod ( @missing )
+	{
+	    my $success = byte_compile( $mod );
+	    log_progress( "$mod\tOK" ) if $success;
+	}
+
+	# Do this as long as there are _any_ changes in the status.
+
+    } while ( $missing_count != $old_missing_count );
+
+
+    #
+    # Print summary
+    #
+
+    if ( $missing_count > 0 )
+    {
+	my $mod;
+
+	foreach $mod ( @missing )
+	{
+	    log_error( "Could not byte-compile $mod" );
+	    # print FAILED_LOG "$mod.ycp\n";
+	}
+
+	push( @failed_dirs, $modules_dir );
+    }
+    else
+    {
+	log_progress( "All YCP modules successfully byte-compiled" );
+    }
+
+    chdir( $work_root );
 }
 
 
@@ -976,29 +1077,44 @@ sub calc_ycp_compilation_order()
 #
 # Parameters:
 #	YCP module list
+#
+# Return value:
+#	1 if success
+#	0 if (any) error
 
 sub byte_compile()
 {
     my @modules = @_;
 
-    log_progress( "Byte-compiling " . ( $#modules + 1 ) . " YCP modules" );
+    if ( $#modules > 0 )
+    {
+	log_progress( "Byte-compiling " . ( $#modules + 1 ) . " YCP modules" );
+    }
+
     chdir( $modules_dir );
 
     my $module;
+    my $success = 1;
 
     foreach $module ( @modules )
     {
 
 	$module .= ".ycp";
-	log_info( "Byte-compiling $module" );
 
 	my $cmd = "$ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module >>$make_log 2>&1";
 
 	log_debug( "$sudo_cmd $cmd" );
-	sudo_system_int( $cmd );
+	my $result = sudo_system_int( $cmd );
+
+	log_debug( "Byte-compiling $module\t- "
+		   . ($result == 0 ? "Success" : "Error" ) );
+
+	$success = 0 if $result != 0;
     }
 
     chdir( $work_root );
+
+    return $success;
 }
 
 
@@ -1156,10 +1272,11 @@ sub usage()
 	"Builds all YaST2 sources from CVS or Subversion.\n"					.
 	"Call this from your toplevel yast2/source CVS or SVN working directory!\n"	.
 	"\n"									.
-	"\t-a all (default) - same as -bmy if none of -b -m -y is given\n"	.
+	"\t-a all (default) - same as -bmy if none of -b -m -l -y is given\n"	.
 	"\t-b binaries - make core binaries\n"					.
 	"\t-m modules - byte-compile YCP modules\n"				.
-	"\t-y YCP - make YCP packages\n"					.
+	"\t-l leftovers - byte-compile leftover YCP modules\n"			.
+	"\t-y YCP - make YCP packages (includes -l)\n"				.
 	"\t-u favourites only - stop processing after favourites list is done\n".
 	"\t-f fast - no \"make -f Makefile.cvs\" if it can be avoided\n"	.
 	"\t-p <prefix> - use <prefix> instead of /usr\n"			.

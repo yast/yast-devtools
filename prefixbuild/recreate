@@ -21,7 +21,10 @@ shift $((OPTIND-1))
 
 #check that we are  in the right directory: .../trunk or .../branches/$B
 if $DIRECTORY_CHECK; then
-    test -f extra-packages || exit
+    if ! test -f extra-packages; then
+	echo "Not in the right directory. extra-packages not seen."
+	exit 1
+    fi
 fi
 
 # the prefix

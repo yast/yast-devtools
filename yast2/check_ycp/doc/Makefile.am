@@ -26,7 +26,8 @@ html/index.html: check_ycp.xml
 html/yast2docs.css: html/index.html
 	cp $(srcdir)/../../../docbook/css/yast2docs.css $@
 	cp -a $(srcdir)/../../../docbook/images html
-	find html -name "Makefile*"  | xargs rm
+	-find html -name "Makefile*"  | xargs rm
+	-find html -name .svn -type d -exec rm -rf '{}' \; 
 
 clean-local:
 	rm -rf html
@@ -34,6 +35,7 @@ clean-local:
 install-data-local:
 	mkdir -p $(DESTDIR)$(htmldir)
 	cp -a $(srcdir)/html/images $(DESTDIR)$(htmldir)
+	-find $(DESTDIR)$(htmldir) -name .svn -type d -exec rm -rf '{}' \; 
 
 EXTRA_DIST =  $(xml_files)
 

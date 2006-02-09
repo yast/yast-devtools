@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Feb  9 17:13:06 CET 2006 - mvidner@suse.cz
+
+- Do not fail on repeated make install from a SVN working copy.
+
+-------------------------------------------------------------------
 Wed Jan 25 15:53:40 CET 2006 - mvidner@suse.cz
 
 - Config skeleton: create a symlink for local build, #145327.

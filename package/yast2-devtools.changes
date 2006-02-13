@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 13 15:30:48 CET 2006 - locilka@suse.cz
+
+- Added standardized file header into the skeletons.
+- 2.13.8
+
+-------------------------------------------------------------------
 Thu Feb  9 17:13:06 CET 2006 - mvidner@suse.cz
 
 - Do not fail on repeated make install from a SVN working copy.

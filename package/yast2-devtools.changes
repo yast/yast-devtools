@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Feb 21 15:12:36 CET 2006 - mvidner@suse.cz
+
+- Provide autodocs-cc-off.ami for leaf packages that only want
+  autodocs on maintainers explicit request (#151370).
+- 2.13.9
+
+-------------------------------------------------------------------
 Mon Feb 13 15:30:48 CET 2006 - locilka@suse.cz
 
 - Added standardized file header into the skeletons.

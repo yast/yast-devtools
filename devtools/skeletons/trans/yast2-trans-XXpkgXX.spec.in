@@ -3,6 +3,7 @@
 @HEADER@
 BuildRequires:		pkgconfig yast2-devtools
 BuildArchitectures:	noarch
+Provides: locale(yast2:@LL@)
 
 Summary:	YaST2 translations for XXpkgXX localization
 %define Y2LANG XXpkgXX

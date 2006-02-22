@@ -72,7 +72,7 @@
 		       ))))
        (ycp-ui-widgets
 	(eval-when-compile
-	 (regexp-opt '(
+	  (regexp-opt '(
 		       "`BarGraph"
 		       "`Bottom"
 		       "`CheckBox"
@@ -109,6 +109,7 @@
 		       "`MultiLineEdit"
 		       "`MultiSelectionBox"
 		       "`PackageSelector"
+		       "`PatternSelector"
 		       "`PartitionSplitter"
 		       "`Password"
 		       "`PkgSpecial"
@@ -153,12 +154,12 @@
 			"`BackgroundPixmap"
 
 			"`animated"
-			"`autoScrollDown"
 			"`autoAdvance"
+			"`autoScrollDown"
 			"`autoShortcut"
 			"`boldFont"
-			"`countShowDelta"
 			"`centered"
+			"`countShowDelta"
 			"`debugLayout"
 			"`decorated"
 			"`default"
@@ -177,10 +178,10 @@
 			"`plainText"
 			"`scaleToFit"
 			"`searchMode"
-			"`summaryMode"
 			"`shrinkable"
 			"`smallDecorations"
 			"`stepsEnabled"
+			"`summaryMode"
 			"`testMode"
 			"`tiled"
 			"`treeEnabled"
@@ -220,30 +221,31 @@
 
        (ycp-ui-widget-properties
 	(eval-when-compile
-	 (regexp-opt '(
-		       "`CurrentButton"
-		       "`CurrentItem"
-		       "`DebugLabel"
-		       "`DialogDebugLabel"
-		       "`EasterEgg"
-		       "`Enabled"
-		       "`ExpectedSize"
-		       "`Filename"
-		       "`Item"
-		       "`Items"
-		       "`Label"
-		       "`Labels"
-		       "`LastLine"
-		       "`Notify"
-		       "`OpenItems"
-		       "`SelectedItems"
-		       "`ValidChars"
-		       "`Value"
-		       "`Values"
-		       "`WidgetClass"
-		       "`WindowID"
-		       "`InputMaxLength"
-		       ))))
+	  (regexp-opt '(
+			"`CurrentBranch"
+			"`CurrentButton"
+			"`CurrentItem"
+			"`DebugLabel"
+			"`DialogDebugLabel"
+			"`EasterEgg"
+			"`Enabled"
+			"`ExpectedSize"
+			"`Filename"
+			"`InputMaxLength"
+			"`Item"
+			"`Items"
+			"`Label"
+			"`Labels"
+			"`LastLine"
+			"`Notify"
+			"`OpenItems"
+			"`SelectedItems"
+			"`ValidChars"
+			"`Value"
+			"`Values"
+			"`WidgetClass"
+			"`WindowID"
+			))))
 
        (ycp-ui-glyphs
 	(eval-when-compile
@@ -271,6 +273,7 @@
 		       "ChangeWidget"
 		       "CheckShortcuts"
 		       "CloseDialog"
+		       "CollectUserInput"
 		       "DumpWidgetTree"
 		       "FakeUserInput"
 		       "GetDisplayInfo"
@@ -302,6 +305,7 @@
 		       "SetProductName"
 		       "StopRecordMacro"
 		       "TimeoutUserInput"
+		       "UI"
 		       "UserInput"
 		       "WFM"
 		       "WaitForEvent"

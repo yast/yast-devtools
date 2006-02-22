@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb 22 17:35:50 CET 2006 - sh@suse.de
+
+- Updated UI builtins and widgets in Emacs mode (ycp-mode.el) 
+
+-------------------------------------------------------------------
 Tue Feb 21 15:12:36 CET 2006 - mvidner@suse.cz
 
 - Provide autodocs-cc-off.ami for leaf packages that only want

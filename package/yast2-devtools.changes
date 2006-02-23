@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb 23 12:48:55 CET 2006 - mvidner@suse.cz
+
+- create-spec: HEADER will include Provides: locale(yast2:$L)
+  for yast2-trans-$L.
+- 2.13.10
+
+-------------------------------------------------------------------
 Wed Feb 22 17:35:50 CET 2006 - sh@suse.de
 
 - Updated UI builtins and widgets in Emacs mode (ycp-mode.el) 

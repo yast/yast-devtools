@@ -45,6 +45,11 @@ if ($VERSION eq "" || $RPMNAME eq "" || $MAINTAINER eq "")
 $yast2dir = "$PREFIX/share/YaST2";
 $execcompdir = "$PREFIX/lib/YaST2";
 
+$provides_locale = "";
+if ($RPMNAME =~ /^yast2-trans-(.*)/) {
+    $provides_locale = "Provides:\tlocale(yast2:$1)\n"
+}
+
 if ($#ARGV > 0)
 {
     # Isn't the following too anti-perl? :-)
@@ -81,7 +86,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-build
 Source0:	$RPMNAME-$VERSION.tar.bz2
 
 prefix:		/usr
-",
+$provides_locale",
 
 # The group tag is only a dummy entry. The correct one is inserted by
 # prepare_spec.

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Thu Feb 23 15:52:11 CET 2006 - etoulas@suse.de
+
+- Extend devtools to catch missing textdomain in C/C++/YCP/Perl code
+  (enhancement 147611)
+  'make package' fails if a textdomain is missing (and needed)
+  'make pot'     warns if a textdomain is missing (and needed)
+- 2.13.11
+
+-------------------------------------------------------------------
 Thu Feb 23 12:48:55 CET 2006 - mvidner@suse.cz
 
 - create-spec: HEADER will include Provides: locale(yast2:$L)

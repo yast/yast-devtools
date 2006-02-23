@@ -154,7 +154,7 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 	    $(PREFIX)/bin/y2tool create-spec < $$i > $$here/package/$${newname} ; \
 	done
 
-package: check-up-to-date check-tagversion check-all-packages package-local
+package: check-up-to-date check-tagversion check-all-packages check-textdomain package-local
 
 TAGVERSION	 = $(PREFIX)/bin/y2tool tagversion
 
@@ -198,6 +198,9 @@ check-all-packages:
 		echo;							\
 		false;							\
 	fi
+
+check-textdomain:
+	$(PREFIX)/bin/y2tool check-textdomain $(srcdir)
 
 stable: checkin-stable
 

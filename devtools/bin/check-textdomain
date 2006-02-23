@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# same function for this file and check-textdomain: get_domain_and_err()
+CWD=`dirname $0`
+. $CWD/gettextdomains
+
+
+if [ -z $1 ]; then
+    echo "check-textdomain: no source-directory"
+    exit 1
+else
+    SRCDIR=$1
+fi
+
+
+# call function in gettextdomains
+get_domains_and_err $SRCDIR
+
+
+# $ERR contains the files without textdomain (see gettextdomains)
+if [ -n "$ERR" ]; then
+    for E in $ERR; do
+        echo "Error: Missing textdomain in: $E"
+    done
+
+    exit 1 ;
+fi
+

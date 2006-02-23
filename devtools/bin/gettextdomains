@@ -1,0 +1,51 @@
+### sourced by 'check-textdomain' and 'y2makepot' ###
+
+#
+# get_domains_and_err():
+#     Argument:  $1        -> directory to search
+#     Returns:   $DOMAINS  -> all text-domains found in $SRCDIR
+#                $ERR      -> filenames without text-domain, but using [_]_tr()
+#
+
+function get_domains_and_err()
+{
+    if [ -z "$1" ]; then
+        echo `basename $0`": argument missing"
+    fi
+
+    # search for sourcecode-files
+    SRCFILES=`find $1 -type d -name testsuite -prune , \
+                           -type f -name "*.ycp" \
+                                -o -name "*.pm"  \
+                                -o -name "*.c"   \
+                                -o -name "*.cc"  \
+                                -o -name "*.cpp"`
+
+    if test "$?" != "0"; then
+        echo "Error: check-pot terminated unexpected."
+        exit 1
+    fi
+    
+    for F in $SRCFILES; do
+        # strip comments from the files and match [_]_( "..." )
+        MATCH=`perl -n -e 'print "$ARGV: $_" if not /(\/\/|#).*[^A-Za-z0-9_]_{1,2}\([[:space:]]*".+".*?\)/../$/' $F | \
+               perl -n -e 'print "$ARGV: $_" if not /\/\*.*/../\*\//' | \
+               perl -n -e 'print "$ARGV: $_" if /^[[:space:]]*[^#(\/\/)].*[^A-Za-z0-9_]_{1,2}\([[:space:]]*".+"/../.*\)/'`
+        if [ -n "$MATCH" ]; then
+            TR_FILES="$F $TR_FILES" ;
+        fi
+    done
+
+    DOMAINS="" ;
+    for F in $TR_FILES; do
+        D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
+            sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
+                 "(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`;
+        if [ -z $D ]; then
+            ERR="$PWD/$F $ERR" ;
+        else
+            DOMAINS="$D:$F\n$DOMAINS" ;
+        fi ;
+    done
+}
+

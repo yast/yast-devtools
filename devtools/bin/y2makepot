@@ -8,17 +8,21 @@
 # Call this from a module toplevel directory to generate all
 # translation files (*.pot)
 
-
 # ##############################################################################
 # -- function defininitions -- start -------------------------------------------
 # ##############################################################################
+
+# same function for this file and check-textdomain: get_domain_and_err()
+CWD=`dirname $0`
+. $CWD/gettextdomains
+
 
 function xgettext_call()
 {
     MODULE=$1
     FILES=$2
 
-    echo "Creating ./$MODULE.pot from $FILES..." ;
+    echo "Creating ./$MODULE.pot from $FILES ...";
     $XGETTEXT --no-wrap --add-comments --add-location --keyword=_:1,2 \
 	--keyword=__ --foreign-user \
 	--copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
@@ -44,31 +48,18 @@ function generate_potfiles()
     POTFILES_FILE=`test -e $SRCDIR/POTFILES && echo POTFILES`
     POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`
 
-    # all the .ycp and .pm files, we should separate texts from
-    # (exclude testsuite directory)
-    POT_SRC=`find $SRCDIR -type d -name testsuite -prune , \
-        -type f -name "*.ycp" -o -name "*.pm" -o -name "*.cc" | \
-        xargs egrep -l '^<?[[:space:]]*[Tt]extdomain>?' \
-	$POTFILES`
+    # call function in gettextdomains
+    get_domains_and_err $SRCDIR
 
-    if test "$?" != "0"; then
-	echo "You have to start this script in a module directory"
-	exit 1
-    fi
-
-    DOMAINS="" ;
-    for F in $POT_SRC; do
-	D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
-            sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
-              "(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`;
-	if [ -z $D ]; then
-	    echo "Error: empty textdomain in $F" ;
-	    exit 1 ;
-	fi ;
-
-	DOMAINS="$D:$F\n$DOMAINS" ;
+    # $ERR contains the files without textdomain (see gettextdomains)
+    echo
+    for F in $ERR; do
+        echo "Warning: empty textdomain in $F" ;
+        echo $F > _MISSING_TEXTDOMAIN_`basename $F` ;
     done
+    echo
 
+    # all textdomains found by gettextdomains
     DOMAINS=`echo -en $DOMAINS | LC_COLLATE=C sort` ;
     MODULE=${DOMAINS%%:*};
 
@@ -126,13 +117,13 @@ function checkin_potfiles()
 
     if test -n "$ADDED" -o -n "$CHANGED"; then
         # commit the added or changed files now
-	svn commit --message "Committed potfile(s) $f to repository" $ADDED $CHANGED
+        svn commit --message "Committed potfile(s) $f to repository" $ADDED $CHANGED
 
-	if test "$?" == "0"; then
-	    echo "Committed files $ADDED $CHANGED to repository"
-	else
-	    echo "Error while committing files to repository";
-	fi
+        if test "$?" == "0"; then
+            echo "Committed files $ADDED $CHANGED to repository"
+        else
+	        echo "Error while committing files to repository";
+        fi    
     fi
 }
 
@@ -158,7 +149,7 @@ while getopts "chfs::" opt; do
 	f)
 	    echo "y2makepot: ignoring obsolete option -f"
             ;;
-        s)
+	s)
             SRCDIR="$OPTARG"
             ;;
 	*)

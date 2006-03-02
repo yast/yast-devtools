@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Mar  2 15:59:35 CET 2006 - lslezak@suse.cz
+
+- fixed the skeletons:
+  - removed yast2-devel-packages macro
+  - added missing file in .spec in config skeleton
+- 2.13.12
+
+-------------------------------------------------------------------
 Thu Feb 23 15:52:11 CET 2006 - etoulas@suse.de
 
 - Extend devtools to catch missing textdomain in C/C++/YCP/Perl code

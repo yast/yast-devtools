@@ -2,7 +2,7 @@
 
 @HEADER@
 Requires:	yast2
-BuildRequires:	yast2-devel-packages
+BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
 
 BuildArchitectures:	noarch
 
@@ -26,5 +26,6 @@ Summary:	Configuration of XXpkgXX
 @clientdir@/XXpkgXX.ycp
 @clientdir@/XXpkgXX_*.ycp
 @moduledir@/XXPkgXX.*
+@moduledir@/XXPkgXX2.*
 @desktopdir@/XXpkgXX.desktop
 %doc @docdir@

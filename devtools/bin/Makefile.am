@@ -9,6 +9,7 @@ ybin_SCRIPTS = ycpmakedep
 
 pkgdata_SCRIPTS = 				\
 	checkin-stable				\
+	check-textdomain			\
 	create-new-package			\
 	create-spec				\
 	devtools-migration			\

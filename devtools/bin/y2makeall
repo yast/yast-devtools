@@ -43,7 +43,7 @@ my @core_binaries =
     (
      "devtools",
      "liby2util",
-     "packagemanager",
+     # "packagemanager",
      "core",
      "pkg-bindings",
      "qt",
@@ -518,8 +518,9 @@ sub byte_compile_leftover_modules()
 
 	# Brute-force approach:
 	#
-	# Simply try to byte-compile all modules that are left over - even if
-	# the compilation order is screwed, at least one of them should compile.
+	# Simply try to byte-compile all modules that are left over. 
+	# Even though the compilation order is screwed, at least one of
+	# should compile.  
 
 	foreach $mod ( @missing )
 	{
@@ -542,7 +543,7 @@ sub byte_compile_leftover_modules()
 
 	foreach $mod ( @missing )
 	{
-	    log_error( "Could not byte-compile $mod" );
+	    log_error( "Could not byte-compile $mod.ycp" );
 	    # print FAILED_LOG "$mod.ycp\n";
 	}
 

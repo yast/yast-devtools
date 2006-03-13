@@ -15,6 +15,7 @@ pkgdata_SCRIPTS = 				\
 	devtools-migration			\
 	for-proofread				\
 	get-lib					\
+	gettextdomains				\
 	kill-leftover-stuff			\
 	pot-spellcheck				\
 	rny2rnc					\

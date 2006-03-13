@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Mar 13 18:59:17 CET 2006 - od@suse.de
+
+- moved yast2/showy2log to devtools/bin/showy2log
+- fixed endless loop in showy2log pretty-print when encountering
+  unexpected formats
+- 2.13.16
+
+-------------------------------------------------------------------
 Mon Mar 13 17:46:45 CET 2006 - od@suse.de
 
 - check-textdomain needs gettextdomains, *sigh*

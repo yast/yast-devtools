@@ -24,7 +24,234 @@ function ErrExit() {
 # ########################################################################
 
 function ShowLog() {
-awk "$@" '
+awk --re-interval "$@" '
+#
+function max( a, b )
+{
+	return ( a > b ? a : b )
+}
+# return a string of spaces corresponding to the current Indent setting and the
+# prefix length at the containing level
+function GetIndent( prefix,     indent )
+{
+	if ( Indent == "a" ) {
+		indent = length( prefix ) + 1
+	} else {
+		indent = Indent
+	}
+	# make string of spaces
+	return sprintf("%*s", indent, "")
+}
+
+# Recursively print a list or map, including a prefix like the key of a map or
+# the leading text of a message
+#
+# This function iterates over one of these constructs:
+#       simple_message:	string1
+# 	map: 		string1  "$[" string2 ":" string3 ["," ...] "]"
+# 	list:		[string1] "[" string2 ["," ...] "]"
+#
+# nesting_level:The nesting level of this list or map. Level 0 means that we
+# 		work on the top level, ie. string1 is message text rather than
+# 		a map key.
+# indent:	a string (of spaces) that is printed before each line and
+# 		corresponds to the current indentation
+# rest:		the rest of the message from this log entry
+# type:		awk-style "local" variable: internally, this function early on
+# 		sets this to "$[" for a map and to "[" for a list
+#
+# returns the rest of the string after the list or map
+#
+function print_message_list_or_map( nesting_level, indent, rest ,      type, parts, saved_indent, key)
+{
+	if ( match ( rest, /(\[|\$\[)(.*)$/, parts ) != 0 ) {
+		# find the part of the message up to and including the opening
+		# bracket (ie string1 "[" or string1 "$[")
+		string1_and_bracket = substr( rest, 1, parts[2, "start"] - 1 )
+		type = parts[1]
+		rest = parts[2]
+
+		# heuristic: "-[" is not the start of a map or list
+		if ( match ( string1_and_bracket, /-(\[|\$\[)/ ) != 0 ) {
+			# simple_message: just print it and return
+			print_line( rest )
+			return ""
+		}
+
+		# at top-level the whole first part has not yet been printed,
+		# below only the "[" or "$["
+		if ( nesting_level == 0 ) {
+			print_text( string1_and_bracket, indent )
+		} else {
+			print_text( type, indent )
+		}
+
+		# adapt indentation:
+		# for the top level, indentation corersponding to the
+		# introductive message is never added, so we print like this:
+		#   file:line message var: $[
+		#                 "key":"value"
+		# for other nesting levels we have to change indentation
+		# according to indentation settings:
+		#   - adaptive:
+		#     "key1":[
+		#              "item1",
+		#              "item2"
+		#   - fixed:
+		#     "key1":[
+		#         "item1",
+		#         "item2"
+		#
+		if ( nesting_level == 0 ) {
+			saved_indent = indent
+			indent = indent GetIndent("    ")
+		} else {
+			saved_indent = indent
+			indent = indent GetIndent(string1_and_bracket)
+		}
+
+	} else {
+		# simple_message: just print it and return
+		print_text( rest, indent )
+		print_line( "" )
+		return ""
+	}
+
+	if ( ShortFormat ) {
+		# print some additional indentation when we stay on the same line
+		print_text( sprintf( "%*s", max( 1, length( GetIndent(string1_and_bracket) ) - length( string1_and_bracket ) ), "" ), indent )
+	} else {
+		# for long format, start printing the data on the next line
+		print_line( "" )
+	}
+	# we are now on the correct line, but we do not know yet whether we
+	# need to print indentation (a closing bracket may be printed for an
+	# empty structure, and it may need less indentation)
+
+	# Loop over the components of the list or map
+	while ( rest != "" ) {
+		if ( Debug >= 3 )
+			print_line( rest " <--- rest in print_message_list_or_map" )
+		key = ""
+		if ( is_map( type ) ) {
+			if ( Debug >= 4 )
+				print_line( "looping over map components" )
+			# find the key
+			if ( match ( rest, /^( *"(\\"|\\.|[^"\\])*":| *[^]\[:,$]+:)(.*)$/, parts ) != 0 ) {
+				# we have ``key:value``, now print the key:
+				key = parts[1]
+				rest = parts[3]
+				print_text( key, indent )
+				if ( Debug >= 4 )
+					print_line( rest " <--- rest in print_message_list_or_map after printing map key " parts[1] )
+			}
+		}
+		# the rest may start with a value (if any) corresponding to the
+		# map key or with a value (if any) of a list
+		if ( match ( rest, /^( *\[| *\$\[)(.*)$/, parts ) != 0 ) {
+			if ( Debug >= 4 )
+				print_line( "found nested list or map as value" )
+			# we have a nested list or map ``value``, recurse into it
+			# also pass down key string (if any) to allow calculation of indent
+			rest = print_message_list_or_map( nesting_level + 1, indent, key rest )
+		} else if ( match ( rest, /^( *"(\\"|\\.|[^"\\])*"| *[^]\[:,$]+)(.*)$/, parts ) != 0 ) {
+			if ( Debug >= 4 )
+				print_line( "found plain value" )
+			# we have a plain ``value``, print it
+			rest = parts[3]
+			print_text( parts[1], indent )
+		}
+		# after a (possibly empty) value, the rest starts either with "," or "]"
+		# if ", " -> next component
+		# if "]"  -> finish this nesting level and return with rest of string
+		if ( match ( rest, /^ *(,) *(.*)$/, parts ) != 0 ) {
+			# we have a ``,``, print it and finish this line
+			rest = parts[2]
+			print_line( parts[1] )
+		} else if ( match ( rest, /^ *(\]) *(.*)$/, parts ) != 0 ) {
+			# we have a ``]``, maybe finish this line, print it,
+			# and maybe finish that line as well
+			rest = parts[2]
+			if ( ShortFormat ) {
+				print_text( " " parts[1], saved_indent )
+			} else {
+				print_line( "" )
+				print_text( parts[1], saved_indent )
+			}
+			if ( nesting_level == 0 )
+				print_line( "" )
+			if ( Debug >= 4 )
+				print_line( rest " <--- rest in print_message_list_or_map after printing ``]``" )
+			return rest
+		}
+	}
+	return ""
+}
+
+# "$[" -> 1
+# "["  -> 0
+function is_map( introducer )
+{
+	return ( introducer == "$[" ? 1 : 0 )
+}
+
+# print some text, but first, if not yet printed for this line, print
+#   - current color escape sequence
+#   - the prefix string (this is used for indenting pretty-printed follow-up
+#     lines -- simply do not supply this parameter if you do not want this (it
+#     will be initialized to "" by awk then))
+function print_text( text, prefix )
+{
+	if ( ! line_started ) {
+		printf("%s%s", color[level,bold], prefix)
+		line_started = 1
+	}
+	printf("%s", text)
+}
+
+# print a single line of output, including color:
+# print current color escape sequence (if needed for this line), some text and
+# switch back to normal color
+function print_line( text )
+{
+	print_text( text normal, "" )
+	printf("\n")
+	line_started = 0
+}
+
+# print a log line, including color and pretty-printing
+function print_log_line( line,    rest, indent )
+{
+	if ( PrettyPrint ) {
+		# this heuristic looks for the message part of the line; only
+		# YaST messages are recognized and pretty-printed
+		# YaST:
+		# <date> <time> <<level>> <host>(<PID>) [<component>] <file>:<line> <message>
+		# libstorage:
+		# <date> <time>,<PID?> <level>  <component> - <file>(<function>):<line> <message>
+		# perl-Bootloader:
+		# <date> <time>,<PID?> <level>  <component> - <namespace>::<subroutine>: <message>
+		#
+		#                    date                        time                         level   host   PID         comp.    file  line      message
+		if ( match( line, /^([0-9]{4}-[0-9]{2}-[0-9]{2} +[0-9]{2}:[0-9]{2}:[0-9]{2} +<[^>]*> +[^(]+\([0-9]+\) +\[[^]]*\] +[^:]*:[0-9]* +)(.*)/, parts ) != 0 ) {
+			if ( Debug )
+				print_line( line " <--- orig" )
+			print_text( parts[1] )
+			indent = PrintAtFront ? "" : sprintf("%*s", length( parts[1] ), "" )
+			rest = parts[2]
+			# loop to print components: message1 list_or_map1 [message2 list_or_map2 ...]
+			while ( rest != "" ) {
+				if ( Debug >= 2 )
+					print_line( rest " <--- rest" )
+				rest = print_message_list_or_map( 0, indent , rest )
+			}
+		} else
+			print_line( line )
+
+	} else
+		print_line( line )
+}
+
 BEGIN {
 	black	= "\033[30m";	debug	 = 0;	normal	= "\033[0m";
 	red	= "\033[31m";	milestone= 1;	bold	= "\033[1m";
@@ -71,12 +298,18 @@ BEGIN {
 	BoldComponent   = split( b, BOLDCOMPONENT, SEP )
 	BoldFilter      = split( B, BOLDFILTER, SEP )
 
+	PrettyPrint     = ( v == 1 ? 1 : 0 )
+	ShortFormat	= ( s == 1 ? 1 : 0 )
+	Indent		= ( i != "" ? i : ( ShortFormat ? "a" : 4 ) )
+	PrintAtFront	= ( F == 1 ? 1 : 0 )
+	Debug		= d
+
 	AcceptLine = 0
 }
 !/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ {
 	# this is a follow up line
 	if ( AcceptLine )
-		print
+		print_log_line($0)
 	next
 }
 {
@@ -166,7 +399,7 @@ BEGIN {
 		}
 	}
 
-	print color[level,bold] $0 normal
+	print_log_line($0)
 }
 END {
 	print normal
@@ -178,7 +411,7 @@ END {
 # setup and options
 # ########################################################################
 
-OPTSTR="?hc:C:l:L:p:P:b:B:f:"
+OPTSTR="?hc:C:l:L:p:P:b:B:f:vsi:Fd:"
 
 function ChkArg() {
 	case "$1" in
@@ -238,6 +471,21 @@ function Usage() {
 	  -B PATTERN	highlight printed message if PATTERN matches
 	  -b PATTERN	as -B, but match PATTERN against componentname
 
+	Pretty printing:
+	  -v		look for maps and lists in the log lines and print them
+	    		with a more readable broken down layout over several
+	    		lines
+	  -s		use short format: the first component is on the same
+	    		line as the opening bracket and the closing bracket on
+	    		the same line as the last component
+	  -i INDENT	if INDENT is a number, this is the number of columns
+	    		added for every level of indentation (default: 4)
+	    		if INDENT is an 'a' (for "adaptive"), indent nested
+	    		data to the right of the nesting component (default for
+	    		short format)
+	  -F		follow-up lines start printing at the first column
+	    		(normal indentation of components is still applied)
+	  -d NUMBER	debugging level for pretty-printing
 	EOF
 	exit 1
 }
@@ -250,6 +498,11 @@ p=""
 P=""
 b=""
 B=""
+v=""
+s=""
+i=""
+F=""
+d=0
 Y2LOG=/var/log/YaST2/y2log
 if [ $(id -u) != 0 -a -f ~/.y2log ]; then
 	Y2LOG=~/.y2log
@@ -286,6 +539,22 @@ if [ -n "$OPTSTR" ]; then
 		B)
 			B="$OPTARG"
 			;;
+		v)
+			v="1"
+			;;
+		s)
+			s="1"
+			i="a"
+			;;
+		i)
+			i="$OPTARG"
+			;;
+		F)
+			F="1"
+			;;
+		d)
+			d="$OPTARG"
+			;;
 		f)
 			Y2LOG="$OPTARG"
 			;;
@@ -307,4 +576,7 @@ ${@:-cat} $Y2LOG | ShowLog \
 	-vc="$c" -vC="$C" \
 	-vl="$l" -vL="$L" \
 	-vp="$P" -vP="$P" \
-	-vb="$b" -vB="$B"
+	-vb="$b" -vB="$B" \
+	-vv="$v" -vs="$s" \
+	-vi="$i" -vF="$F" \
+	-vd="$d"

@@ -19,6 +19,7 @@ pkgdata_SCRIPTS = 				\
 	kill-leftover-stuff			\
 	pot-spellcheck				\
 	rny2rnc					\
+	showy2log				\
 	svnall					\
 	tagversion 				\
 	version					\

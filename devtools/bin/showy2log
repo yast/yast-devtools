@@ -62,7 +62,7 @@ function GetIndent( prefix,     indent )
 #
 # returns the rest of the string after the list or map
 #
-function print_message_list_or_map( nesting_level, indent, rest ,      type, parts, saved_indent, key)
+function print_message_list_or_map( nesting_level, indent, rest ,      type, parts, saved_indent, key, old_rest)
 {
 	if ( match ( rest, /(\[|\$\[)(.*)$/, parts ) != 0 ) {
 		# find the part of the message up to and including the opening
@@ -129,9 +129,25 @@ function print_message_list_or_map( nesting_level, indent, rest ,      type, par
 	# empty structure, and it may need less indentation)
 
 	# Loop over the components of the list or map
+	old_rest = ""
 	while ( rest != "" ) {
 		if ( Debug >= 3 )
 			print_line( rest " <--- rest in print_message_list_or_map" )
+		# make sure we make progress
+		if ( old_rest == rest ) {
+			# otherwise, find next "]" or end of line and return
+			# with rest of line from there
+			if ( Debug >= 4 )
+				print_line( "making no progress, return with rest after ``]`` or nothing" )
+			if ( match ( rest, /](.*)$/, parts ) != 0 ) {
+				print_line( substr( rest, 1, parts[1, "start"] - 1 ) )
+				return parts[1]
+			} else {
+				print_line( rest )
+				return ""
+			}
+		}
+		old_rest = rest
 		key = ""
 		if ( is_map( type ) ) {
 			if ( Debug >= 4 )

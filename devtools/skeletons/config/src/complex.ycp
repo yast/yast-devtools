@@ -35,7 +35,9 @@ import "Label";
 import "Popup";
 import "Wizard";
 import "Wizard_hw";
+import "Confirm";
 import "XXPkgXX";
+
 
 include "XXpkgXX/helps.ycp";
 
@@ -62,6 +64,7 @@ boolean PollAbort() {
 symbol ReadDialog() {
     Wizard::RestoreHelp(HELPS["read"]:"");
     // XXPkgXX::AbortFunction = PollAbort;
+    if (!Confirm::MustBeRoot()) return `abort;
     boolean ret = XXPkgXX::Read();
     return ret ? `next : `abort;
 }

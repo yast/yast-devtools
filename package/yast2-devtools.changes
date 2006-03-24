@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Mar 24 09:17:06 CET 2006 - mzugec@suse.cz
+
+- add Confirm::MustBeRoot() to ReadDialog() 
+
+-------------------------------------------------------------------
 Mon Mar 13 18:59:17 CET 2006 - od@suse.de
 
 - moved yast2/showy2log to devtools/bin/showy2log

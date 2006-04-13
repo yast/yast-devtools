@@ -8,6 +8,7 @@
 
 #where devtools are
 PREFIX := $(shell pkg-config --print-errors --variable=prefix yast2-devtools)
+Y2TOOL = $(PREFIX)/bin/y2tool
 
 VERSION			= $(shell cat $(srcdir)/VERSION)
 RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
@@ -95,7 +96,7 @@ dist-hook:
 	done
 
 pot:
-	y2tool y2makepot -s $(srcdir)
+	$(Y2TOOL) y2makepot -s $(srcdir)
 
 install-pot: pot
 	@POT_DST=`find -type d -name testsuite -prune , \
@@ -116,7 +117,7 @@ install-pot: pot
 	fi
 
 spellcheck: pot
-	y2tool pot-spellcheck
+	$(Y2TOOL) pot-spellcheck
 
 # all-local: $(if $(IS_DEVTOOLS),,$(POT_DST))
 
@@ -143,20 +144,20 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 	rm -f package/*.bak
 	rm -f package/*.auto
 	mv $(RPMNAME)-$(VERSION).tar.bz2 package/
-	if ! test -x $(PREFIX)/bin/y2tool; then \
-	    echo "$(PREFIX)/bin/y2tool: not found."; \
+	if ! test -x $(Y2TOOL); then \
+	    echo "$(Y2TOOL): not found."; \
 	    echo "You have to install yast2-devtools to making a package"; \
 	    false; \
 	fi
 	here=`pwd`; \
 	cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \
 	    newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
-	    $(PREFIX)/bin/y2tool create-spec < $$i > $$here/package/$${newname} ; \
+	    $(Y2TOOL) create-spec < $$i > $$here/package/$${newname} ; \
 	done
 
 package: check-up-to-date check-tagversion check-all-packages check-textdomain package-local
 
-TAGVERSION	 = $(PREFIX)/bin/y2tool tagversion
+TAGVERSION	 = $(Y2TOOL) tagversion
 
 check-up-to-date check-cvs-up-to-date check-svn-up-to-date:
 	if [ -d $(srcdir)/CVS ]; then \
@@ -200,12 +201,12 @@ check-all-packages:
 	fi
 
 check-textdomain:
-	$(PREFIX)/bin/y2tool check-textdomain $(srcdir)
+	$(Y2TOOL) check-textdomain $(srcdir)
 
 stable: checkin-stable
 
 checkin-stable: package
-	$(PREFIX)/bin/y2tool checkin-stable
+	$(Y2TOOL) checkin-stable
 
 
 # For po/ modules

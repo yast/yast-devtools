@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Thu Apr 13 18:11:52 CEST 2006 - mvidner@suse.cz
+
+- Respect POTFILES in y2makepot and check-textdomain.
+- y2autoconf: Write the devtools version to the output.
+- top_srcdir/Makefile.am: Always call y2tool in the right prefix.
+- yast2-deps: Process all BuildRequires lines, do not skip
+  liby2util-devel.
+- recreate: Added usage (-h), skip recently recreated (-s), non-YaST
+  mode (-Y).
+- 2.13.17
+
+-------------------------------------------------------------------
 Fri Mar 24 09:17:06 CET 2006 - mzugec@suse.cz
 
 - add Confirm::MustBeRoot() to ReadDialog() 

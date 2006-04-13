@@ -3,21 +3,40 @@
 # recreate prefix installation of yast
 set -o errexit
 
+USAGE=false
 RESOLVE_DEPS=false
 NETWORK=true
 AUTORECONF=true
 DIRECTORY_CHECK=true
-while getopts dnaCD FLAG; do
+SKIP_RECENT=false
+YAST=true
+while getopts hdnaCDsY FLAG; do
     case $FLAG in
+	h) USAGE=true;;
 	d) RESOLVE_DEPS=true;;
 	n) NETWORK=false;;
 	a) AUTORECONF=false;;
 	C) CACHE=-C;;
 	D) DIRECTORY_CHECK=false;;
-	*) echo Ugh; exit 1;;
+	s) SKIP_RECENT=true;;
+	Y) YAST=false;;
+	*) USAGE=true; RC=1;;
     esac
 done
 shift $((OPTIND-1))
+
+if $USAGE; then
+    echo "Usage:"
+    exho " -h  Help"
+    echo " -d  also do Dependent modules"
+    echo " -n  no Network, do not update"
+    echo " -a  no Autoreconf"
+    echo " -C  autoconf Cache"
+    echo " -D  don't check the Directory"
+    echo " -s  Skip recently visited modules"
+    echo " -Y  non-Yast mode"
+    exit $RC
+fi
 
 #check that we are  in the right directory: .../trunk or .../branches/$B
 if $DIRECTORY_CHECK; then
@@ -42,17 +61,33 @@ fi
 # configure arguments are take from MODULE_ARGUMENTS_$1
 function build_module() {
     local MODULE="$1"; shift
-    local MODULE_ARGUMENTS_r=`echo MODULE_ARGUMENTS_$MODULE | tr - _`
+    if $SKIP_RECENT; then
+	T=$(mktemp /tmp/skip_recent.XXXXXX) || exit
+	touch -d '12 hours ago' $T
+	BYE=0
+	test "$MODULE"/.recreated -nt $T && BYE=1
+	rm $T
+	if [ "$BYE" = 1 ]; then
+	    echo "Module $MODULE was recently recreated, skipping"
+	    return
+	fi
+    fi
     $NETWORK && condup "$MODULE"
     pushd "$MODULE"
 
-    if [ "$MODULE" = devtools ]; then
-	local BOOTSTRAP="--bootstrap ./devtools/admin"
-    fi
 
     if $AUTORECONF || ! test -x ./configure; then
-	pfx y2tool y2autoconf $BOOTSTRAP
-	pfx y2tool y2automake $BOOTSTRAP
+	if $YAST; then
+	    if [ "$MODULE" = devtools ]; then
+		local DTPATH="./devtools/bin"
+		local BOOTSTRAP="--bootstrap ./devtools/admin"
+		pfx $DTPATH/y2autoconf $BOOTSTRAP
+		pfx $DTPATH/y2automake $BOOTSTRAP
+	    else
+		pfx y2tool y2autoconf
+		pfx y2tool y2automake
+	    fi
+	fi
 	pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
     fi
 
@@ -60,6 +95,7 @@ function build_module() {
 	pfx ./config.status --recheck
 	pfx ./config.status
     else
+	local MODULE_ARGUMENTS_r=`echo MODULE_ARGUMENTS_$MODULE | tr - _`
 	# if no MODULE_ARGUMENTS_foo are given, assume $PFX
 	# pfx: pick up prefixed pkg-config
 	# pfx ./configure $CACHE "${MODULE_ARGUMENTS_foo[@]-$PFX}"
@@ -67,6 +103,8 @@ function build_module() {
     fi
     pfx $MAKE
     pfx make install
+
+    touch .recreated
     popd
 }
 

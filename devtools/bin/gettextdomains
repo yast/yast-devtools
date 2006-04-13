@@ -1,4 +1,4 @@
-### sourced by 'check-textdomain' and 'y2makepot' ###
+### sourced by 'check-textdomain' and 'y2makepot' ### -*- sh -*- 
 
 #
 # get_domains_and_err():
@@ -12,9 +12,10 @@ function get_domains_and_err()
     if [ -z "$1" ]; then
         echo `basename $0`": argument missing"
     fi
+    SRCDIR=$1
 
     # search for sourcecode-files
-    SRCFILES=`find $1 -type d -name testsuite -prune , \
+    SRCFILES=`find $SRCDIR -type d -name testsuite -prune , \
                            -type f -name "*.ycp" \
                                 -o -name "*.pm"  \
                                 -o -name "*.c"   \
@@ -36,8 +37,11 @@ function get_domains_and_err()
         fi
     done
 
+    # we can specify additional files to .pot creation
+    POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`
+
     DOMAINS="" ;
-    for F in $TR_FILES; do
+    for F in $TR_FILES $POTFILES; do
         D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
             sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
                  "(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`;

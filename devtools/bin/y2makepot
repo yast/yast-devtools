@@ -44,10 +44,6 @@ function usage()
 
 function generate_potfiles()
 {
-    # we can specify additional files to .pot creation
-    POTFILES_FILE=`test -e $SRCDIR/POTFILES && echo POTFILES`
-    POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`
-
     # call function in gettextdomains
     get_domains_and_err $SRCDIR
 
@@ -63,6 +59,7 @@ function generate_potfiles()
     DOMAINS=`echo -en $DOMAINS | LC_COLLATE=C sort` ;
     MODULE=${DOMAINS%%:*};
 
+    # gather files that share a domain to FILES and call xgettext
     FILES="";
     for I in $DOMAINS; do
 	D=${I%%:*} ;

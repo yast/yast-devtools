@@ -90,7 +90,7 @@ $OUTPUT = join ("\n", map { "$_/Makefile" } @SUBDIRS);
 
     # init: common stuff
     '@YAST2-INIT-COMMON@' =>
-"AC_INIT($RPMNAME, $VERSION, http://www.suse.de/feedback, $RPMNAME)
+"AC_INIT($RPMNAME, $VERSION, http://bugs.opensuse.org/, $RPMNAME)
 dnl Check for presence of file 'RPMNAME'
 AC_CONFIG_SRCDIR([RPMNAME])
 

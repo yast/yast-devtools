@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Apr 26 11:56:07 CEST 2006 - sh@suse.de
+
+- V 2.13.17
+- Changed feedback address to http://bugs.opensuse.org/
+  upon lrupp's request 
+
+-------------------------------------------------------------------
 Thu Apr 13 18:11:52 CEST 2006 - mvidner@suse.cz
 
 - Respect POTFILES in y2makepot and check-textdomain.

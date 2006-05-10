@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed May 10 16:45:57 CEST 2006 - mvidner@suse.cz
+
+- Disabled broken filtering for files that contain translated messages
+  while making pot files (#173826).
+- 2.13.19
+
+-------------------------------------------------------------------
 Wed Apr 26 11:56:07 CEST 2006 - sh@suse.de
 
 - V 2.13.17

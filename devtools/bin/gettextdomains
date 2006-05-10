@@ -27,6 +27,13 @@ function get_domains_and_err()
         exit 1
     fi
     
+# this filter is supposed to find only files that contain translatable strings,
+# but the code is ugly and broken at least for power-management/src/helps.ycp
+# (#173826)
+# so take all files that we find. it means that we may report missing
+# textdomain declaration where it is not really needed, but it is important
+# to have complete potfiles
+if false; then
     for F in $SRCFILES; do
         # strip comments from the files and match [_]_( "..." )
         MATCH=`perl -n -e 'print "$ARGV: $_" if not /(\/\/|#).*[^A-Za-z0-9_]_{1,2}\([[:space:]]*".+".*?\)/../$/' $F | \
@@ -36,6 +43,9 @@ function get_domains_and_err()
             TR_FILES="$F $TR_FILES" ;
         fi
     done
+else
+    TR_FILES="$SRCFILES"
+fi
 
     # we can specify additional files to .pot creation
     POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`

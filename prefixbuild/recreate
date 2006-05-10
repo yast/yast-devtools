@@ -10,13 +10,14 @@ AUTORECONF=true
 DIRECTORY_CHECK=true
 SKIP_RECENT=false
 YAST=true
-while getopts hdnaCDsY FLAG; do
+while getopts hdnaCcDsY FLAG; do
     case $FLAG in
 	h) USAGE=true;;
 	d) RESOLVE_DEPS=true;;
 	n) NETWORK=false;;
 	a) AUTORECONF=false;;
 	C) CACHE=-C;;
+	c) CACHE=--cache-file=`pwd`/common-config.cache;;
 	D) DIRECTORY_CHECK=false;;
 	s) SKIP_RECENT=true;;
 	Y) YAST=false;;
@@ -176,6 +177,7 @@ module dns-server	"$PFX"
 module schema		"$PFX"
 
 module runlevel		"$PFX"
+module firstboot	"$PFX" "$FILLUPDIR" '--sysconfdir=$(prefix)/etc'
 
 if $RESOLVE_DEPS; then
     echo >&2 "Getting dependencies"

@@ -27,28 +27,21 @@ function get_domains_and_err()
         exit 1
     fi
     
-# this filter is supposed to find only files that contain translatable strings,
-# but the code is ugly and broken at least for power-management/src/helps.ycp
-# (#173826)
-# so take all files that we find. it means that we may report missing
-# textdomain declaration where it is not really needed, but it is important
-# to have complete potfiles
-if false; then
     for F in $SRCFILES; do
         # strip comments from the files and match [_]_( "..." )
         # 1. perl: strip one-line-comments
-        # 2. perl: strip C comments
-        # 3. perl: match for _( "...") and __("..." )
-        MATCH=`perl -n -e 'print "$ARGV: $_" if not /(\/\/|#).*$/' $F | \
-               perl -n -e 'print "$_" if not /\/\*.*/../\*\//'        | \
-               perl -n -e 'print "$_" if /^.*[^[:alnum:]_]_{1,2}\([[:space:]]*/../\)/'`
+        # 2. perl: strip C comments (multiline too)
+        # 3. perl: match for _( "...") and __("..." ) (multiline too)
+	# problems left:
+	# - false matches of comments inside strings
+	# - uncaught _( at line beginning
+        MATCH=`perl -n -e 'print "$ARGV: $_" if not /(\/\/|#)/' $F | \
+               perl -n -e 'print "$_" if not /\/\*/../\*\//'        | \
+               perl -n -e 'print "$_" if /[^[:alnum:]_]_{1,2}\(/../\)/'`
         if [ -n "$MATCH" ]; then
             TR_FILES="$F $TR_FILES" ;
         fi
     done
-else
-    TR_FILES="$SRCFILES"
-fi
 
     # we can specify additional files to .pot creation
     POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`

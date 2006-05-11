@@ -1,8 +1,8 @@
 -------------------------------------------------------------------
-Wed May 10 16:45:57 CEST 2006 - mvidner@suse.cz
+Thu May 11 10:05:21 CEST 2006 - mvidner@suse.cz
 
-- Disabled broken filtering for files that contain translated messages
-  while making pot files (#173826).
+- Fixed filtering for files that contain translated messages
+  while making pot files (#173826, etoulas).
 - 2.13.19
 
 -------------------------------------------------------------------

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri May 12 18:00:43 CEST 2006 - sh@suse.de
+
+- Added check_buildrequires and checkall_buildrequires utilities
+  as substitutes for check_neededforbuild and checkall_neededforbuild 
+
+-------------------------------------------------------------------
 Thu May 11 10:05:21 CEST 2006 - mvidner@suse.cz
 
 - Fixed filtering for files that contain translated messages

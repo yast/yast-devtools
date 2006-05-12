@@ -1,0 +1,13 @@
+#!/bin/sh
+
+SPEC_FILES=*/*.spec.in
+PKGS=`sed -ne '/BuildRequires/s/BuildRequires[ \t]*:[ \t]*//p' $SPEC_FILES | tr '\n' ' ' | sort -u`
+export LANG=C
+MISSING=`rpm -q -- $PKGS | grep "not installed" | sed -e 's/^package //' -e 's/ is not installed$//' | sort -u`
+
+if [ -z "$MISSING" ]; then
+    echo "All required packages are installed"
+else
+    echo -e "MISSING PACKAGES\n" >&2
+    echo "$MISSING"
+fi

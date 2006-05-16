@@ -15,7 +15,10 @@
             <title>
                 <xsl:value-of select="entries_item/file_summary"/>
             </title>
-            <xsl:apply-templates select="entries_item"/> 
+	    <xsl:for-each select="entries_item">
+		<xsl:sort order="ascending" select="./names/names_item"/>
+        	<xsl:apply-templates select="."/>
+	    </xsl:for-each>
         </reference>
     </xsl:template>
 

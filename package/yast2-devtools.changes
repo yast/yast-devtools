@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue May 16 16:23:59 CEST 2006 - locilka@suse.cz
+
+- Sort YCP builtins in generated doc alphabetically, ASC.
+
+-------------------------------------------------------------------
 Fri May 12 18:00:43 CEST 2006 - sh@suse.de
 
 - Added check_buildrequires and checkall_buildrequires utilities

@@ -36,12 +36,12 @@
 
   <!-- use custom icons for navigation -->
   <xsl:param name="navig.graphics" select="1"/>
-  <xsl:param name="navig.graphics.path">images/navig/</xsl:param>
+  <xsl:param name="navig.graphics.path">../images/</xsl:param>
   <xsl:param name="navig.graphics.extension" select="'.png'"/>
 
   <!-- use custom icons for admonition -->
   <xsl:param name="admon.graphics" select="1"/>
-  <xsl:param name="admon.graphics.path">images/admon/</xsl:param>
+  <xsl:param name="admon.graphics.path">../images/</xsl:param>
   <xsl:param name="admon.graphic.width" select="32"/>
   <xsl:param name="admon.style" select="''"/>
 

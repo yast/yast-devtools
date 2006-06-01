@@ -78,9 +78,8 @@ kdoc/ydoc.
 Format:
 
 	Attribute: value
-	Flag
 
-Attributes: Module Package File Summary Depends Authors Author
+Attributes: Module Package File Summary Depends Authors Author Flags
 
 Flags: Stable Unstable
 
@@ -262,7 +261,7 @@ my $g;
 #   descr
 #   summary
 #   depends
-#   stability: unstable (default) | stable
+#   flags: unstable (default) | stable
 # requires map:
 #   kind: include or import or (yuck! provides!) module
 #   name

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jun 26 19:02:51 CEST 2006 - mvidner@suse.cz
+
+- tagversion: do not break the tag if run again.
+
+-------------------------------------------------------------------
 Tue May 16 16:23:59 CEST 2006 - locilka@suse.cz
 
 - Sort YCP builtins in generated doc alphabetically, ASC.

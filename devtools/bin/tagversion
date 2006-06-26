@@ -72,11 +72,11 @@ else
 	t=stable-$v
     fi
 
-    URL_t=$REPOSITORY/tags/$t/$MODULE
+    URL_t=$REPOSITORY/tags/$t
     if [ "$ECHO" ]; then
 	echo "$t"
     elif [ "$ECHOURL" ]; then
-	echo "$URL_t"
+	echo "$URL_t/$MODULE"
     else
 	echo "$p $t"
 	svn mkdir --message "Created tag $t" $REPOSITORY/tags/$t

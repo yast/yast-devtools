@@ -63,7 +63,7 @@ function get_deps() {
 	NFB=$(sed -n -e '/^BuildRequires:[[:space:]]*\(.*\)/{;s//\1/;p;}' "$1"/*.spec.in)
     fi
     # these are not in NFB but are needed at runtime, so let's sneak them in
-    REQ="yast2-hardware-detection yast2-ncurses yast2-qt"
+    REQ="yast2-hardware-detection yast2-ncurses yast2-qt yast2-perl-bindings"
     # expand macros (/work/abuild/lib/abuild/etc/needed_packages.fixes)
     NFB=${NFB/yast2-devel-packages/yast2-core-devel-packages yast2-pkg-bindings}
     NFB=${NFB/yast2-core-devel-packages/yast2-devtools liby2util yast2-core yast2-packagemanager yast2-testsuite yast2-perl-bindings yast2}

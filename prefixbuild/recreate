@@ -28,11 +28,12 @@ shift $((OPTIND-1))
 
 if $USAGE; then
     echo "Usage:"
-    exho " -h  Help"
+    echo " -h  Help"
     echo " -d  also do Dependent modules"
     echo " -n  no Network, do not update"
     echo " -a  no Autoreconf"
     echo " -C  autoconf Cache"
+    echo " -c  global autoconf Cache"
     echo " -D  don't check the Directory"
     echo " -s  Skip recently visited modules"
     echo " -Y  non-Yast mode"

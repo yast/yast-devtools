@@ -1,7 +1,12 @@
 -------------------------------------------------------------------
+Fri Jun 30 09:46:28 CEST 2006 - locilka@suse.cz
+
+- New tag alias 'Author' -> 'Authors' in ycpdoc (bug #188881).
+
+-------------------------------------------------------------------
 Thu Jun 29 15:40:43 CEST 2006 - locilka@suse.cz
 
-- Learning scrdoc one-line tags, general description, tag-aliases,
+- Teaching scrdoc one-line tags, general description, tag-aliases,
   fixing mount-point identification, etc.
 
 -------------------------------------------------------------------

@@ -135,6 +135,9 @@ yast2-trans-cs		inst-sys		all
 yast2-trans-cy		inst-sys		all
 yast2-trans-da		inst-sys		all
 yast2-trans-de		inst-sys		all
+# SL 10.2
+yast2-trans-el		inst-sys		all
+# SLE 10
 yast2-trans-el_GR	inst-sys		all
 yast2-trans-en_GB	inst-sys		all
 yast2-trans-en_US	inst-sys		all
@@ -160,10 +163,14 @@ yast2-trans-ro		inst-sys		all
 yast2-trans-ru		inst-sys		all
 yast2-trans-sk		inst-sys		all
 yast2-trans-sr		inst-sys		all
+# SL 10.2
+yast2-trans-sl		inst-sys		all
+# SLE 10
 yast2-trans-sl_SI	inst-sys		all
 yast2-trans-sv		inst-sys		all
 yast2-trans-tr		inst-sys		all
 yast2-trans-uk		inst-sys		all
+yast2-trans-vi		inst-sys		all
 yast2-trans-zh_CN	inst-sys		all
 yast2-trans-zh_TW	inst-sys		all
 

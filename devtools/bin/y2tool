@@ -11,18 +11,18 @@ self=`basename $0`
 
 if [ "$1" == "--prefix" -o "$1" == "-p" ]; then
     shift
-    prefix="$1"
+    PREFIX="$1"
     shift
 fi
 
 # run the tools that are in the same prefix as we are
-if [ -z "$prefix" ]; then
-    if [ `dirname $0` == "." ]; then
-	y2toolpath=.
-    else
-	prefix=${0%/bin/$self}
-	y2toolpath=${prefix}/share/YaST2/data/devtools/bin
-    fi
+if [ -z "$PREFIX" ]; then
+    PREFIX=${0%/bin/$self}
+fi
+
+y2toolpath=${PREFIX}/share/YaST2/data/devtools/bin
+if [ `dirname $0` == "." ]; then
+    y2toolpath=.
 fi
 
 cmd=$1

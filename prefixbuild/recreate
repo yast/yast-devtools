@@ -3,6 +3,8 @@
 # recreate prefix installation of yast
 set -o errexit
 
+# the prefix
+PREFIX=$HOME/pfx
 USAGE=false
 RESOLVE_DEPS=false
 NETWORK=true
@@ -10,7 +12,7 @@ AUTORECONF=true
 DIRECTORY_CHECK=true
 SKIP_RECENT=false
 YAST=true
-while getopts hdnaCcDsY FLAG; do
+while getopts hdnaCcDsYp: FLAG; do
     case $FLAG in
 	h) USAGE=true;;
 	d) RESOLVE_DEPS=true;;
@@ -21,10 +23,13 @@ while getopts hdnaCcDsY FLAG; do
 	D) DIRECTORY_CHECK=false;;
 	s) SKIP_RECENT=true;;
 	Y) YAST=false;;
+	p) PREFIX="$OPTARG";;
 	*) USAGE=true; RC=1;;
     esac
 done
 shift $((OPTIND-1))
+
+export PREFIX
 
 if $USAGE; then
     echo "Usage:"
@@ -37,6 +42,7 @@ if $USAGE; then
     echo " -D  don't check the Directory"
     echo " -s  Skip recently visited modules"
     echo " -Y  non-Yast mode"
+    echo " -p <prefix> use a prefix different from ~/pfx"
     exit $RC
 fi
 
@@ -48,8 +54,6 @@ if $DIRECTORY_CHECK; then
     fi
 fi
 
-# the prefix
-PREFIX=$HOME/pfx
 # distributed make; can just use "make" instead
 for MAKE in dmake make false; do
     type $MAKE >/dev/null 2>/dev/null && break
@@ -76,7 +80,6 @@ function build_module() {
     fi
     $NETWORK && condup "$MODULE"
     pushd "$MODULE"
-
 
     if $AUTORECONF || ! test -x ./configure; then
 	if $YAST; then
@@ -150,12 +153,12 @@ module mouse		"$PFX"
 
 ## yast2-deps says installation needs xml
 ## but apparently that's not the case
-module installation	"$PFX"
+module installation	"$PFX" "$FILLUPDIR"
 module firewall		"$PFX"
 
 module perl-bindings	"$PFX" "$CFLAGS"
 
-module storage		"$PFX" "$CFLAGS" # "SWIG=$HOME/pfx-swig-1.3.24/bin/swig"
+module storage		"$PFX" "$CFLAGS" '--sbindir=$(prefix)/sbin'
 module bootloader	"$PFX" "$FILLUPDIR"
 
 module x11		"$PFX" "$CFLAGS"

@@ -4,7 +4,7 @@ if [ $# = 0 ]; then
     echo "Usage: $0 <program> <arguments>" >&2
     exit 1
 fi
-PREFIX=$HOME/pfx
+: ${PREFIX=$HOME/pfx}
 PATH=$PREFIX/bin:$PATH
 export Y2DIR=$PREFIX/share/YaST2
 # FOO=BAR${FOO+:$FOO}

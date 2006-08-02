@@ -98,6 +98,10 @@ function do_deps() {
     done
 }
 
+# FIXME packager BReq installation
+# installation Req storage
+# but storage is not considered for packager rebuild
+
 for i in "$@"; do
     do_deps $i
 done

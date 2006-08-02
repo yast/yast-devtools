@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Aug  2 10:13:30 CEST 2006 - mvidner@suse.cz
+
+- Fixed makefiles for make 3.81
+
+-------------------------------------------------------------------
 Tue Jul 18 12:55:54 CEST 2006 - mvidner@suse.cz
 
 - all-packages: added yast2-trans-{el,sl,vi}; kept

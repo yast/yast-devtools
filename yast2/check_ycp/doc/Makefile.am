@@ -18,7 +18,7 @@ html_DATA = $(wildcard html/*.html) \
 
 
 html/index.html: check_ycp.xml
-	XML_CATALOG_FILES=$(XML_CATALOG)\
+	XML_CATALOG_FILES=$(XML_CATALOG) \
 	$(XSLTPROC) $(XSLTPROC_FLAGS) --xinclude \
 	$(STYLESHEET_HTML) $<
 

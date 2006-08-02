@@ -21,7 +21,7 @@ html_DATA = $(wildcard html/*.html) \
 
 
 html/index.html: yast2-devtools.xml
-	XML_CATALOG_FILES=$(XML_CATALOG)\
+	XML_CATALOG_FILES=$(XML_CATALOG) \
 	$(XSLTPROC) $(XSLTPROC_FLAGS) --xinclude \
 	$(STYLESHEET_HTML) $<
 

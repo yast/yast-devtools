@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Aug  7 12:46:25 CEST 2006 - mvidner@suse.cz
+
+- Prevent false positives for check-textdomain in core and perl-bindings.
+
+-------------------------------------------------------------------
 Wed Aug  2 10:13:30 CEST 2006 - mvidner@suse.cz
 
 - Fixed makefiles for make 3.81

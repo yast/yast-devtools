@@ -4,6 +4,7 @@ Mon Aug  7 13:55:35 CEST 2006 - mvidner@suse.cz
 - Better parsing of "listmap" and the like not to mistake it for
   a function declaration (#133662).
 - Prevent false positives for check-textdomain in core and perl-bindings.
+- 2.13.21
 
 -------------------------------------------------------------------
 Wed Aug  2 10:13:30 CEST 2006 - mvidner@suse.cz

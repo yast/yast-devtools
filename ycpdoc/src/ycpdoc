@@ -364,6 +364,8 @@ sub recursive_type ($)
     |map   \s* <  \s* $t \s* , \s* $t \s* >
     | $t	# must come last otherwise "list<foo>" would not
 		# be parsed because of "list"
+      (?!\w)    # (negative lookahead, man perlre)
+		# Do not match "listmap", #133662
     )}x;
 }
 

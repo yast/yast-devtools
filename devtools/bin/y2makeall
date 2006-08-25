@@ -1944,8 +1944,8 @@ EXAMPLES:
 Build everything:
 	$prog_name
 
-Do a "make pot" in all YCP packages:
-	$prog_name --ycp pot
+Do a "make pot" in all packages:
+	$prog_name pot
 
 Default values can be overridden in $user_config_file
 Remember to look into $make_log for build errors!

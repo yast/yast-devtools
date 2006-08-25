@@ -188,6 +188,7 @@ sub main()
     my $dump_build_order	= 0;
     my $dump_dependencies	= 0;
     my $old_style_all		= 0;
+    my $old_style		= 0;
 
     GetOptions( "all"			=> \$enable_make_all,
 		"old-style-all"		=> \$old_style_all,
@@ -229,6 +230,7 @@ sub main()
 
     if ( $old_style_all )
     {
+	$old_style				= 1;
 	$enable_make_core_binaries		= 1;
 	$enable_byte_compile_modules		= 1;
 	$enable_byte_compile_leftover_modules	= 1;
@@ -236,9 +238,13 @@ sub main()
     }
 
     $enable_byte_compile_leftover_modules	= 1	if $enable_byte_compile_modules;
-    $enable_make_ycp_packages			= 1	if $favourites_only;
+    $old_style					= 1	if $enable_make_core_binaries
+							or $enable_byte_compile_modules
+							or $enable_byte_compile_leftover_modules
+							or $enable_make_ycp_packages;
 
-    $sudo_cmd = ""				if $no_sudo;
+    $enable_make_ycp_packages			= 1	if $favourites_only;
+    $sudo_cmd = ""					if $no_sudo;
 
     $ycpc_cmd		= "$prefix/bin/ycpc";
     $modules_dir	= "$prefix/share/YaST2/modules";
@@ -292,7 +298,6 @@ sub main()
     read_rpm_names();
     calc_build_order();
 
-
     if ( $dump_dependencies )
     {
 	dump_dependencies();
@@ -306,22 +311,25 @@ sub main()
     }
 
 
-    # dump_dependencies();
-
     #
-    # Build phases
+    # Build
     #
 
+    if ( $old_style )
+    {
+	#
+	# Old style - obsolete, but still available for emergency use
+	#
 
-
-    #
-    # Old style - obsolete, but still available for emergency use
-    #
-
-    make_core_binaries()		if $enable_make_core_binaries;
-    byte_compile_modules()		if $enable_byte_compile_modules;
-    byte_compile_leftover_modules()	if $enable_byte_compile_leftover_modules;
-    make_ycp_packages()			if $enable_make_ycp_packages;
+	make_core_binaries()		if $enable_make_core_binaries;
+	byte_compile_modules()		if $enable_byte_compile_modules;
+	byte_compile_leftover_modules()	if $enable_byte_compile_leftover_modules;
+	make_ycp_packages()			if $enable_make_ycp_packages;
+    }
+    else
+    {
+	make_in_build_order();
+    }
 
 
     #
@@ -597,7 +605,7 @@ sub tsort_dependencies()
     # Append what is left in alphabetical order
     #
 
-    push( @build_order, sort( keys( %leaf_rpms ) ) );
+    push( @build_order, sort( keys( %leaf_rpms ) ) ) unless $favourites_only;
 }
 
 
@@ -1192,6 +1200,55 @@ sub make_ycp_packages()
 
 #-----------------------------------------------------------------------------
 
+# Build in build order
+
+sub make_in_build_order()
+{
+    #
+    # Set up hash with packages not to process
+    #
+
+    my %dont_process = %exclude_dirs;
+
+
+    log_debug( "Excluding packages " . join( " ", sort ( keys( %dont_process ) ) ) );
+
+
+    #
+    # Process packages
+    #
+
+    my $pkg;
+
+    foreach $pkg ( @build_order )
+    {
+	my $dir = $work_root . "/" . $rpm_dirs{ $pkg };
+
+	if ( -d $dir )
+	{
+	    if ( ! exists( $dont_process{ $pkg } ) )
+	    {
+		# log_progress( "Building $pkg" );
+		make( $dir );
+	    }
+	    else
+	    {
+		if ( exists( $exclude_dirs{ $pkg } ) )
+		{
+		    log_progress( "\nExcluding $pkg\n" );
+		}
+	    }
+	}
+	else
+	{
+	    log_error( "No such directory: $dir (for package $pkg)" );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
 # Make one package.
 #
 # Parameters:
@@ -1205,7 +1262,7 @@ sub make()
     chdir $work_root;
     chdir $pkg;
 
-    log_progress( "Building $pkg" );
+    log_progress( "Building", basename( $pkg ) );
 
 
     # Check if "make -f Makefile.cvs" must be performed.

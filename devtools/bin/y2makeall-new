@@ -13,6 +13,7 @@ use strict;
 use English;
 use Getopt::Long;
 use File::Basename;
+use IPC::Open2;
 
 #
 # Configuration variables.
@@ -73,17 +74,8 @@ our @exclude_list =
 our @ycp_favourites =
     (
      "yast2",
-     "xml",
      "installation",
-     "storage",
-     "country",
-     "bootloader",
-     "mouse",
-     "x11",
-     "packager",
-     "transfer",
-     "update",
-     "autoinstallation",
+     "packager"
      );
 
 # Dependencies (from all other YaST2 packages) that are deliberately ignored.
@@ -134,9 +126,6 @@ my $tty_verbosity		= LOG_PROGRESS;
 my $log_verbosity		= LOG_INFO;
 
 my $make_target			= "";
-# if we don't install to usr, it is not necessary
-# -n means "no sudo"
-# note the trailing space
 my $sudo_cmd			= "/usr/bin/sudo";
 my $install_cmd			= "/usr/bin/install";
 
@@ -158,10 +147,12 @@ my %ycp_install_dirs;
 my %exclude_dirs;
 my %done_dirs;
 my %rpm_names;
+my %rpm_dirs;
 my %relevant_rpms;
 my %pkg_provides;
 my %pkg_requires;
 my %provided_by;
+my %base_rpms;
 my @build_order;
 
 my @failed_dirs;
@@ -189,12 +180,14 @@ exit 0;
 
 sub main()
 {
-    my $show_help	= 0;
-    my $verbose		= 0;
-    my $debug		= 0;
-    my $silent		= 0;
-    my $no_sudo		= 0;
-    my $old_style_all	= 0;
+    my $show_help		= 0;
+    my $verbose			= 0;
+    my $debug			= 0;
+    my $silent			= 0;
+    my $no_sudo			= 0;
+    my $dump_build_order	= 0;
+    my $dump_dependencies	= 0;
+    my $old_style_all		= 0;
 
     GetOptions( "all"			=> \$enable_make_all,
 		"old-style-all"		=> \$old_style_all,
@@ -206,6 +199,8 @@ sub main()
 		"fast"			=> \$disable_make_makefile_cvs,
 		"prefix=s"		=> \$prefix,
 		"no-sudo"		=> \$no_sudo,
+		"dump-build-order"	=> \$dump_build_order,
+		"dump-dependencies"	=> \$dump_dependencies,
 		"verbose"		=> \$verbose,
 		"debug"			=> \$debug,
 		"silent"		=> \$silent,
@@ -293,11 +288,25 @@ sub main()
     # Calculate dependencies and build order
     #
 
+
     read_rpm_names();
-    read_all_dependencies();
-    expand_provides();
-    kick_irrelevant_requires();
-    dump_dependencies();
+    calc_build_order();
+
+
+    if ( $dump_dependencies )
+    {
+	dump_dependencies();
+	exit;
+    }
+
+    if ( $dump_build_order )
+    {
+	dump_build_order();
+	exit;
+    }
+
+
+    # dump_dependencies();
 
     #
     # Build phases
@@ -360,6 +369,7 @@ sub read_rpm_names()
 		    else
 		    {
 			$rpm_names{ $dir } = $line;
+			$rpm_dirs{ $line } = $dir;
 		    }
 		}
 	    }
@@ -373,6 +383,19 @@ sub read_rpm_names()
     }
 
     %relevant_rpms = reverse( %rpm_names );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Read dependencies and calculate the build order (in global @build_order).
+
+sub calc_build_order()
+{
+    read_all_dependencies();
+    expand_provides();
+    kick_irrelevant_requires();
+    tsort_dependencies();
 }
 
 
@@ -476,12 +499,126 @@ sub read_dependencies($)
 		}
 	    }
 	}
-
     }
 
     close( SPEC_IN );
 
     return ( \%this_pkg_requires, \%this_pkg_provides );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Do a topological sort (using the external tsort(1) program) to calculate the
+# correct build order.
+
+sub tsort_dependencies()
+{
+    my $pid = open2( *TSORT_OUT, *TSORT_IN, 'tsort' );
+    my $rpm;
+
+    #
+    # Pipe all "requires" to the tsort(1) program (part of coreutils.rpm)
+    #
+
+    foreach $rpm ( sort( keys( %pkg_requires ) ) )
+    {
+	my $req = $pkg_requires{ $rpm };
+	my $this_pkg_requires;
+
+	foreach $this_pkg_requires ( sort( keys( %$req ) ) )
+	{
+	    print TSORT_IN "$rpm $this_pkg_requires\n";
+	}
+    }
+
+    close( TSORT_IN );
+
+
+    #
+    # Read the output of the tsort(1) program
+    #
+
+    my $line;
+
+    while ( $line = <TSORT_OUT> )
+    {
+	chomp( $line );
+	$line =~ s/^\s+//;
+	$line =~ s/\s+$//;
+
+	push( @build_order, $line );
+    }
+
+    close( TSORT_OUT );
+    @build_order = reverse( @build_order );
+
+
+    #
+    # Find the leaf packages to honour the user's favourites
+    #
+
+    my @base_rpms_build_order;
+    my %leaf_rpms;
+
+    foreach $rpm ( @build_order )
+    {
+	if ( defined( $base_rpms{ $rpm } ) )
+	{
+	    push( @base_rpms_build_order, $rpm )
+	}
+	else
+	{
+	    $leaf_rpms{ $rpm } = 1;
+	}
+    }
+
+
+    #
+    # Move favourites (that are leaf packages) to the front of the leaf package build order
+    #
+
+    @build_order = @base_rpms_build_order;
+    my $favourite;
+
+    foreach $favourite ( @ycp_favourites )
+    {
+    	if ( defined( $leaf_rpms{ $favourite } ) or		 # RPM name specified in favourites
+    	     defined( $leaf_rpms{ $rpm_names{ $favourite } } ) ) # directory specified
+    	{
+	    $favourite = $rpm_names{ $favourite } unless defined $leaf_rpms{ $favourite };
+    	    log_info( "Preferring favourite $favourite" );
+    	    push( @build_order, $favourite );
+    	    $leaf_rpms{ $favourite } = undef;
+    	}
+    }
+
+    #
+    # Append what is left in alphabetical order
+    #
+
+    push( @build_order, sort( keys( %leaf_rpms ) ) );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Output the build order
+
+sub dump_build_order()
+{
+    my $rpm;
+    my $leaf_package_count = 0;
+
+    log_always( "\n### Base Packages ###\n" ) if defined( $base_rpms{ $build_order[0] } );
+
+    foreach $rpm ( @build_order )
+    {
+	log_always( $rpm );
+
+	$leaf_package_count++ if ( ! defined( $base_rpms{ $rpm } ) );
+	log_always( "\n### Leaf Packages ###\n" ) if $leaf_package_count == 1;
+    }
 }
 
 
@@ -613,6 +750,10 @@ sub find_providers()
 # Note: It's not as trivial as it seems - not all YaST2 packages are named
 # yast2-xxx. This is why the content of all RPMNAME files was stored in earlier
 # phases.
+#
+# As a side effect, this function also fills the global hash %base_rpms with
+# the names of all packages that have dependent packages (i.e. some other
+# package depends on them).
 
 sub kick_irrelevant_requires()
 {
@@ -630,15 +771,82 @@ sub kick_irrelevant_requires()
 	    if ( defined $relevant_rpms{ $req } )
 	    {
 		$new_requires{ $req } = 1;
+		$base_rpms{ $req } = 1;
 	    }
 	    else
 	    {
-		log_debug( "Kicking irrelevant dependency \"$pkg requires $req\"" );
+		if ( $req =~ /^yast2-/ )
+		{
+		    log_info( "Kicking bogus dependency \"$pkg requires $req\"" );
+		}
+		else
+		{
+		    log_debug( "Kicking irrelevant dependency \"$pkg requires $req\"" );
+		}
 	    }
 	}
 
 	$pkg_requires{ $pkg } = \%new_requires;
     }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Output base packages (those that have any dependent packages)
+
+sub dump_base_packages()
+{
+    my $rpm;
+
+    log_always( "\nBase packages:\n" );
+
+    foreach $rpm ( sort( keys( %base_rpms ) ) )
+    {
+	my $dir = $rpm_dirs{ $rpm };
+
+	if ( $rpm =~ /(yast2-)?$dir/ )
+	{
+	    log_always( "\t$rpm" );
+	}
+	else
+	{
+	    log_always( "\t$rpm\t(directory \"$dir\")" );
+	}
+    }
+
+    log_always( "" );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Output leaf packages (those that don't have any dependent packages)
+
+sub dump_leaf_packages()
+{
+    my $rpm;
+
+    log_always( "\nLeaf packages:\n" );
+
+    foreach $rpm ( sort( keys( %relevant_rpms ) ) )
+    {
+	if ( ! defined $base_rpms{ $rpm } )
+	{
+	    my $dir = $rpm_dirs{ $rpm };
+
+	    if ( $rpm =~ /(yast2-)?$dir/ )
+	    {
+		log_always( "\t$rpm" );
+	    }
+	    else
+	    {
+		log_always( "\t$rpm\t(directory \"$dir\")" );
+	    }
+	}
+    }
+
+    log_always( "" );
 }
 
 
@@ -1655,6 +1863,9 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 
 	--prefix <prefix>	use <prefix> instead of /usr
 	-n  (--no-sudo)		do not sudo certain commands (useful with --prefix)
+
+	--dump-build-order	only dump the build order to stdout and log
+	--dump-dependencies	only dump the package dependencies to stdout and log
 
 	-v  (--verbose)		verbose output
 	-d  (--debug)		debug output (even more verbose)

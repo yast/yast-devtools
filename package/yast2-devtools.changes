@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 29 17:23:36 CEST 2006 - mvidner@suse.cz
+
+- po makefiles: cope with both old and new suse-i18n directory layout (ke).
+
+-------------------------------------------------------------------
 Wed Aug 23 16:53:45 CEST 2006 - mvidner@suse.cz
 
 - Added yast2-sudo to all-packages.

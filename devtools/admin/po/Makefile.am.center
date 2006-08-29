@@ -1,7 +1,8 @@
 # Emacs: -*- makefile -*-
 
 LL = @LL@
-POTDIR = ../../pot/pot
+#POTDIR = ../../50-pot
+POTDIR = @POTDIR@
 POTFILES = $(wildcard $(POTDIR)/*.pot)
 GENERATED = $(MOFILES)
 CLEANFILES = $(GENERATED)
@@ -88,7 +89,7 @@ showmo:
 
 checkpo:
 	for f in $(POFILES); do \
-	  mypot=../../pot/pot/$${f/$(LL).po/pot}; echo $$f $$mypot; \
+	  mypot=$(POTDIR)/$${f/$(LL).po/pot}; echo $$f $$mypot; \
 	  [ -f $$mypot ] && { LANG=C $(MSGMERGE) --verbose --output=/dev/null $$f $$mypot || exit 1; }; \
 	  LANG=C $(MSGFMT) --output=/dev/null --check --statistics --verbose $$f \
                  || exit 1; \

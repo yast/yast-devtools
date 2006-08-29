@@ -4,7 +4,7 @@
 set -o errexit
 
 # the prefix
-PREFIX=$HOME/pfx
+: ${PREFIX=$HOME/pfx}
 USAGE=false
 RESOLVE_DEPS=false
 NETWORK=true

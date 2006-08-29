@@ -5,6 +5,7 @@ if [ $# = 0 ]; then
     exit 1
 fi
 : ${PREFIX=$HOME/pfx}
+export PREFIX
 PATH=$PREFIX/bin:$PATH
 export Y2DIR=$PREFIX/share/YaST2
 # FOO=BAR${FOO+:$FOO}

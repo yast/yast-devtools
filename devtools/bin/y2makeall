@@ -154,9 +154,8 @@ my %pkg_requires;
 my %provided_by;
 my %base_rpms;
 my @build_order;
-
 my @failed_dirs;
-my $successful_dirs = 0;
+my $successful_count = 0;
 
 
 #
@@ -205,7 +204,8 @@ sub main()
 		"verbose"		=> \$verbose,
 		"debug"			=> \$debug,
 		"silent"		=> \$silent,
-		"help"			=> \$show_help );
+		"help"			=> \$show_help
+		);
 
     usage() if $show_help;
 
@@ -324,7 +324,7 @@ sub main()
 	make_core_binaries()		if $enable_make_core_binaries;
 	byte_compile_modules()		if $enable_byte_compile_modules;
 	byte_compile_leftover_modules()	if $enable_byte_compile_leftover_modules;
-	make_ycp_packages()			if $enable_make_ycp_packages;
+	make_ycp_packages()		if $enable_make_ycp_packages;
     }
     else
     {
@@ -1210,7 +1210,6 @@ sub make_in_build_order()
 
     my %dont_process = %exclude_dirs;
 
-
     log_debug( "Excluding packages " . join( " ", sort ( keys( %dont_process ) ) ) );
 
 
@@ -1256,13 +1255,13 @@ sub make_in_build_order()
 
 sub make()
 {
-    my( $pkg ) = @_;
+    my( $pkg_dir ) = @_;
     my $error = 0;
 
     chdir $work_root;
-    chdir $pkg;
+    chdir $pkg_dir;
 
-    log_progress( "Building", basename( $pkg ) );
+    log_progress( "Building", basename( $pkg_dir ) );
 
 
     # Check if "make -f Makefile.cvs" must be performed.
@@ -1288,10 +1287,11 @@ sub make()
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'make -f Makefile.cvs' failed for $pkg" );
+	    log_error( "'make -f Makefile.cvs' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
+
 
     #
     # make
@@ -1304,10 +1304,11 @@ sub make()
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'make $make_target' failed for $pkg" );
+	    log_error( "'make $make_target' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
+
 
     #
     # sudo make install
@@ -1320,7 +1321,7 @@ sub make()
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'$sudo_cmd make install' failed for $pkg" );
+	    log_error( "'$sudo_cmd make install' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
@@ -1332,13 +1333,17 @@ sub make()
 
     if ( $error )
     {
-	push( @failed_dirs, basename( $pkg  ) );
-	print FAILED_LOG "$pkg\n";
+	my $dir = basename( $pkg_dir );
+	push( @failed_dirs, $dir );
+	my $rpm = $rpm_names{ $dir };
+	my $msg = "$dir";
+	$msg .= "\t\t\t(base package)" if defined( $base_rpms{ $rpm } );
+	print FAILED_LOG "$msg\n";
     }
     else
     {
 	log_progress( "\tOK" );
-	$successful_dirs++;
+	$successful_count++;
     }
 
     chdir $work_root;
@@ -1760,20 +1765,24 @@ sub byte_compile()
 
 sub print_summary()
 {
-    return if $successful_dirs + $#failed_dirs+1 < 1;	# didn't really build anything
+    my $failed_count = scalar( @failed_dirs ) + 1;
+    return if $successful_count + $failed_count < 1;	# didn't really build anything
 
     log_milestone( "\n$prog_name $make_target summary:\n" );
-    log_milestone( "    Success in $successful_dirs directories" );
+    log_milestone( "    Success in $successful_count directories" );
 
-    if ( $#failed_dirs >= 0 )
+    if ( $failed_count > 0 )
     {
-	log_milestone( "    Failed  in " . ( $#failed_dirs+1 ) . " directories:\n" );
-
+	log_milestone( "    Failed  in " . $failed_count . " directories:\n" );
 	my $failed_dir;
 
-	foreach $failed_dir ( sort @failed_dirs )
+	foreach $failed_dir ( @failed_dirs )
 	{
-	    log_milestone( "\t$failed_dir" );
+	    my $rpm = $rpm_names{ $failed_dir };
+	    my $msg = "\t$failed_dir";
+	    $msg .= "\t\t\t(base package)" if defined( $base_rpms{ $rpm } );
+
+	    log_milestone( $msg );
 	}
     }
     else

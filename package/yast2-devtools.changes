@@ -1,8 +1,10 @@
 -------------------------------------------------------------------
-Fri Sep  8 18:46:26 CEST 2006 - mvidner@suse.de
+Fri Sep  8 18:48:16 CEST 2006 - mvidner@suse.cz
 
+- Check for docbook-xml-stylesheets if using docbook (#157629).
 - autodocs-ycp.ami: Generate docs also from *.pm sources, by pod2html (F#415).
 - ycpdoc: Ignore *.pm but write them to files.html (F#415).
+- 2.13.23
 
 -------------------------------------------------------------------
 Tue Aug 29 17:26:10 CEST 2006 - mvidner@suse.cz

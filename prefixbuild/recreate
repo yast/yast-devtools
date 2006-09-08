@@ -88,6 +88,7 @@ function build_module() {
 		local BOOTSTRAP="--bootstrap ./devtools/admin"
 		pfx $DTPATH/y2autoconf $BOOTSTRAP
 		pfx $DTPATH/y2automake $BOOTSTRAP
+		cat ./devtools/admin/aclocal/*.m4 > acinclude.m4
 	    else
 		pfx y2tool y2autoconf
 		pfx y2tool y2automake

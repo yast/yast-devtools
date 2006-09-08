@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
-Fri Sep  8 18:42:28 CEST 2006 - mvidner@suse.de
+Fri Sep  8 18:46:26 CEST 2006 - mvidner@suse.de
 
+- autodocs-ycp.ami: Generate docs also from *.pm sources, by pod2html (F#415).
 - ycpdoc: Ignore *.pm but write them to files.html (F#415).
 
 -------------------------------------------------------------------

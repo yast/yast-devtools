@@ -384,6 +384,8 @@ my $no_comment_end = '(?:[^*]|\*[^*/])*';
 sub parse_file ($)
 {
     $pathname = shift;
+    return {} if $pathname !~ /\.ycp$/;	# dummy for a non-ycp
+
     my $state = "firstline"; # aftercomment, fistcomment, firstline, incomment, intro, start,
 
     my $f = {};
@@ -1140,7 +1142,7 @@ sub write_docs
 sub html_name ($)
 {
     my $base = shift;
-    $base =~ s/.ycp$//;
+    $base =~ s/.(ycp|pm)$//;
     $base =~ s{/}{__}g;
     return $base . ".html";
 }
@@ -1168,7 +1170,7 @@ sub create_index ($)
     my @entries = ();
     foreach my $f (values %{$g->{"files"}})
     {
-	push @entries, @{$f->{"provides"}};
+	push @entries, @{$f->{"provides"} || []};
     }
 
     for my $one ( sort {$a->{"signature"} cmp $b->{"signature"}} @entries )
@@ -1290,6 +1292,8 @@ sub item_index ($$@)
 sub write_onefile ($$)
 {
     my ($file, $f) = @_;
+    return if ! %$f; 		# empty, a dummy for non-ycp
+
     my $parsed_header = $f->{"header"};
     my $htmlfn = $output_dir . html_name ($file);
 

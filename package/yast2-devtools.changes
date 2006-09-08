@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep  8 18:42:28 CEST 2006 - mvidner@suse.de
+
+- ycpdoc: Ignore *.pm but write them to files.html (F#415).
+
+-------------------------------------------------------------------
 Tue Aug 29 17:26:10 CEST 2006 - mvidner@suse.cz
 
 - po makefiles: cope with both old and new suse-i18n directory layout (ke).

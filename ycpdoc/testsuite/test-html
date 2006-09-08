@@ -1,6 +1,7 @@
-#! /bin/sh
-# for each FOO.drv, parse FOO*.ycp and compare the output
+#! /bin/bash
+# for each FOO.drv, parse FOO*.ycp FOO*.pm and compare the output
 # Or run only $1.
+shopt -s nullglob
 YCPDOC=../src/ycpdoc
 
 echo
@@ -24,7 +25,7 @@ for DRV in ${1-*.drv}; do
     rm -rf $ACT
     mkdir $ACT
     cp -a $DRV $ACT
-    $YCPDOC --format=html --outputdir=$ACT $CASE*.ycp
+    $YCPDOC --format=html --outputdir=$ACT $CASE*.ycp $CASE*.pm
     if test $? != 0 || ! diff -ur $EXP $ACT; then
 	FAIL=1
 	break

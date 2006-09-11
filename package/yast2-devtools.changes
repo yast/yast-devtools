@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep 11 13:22:49 CEST 2006 - mvidner@suse.de
+
+- Fixed the autodocs if there were no *.pm files.
+- 2.13.24
+
+-------------------------------------------------------------------
 Fri Sep  8 18:48:16 CEST 2006 - mvidner@suse.cz
 
 - Check for docbook-xml-stylesheets if using docbook (#157629).

@@ -12,10 +12,10 @@
 htmldir = $(docdir)/autodocs
 
 html_DATA = index.html $(wildcard *.html)
-CLEANFILES = $(html_DATA)
+CLEANFILES = $(html_DATA) pod2htm*.tmp
 
-AUTODOCS_YCP ?= $(srcdir)/../../src/*.ycp
-AUTODOCS_PM  ?= $(srcdir)/../../src/*.pm
+AUTODOCS_YCP ?= $(wildcard $(srcdir)/../../src/*.ycp)
+AUTODOCS_PM  ?= $(wildcard $(srcdir)/../../src/*.pm)
 
 index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM)
 #including *.pm, for the index

@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
-Mon Sep 18 15:43:20 CEST 2006 - mvidner@suse.cz
+Mon Sep 18 16:00:44 CEST 2006 - mvidner@suse.cz
 
+- With xgettext 0.15, "--keyword=_:1,2" alone did not trigger for
+  single-form messages. Added "--keyword=_" to fix that.
 - Added yast2-trans-et to all-packages.
+- 2.13.25
 
 -------------------------------------------------------------------
 Mon Sep 11 13:22:49 CEST 2006 - mvidner@suse.de

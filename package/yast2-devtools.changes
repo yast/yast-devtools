@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 18 15:43:20 CEST 2006 - mvidner@suse.cz
+
+- Added yast2-trans-et to all-packages.
+
+-------------------------------------------------------------------
 Mon Sep 11 13:22:49 CEST 2006 - mvidner@suse.de
 
 - Fixed the autodocs if there were no *.pm files.

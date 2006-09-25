@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Sep 25 15:51:30 CEST 2006 - mvidner@suse.cz
+
+- Docbook configure check: fixed when no catalog found, and
+  don't overwrite config.log.
+- 2.13.25
+
+-------------------------------------------------------------------
 Mon Sep 18 16:00:44 CEST 2006 - mvidner@suse.cz
 
 - With xgettext 0.15, "--keyword=_:1,2" alone did not trigger for

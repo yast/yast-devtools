@@ -29,10 +29,10 @@ if test -n "$XSLTPROC"; then
         if test -n "$XML_CATALOG"; then
                 DB_FILE="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"
         else
-                DB_FILE="$DOCBOOK_ROOT/docbook.xsl"
+                DB_FILE="$DOCBOOK_ROOT/xhtml/docbook.xsl"
         fi
 
-        $XSLTPROC $XSLTPROC_FLAGS $DB_FILE >/dev/null 2>config.log << END
+        $XSLTPROC $XSLTPROC_FLAGS $DB_FILE >/dev/null 2>>config.log << END
 <?xml version="1.0" encoding='ISO-8859-1'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <book id="test">

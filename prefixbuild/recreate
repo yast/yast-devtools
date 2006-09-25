@@ -8,16 +8,19 @@ set -o errexit
 USAGE=false
 RESOLVE_DEPS=false
 NETWORK=true
+# useful to disable it on slow machines
 AUTORECONF=true
+USE_CONFIG_STATUS=true
 DIRECTORY_CHECK=true
 SKIP_RECENT=false
 YAST=true
-while getopts hdnaCcDsYp: FLAG; do
+while getopts hdnatCcDsYp: FLAG; do
     case $FLAG in
 	h) USAGE=true;;
 	d) RESOLVE_DEPS=true;;
 	n) NETWORK=false;;
 	a) AUTORECONF=false;;
+	t) USE_CONFIG_STATUS=false;;
 	C) CACHE=-C;;
 	c) CACHE=--cache-file=`pwd`/common-config.cache;;
 	D) DIRECTORY_CHECK=false;;
@@ -37,6 +40,7 @@ if $USAGE; then
     echo " -d  also do Dependent modules"
     echo " -n  no Network, do not update"
     echo " -a  no Autoreconf"
+    echo " -t  don't use config.sTatus"
     echo " -C  autoconf Cache"
     echo " -c  global autoconf Cache"
     echo " -D  don't check the Directory"
@@ -97,7 +101,8 @@ function build_module() {
 	pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
     fi
 
-    if [ -x ./config.status ]; then
+    # we may want to rerun configure with updated parameters
+    if $USE_CONFIG_STATUS && test -x ./config.status; then
 	pfx ./config.status --recheck
 	pfx ./config.status
     else

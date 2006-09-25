@@ -1,9 +1,11 @@
 -------------------------------------------------------------------
-Mon Sep 25 15:51:30 CEST 2006 - mvidner@suse.cz
+Mon Sep 25 15:57:20 CEST 2006 - mvidner@suse.cz
 
 - Docbook configure check: fixed when no catalog found, and
   don't overwrite config.log.
-- 2.13.25
+- prefixbuild/recreate -t: run configure instead of config.status
+- prefixbuild/yp: honor PREFIX
+- 2.13.26
 
 -------------------------------------------------------------------
 Mon Sep 18 16:00:44 CEST 2006 - mvidner@suse.cz

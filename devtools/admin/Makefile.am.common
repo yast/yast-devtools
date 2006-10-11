@@ -29,7 +29,19 @@ NEWDEP=${top_builddir}/.dep.new
 
 dist-hook: check-syntax
 
+CHECK_SYNTAX = true
 check-syntax: $(client_DATA) $(ycpchook)
-	if test "$(client_DATA)"; then $(bindir)/ycpc -qE -M. -I. $(YCPCFLAGS) $(filter %.ycp,$^) || exit 1; fi
+	@if test "$(client_DATA)"; then \
+	  if $(CHECK_SYNTAX); then \
+	    TO_CHECK="$(filter %.ycp,$^)"; \
+	    echo "Checking syntax of $${TO_CHECK}"; \
+	    if ! $(YCPC) -qE -M. -I. $(YCPCFLAGS) $${TO_CHECK}; then \
+	      echo "Failed. Disable by 'make ... CHECK_SYNTAX=false' at your own risk"; \
+	      exit 1; \
+	    fi; \
+	  else \
+	    echo "Syntax check disabled"; \
+	  fi; \
+	fi
 
 -include .dep

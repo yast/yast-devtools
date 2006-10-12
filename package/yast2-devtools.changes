@@ -2,6 +2,7 @@
 Wed Oct 11 19:06:21 CEST 2006 - mvidner@suse.cz
 
 - "make dist" will honor CHECK_SYNTAX=false
+- 2.13.27
 
 -------------------------------------------------------------------
 Mon Sep 25 15:57:20 CEST 2006 - mvidner@suse.cz

@@ -116,6 +116,7 @@ yast2-security		default			security
 yast2-slp-server	default			slp daemon
 yast2-sound		default			sound
 yast2-storage		inst-sys,default	storage
+yast2-sudo		default			/etc/sudoers
 yast2-support		default			support
 yast2-sysconfig		default			sysconfig editor
 yast2-tftp-server	default			TFTP server
@@ -131,15 +132,20 @@ yast2-you-server	default			YOU server
 yast2-trans-bg		inst-sys		all
 yast2-trans-bn		inst-sys		all
 yast2-trans-bs		inst-sys		all
+yast2-trans-ca		inst-sys		all
 yast2-trans-cs		inst-sys		all
 yast2-trans-cy		inst-sys		all
 yast2-trans-da		inst-sys		all
 yast2-trans-de		inst-sys		all
+# SL 10.2
 yast2-trans-el		inst-sys		all
+# SLE 10
 yast2-trans-el_GR	inst-sys		all
 yast2-trans-en_GB	inst-sys		all
 yast2-trans-en_US	inst-sys		all
 yast2-trans-es		inst-sys		all
+# SL 10.2
+yast2-trans-et		inst-sys		all
 yast2-trans-fi		inst-sys		all
 yast2-trans-fr		inst-sys		all
 yast2-trans-he		inst-sys		all
@@ -161,11 +167,14 @@ yast2-trans-ro		inst-sys		all
 yast2-trans-ru		inst-sys		all
 yast2-trans-sk		inst-sys		all
 yast2-trans-sr		inst-sys		all
+# SL 10.2
 yast2-trans-sl		inst-sys		all
+# SLE 10
 yast2-trans-sl_SI	inst-sys		all
 yast2-trans-sv		inst-sys		all
 yast2-trans-tr		inst-sys		all
 yast2-trans-uk		inst-sys		all
+yast2-trans-vi		inst-sys		all
 yast2-trans-zh_CN	inst-sys		all
 yast2-trans-zh_TW	inst-sys		all
 

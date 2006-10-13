@@ -67,7 +67,7 @@ if CREATE_PKGCONFIG
 # because the prerequisite is made here (not anymore!)
 # and we don't want any paths in y2autoconf
 # info '(autoconf)config.status Invocation'
-$(RPMNAME).pc: $(RPMNAME).pc.in
+$(RPMNAME).pc: $(RPMNAME).pc.in config.status
 	./config.status --file=$@:$<
 
 if CREATE_PKGCONFIG_NOARCH

@@ -1,0 +1,12 @@
+//
+{
+    /**
+     * #133662 separate type and identifier
+     * @return list <string> my friends
+     */
+    list<string>Friends () {
+	return
+		maplist (string s, ["Tux", "Linus"],
+			 ``( s + s ));
+    }
+}

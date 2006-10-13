@@ -79,7 +79,7 @@ Format:
 
 	Attribute: value
 
-Attributes: Module Package File Summary Depends Authors Author Flags
+Attributes: Author Authors Depends File Flags Module Package Summary
 
 Flags: Stable Unstable
 
@@ -364,6 +364,8 @@ sub recursive_type ($)
     |map   \s* <  \s* $t \s* , \s* $t \s* >
     | $t	# must come last otherwise "list<foo>" would not
 		# be parsed because of "list"
+      (?!\w)    # (negative lookahead, man perlre)
+		# Do not match "listmap", #133662
     )}x;
 }
 
@@ -382,6 +384,8 @@ my $no_comment_end = '(?:[^*]|\*[^*/])*';
 sub parse_file ($)
 {
     $pathname = shift;
+    return {} if $pathname !~ /\.ycp$/;	# dummy for a non-ycp
+
     my $state = "firstline"; # aftercomment, fistcomment, firstline, incomment, intro, start,
 
     my $f = {};
@@ -841,6 +845,8 @@ sub parse_header (@)
 	    $key = lc $1;
 	    # Module is old style, Package is new style. TODO, define meaning
 	    $key = "module" if $key eq "package";
+	    # tag alias (bug #188881)
+	    $key = "authors" if $key eq "author";
 	}
 	elsif ($a =~ /^\s*(Stable|Unstable)\./)
 	{
@@ -853,6 +859,7 @@ sub parse_header (@)
 	    $key = "descr";	# Id marks the start of description
 	}
 
+	# processing tags
 	if ( $key eq "authors")
 	{
 	    my $mail = $a;
@@ -1135,7 +1142,7 @@ sub write_docs
 sub html_name ($)
 {
     my $base = shift;
-    $base =~ s/.ycp$//;
+    $base =~ s/.(ycp|pm)$//;
     $base =~ s{/}{__}g;
     return $base . ".html";
 }
@@ -1163,7 +1170,7 @@ sub create_index ($)
     my @entries = ();
     foreach my $f (values %{$g->{"files"}})
     {
-	push @entries, @{$f->{"provides"}};
+	push @entries, @{$f->{"provides"} || []};
     }
 
     for my $one ( sort {$a->{"signature"} cmp $b->{"signature"}} @entries )
@@ -1285,6 +1292,8 @@ sub item_index ($$@)
 sub write_onefile ($$)
 {
     my ($file, $f) = @_;
+    return if ! %$f; 		# empty, a dummy for non-ycp
+
     my $parsed_header = $f->{"header"};
     my $htmlfn = $output_dir . html_name ($file);
 

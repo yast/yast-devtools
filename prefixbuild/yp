@@ -20,4 +20,5 @@ a=("$@")
 a=("${a[@]/#/(\"}")
 a=("${a[@]/%/\")}")
 set -- "${a[@]}"
-pfx $VALGRIND ~mvidner/pfx/lib/YaST2/bin/y2base "$CLIENT" "$@" $UI
+: ${PREFIX=~mvidner/pfx}
+pfx $VALGRIND $PREFIX/lib/YaST2/bin/y2base "$CLIENT" "$@" $UI

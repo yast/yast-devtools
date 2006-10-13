@@ -1,4 +1,95 @@
 -------------------------------------------------------------------
+Wed Oct 11 19:06:21 CEST 2006 - mvidner@suse.cz
+
+- "make dist" will honor CHECK_SYNTAX=false
+- 2.13.27
+
+-------------------------------------------------------------------
+Mon Sep 25 15:57:20 CEST 2006 - mvidner@suse.cz
+
+- Docbook configure check: fixed when no catalog found, and
+  don't overwrite config.log.
+- prefixbuild/recreate -t: run configure instead of config.status
+- prefixbuild/yp: honor PREFIX
+- 2.13.26
+
+-------------------------------------------------------------------
+Mon Sep 18 16:00:44 CEST 2006 - mvidner@suse.cz
+
+- With xgettext 0.15, "--keyword=_:1,2" alone did not trigger for
+  single-form messages. Added "--keyword=_" to fix that.
+- Added yast2-trans-et to all-packages.
+- 2.13.25
+
+-------------------------------------------------------------------
+Mon Sep 11 13:22:49 CEST 2006 - mvidner@suse.de
+
+- Fixed the autodocs if there were no *.pm files.
+- 2.13.24
+
+-------------------------------------------------------------------
+Fri Sep  8 18:48:16 CEST 2006 - mvidner@suse.cz
+
+- Check for docbook-xml-stylesheets if using docbook (#157629).
+- autodocs-ycp.ami: Generate docs also from *.pm sources, by pod2html (F#415).
+- ycpdoc: Ignore *.pm but write them to files.html (F#415).
+- 2.13.23
+
+-------------------------------------------------------------------
+Tue Aug 29 17:26:10 CEST 2006 - mvidner@suse.cz
+
+- po makefiles: cope with both old and new suse-i18n directory layout (ke).
+- yast2-devtools.pc: removed libdir because this is a noarch package.
+- prefixbuild: Another fix to honor PREFIX in the environment.
+- 2.13.22
+
+-------------------------------------------------------------------
+Wed Aug 23 16:53:45 CEST 2006 - mvidner@suse.cz
+
+- Added yast2-sudo to all-packages.
+
+-------------------------------------------------------------------
+Mon Aug  7 17:45:36 CEST 2006 - mvidner@suse.cz
+
+- Added yast2-trans-ca to all-packages (#190072).
+
+-------------------------------------------------------------------
+Mon Aug  7 13:55:35 CEST 2006 - mvidner@suse.cz
+
+- Better parsing of "listmap" and the like not to mistake it for
+  a function declaration (#133662).
+- Prevent false positives for check-textdomain in core and perl-bindings.
+- 2.13.21
+
+-------------------------------------------------------------------
+Wed Aug  2 10:13:30 CEST 2006 - mvidner@suse.cz
+
+- Fixed makefiles for make 3.81
+- 2.13.20
+
+-------------------------------------------------------------------
+Tue Jul 18 12:55:54 CEST 2006 - mvidner@suse.cz
+
+- all-packages: added yast2-trans-{el,sl,vi}; kept
+  yast2-trans-{el_GR,sl_SI} for SLE 10 compatibility.
+
+-------------------------------------------------------------------
+Fri Jun 30 09:46:28 CEST 2006 - locilka@suse.cz
+
+- New tag alias 'Author' -> 'Authors' in ycpdoc (bug #188881).
+
+-------------------------------------------------------------------
+Thu Jun 29 15:40:43 CEST 2006 - locilka@suse.cz
+
+- Teaching scrdoc one-line tags, general description, tag-aliases,
+  fixing mount-point identification, etc.
+
+-------------------------------------------------------------------
+Mon Jun 26 19:02:51 CEST 2006 - mvidner@suse.cz
+
+- tagversion: do not break the tag if run again.
+
+-------------------------------------------------------------------
 Tue May 16 16:23:59 CEST 2006 - locilka@suse.cz
 
 - Sort YCP builtins in generated doc alphabetically, ASC.

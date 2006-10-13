@@ -1,6 +1,5 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-libdir=@libdir@
 # if your pkgconfig does not see this variable, remove the obsolete
 # version of this file at /usr/lib*/pkgconfig/yast2-devtools.pc
 datadir=@datadir@

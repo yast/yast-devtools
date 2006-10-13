@@ -191,11 +191,21 @@ AC_ARG_WITH(own_compendium,
 			   [Location of compendium file]),
 	    y2compendium=yes, y2compendium=no)
 if test "x$with_own_compendium" = "x" ; then
-  COMPENDIUM=\'../../memory/yast2.$(LL).po\'
+  if test -d ../50-memory ; then
+    COMPENDIUM=\'../../50-memory/yast2.$(LL).po\'
+  else
+    COMPENDIUM=\'../../memory/yast2.$(LL).po\'
+  fi
 else
   COMPENDIUM=${with_own_compendium}
 fi
 AC_SUBST(COMPENDIUM)
+if test -d ../50-pot ; then
+  POTDIR=../../50-pot
+else
+  POTDIR=../../pot/pot
+fi
+AC_SUBST(POTDIR)
 ',
 
     # init: YCP sources

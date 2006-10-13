@@ -140,10 +140,19 @@ sub extractBlocksFromFile {
 
     # Get every comment and possibly next line if special
     my @Blocks = ($File =~ m{/\*.*?\*/(?:[^\n]*\n(?:\s*\n)*^(?:[^\n]*define|\.)[^\n]*$)?}gsm);
-
+    
     # If file starts with "." on first position, it's an old style scr file
     if ($File =~ /^(\..*?)[ \t]*\n/) {
 	unshift @Blocks, "/**\n * $1\n */\n$1\n";
+    }
+
+    if (scalar(@Blocks) == 0) {
+	foreach my $line (split(/\n/, $File)) {
+	    if ($line =~ /\s*(^\.\S+)/) {
+		push @Blocks, $1;
+		last;
+	    }
+	}
     }
 
     return \@Blocks;
@@ -163,12 +172,23 @@ sub extractInfoFromBlock {
 
     for (my $BlockNumber = 0; $BlockNumber <= $#$Blocks; ++$BlockNumber) {
 	my $Block = $Blocks->[$BlockNumber];
+	
+	my $Comment = "";
+	my $Rest = "";
+	
+	# sometimes, only the mount-point is defined
+	# and no other documentation is included
+	if ($Block =~ /^\.\S+$/) {
+	    $Comment = "";
+	    $Rest = $Block;
+	} else {
+	    # Split up Comment and Rest
+	    $Block =~ /(\/\*.*?\*\/)[^\n]*\n(?:\s*\n)*^(.*)\Z/ms;
 
-	# Split up Comment and Rest
-	$Block =~ /(\/\*.*?\*\/)[^\n]*\n(?:\s*\n)*^(.*)\Z/ms;
-	my $Comment = $1;
-	my $Rest = $2;
-
+	    $Comment = $1;
+	    $Rest = $2;
+	}
+	
 	# Analyse Rest
 	my $Type  = "";
 	my $Value = "";
@@ -181,10 +201,18 @@ sub extractInfoFromBlock {
 	} else {
 	    $Type = "unknown";
 	}
-
+	
 	my $BlockInfo = analyseComment($Comment);
+
+	# Mountpoint is the special case
+	if ($Type eq "mountpoint") {
+	    #print STDERR "MOUNTPOINT: $BlockNumber ($Value)\n";
+	    $BlockInfo->{MountPoint} = $Value;
+	    push @{$Info->{Mount}}, $BlockInfo;
+	}
+
 	# Categorize Comment
-	if ($Block =~ /\/\*[^*]/) {
+	if ($Block =~ /^\/\*[^\*]/) {
 	    #print STDERR "SKIP: $BlockNumber\n";
 	    next;
 	} elsif ($Block =~ /\/\*\*\*/) {
@@ -194,10 +222,6 @@ sub extractInfoFromBlock {
 	    #print STDERR "FUNTION: $BlockNumber ($Value)\n";
 	    $BlockInfo->{FunctionName} = $Value;
 	    push @{$Info->{Function}}, $BlockInfo;
-	} elsif ($Type eq "mountpoint") {
-	    #print STDERR "MOUNTPOINT: $BlockNumber ($Value)\n";
-	    $BlockInfo->{MountPoint} = $Value;
-	    push @{$Info->{Mount}}, $BlockInfo;
 	} elsif (@{$Info->{Module}} == 0) {
 	    #print STDERR "MODULE: $BlockNumber\n";
 	    push @{$Info->{Module}}, $BlockInfo;
@@ -206,14 +230,58 @@ sub extractInfoFromBlock {
 	    push @{$Info->{General}}, $BlockInfo;
 	}
     }
-
+    
     return $Info;
-
-
-
-
 }
 #----------------------------------------------------------------------
+sub ConvertAliases ($) {
+    my $Name = shift;
+
+    # General description
+    if ($Name =~ /Description/i || $Name =~ /Descr/i) {
+        $Name = "General";
+    # Author is alias for Authors
+    } elsif ($Name =~ /Author/i) {
+        $Name = "Authors";
+    } elsif ($Name =~ /Examples/i) {
+        $Name = "Example";
+    }
+
+    return $Name;
+}
+#----------------------------------------------------------------------
+sub MakeExampleNicer ($$) {
+    my $example = shift;
+    my $blankchar = shift;
+
+    my @lines = split(/\n/, $example);
+    
+    # find the minimal count of spaces on the left side of example
+    my $minspaces = 99999;
+    foreach my $line (@lines) {
+	# ignore blank lines
+	next if ($line =~ /^$blankchar*$/);
+	# find out count of spaces
+	$line =~ /^($blankchar*).*$/;
+	if (length($1) < $minspaces) {
+	    $minspaces = length($1);
+	}
+    }
+    if ($minspaces > 0) {
+	$example = "";
+	foreach my $line (@lines) {
+	    for (1..$minspaces) {
+		$line =~ s/^$blankchar//;
+	    }
+	    $line =~ s/^[ \t]*$//;
+	    $example .= ($example ne "" ? "\n":"").$line;
+	}
+    }
+    
+    $example =~ s/^\n+//g;
+    $example =~ s/\n+$//g;
+    return $example;
+}
 #----------------------------------------------------------------------
 sub analyseComment {
     my $Comment = shift;
@@ -226,26 +294,66 @@ sub analyseComment {
 	push @{ $Info->{$1} }, $2;
     }
 
-    # Get Id
-    if ($Comment =~ s/^\s*\**\s*(\$Id\:.*?\$)\s*\n//mi) {
-	$Info->{ID} = $1;
+    # Go through the comments line by line
+    # Find the 'Name' and 'Text'
+    # If both are found, add it to the map
+    my $Name = "";
+    my $Text = "";
+    foreach my $line (split(/\n/, $Comment)) {
+	# 'Name: Text' or 'Name:' (with text on the following line)
+	if ($line =~ /^\s*\**\s*([a-zA-Z]+):(.*)/) {
+	    $Name = $1;
+	    $Text = $2;
+	    # do not reformat only examples
+	    if ($Name ne "Example") {
+		$Text =~ s/^\s*(.*)\s*$/$1/;
+	    }
+	# final '*/', delete the 'Name'
+	} elsif ($line =~ /^\s*\*+\//) {
+	    $Name = "";
+	# special tag ID
+	} elsif ($line =~ /^\s*\**\s*(\$Id\:.*?\$)\s*/mi) {
+	    $Name = "ID";
+	    $Text = $1;
+	# a blank line means if a 'Text' comes on the next line
+	# the 'Name' is 'General' ('Description')
+	# the only exception is an 'Example' (it allows blank lines)
+	} elsif ($line =~ /^\s*\**\s*$/ && $Name ne "Example") {
+	    $Name = "General";
+	    $Text = "";
+	# just a text, 'Name' should be already defined
+	} elsif ($line =~ /^\s*\**(.*)/) {
+	    $Text = $1;
+	    # do not reformat only examples
+	    if ($Name ne "Example") {
+		$Text =~ s/^\s*(.*)\s*$/$1/;
+	    }
+	} else {
+	    warn
+		"Unknown input: $line\n".
+		"Current Name was: ".$Name."\n".
+		"Current Text was: ".$Text;
+	}
+	
+	# Convert 'Name' aliases bofore the record is written
+	$Name = ConvertAliases($Name);
+	
+	if ($Name && $Text) {
+	    $Info->{$Name} .= "\n".$Text;
+	}
     }
-
-    # Collect Areas
-    while ($Comment =~ s/^\s*\**(\s*)([a-zA-Z]+):.*?\n(.*?\n)(?=(\s*\*?\s*|\s*\**\s*[a-zA-Z]+:)\n)//ms) {
-	my $Indent = $1;
-	my $Name = $2;
-	my $Text = $3;
-	$Text =~ s/^\s*\**(\Q$Indent\E)?//mg;
-	$Info->{$Name} = $Text;
+    
+    # Transform example (remove some spaces)
+    if (defined $Info->{"Example"}) {
+	$Info->{"Example"} = MakeExampleNicer($Info->{"Example"}, " ");
+	$Info->{"Example"} = MakeExampleNicer($Info->{"Example"}, "\t");
     }
-
-    # General
-    $Comment =~ s/^.*?\/\*+\s*\n?//;
-    $Comment =~ s/\s*\*+\/.*\n?$//;
-    $Comment =~ s/^\s*\**[ \t]?//gm;
-    $Info->{General} = $Comment;
-
+    
+    # remove opening newlines
+    foreach $Name (keys %{$Info}) {
+	$Info->{$Name} =~ s/^\n//m;
+    }
+    
     return $Info;
 }
 #----------------------------------------------------------------------

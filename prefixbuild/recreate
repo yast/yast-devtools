@@ -3,39 +3,50 @@
 # recreate prefix installation of yast
 set -o errexit
 
+# the prefix
+: ${PREFIX=$HOME/pfx}
 USAGE=false
 RESOLVE_DEPS=false
 NETWORK=true
+# useful to disable it on slow machines
 AUTORECONF=true
+USE_CONFIG_STATUS=true
 DIRECTORY_CHECK=true
 SKIP_RECENT=false
 YAST=true
-while getopts hdnaCcDsY FLAG; do
+while getopts hdnatCcDsYp: FLAG; do
     case $FLAG in
 	h) USAGE=true;;
 	d) RESOLVE_DEPS=true;;
 	n) NETWORK=false;;
 	a) AUTORECONF=false;;
+	t) USE_CONFIG_STATUS=false;;
 	C) CACHE=-C;;
 	c) CACHE=--cache-file=`pwd`/common-config.cache;;
 	D) DIRECTORY_CHECK=false;;
 	s) SKIP_RECENT=true;;
 	Y) YAST=false;;
+	p) PREFIX="$OPTARG";;
 	*) USAGE=true; RC=1;;
     esac
 done
 shift $((OPTIND-1))
 
+export PREFIX
+
 if $USAGE; then
     echo "Usage:"
-    exho " -h  Help"
+    echo " -h  Help"
     echo " -d  also do Dependent modules"
     echo " -n  no Network, do not update"
     echo " -a  no Autoreconf"
+    echo " -t  don't use config.sTatus"
     echo " -C  autoconf Cache"
+    echo " -c  global autoconf Cache"
     echo " -D  don't check the Directory"
     echo " -s  Skip recently visited modules"
     echo " -Y  non-Yast mode"
+    echo " -p <prefix> use a prefix different from ~/pfx"
     exit $RC
 fi
 
@@ -47,8 +58,6 @@ if $DIRECTORY_CHECK; then
     fi
 fi
 
-# the prefix
-PREFIX=$HOME/pfx
 # distributed make; can just use "make" instead
 for MAKE in dmake make false; do
     type $MAKE >/dev/null 2>/dev/null && break
@@ -76,7 +85,6 @@ function build_module() {
     $NETWORK && condup "$MODULE"
     pushd "$MODULE"
 
-
     if $AUTORECONF || ! test -x ./configure; then
 	if $YAST; then
 	    if [ "$MODULE" = devtools ]; then
@@ -84,6 +92,7 @@ function build_module() {
 		local BOOTSTRAP="--bootstrap ./devtools/admin"
 		pfx $DTPATH/y2autoconf $BOOTSTRAP
 		pfx $DTPATH/y2automake $BOOTSTRAP
+		cat ./devtools/admin/aclocal/*.m4 > acinclude.m4
 	    else
 		pfx y2tool y2autoconf
 		pfx y2tool y2automake
@@ -92,7 +101,8 @@ function build_module() {
 	pfx autoreconf -v --force --install --include=$PREFIX/share/aclocal
     fi
 
-    if [ -x ./config.status ]; then
+    # we may want to rerun configure with updated parameters
+    if $USE_CONFIG_STATUS && test -x ./config.status; then
 	pfx ./config.status --recheck
 	pfx ./config.status
     else
@@ -149,12 +159,12 @@ module mouse		"$PFX"
 
 ## yast2-deps says installation needs xml
 ## but apparently that's not the case
-module installation	"$PFX"
+module installation	"$PFX" "$FILLUPDIR"
 module firewall		"$PFX"
 
 module perl-bindings	"$PFX" "$CFLAGS"
 
-module storage		"$PFX" "$CFLAGS" # "SWIG=$HOME/pfx-swig-1.3.24/bin/swig"
+module storage		"$PFX" "$CFLAGS" '--sbindir=$(prefix)/sbin'
 module bootloader	"$PFX" "$FILLUPDIR"
 
 module x11		"$PFX" "$CFLAGS"

@@ -5,29 +5,15 @@
 # Summary:	Build all YaST2 sources from CVS or Subversion
 # Authors:	Stefan Hundhammer <sh@suse.de>
 #
-# $Id$
+# $Id: y2makeall 28792 2006-03-09 17:36:11Z sh $
 #
 # Call this from your toplevel yast2/source CVS or Subversion working directory.
 
 use strict;
 use English;
-use Getopt::Std;
+use Getopt::Long;
 use File::Basename;
-use vars qw(
-	     $opt_a
-	     $opt_b
-	     $opt_d
-	     $opt_f
-	     $opt_h
-	     $opt_l
-	     $opt_m
-	     $opt_n
-	     $opt_p
-	     $opt_s
-	     $opt_u
-	     $opt_v
-	     $opt_y
-	     );
+use IPC::Open2;
 
 #
 # Configuration variables.
@@ -36,31 +22,6 @@ use vars qw(
 
 my $user_config_file = <~/.yast2/y2makeallrc>;
 
-
-# Core binary packages that need to be built in that order before any YCP code
-# can be built.
-my @core_binaries =
-    (
-     "devtools",
-     "liby2util",
-     # "packagemanager",
-     "core",
-     "pkg-bindings",
-     "qt",
-     "ncurses",
-     "testsuite",
-     "perl-bindings",
-     "storage"
-     );
-
-
-# Mixed packages that belong to the core binaries but still have YCP code that
-# should be built after modules are byte-compiled
-
-my @core_and_ycp =
-    (
-     "storage"
-     );
 
 # Directories to exclude from building - unmaintained packages, packages that
 # are not yet ready to be built, ...
@@ -73,7 +34,6 @@ our @exclude_list =
     (
      "CVS",
      ".svn",
-     "openteam",
      "certify",
      "debugger"
      );
@@ -89,19 +49,22 @@ our @exclude_list =
 our @ycp_favourites =
     (
      "yast2",
-     "xml",
      "installation",
-     "storage",
-     "country",
-     "bootloader",
-     "mouse",
-     "x11",
-     "packager",
-     "transfer",
-     "update",
-     "autoinstallation",
+     "packager"
      );
 
+# Dependencies (from all other YaST2 packages) that are deliberately ignored.
+# This is necessary to break up dependency cycles which otherwise would make
+# bootstrapping impossible.
+#
+# Yes, this is a mess. But SuSE AutoBuild does it the same way.
+# There is no reasonable way to avoid this.   :-(
+my %ignored_requires =
+    (
+     "yast2-installation"	=> 1,
+     "yast2-inetd"		=> 1,
+     "yast2_theme"		=> 1
+     );
 
 
 my $work_root	= $ENV{'PWD'};
@@ -113,14 +76,9 @@ my $failed_log	= $work_root . "/failed-packages.log";
 # Other global variables.
 #
 
-my $disable_make_makefile_cvs			= 0;		# -f
-my $enable_make_core_binaries			= 0;		# -b
-my $enable_byte_compile_modules			= 0;		# -m
-my $enable_byte_compile_leftover_modules	= 0;		# -l
-my $enable_make_ycp_packages			= 0;		# -y
-my $enable_make_all				= 1;		# -a
-my $favourites_only				= 0;		# -u
-my $prefix					= "/usr";	# -p
+my $disable_make_makefile_cvs			= 0;
+my $favourites_only				= 0;
+my $prefix					= "/usr";
 my $enable_print_summary			= 1;
 
 # Verbosity values
@@ -138,31 +96,25 @@ my $tty_verbosity		= LOG_PROGRESS;
 my $log_verbosity		= LOG_INFO;
 
 my $make_target			= "";
-# if we don't install to usr, it is not necessary
-# -n means "no sudo"
-# note the trailing space
 my $sudo_cmd			= "/usr/bin/sudo";
 my $install_cmd			= "/usr/bin/install";
-
-# assigned only after the prefix option could be evaluated
-my $ycpc_cmd;
-my $modules_dir;
-my $ycp_include_dir;
 
 
 # ---- END configuration variables ----------------------------------------
 
 
 my $prog_name = basename( $0 );
-my @ycp_files;
-my %ycp_modules;
-my %needed_ycp_include_files;
-my %included_by;
-my %ycp_install_dirs;
 my %exclude_dirs;
-my %done_dirs;
+my %rpm_names;
+my %rpm_dirs;
+my %relevant_rpms;
+my %pkg_provides;
+my %pkg_requires;
+my %provided_by;
+my %base_rpms;
+my @build_order;
 my @failed_dirs;
-my $successful_dirs = 0;
+my $successful_count = 0;
 
 
 #
@@ -186,48 +138,47 @@ exit 0;
 
 sub main()
 {
-    # Extract command line options.
-    # This will set a variable opt_? for any option,
-    # e.g. opt_v if option '-v' is passed on the command line.
+    my $show_help		= 0;
+    my $verbose			= 0;
+    my $debug			= 0;
+    my $silent			= 0;
+    my $no_sudo			= 0;
+    my $dump_build_order	= 0;
+    my $dump_dependencies	= 0;
 
-    getopts('hvsdfbmylaunp:');
+    GetOptions( "favourites-only"	=> \$favourites_only,
+		"fast"			=> \$disable_make_makefile_cvs,
+		"prefix=s"		=> \$prefix,
+		"no-sudo"		=> \$no_sudo,
+		"dump-build-order"	=> \$dump_build_order,
+		"dump-dependencies"	=> \$dump_dependencies,
+		"verbose"		=> \$verbose,
+		"debug"			=> \$debug,
+		"silent"		=> \$silent,
+		"help"			=> \$show_help
+		);
 
-    usage()		if $opt_h;
+    usage() if $show_help;
 
-    if ( $opt_v )		# verbose
+    if ( $verbose)
     {
 	$tty_verbosity	= LOG_INFO;
 	$log_verbosity	= LOG_DEBUG;
     }
 
-    if ( $opt_d )		# debug
+    if ( $debug )
     {
 	$tty_verbosity	= LOG_DEBUG;
 	$log_verbosity	= LOG_DEBUG;
     }
 
-    if ( $opt_s )		# silent  )))
+    if ( $silent )
     {
 	$tty_verbosity	= LOG_MILESTONE;
 	$log_verbosity	= LOG_PROGRESS;
     }
 
-
-    $enable_make_all				= 0	if $opt_b or $opt_m or $opt_y or $opt_l;
-    $enable_make_core_binaries			= 1	if $opt_b;
-    $enable_byte_compile_modules		= 1	if $opt_m;
-    $enable_byte_compile_leftover_modules	= 1	if $opt_l or $opt_m;
-    $enable_make_ycp_packages			= 1	if $opt_y or $opt_u;
-
-    $disable_make_makefile_cvs			= 1	if $opt_f;
-    $favourites_only				= 1	if $opt_u;
-
-    $sudo_cmd = ""				if $opt_n;
-    $prefix = $opt_p				if $opt_p;
-
-    $ycpc_cmd		= "$prefix/bin/ycpc";
-    $modules_dir	= "$prefix/share/YaST2/modules";
-    $ycp_include_dir	= "$prefix/share/YaST2/include";
+    $sudo_cmd = "" if $no_sudo;
 
     #
     # Check if we are in the right directory
@@ -270,13 +221,33 @@ sub main()
 
 
     #
-    # Build phases
+    # Calculate dependencies and build order
     #
 
-    make_core_binaries()		if $enable_make_all or $enable_make_core_binaries;
-    byte_compile_modules()		if $enable_make_all or $enable_byte_compile_modules;
-    byte_compile_leftover_modules()	if $enable_make_all or $enable_byte_compile_leftover_modules;
-    make_ycp_packages()			if $enable_make_all or $enable_make_ycp_packages;
+
+    read_rpm_names();
+    calc_build_order();
+
+    if ( $dump_dependencies )
+    {
+	dump_dependencies();
+	exit;
+    }
+
+    if ( $dump_build_order )
+    {
+	dump_build_order();
+	exit;
+    }
+
+
+
+    #
+    # Build
+    #
+
+    make_in_build_order();
+
 
     #
     # Clean up
@@ -287,6 +258,520 @@ sub main()
     close( FAILED_LOG );
 
     unlink( $failed_log ) if ( scalar( @failed_dirs ) < 1 );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Read all RPM names from all $work_root/*/RPMNAME files and store them in
+# the global %rpm_names hash
+
+sub read_rpm_names()
+{
+    chdir( $work_root );
+    undef %rpm_names;
+    my $rpmname_file;
+
+    foreach $rpmname_file ( <*/RPMNAME> )
+    {
+	if ( open( RPMNAME, $rpmname_file ) )
+	{
+	    my $dir = dirname( $rpmname_file );
+	    my $line;
+
+	    while ( $line = <RPMNAME> )
+	    {
+		chomp( $line );
+		$line =~ s/^\s+//;
+		$line =~ s/\s$//;
+
+		if ( $line )
+		{
+		    if ( defined( $rpm_names{ $dir } ) )
+		    {
+			log_warning( "Multiple RPM names for $dir: $rpm_names{ $dir }, $line" );
+		    }
+		    else
+		    {
+			$rpm_names{ $dir } = $line;
+			$rpm_dirs{ $line } = $dir;
+		    }
+		}
+	    }
+
+	    close( RPMNAME);
+	}
+	else
+	{
+	    log_warning( "Can't open $rpmname_file" );
+	}
+    }
+
+    %relevant_rpms = reverse( %rpm_names );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Read dependencies and calculate the build order (in global @build_order).
+
+sub calc_build_order()
+{
+    read_all_dependencies();
+    expand_provides();
+    kick_irrelevant_requires();
+    tsort_dependencies();
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Read all .spec.in files below $work_root and store the "Requires" and
+# "BuildRequires" in the global %pkg_requires hash
+
+sub read_all_dependencies()
+{
+    chdir( $work_root );
+    my $spec_in_file;
+
+    foreach $spec_in_file ( <*/*.spec.in> )
+    {
+	my $rpm = $rpm_names{ dirname( $spec_in_file ) };
+	my ( $this_pkg_requires, $this_pkg_provides ) = read_dependencies( $rpm, $spec_in_file );
+	$pkg_requires{ $rpm } = $this_pkg_requires;
+	$pkg_provides{ $rpm } = $this_pkg_provides;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Read depencencies ("Requires" and "BuildRequires" from one .spec.in file.
+# Filter out only relevant packages.
+#
+# Parameters:
+#	$this_pkg		RPM name of this package
+#	$spec_in_file_name	file name to read
+#
+# Return value:
+#	Hash reference with all relevant depencencies (keys are RPM names, values are "1")
+
+sub read_dependencies($)
+{
+    my( $this_pkg, $spec_in_file_name ) = @_;
+    my %this_pkg_requires;
+    my %this_pkg_provides;
+
+    log_debug( "Reading dependencies for $this_pkg" );
+
+    if ( ! open( SPEC_IN, $spec_in_file_name ) )
+    {
+	log_error( "Can't open $spec_in_file_name" );
+	return ( \%this_pkg_requires, \%this_pkg_provides );
+    }
+
+    my $line;
+
+    while ( $line = <SPEC_IN> )
+    {
+	chomp( $line );
+	$line =~ s/#.$//;	# ignore comments
+
+	if ( $line =~ /^\s*(Requires|BuildRequires)\s*:/ )
+	{
+	    $line =~ s/^\s*(Requires|BuildRequires)\s*:\s*//;
+	    my $rpm;
+
+	    foreach $rpm ( split( '\s+', $line ) )
+	    {
+		if ( defined( $ignored_requires{ $rpm } ) )
+		{
+		    # Strictly speaking, this is a mess: All dependencies should be correct.
+		    # There should be no cycles in build dependencies.
+		    # But in real life, they exist. So some of them need to be suppressed.
+		    #
+		    # SuSE AutoBuild, too has exception lists for each distribution
+		    # to ignore some of them. Otherwise bootstrapping is simply not possible.
+
+		    log_debug( "\t# IGNORING: $this_pkg requires $rpm" );
+		}
+		elsif ( $rpm =~ /[a-zA-Z_+-]+[a-zA-Z0-9_+-]*/ )
+		{
+		    log_debug( "\t$this_pkg requires $rpm" );
+		    $this_pkg_requires{ $rpm } = 1;
+		}
+		else
+		{
+		    log_debug( "\tIgnoring cruft \"$rpm\"" );
+		}
+	    }
+	}
+	elsif ( $line =~ /^\s*(Provides)\s*:/ )
+	{
+	    $line =~ s/^\s*(Provides)\s*:\s*//;
+	    my $prov;
+
+	    foreach $prov ( split( '\s+', $line ) )
+	    {
+		if ( $prov =~ /^[a-zA-Z_+-]+[a-zA-Z0-9_+-]*$/ )
+		{
+		    log_debug( "\t$this_pkg provides $prov" );
+		    $this_pkg_provides{ $prov } = 1;
+		}
+		else
+		{
+		    log_debug( "\t# IGNORING: $this_pkg provides $prov" );
+		}
+	    }
+	}
+    }
+
+    close( SPEC_IN );
+
+    return ( \%this_pkg_requires, \%this_pkg_provides );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Do a topological sort (using the external tsort(1) program) to calculate the
+# correct build order.
+
+sub tsort_dependencies()
+{
+    my $pid = open2( *TSORT_OUT, *TSORT_IN, 'tsort' );
+    my $rpm;
+
+    #
+    # Pipe all "requires" to the tsort(1) program (part of coreutils.rpm)
+    #
+
+    foreach $rpm ( sort( keys( %pkg_requires ) ) )
+    {
+	my $req = $pkg_requires{ $rpm };
+	my $this_pkg_requires;
+
+	foreach $this_pkg_requires ( sort( keys( %$req ) ) )
+	{
+	    print TSORT_IN "$rpm $this_pkg_requires\n";
+	}
+    }
+
+    close( TSORT_IN );
+
+
+    #
+    # Read the output of the tsort(1) program
+    #
+
+    my $line;
+
+    while ( $line = <TSORT_OUT> )
+    {
+	chomp( $line );
+	$line =~ s/^\s+//;
+	$line =~ s/\s+$//;
+
+	push( @build_order, $line );
+    }
+
+    close( TSORT_OUT );
+    @build_order = reverse( @build_order );
+
+
+    #
+    # Find the leaf packages to honour the user's favourites
+    #
+
+    my @base_rpms_build_order;
+    my %leaf_rpms;
+
+    foreach $rpm ( @build_order )
+    {
+	if ( defined( $base_rpms{ $rpm } ) )
+	{
+	    push( @base_rpms_build_order, $rpm )
+	}
+	else
+	{
+	    $leaf_rpms{ $rpm } = 1;
+	}
+    }
+
+
+    #
+    # Move favourites (that are leaf packages) to the front of the leaf package build order
+    #
+
+    @build_order = @base_rpms_build_order;
+    my $favourite;
+
+    foreach $favourite ( @ycp_favourites )
+    {
+    	if ( defined( $leaf_rpms{ $favourite } ) or		 # RPM name specified in favourites
+    	     defined( $leaf_rpms{ $rpm_names{ $favourite } } ) ) # directory specified
+    	{
+	    $favourite = $rpm_names{ $favourite } unless defined $leaf_rpms{ $favourite };
+    	    log_info( "Preferring favourite $favourite" );
+    	    push( @build_order, $favourite );
+    	    $leaf_rpms{ $favourite } = undef;
+    	}
+    }
+
+    #
+    # Append what is left in alphabetical order
+    #
+
+    push( @build_order, sort( keys( %leaf_rpms ) ) ) unless $favourites_only;
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Output the build order
+
+sub dump_build_order()
+{
+    my $rpm;
+    my $leaf_package_count = 0;
+
+    log_always( "\n### Base Packages ###\n" ) if defined( $base_rpms{ $build_order[0] } );
+
+    foreach $rpm ( @build_order )
+    {
+	log_always( $rpm );
+
+	$leaf_package_count++ if ( ! defined( $base_rpms{ $rpm } ) );
+	log_always( "\n### Leaf Packages ###\n" ) if $leaf_package_count == 1;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Dump all depencencies to stdout.
+
+sub dump_dependencies()
+{
+    my $rpm;
+
+    foreach $rpm ( sort( keys( %pkg_requires ) ) )
+    {
+	my $req = $pkg_requires{ $rpm };
+	my $this_pkg_requires;
+
+	foreach $this_pkg_requires ( sort( keys( %$req ) ) )
+	{
+	    log_always( "$rpm", $this_pkg_requires );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Expand all RPM "provides" from the global %provides hash in all dependencies
+# in the global %requires hash: Replace any dependencies that are satisfied
+# with any capability in %provides with the package that provides that
+# capability.
+#
+# Example:
+#
+#    yast2         requires yast2-ui
+#    yast2-qt      provides yast2-ui
+#    yast2-ncurses provides yast2-ui
+#
+# will be changed to
+#
+#    yast2 requires yast2-qt
+#    yast2 requires yast2-ncurses
+#    (deleting depencendy "yast2 requires yast2-ui")
+#
+# While this is not really correct in the RPM world, it will do nicely for
+# calculating the build order, which is what this script needs to do.
+
+sub expand_provides()
+{
+    find_providers();	# fill global %provided_by hash
+
+    my $pkg;
+
+    foreach $pkg ( keys %pkg_requires )
+    {
+	my $old_requires = $pkg_requires{ $pkg };
+	my %new_requires;
+	my $req;
+
+	foreach $req ( keys %$old_requires )
+	{
+	    if ( defined( $provided_by{ $req } ) )
+	    {
+		my $providers = $provided_by{ $req };
+		log_debug( "Expanding requires: $pkg requires $req -> $pkg requires @$providers" );
+		my $prov;
+
+		foreach $prov ( @$providers )
+		{
+		    $new_requires{ $prov } = 1;
+		}
+	    }
+	    else
+	    {
+		$new_requires{ $req } = 1;
+	    }
+	}
+
+	$pkg_requires{ $pkg } = \%new_requires;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Find the providers (the packages that provide a certain capability):
+# Go through all package provides in the global %pkg_provides hash and
+# fill the global %provided_by hash with it.
+
+sub find_providers()
+{
+    my $pkg;
+
+    foreach $pkg ( keys %pkg_provides )
+    {
+	my $this_pkg_provides = $pkg_provides{ $pkg };
+	my $prov;
+
+	foreach $prov ( keys %$this_pkg_provides )
+	{
+	    my $providers;
+	    $providers = $provided_by{ $prov } if defined $provided_by{ $prov };
+	    push( @$providers, $pkg );
+	    $provided_by{ $prov } = $providers;
+	}
+    }
+
+
+    if ( $log_verbosity <= LOG_DEBUG or
+	 $tty_verbosity <= LOG_DEBUG   )
+    {
+	my $prov;
+
+	foreach $prov ( keys %provided_by )
+	{
+	    my $providers = $provided_by{ $prov };
+	    log_debug( "$prov\tis provided by", @$providers );
+	}
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Remove all "requires" dependencies from the global %pkg_requires hash that
+# don't refer to anything in the global %relevant_rpms hash: We don't need to
+# bother about dependencies to gcc and glibc for the purpose of finding out the
+# build order for YaST2.
+#
+# Note: It's not as trivial as it seems - not all YaST2 packages are named
+# yast2-xxx. This is why the content of all RPMNAME files was stored in earlier
+# phases.
+#
+# As a side effect, this function also fills the global hash %base_rpms with
+# the names of all packages that have dependent packages (i.e. some other
+# package depends on them).
+
+sub kick_irrelevant_requires()
+{
+    # log_debug( "Relevant RPMs: ", sort( keys( %relevant_rpms ) ) );
+    my $pkg;
+
+    foreach $pkg ( keys %pkg_requires )
+    {
+	my $old_requires = $pkg_requires{ $pkg };
+	my %new_requires;
+	my $req;
+
+	foreach $req ( keys %$old_requires )
+	{
+	    if ( defined $relevant_rpms{ $req } )
+	    {
+		$new_requires{ $req } = 1;
+		$base_rpms{ $req } = 1;
+	    }
+	    else
+	    {
+		if ( $req =~ /^yast2-/ )
+		{
+		    log_info( "Kicking bogus dependency \"$pkg requires $req\"" );
+		}
+		else
+		{
+		    log_debug( "Kicking irrelevant dependency \"$pkg requires $req\"" );
+		}
+	    }
+	}
+
+	$pkg_requires{ $pkg } = \%new_requires;
+    }
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Output base packages (those that have any dependent packages)
+
+sub dump_base_packages()
+{
+    my $rpm;
+
+    log_always( "\nBase packages:\n" );
+
+    foreach $rpm ( sort( keys( %base_rpms ) ) )
+    {
+	my $dir = $rpm_dirs{ $rpm };
+
+	if ( $rpm =~ /(yast2-)?$dir/ )
+	{
+	    log_always( "\t$rpm" );
+	}
+	else
+	{
+	    log_always( "\t$rpm\t(directory \"$dir\")" );
+	}
+    }
+
+    log_always( "" );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Output leaf packages (those that don't have any dependent packages)
+
+sub dump_leaf_packages()
+{
+    my $rpm;
+
+    log_always( "\nLeaf packages:\n" );
+
+    foreach $rpm ( sort( keys( %relevant_rpms ) ) )
+    {
+	if ( ! defined $base_rpms{ $rpm } )
+	{
+	    my $dir = $rpm_dirs{ $rpm };
+
+	    if ( $rpm =~ /(yast2-)?$dir/ )
+	    {
+		log_always( "\t$rpm" );
+	    }
+	    else
+	    {
+		log_always( "\t$rpm\t(directory \"$dir\")" );
+	    }
+	}
+    }
+
+    log_always( "" );
 }
 
 
@@ -323,291 +808,28 @@ sub sudo_system_int($)
 
 #-----------------------------------------------------------------------------
 
-# Build the YaST2 core binaries - those packages that are required for
-# everything else.
+# Build in build order
 
-sub make_core_binaries()
+sub make_in_build_order()
 {
-    log_milestone( "\n--- Phase 1 (-b): Building core binaries..." );
-
-    my $dir;
-
-    foreach $dir ( @core_binaries )
-    {
-	make( $dir );
-    }
-
-    log_milestone( "--- Core binaries done.\n" );
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Byte-compile all YCP modules in all subdirectories.
-
-sub byte_compile_modules()
-{
-    log_milestone( "\n--- Phase 2 (-m): Byte-compiling YCP modules..." );
-
-    #
-    # Find all YCP modules in CVS working directory
-    #
-
-    # Make use of YCP programming conventions: Module names start with a capital letter.
-    my @module_candidates = find_files( $work_root, "[A-Z]*.ycp", "(testsuite|examples|skeleton)" );
-
-    log_info( "Exclude list: " . join( " ", sort( keys %exclude_dirs ) ) );
-    my $file;
-
-    foreach $file ( @module_candidates )
-    {
-	if ( is_ycp_module( $file ) )
-	{
-	    my $pkg = $file;
-	    $pkg =~ s:^$work_root/::;	# remove leading work root
-	    $pkg =~ s:/.*$::;		# remove all path components but the first
-	    my $mod = basename( $file );
-
-	    if ( exists( $exclude_dirs{ $pkg } ) )
-	    {
-		log_info( "Excluding module \"$mod\" from package \"$pkg\"" );
-	    }
-	    else
-	    {
-		log_debug( "Found module \"$mod\" from package \"$pkg\"" );
-		$ycp_modules{ $mod } = $file;
-	    }
-	}
-    }
-
-
-    #
-    # Find all YCP modules that are already installed
-    #
-
-    my @installed_modules = glob( $modules_dir . "/*.ycp" );
-
-    foreach $file( @installed_modules )
-    {
-	$file = basename( $file );
-
-	if ( ! defined( $ycp_modules{ $file } ) )
-	{
-	    log_warning( "Module $file not found below $work_root" );
-	}
-    }
-
-
-    #
-    # Clear old YCP byte code files (.ybc)
-    #
-
-    log_progress( "Removing old byte code files in $modules_dir" );
-    sudo_system_int( "rm -f $modules_dir/*.ybc" );
-
-    log_progress( "Removing old byte code files in $work_root" );
-    system_int( "find $work_root -name '*.ybc' -print0 | xargs -0 $sudo_cmd rm" );
-
-
-
-    #
-    # Clear old YCP module files (.ycp)
-    #
-
-    log_progress( "Removing old modules from $modules_dir" );
-    sudo_system_int( "rm -f $modules_dir/*.ycp" );
-
-
-    #
-    # Copy modules from CVS tree to system
-    #
-
-    log_progress( "Installing " . scalar( keys( %ycp_modules ) ) . " YCP modules" );
-    make_install_dir( $modules_dir );
-    xargs_install( $modules_dir, values( %ycp_modules ) );
-
-
-    #
-    # Find all 'include' statements in the newly copied modules
-    #
-
-    my $module;
-
-    foreach $module( keys( %ycp_modules ) )
-    {
-	find_include_statements( $modules_dir . "/" . $module );
-    }
-
-    log_progress( "Modules require " . scalar( keys( %needed_ycp_include_files ) ) . " YCP include files" );
-
-    #
-    # Now find and install all include files required by the installed YCP modules
-    #
-
-    locate_include_files();
-    install_include_files();
-
-
-    #
-    # Figure out YCP compilation order and compile the modules
-    #
-
-    my @order = calc_ycp_compilation_order();
-    byte_compile( @order );
-
-
-    log_milestone( "--- Byte-compiling YCP modules done.\n" );
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Byte-compile leftover YCP modules - everything that didn't get compiled by
-# byte_compile_modules(), maybe because 'ycpc' in calc_ycp_compilation_order
-# did not report the correct compilation order.
-
-sub byte_compile_leftover_modules()
-{
-    log_milestone( "\n--- Phase 2b (-l): Byte-compiling leftover YCP modules..." );
-
-    my @missing;
-    my $missing_count	  = 0;
-    my $old_missing_count = 0;
-    my $loop_count	  = 0;
-
-    do
-    {
-	$loop_count++;
-	$old_missing_count = $missing_count;
-	@missing = ();
-
-	chdir( $modules_dir );
-	my @src_modules		= <*.ycp>;
-	my @compiled_modules	= <*.ybc>;
-
-	my %compiled;
-	my $mod;
-
-	foreach $mod ( @compiled_modules )
-	{
-	    $mod = basename( $mod, ".ybc" );
-	    $compiled{ $mod } = 1;
-	}
-
-
-	foreach $mod ( @src_modules )
-	{
-	    $mod = basename( $mod, ".ycp" );
-
-	    push( @missing, $mod )
-		if ( ! defined( $compiled{ $mod } ) );
-	}
-
-	$missing_count = $#missing + 1;
-
-	if ( $loop_count == 1 )
-	{
-	    log_milestone( "$missing_count modules left over" );
-	    log_info( @missing );
-	}
-	else
-	{
-	    log_progress( "Iteration #" . $loop_count
-			  . ": $missing_count modules left over" );
-	}
-
-	# Brute-force approach:
-	#
-	# Simply try to byte-compile all modules that are left over. 
-	# Even though the compilation order is screwed, at least one of
-	# should compile.  
-
-	foreach $mod ( @missing )
-	{
-	    my $success = byte_compile( $mod );
-	    log_progress( "$mod\tOK" ) if $success;
-	}
-
-	# Do this as long as there are _any_ changes in the status.
-
-    } while ( $missing_count != $old_missing_count );
-
-
-    #
-    # Print summary
-    #
-
-    if ( $missing_count > 0 )
-    {
-	my $mod;
-
-	foreach $mod ( @missing )
-	{
-	    log_error( "Could not byte-compile $mod.ycp" );
-	    # print FAILED_LOG "$mod.ycp\n";
-	}
-
-	push( @failed_dirs, $modules_dir );
-    }
-    else
-    {
-	log_progress( "All YCP modules successfully byte-compiled" );
-    }
-
-    chdir( $work_root );
-}
-
-
-#-----------------------------------------------------------------------------
-
-
-# Build YCP packages.
-
-sub make_ycp_packages()
-{
-    log_milestone( "\n--- Phase 3 (-y): Building YCP packages..." );
-
     #
     # Set up hash with packages not to process
     #
 
     my %dont_process = %exclude_dirs;
 
-    # Add the contents of @core_binaries to that hash
-    @dont_process{ @core_binaries } = (); # Black magic - see Perl cook book chapter 4.7
-
-
-    # Remove the contents of @core_and_ycp from %dont_process
-
-    my $pkg;
-
-    foreach $pkg ( @core_and_ycp )
-    {
-	undef( $dont_process{ $pkg } );
-    }
-
-
     log_debug( "Excluding packages " . join( " ", sort ( keys( %dont_process ) ) ) );
 
-    #
-    # Set up list with packages to process
-    #
-
-    my @packages = @ycp_favourites;
-
-    if ( ! $favourites_only )
-    {
-	chdir( $work_root );
-	push( @packages, sort( glob( "*" )  ) );
-    }
 
     #
     # Process packages
     #
 
-    foreach $pkg ( @packages )
+    my $pkg;
+
+    foreach $pkg ( @build_order )
     {
-	my $dir = $work_root . "/" . $pkg;
+	my $dir = $work_root . "/" . $rpm_dirs{ $pkg };
 
 	if ( -d $dir )
 	{
@@ -624,9 +846,11 @@ sub make_ycp_packages()
 		}
 	    }
 	}
+	else
+	{
+	    log_error( "No such directory: $dir (for package $pkg)" );
+	}
     }
-
-    log_milestone( "--- Building YCP packages done.\n" );
 }
 
 
@@ -639,13 +863,13 @@ sub make_ycp_packages()
 
 sub make()
 {
-    my( $pkg ) = @_;
+    my( $pkg_dir ) = @_;
     my $error = 0;
 
     chdir $work_root;
-    chdir $pkg;
+    chdir $pkg_dir;
 
-    log_progress( "Building $pkg" );
+    log_progress( "Building", basename( $pkg_dir ) );
 
 
     # Check if "make -f Makefile.cvs" must be performed.
@@ -671,10 +895,11 @@ sub make()
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'make -f Makefile.cvs' failed for $pkg" );
+	    log_error( "'make -f Makefile.cvs' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
+
 
     #
     # make
@@ -687,10 +912,11 @@ sub make()
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'make $make_target' failed for $pkg" );
+	    log_error( "'make $make_target' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
+
 
     #
     # sudo make install
@@ -703,7 +929,7 @@ sub make()
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'$sudo_cmd make install' failed for $pkg" );
+	    log_error( "'$sudo_cmd make install' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
@@ -715,206 +941,20 @@ sub make()
 
     if ( $error )
     {
-	push( @failed_dirs, basename( $pkg  ) );
-	print FAILED_LOG "$pkg\n";
+	my $dir = basename( $pkg_dir );
+	push( @failed_dirs, $dir );
+	my $rpm = $rpm_names{ $dir };
+	my $msg = "$dir";
+	$msg .= "\t\t\t(base package)" if defined( $base_rpms{ $rpm } );
+	print FAILED_LOG "$msg\n";
     }
     else
     {
 	log_progress( "\tOK" );
-	$successful_dirs++;
+	$successful_count++;
     }
 
     chdir $work_root;
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Check if a file is a YCP module: Search it for 'module XY'.
-#
-# Parameters:
-#	file name
-#
-# Return value:
-#	1 if it is a YCP module,
-#	0 if it is not.
-
-sub is_ycp_module()
-{
-    my ( $file_name ) = @_;
-    my $module_name = basename( $file_name, ".ycp" );
-
-    # log_debug( "Checking mod candidate $module_name: $file_name" );
-    open( MOD, $file_name ) or return 0;
-
-    my $line;
-
-    while ( $line = <MOD> )
-    {
-	# A valid YCP named "ABC" module must have a line
-	#	module "ABC";
-
-	if ( $line =~ /^\s*module\s+"$module_name"\s*;/ )
-	{
-	    # log_debug( "Found \'module \"$module_name\"\' in $file_name" );
-	    close( MOD );
-	    return 1;
-	}
-    }
-
-    close( MOD );
-    return 0;
-}
-
-
-#-----------------------------------------------------------------------------
-
-
-# Find all 'include' statements in a file and add the include file to the
-# global %needed_ycp_include_files hash.
-#
-# Parameters:
-#	Filename
-
-sub find_include_statements()
-{
-    my ( $ycp ) = @_;
-
-    if ( ! open( YCP, $ycp ) )
-    {
-	log_error( "Can't open $ycp" );
-	return;
-    }
-
-    my $line;
-
-    while ( $line = <YCP> )
-    {
-	# Note: This search method will also find 'include' statements in
-	# multi-line comments, but then this can be considered _very_ broken.
-	# It should really be fixed in the YCP source.
-	# Anyway, it doesn't hurt much: Maybe one include file too many will be
-	# installed to /usr/share/YaST2/include/ - so what...
-
-	if ( $line =~ /^\s*include\s+"(.*)"/ )
-	{
-	    my $include_file = $1;
-	    $needed_ycp_include_files{ $include_file } = undef;
-	    log_info( basename( $ycp ) . " includes \"" . $include_file . "\"" );
-	    $included_by{ $include_file } .= basename ( $ycp ) . " " ;
-	}
-    }
-
-    close( YCP );
-}
-
-
-#-----------------------------------------------------------------------------
-
-
-# Locate all include files in the global %needed_ycp_include_files hash in the
-# CVS or Subversion working directory - write the full path into the hash.
-
-sub locate_include_files()
-{
-    log_progress( "Searching include files" );
-
-    # Grep all Makefile.am files to find out where include files get installed to.
-    # This is necessary since somebody came up with that crazy idea to give
-    # lots of include files the same name, differing only in install directory,
-    # which has no match at all in the source directory structure. What a mess.
-
-    find_install_dirs();
-
-
-    # Cache YCP files for faster search
-
-    log_progress( "Creating .ycp file location cache" );
-    my @ycp_files = find_files( $work_root, "*.ycp", "(testsuite|examples|skeleton)" );
-
-
-    log_progress( "Mapping include file paths" );
-
-    #
-    # Map all full path names to install directories, if possible
-    # (i.e., if their Makefile.am had a line with @yncludedir@);
-    # if not, it is most likely not an include file and can be ignored here.
-    # If it is anyway, its Makefile.am is broken and needs to be fixed.
-    #
-
-    my %found_ycp_include_files;
-    my $ycp_file;
-
-    foreach $ycp_file ( @ycp_files )
-    {
-	my $dir = dirname( $ycp_file );
-
-	if ( defined( $ycp_install_dirs{ $dir } ) )
-	{
-	    my $target = $ycp_install_dirs{ $dir };
-	    $target .= "/" . basename( $ycp_file );
-	    $found_ycp_include_files{ $target } = $ycp_file;
-
-	    log_info( "Include file " . $target . " is " . $ycp_file );
-	}
-    }
-
-
-    my $not_found = 0;
-    my $needed_include;
-
-    foreach $needed_include ( keys( %needed_ycp_include_files ) )
-    {
-	if ( ! defined( $found_ycp_include_files{ $needed_include } ) )
-	{
-	    $not_found++;
-	    log_error( "Can't find include file \"" . $needed_include
-		  . "\"\n    included by " . $included_by{ $needed_include } );
-	}
-	else
-	{
-	    log_debug( "Found " . $needed_include );
-
-	    $needed_ycp_include_files{ $needed_include } =
-		$found_ycp_include_files{ $needed_include };
-	}
-    }
-
-    if ( $not_found > 0 )
-    {
-	log_error( "Can't resolve YCP include dependencies" );
-    }
-    else
-    {
-	log_progress( "Found all YCP files included from modules" );
-    }
-}
-
-
-#-----------------------------------------------------------------------------
-
-
-# Install all YCP include files in the global %needed_ycp_include_files hash.
-
-sub install_include_files()
-{
-    log_progress( "Installing include files" );
-    my $ycp_include_file;
-
-    foreach $ycp_include_file ( keys( %needed_ycp_include_files ) )
-    {
-	if ( defined( $needed_ycp_include_files{ $ycp_include_file } ) )
-	{
-	    my $src = $needed_ycp_include_files{ $ycp_include_file };
-	    my $target = $ycp_include_dir . "/" . $ycp_include_file;
-
-	    install_file( $src, $target );
-	}
-	else
-	{
-	    log_warning( "Skipping $ycp_include_file - not found" );
-	}
-    }
 }
 
 
@@ -1005,156 +1045,26 @@ sub make_install_dir()
 #-----------------------------------------------------------------------------
 
 
-# Since some of our developers in their infinite wisdom decided long ago that
-# it might be a cool thing to try what happens when source file names are not
-# unique, we now have to deal with dozens of YCP include files with the same
-# name, sometimes even in the same source directory level. The only thing to
-# tell them apart is the install target in the respective Makefile.am, so now
-# we have to 'grep' through all of them and find lines with "@yncludedir" to
-# figure out the installation target directory.
-#
-# Yes, this is broken by design.
-#
-# This function now searches all Makefile.am files in the CVS or SVN working directory
-# for lines with @yncludedir@ and fills the global %ycp_install_dirs hash with
-# the result. The keys of this hash are directories in the CVS or SVN working tree,
-# the values are the target directories below /usr/share/YaST2/include
-# (with the @yncludedir@ macro removed, e.g. "network/services" ).
-
-sub find_install_dirs()
-{
-    log_progress( "Searching target directories for YCP include files" );
-
-    my $makefile_am;
-
-    foreach $makefile_am ( find_files( $work_root, "Makefile.am", "(testsuite|examples|skeleton)" ) )
-    {
-	if ( ! open( MAKEFILE_AM, $makefile_am ) )
-	{
-	    log_error( "Can't open $makefile_am" );
-	    return;
-	}
-
-	my $dir = dirname( $makefile_am );
-	my $line;
-
-	while ( $line = <MAKEFILE_AM> )
-	{
-	    $line =~ s/#.*//;
-
-	    if ( $line =~ /\@yncludedir\@/ )
-	    {
-		$line =~ s:^.*\@yncludedir\@/?::;  # strip everything up to @yncludedir@/
-		$line =~ s/\s*$//;		   # strip trailing whitespace
-
-		if ( defined( $ycp_install_dirs{ $dir } ) )
-		{
-		    log_error( "Include target in $makefile_am not unique!" );
-		}
-		else
-		{
-		    $ycp_install_dirs{ $dir } = $line;
-		    log_debug( "Dir " . $dir . " => " . $line );
-		}
-	    }
-	}
-
-	close( MAKEFILE_AM );
-    }
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Let the YCP compiler calculate the compilation order for the YCP modules,
-# taking their interdependencies into account.
-#
-# Parameters:
-#	---
-# Return value:
-#	Module list in compilation order
-
-sub calc_ycp_compilation_order()
-{
-    log_progress( "Calculating YCP module compilation order" );
-
-    chdir( $modules_dir );
-    my $cmd = "$ycpc_cmd -f -r -I $ycp_include_dir *.ycp 2>>$make_log | egrep -v '(^Check)|(^\$)|(is newer than)'";
-
-    log_info( "$cmd" );
-    my @order = split( "\n", `$cmd` );
-
-    log_debug( "YCP compilation order:\n", join( "\t\n", @order ) );
-    chdir( $work_root );
-
-    return @order;
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Byte-compile a list of YCP modules in this order.
-#
-# Parameters:
-#	YCP module list
-#
-# Return value:
-#	1 if success
-#	0 if (any) error
-
-sub byte_compile()
-{
-    my @modules = @_;
-
-    if ( $#modules > 0 )
-    {
-	log_progress( "Byte-compiling " . ( $#modules + 1 ) . " YCP modules" );
-    }
-
-    chdir( $modules_dir );
-
-    my $module;
-    my $success = 1;
-
-    foreach $module ( @modules )
-    {
-
-	$module .= ".ycp";
-
-	my $cmd = "$ycpc_cmd -I $ycp_include_dir -M $modules_dir -q -c $modules_dir/$module >>$make_log 2>&1";
-
-	log_debug( "$sudo_cmd $cmd" );
-	my $result = sudo_system_int( $cmd );
-
-	log_debug( "Byte-compiling $module\t- "
-		   . ($result == 0 ? "Success" : "Error" ) );
-
-	$success = 0 if $result != 0;
-    }
-
-    chdir( $work_root );
-
-    return $success;
-}
-
-
-#-----------------------------------------------------------------------------
-
-
 sub print_summary()
 {
+    my $failed_count = scalar( @failed_dirs ) + 1;
+    return if $successful_count + $failed_count < 1;	# didn't really build anything
+
     log_milestone( "\n$prog_name $make_target summary:\n" );
-    log_milestone( "    Success in $successful_dirs directories" );
+    log_milestone( "    Success in $successful_count directories" );
 
-    if ( $#failed_dirs >= 0 )
+    if ( $failed_count > 0 )
     {
-	log_milestone( "    Failed  in " . ( $#failed_dirs+1 ) . " directories:\n" );
-
+	log_milestone( "    Failed  in " . $failed_count . " directories:\n" );
 	my $failed_dir;
 
-	foreach $failed_dir ( sort @failed_dirs )
+	foreach $failed_dir ( @failed_dirs )
 	{
-	    log_milestone( "\t$failed_dir" );
+	    my $rpm = $rpm_names{ $failed_dir };
+	    my $msg = "\t$failed_dir";
+	    $msg .= "\t\t\t(base package)" if defined( $base_rpms{ $rpm } );
+
+	    log_milestone( $msg );
 	}
     }
     else
@@ -1287,41 +1197,40 @@ sub log_stderr()
 
 sub usage()
 {
-    die "Usage: $prog_name [opt] [make-target]\n"				.
-	"\n"									.
-	"Builds all YaST2 sources from CVS or Subversion.\n"					.
-	"Call this from your toplevel yast2/source CVS or SVN working directory!\n"	.
-	"\n"									.
-	"\t-a all (default) - same as -bmy if none of -b -m -l -y is given\n"	.
-	"\t-b binaries - make core binaries\n"					.
-	"\t-m modules - byte-compile YCP modules\n"				.
-	"\t-l leftovers - byte-compile leftover YCP modules\n"			.
-	"\t-y YCP - make YCP packages (includes -l)\n"				.
-	"\t-u favourites only - stop processing after favourites list is done\n".
-	"\t-f fast - no \"make -f Makefile.cvs\" if it can be avoided\n"	.
-	"\t-p <prefix> - use <prefix> instead of /usr\n"			.
-	"\t-n no-sudo - useful with -p, do not sudo certain commands\n"		.
-	"\n"									.
-	"\t-v verbose\n"							.
-	"\t-d debug - even more verbose\n"					.
-	"\t-s silent - turn verbosity down\n"					.
-	"\t-h help (this message)\n"						.
-	"\n"									.
-	"EXAMPLES:\n"								.
-	"\n"									.
-	"Build everything:\n"							.
-	"\t$prog_name\n"							.
-	"\n"									.
-	"Do a \"make pot\" in all YCP packages:\n"				.
-	"\t$prog_name -y pot\n"							.
-	"\n"									.
-	"Byte-recompile all YCP modules, then make all YCP packages, but\n"	.
-	"don't do \"make -f Makefile.cvs\" if it can be avoided:\n"		.
-	"\t$prog_name -myf\n"							.
-	"\n"									.
-	"Default values can be overridden in $user_config_file\n"		.
-	"Remember to look into $make_log for build errors!\n"			.
-	"";
+    die <<"HELP_END";
+
+Usage: $prog_name [opt] [make-target]
+
+Builds all YaST2 sources from CVS or Subversion.
+Call this from your toplevel yast2/source CVS or SVN working directory!
+
+	--fast			no "make -f Makefile.cvs" if it can be avoided
+	--favourites-only	stop processing after favourites list is done
+
+	--prefix <prefix>	use <prefix> instead of /usr
+	-n  (--no-sudo)		do not sudo certain commands (useful with --prefix)
+
+	--dump-build-order	only dump the build order to stdout and log
+	--dump-dependencies	only dump the package dependencies to stdout and log
+
+	-v  (--verbose)		verbose output
+	-d  (--debug)		debug output (even more verbose)
+	-s  (--silent)		turn verbosity down
+	-h  (--help)		(this message)
+
+EXAMPLES:
+
+Build everything:
+	$prog_name
+
+Do a "make pot" in all packages:
+	$prog_name pot
+
+Default values can be overridden in $user_config_file
+Remember to look into $make_log for build errors!
+
+HELP_END
+
 }
 
 

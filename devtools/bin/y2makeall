@@ -5,7 +5,7 @@
 # Summary:	Build all YaST2 sources from CVS or Subversion
 # Authors:	Stefan Hundhammer <sh@suse.de>
 #
-# $Id: y2makeall 28792 2006-03-09 17:36:11Z sh $
+# $Id$
 #
 # Call this from your toplevel yast2/source CVS or Subversion working directory.
 

@@ -362,6 +362,9 @@ AC_PATH_PROG(YCPC, ycpc, false, $PATH:$bindir)
 if test "$YCPC" = "false"; then
     AC_MSG_ERROR([ycpc is not installed])
 fi
+AC_CHECK_FILE($devtools_yast2dir/data/testsuite/Makefile.testsuite, [], [
+    AC_MSG_ERROR([yast2-testsuite.rpm is not installed])
+])
 ',
 
     # generate output

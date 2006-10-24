@@ -1,7 +1,9 @@
 -------------------------------------------------------------------
-Tue Oct 24 16:14:01 CEST 2006 - mvidner@suse.cz
+Tue Oct 24 17:05:48 CEST 2006 - mvidner@suse.cz
 
 - Run pkg-config at configure time, not at make time (#208998).
+- For YCP packages, check for yast2-testsuite at configure time (#208999).
+- 2.13.28
 
 -------------------------------------------------------------------
 Wed Oct 11 19:06:21 CEST 2006 - mvidner@suse.cz

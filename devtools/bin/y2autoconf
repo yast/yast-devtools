@@ -233,6 +233,8 @@ if test -z "$XGETTEXT" ; then
     AC_MSG_ERROR(xgettext is missing; please install gettext-devel.)
 fi
 
+Y2DEVTOOLS_PREFIX=`pkg-config --print-errors --variable=prefix yast2-devtools`
+AC_SUBST(Y2DEVTOOLS_PREFIX)
 devtools_ybindir=`pkg-config --print-errors --variable=ybindir yast2-devtools`
 devtools_yast2dir=`pkg-config --print-errors --variable=yast2dir yast2-devtools`
 

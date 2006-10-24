@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Oct 24 16:14:01 CEST 2006 - mvidner@suse.cz
+
+- Run pkg-config at configure time, not at make time (#208998).
+
+-------------------------------------------------------------------
 Wed Oct 11 19:06:21 CEST 2006 - mvidner@suse.cz
 
 - "make dist" will honor CHECK_SYNTAX=false

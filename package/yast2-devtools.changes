@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Oct 27 15:24:01 CEST 2006 - mvidner@suse.cz
+
+- Made the yast2-testsuite check only a warning, otherwise too many
+  packages would break.
+- prefixbuild/pfx: Let also Perl search in the prefix (via PERL5LIB).
+- 2.13.29
+
+-------------------------------------------------------------------
 Tue Oct 24 17:05:48 CEST 2006 - mvidner@suse.cz
 
 - Run pkg-config at configure time, not at make time (#208998).

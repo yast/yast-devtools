@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Nov 13 12:58:51 CET 2006 - jsrain@suse.cz
+
+- 2.14.0
+
+-------------------------------------------------------------------
 Fri Oct 27 15:24:01 CEST 2006 - mvidner@suse.cz
 
 - Made the yast2-testsuite check only a warning, otherwise too many

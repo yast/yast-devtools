@@ -78,6 +78,7 @@ my $failed_log	= $work_root . "/failed-packages.log";
 
 my $disable_make_makefile_cvs			= 0;
 my $favourites_only				= 0;
+my $dry_run					= 0;
 my $prefix					= "/usr";
 my $enable_print_summary			= 1;
 
@@ -152,6 +153,7 @@ sub main()
 		"no-sudo"		=> \$no_sudo,
 		"dump-build-order"	=> \$dump_build_order,
 		"dump-dependencies"	=> \$dump_dependencies,
+		"dry-run"		=> \$dry_run,
 		"verbose"		=> \$verbose,
 		"debug"			=> \$debug,
 		"silent"		=> \$silent,
@@ -840,7 +842,8 @@ sub make_in_build_order()
 	    }
 	    else
 	    {
-		if ( exists( $exclude_dirs{ $pkg } ) )
+		if ( exists( $exclude_dirs{ $pkg } ) or
+		     exists( $exclude_dirs{ $rpm_names{ $pkg } } ) )
 		{
 		    log_progress( "\nExcluding $pkg\n" );
 		}
@@ -888,10 +891,10 @@ sub make()
     {
 
 	log_info( "\trm -rf autom4te.cache" );
-	system_int( "rm -rf autom4te.cache >>$make_log 2>&1" );
+	system_int( "rm -rf autom4te.cache >>$make_log 2>&1" ) unless $dry_run;
 
 	log_progress( "\tmake -f Makefile.cvs" );
-	system_int( "make -f Makefile.cvs >>$make_log 2>&1" );
+	system_int( "make -f Makefile.cvs >>$make_log 2>&1" ) unless $dry_run;
 
 	if ( $CHILD_ERROR )
 	{
@@ -908,7 +911,7 @@ sub make()
     if ( ! $error )
     {
 	log_progress( "\tmake $make_target" );
-	system_int( "make $make_target >>$make_log 2>&1" );
+	system_int( "make $make_target >>$make_log 2>&1" ) unless $dry_run;
 
 	if ( $CHILD_ERROR )
 	{
@@ -925,7 +928,7 @@ sub make()
     if ( $make_target eq "" && ! $error )
     {
 	log_progress( "\t$sudo_cmd make install" );
-	sudo_system_int( "make install >>$make_log 2>&1" );
+	sudo_system_int( "make install >>$make_log 2>&1" ) unless $dry_run;
 
 	if ( $CHILD_ERROR )
 	{
@@ -955,90 +958,6 @@ sub make()
     }
 
     chdir $work_root;
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Install multiple files like "xargs": Build a command line as long as possible
-# to avoid to many shell calls. Calls
-#
-#	sudo install -m 644 <file> [<file>...] <target>
-#
-# until all files are installed.
-#
-# Parameters:
-#	target directory
-#	(array) files to install
-
-sub xargs_install()
-{
-    my $target_dir = shift;
-    my @files = @_;
-
-
-    my $cmd_line_limit = 8000;
-    my $sources = "";
-
-    while ( $#files >= 0 )
-    {
-	my $file = shift @files;
-
-	if ( length( $sources ) + length( $file ) > $cmd_line_limit )
-	{
-	    # Buffer is full - execute command
-	    # (avoid "command line too long" error)
-
-	    install_file( $sources, $target_dir );
-	    $sources = "";
-	}
-
-	$sources .= " " . $file;
-    }
-
-    #
-    # Handle any leftovers
-    #
-
-    if ( ! $sources =~ /^\s*$/ )
-    {
-	install_file( $sources, $target_dir );
-    }
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Install "src" to "target" with proper permissions (644).
-#
-# Parameters:
-#	source (may be multiple source files as one string)
-#	target (may be a directory
-
-sub install_file()
-{
-    my ( $src, $target ) = @_;
-    my $cmd = "$install_cmd -p -m 644 $src $target";
-
-    log_info( "$sudo_cmd $cmd" );
-    sudo_system_int( $cmd );
-}
-
-
-#-----------------------------------------------------------------------------
-
-# Create an installation directory with all its component with mode 755.
-#
-# Parameters:
-#	Directory to create
-
-sub make_install_dir()
-{
-    my ( $dir ) = @_;
-    my $cmd = "$install_cmd -m 755 -d $dir";
-
-    log_info( "$sudo_cmd $cmd" );
-    sudo_system_int( $cmd );
 }
 
 
@@ -1211,7 +1130,8 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 	-n  (--no-sudo)		do not sudo certain commands (useful with --prefix)
 
 	--dump-build-order	only dump the build order to stdout and log
-	--dump-dependencies	only dump the package dependencies to stdout and log
+	--dump-dependencies	only dump package dependencies to stdout and log
+	--dry-run		do not build anything, only print what would be done
 
 	-v  (--verbose)		verbose output
 	-d  (--debug)		debug output (even more verbose)

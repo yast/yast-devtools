@@ -368,7 +368,7 @@ sub find_ycp_files()
     my $ycp_file;
     my $basename;
 
-    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" -o -name "*.pm" -o -name "*.cc" -o -name "*.glade" \\) -print` )
+    foreach $ycp_file ( `find $ycp_base_path \\( -name "*.ycp" -o -name "*.y2cc" -o -name "*.pm" -o -name "*.cc" -o -name "*.h" -o -name "*.glade" \\) -print` )
     {
 	chomp $ycp_file;
 

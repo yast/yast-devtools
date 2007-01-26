@@ -44,7 +44,7 @@ rm -f $TMPFILE
 
 AX_CHECK_DOCBOOK
 
-## this is for y2log_ana 
+## test ---
 
 pkg_modules="QtCore, QtGui"
 PKG_CHECK_MODULES(PACKAGE, [$pkg_modules], [], [ 

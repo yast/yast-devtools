@@ -1,0 +1,13 @@
+Little Viewer for the y2log-File of YaST
+Version 0.11
+
+Search-Options:
+
+1. ComboBox = Type-Selection
+2. ComboBox = Log-Level
+3. ComboBox = Selection-Mode
+4. ComboBox = Color
+
+After a double-click on an entry, the entry will be copied 
+to the TextBox below the ListWidget. 
+There you can also add comments.

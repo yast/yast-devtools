@@ -2,15 +2,21 @@
 # Makefile.am for devtools/y2log_ana
 #
 
-INCLUDES = $(PACKAGE_CFLAGS) 
+if CHECK_QT4
+Y2L = y2log_ana 
+else
+Y2L =
+endif
 
-noinst_PROGRAMS		= y2log_ana
+INCLUDES = $(Qt4_CFLAGS) 
+
+noinst_PROGRAMS		= $(Y2L)
 
 METASOURCES = AUTO
 
 y2log_ana_LDFLAGS = $(all_libraries)
 
-y2log_ana_LDADD = $(PACKAGE_LIBS)
+y2log_ana_LDADD = $(Qt4_LIBS)
 
 y2log_ana_SOURCES	= cgui.cc	\
 				 	 cman.cc	\

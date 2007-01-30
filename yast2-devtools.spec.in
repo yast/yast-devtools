@@ -1,7 +1,7 @@
 @HEADER-COMMENT@ 
 
 @HEADER@
-BuildRequires:	docbook-xsl-stylesheets gcc-c++ libxslt perl-XML-Writer sgml-skel
+BuildRequires:	docbook-xsl-stylesheets gcc-c++ libxslt perl-XML-Writer sgml-skel pkgconfig
 Requires:	perl
 Requires:	perl-XML-Writer
 Requires:       libxslt

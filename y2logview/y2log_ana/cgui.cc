@@ -17,10 +17,13 @@
 #include <QCursor>
 #include "cgui.h"
 
+#include <QtDebug>
+
 using namespace std;
 
 MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 	
+	loadConfigs();
 	setWindowTitle("y2log - Analyzer");
 	setMinimumSize(1024,800);
 	setContextMenuPolicy(Qt::CustomContextMenu);
@@ -31,6 +34,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 	QMenuBar *menu = new QMenuBar();
 
 	hMenu.setTitle("H&idden Types");
+	hMenu.setEnabled(false);
 	
 	fMenu = new QMenu();
 	fMenu->setTitle("&File");
@@ -62,7 +66,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 
 	listview->setColumnCount(7);
 	listview->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	listview->setAlternatingRowColors(true);
+	//listview->setAlternatingRowColors(true);
 	listview->setMinimumHeight(400);
 
 	headers << tr("host") << tr("date") << tr("time") << tr("loglevel");
@@ -169,18 +173,27 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 
 	setLayout(mainLayout);
 
+	//loading initial log-File per command-line
+	if(qApp->arguments().size() > 1){
+		init(qApp->arguments().value(1));
+	}
 }
 
 //Load LogFile in TreeWidget
 
 void MyWidget::init(QString logName){
+	int fail;
+
 	setCursor(Qt::WaitCursor);
 	listview->hide();
 	log y2log;
 	char *tlog = qstrdup(qPrintable(logName));
 
 	logFile y2File(tlog, &y2log);
-	y2File.readout();
+	fail = y2File.readout();
+	if(fail == 1){
+		QMessageBox::critical(this, "ERROR", "Log-File could not be opened!", QMessageBox::Ok, QMessageBox::NoButton);
+	}
 
 	vector<string> keys;
 	int temp;
@@ -194,9 +207,19 @@ void MyWidget::init(QString logName){
 		
 		vector<entry> entries;
 		entries = y2log.getEntries(keys[i]);
+
+		//Show first entry as Parent-Item
+
+		tItem->setText(1, (entries[0].getDate()).c_str());
+		tItem->setText(2, (entries[0].getTime()).c_str());
+		tItem->setText(3, (entries[0].getI()).c_str());
+		tItem->setText(4, (entries[0].getType()).c_str());
+		tItem->setText(5, (entries[0].getFile()).c_str());
+		tItem->setText(6, (entries[0].getMsg()).c_str());
+
 		int temp2 = entries.size();
 
-		for (int y = 0; y < temp2; y++){
+		for (int y = 1; y < temp2; y++){
 			QTreeWidgetItem *cItem = new QTreeWidgetItem(tItem);
 			cItem->setText(0, (entries[y].getHost()).c_str());
 			cItem->setText(1, (entries[y].getDate()).c_str());
@@ -205,6 +228,8 @@ void MyWidget::init(QString logName){
 			cItem->setText(4, (entries[y].getType()).c_str());
 			cItem->setText(5, (entries[y].getFile()).c_str());
 			cItem->setText(6, (entries[y].getMsg()).c_str());
+
+			highLine(cItem);
 
 			if (types.contains((entries[y].getType()).c_str()) == false){
 				types << (entries[y].getType()).c_str();
@@ -269,13 +294,25 @@ void MyWidget::highlight(QList<QTreeWidgetItem*> items, QString col){
 	scroll->setMaximum(sItems.count());
 }
 
+// Highlight Line
+
+void MyWidget::highLine(QTreeWidgetItem *item){
+	
+	QColor *color = new QColor;
+
+	*color = levelBg[item->text(3)];
+	for(int i = 0; i < listview->columnCount(); i++){
+		item->setBackgroundColor(i, *color);
+	}
+}
+
 // Clear all colored Items
 
 void MyWidget::clear(){
 	for(int i = 0; i < cItems.count(); i++){
 		cItems[i]->setTextColor(0, Qt::black);
 		for(int y = 0; y < listview->columnCount(); y++)
-			cItems[i]->setBackgroundColor(y, Qt::white);
+			cItems[i]->setBackgroundColor(y, levelBg[cItems[i]->text(3)]);
 	}
 	cItems.clear();
 	if(sItems.isEmpty() != true){
@@ -334,6 +371,13 @@ void MyWidget::hideItems(QString type, QString color, QString level, int opt){
 	}
 	if (opt == 2){
 		hTypes.removeAll(type);
+	}
+
+	// enable/disable HiddenTypes Menu
+	if(hTypes.size() > 0){
+		hMenu.setEnabled(true);
+	}else{
+		hMenu.setEnabled(false);
 	}
 
 	cTypeChange(cTypes->currentText());
@@ -473,4 +517,20 @@ void MyWidget::upDownEditor(){
 	}else{
 		editor->hide();
 	}
+}
+
+void MyWidget::loadConfigs(){
+
+//TODO load such configurations from a config-file
+
+	levelBg["<0>"] = QColor(135, 206, 255);
+	levelBg["<1>"] = QColor(242, 242, 242);
+	levelBg["<2>"] = QColor(255, 255, 224);
+	levelBg["<3>"] = QColor(255, 193, 192);
+	levelBg["<4>"] = QColor(221, 160, 221);
+	levelBg["<5>"] = QColor(84, 255, 159);
+	levelBg["<6>"] = QColor(255, 255, 0);
+	levelBg["<7>"] = QColor(173,255, 47);
+	levelBg[""] = QColor(255, 255, 255);
+	
 }

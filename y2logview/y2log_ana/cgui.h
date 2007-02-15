@@ -17,8 +17,10 @@ class MyWidget : public QWidget{
 		MyWidget(QWidget *parent = 0);
 		~MyWidget();
 		void highlight(QList<QTreeWidgetItem*>, QString color = "red");
+		void highLine(QTreeWidgetItem*);
 		void init(QString);
 		void hideItems(QString, QString, QString, int);
+		void loadConfigs();
 
 	private:
 		QTreeWidget *listview;
@@ -38,6 +40,7 @@ class MyWidget : public QWidget{
 		QScrollBar *scroll;
 		QMenu hMenu;
 		QMenu *fMenu;
+		map<QString, QColor> levelBg;
 
 	public slots:
 		void highOne(QTreeWidgetItem*, int);

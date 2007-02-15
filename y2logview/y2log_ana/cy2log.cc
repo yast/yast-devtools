@@ -108,12 +108,17 @@ logFile::logFile(char* nFile, log* ny2log){
 
 int logFile::readout(){
 	ifstream f;
+		
 	string line;
 	vector<string> words;
 	char sep[2] = " ";
 	vector<string> temp;
 	
 	f.open(file, ios::in);
+	if(f.fail() == true){
+		cout << "Hallo";
+		return 1;
+	}
 	
 	//readout of the logfile and parse all the words in a vector
 	

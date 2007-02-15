@@ -1,5 +1,9 @@
 Little Viewer for the y2log-File of YaST
-Version 0.11
+Version 0.11c
+
+Command-Line:
+
+y2log /Path/to/File/log
 
 Search-Options:
 

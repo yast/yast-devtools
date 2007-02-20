@@ -46,7 +46,7 @@ AX_CHECK_DOCBOOK
 
 ## this is for y2log_ana 
 
-pkg_modules="QtCore, QtGui"
+pkg_modules="QtCore, QtGui, QtXml"
 PKG_CHECK_MODULES(Qt4,[$pkg_modules],[qt=true],[AC_MSG_RESULT(not found)])
 AM_CONDITIONAL(CHECK_QT4, test "$qt" = "true")
 

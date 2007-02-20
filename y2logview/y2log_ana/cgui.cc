@@ -15,6 +15,8 @@
 #include <QLineEdit>
 #include <QMenuBar>
 #include <QCursor>
+#include <QDomDocument>
+#include <QColorDialog>
 #include "cgui.h"
 
 #include <QtDebug>
@@ -23,6 +25,9 @@ using namespace std;
 
 MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 	
+	configPath = QDir::home().path();
+	configPath += "/.y2log_ana";
+
 	loadConfigs();
 	setWindowTitle("y2log - Analyzer");
 	setMinimumSize(1024,800);
@@ -45,6 +50,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 
 	menu->addMenu(fMenu);
 	menu->addMenu(&hMenu);
+	menu->addAction("&Config", this, SLOT(saveConfigs()));
 	menu->addAction("&Help", this, SLOT(help()));
 
 	QPushButton *quit = new QPushButton("Quit");
@@ -521,8 +527,7 @@ void MyWidget::upDownEditor(){
 
 void MyWidget::loadConfigs(){
 
-//TODO load such configurations from a config-file
-
+	// load Default-Settings
 	levelBg["<0>"] = QColor(135, 206, 255);
 	levelBg["<1>"] = QColor(242, 242, 242);
 	levelBg["<2>"] = QColor(255, 255, 224);
@@ -532,5 +537,194 @@ void MyWidget::loadConfigs(){
 	levelBg["<6>"] = QColor(255, 255, 0);
 	levelBg["<7>"] = QColor(173,255, 47);
 	levelBg[""] = QColor(255, 255, 255);
+
+	QDomDocument config("y2log_ana-settings");
+
+	QFile *configFile = new QFile(configPath);	
 	
+	if(!configFile->open(QIODevice::ReadOnly)){
+		return;
+	}
+
+	if(!config.setContent(configFile)){
+		configFile->close();
+		return;
+	}
+
+	configFile->close();
+
+	QDomElement conElem = config.documentElement();
+	QDomNode conNod = conElem.firstChild();
+
+	while(!conNod.isNull()){
+		QDomElement e = conNod.toElement();
+		if(!e.isNull()){
+			// Load BG-Colors
+			if(e.tagName() == "levelBg"){
+				int r, g, b;
+				
+				r = e.attribute("r", "").toInt();
+				g = e.attribute("g", "").toInt();
+				b = e.attribute("b", "").toInt();
+
+				if(!(r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255))
+					levelBg[e.attribute("id", "unknown")] = QColor(r, g, b);
+			}
+		}
+		conNod = conNod.nextSibling();
+	}
+
+}
+
+// Widget for Configuration
+
+void MyWidget::saveConfigs(){
+	QDialog *confDialog = new QDialog(this);
+	confDialog->setMinimumSize(450,100);
+	
+	QWidget *bgColWidget = new QWidget(confDialog);
+	QGridLayout *bgColLay = new QGridLayout(bgColWidget);
+
+	level = new QComboBox(bgColWidget);
+	level->setEditable(false);
+
+	map<QString, QColor>::iterator pIterMap;
+
+	for(pIterMap = levelBg.begin(); pIterMap != levelBg.end(); pIterMap++){
+		level->addItem(pIterMap->first);		
+	}
+
+	hexCol = new QLineEdit(bgColWidget);
+	hexCol->setReadOnly(true);
+	hexCol->setText(levelBg[level->currentText()].name());
+	connect(level, SIGNAL(currentIndexChanged(const QString&)), SLOT(showColHex(const QString&)));
+
+	QPushButton *colChooser = new QPushButton("Choose Color", bgColWidget);
+	connect(colChooser, SIGNAL(clicked()), SLOT(colorDialog()));
+
+	bgColLay->addWidget(level, 0, 0);
+	bgColLay->addWidget(hexCol, 0, 1);
+	bgColLay->addWidget(colChooser, 0, 2);
+	bgColWidget->setLayout(bgColLay);
+	
+	QVBoxLayout *vLayout = new QVBoxLayout(confDialog);
+	QHBoxLayout *hLayout = new QHBoxLayout(confDialog);
+
+	QTabWidget *confTab = new QTabWidget(confDialog);
+	confTab->addTab(bgColWidget, "BG-Color");
+
+	colSave = new QPushButton("Save", confDialog);
+	colSave->setEnabled(false);
+	QPushButton *close = new QPushButton("Close", confDialog);
+
+	confDialog->connect(close, SIGNAL(clicked()), SLOT(close()));
+	connect(colSave, SIGNAL(clicked()), SLOT(writeConf()));
+
+	hLayout->addWidget(colSave);
+	hLayout->addWidget(close);
+	vLayout->addWidget(confTab);
+	vLayout->addLayout(hLayout);
+	confDialog->setLayout(vLayout);
+
+	confDialog->show();
+	confDialog->raise();
+	confDialog->activateWindow();
+}
+
+// Save config to file
+void MyWidget::writeConf(){
+QDomDocument config("y2log_ana-settings");
+
+	QFile *configFile = new QFile(configPath);	
+	
+	// Look for existing config-File otherwise build one
+	if(!configFile->exists())
+		buildConfig();
+
+	if(!configFile->open(QIODevice::ReadOnly)){
+		qDebug() << "Datei nicht da";
+		return;
+	}
+
+	QString errorStr;
+	int errorLine;
+	int errorColumn;
+	
+	if(!config.setContent(configFile, true, &errorStr, &errorLine, &errorColumn)){
+		configFile->close();
+		qDebug() << "ErrorString" << errorStr;
+		qDebug() << "ErrorLine" << errorLine;
+		qDebug() << "ErrorColumn" << errorColumn;
+		return;
+	}
+	
+	configFile->close();	
+
+	QDomElement conElem = config.documentElement();
+	QDomNode conNod = conElem.firstChild();
+
+	while(!conNod.isNull()){
+		QDomElement e = conNod.toElement();
+		if(!e.isNull()){
+			// Save BG-Colors
+			if(e.tagName() == "levelBg"){
+				
+				e.setAttribute("r", levelBg[e.attribute("id", "")].red());
+				e.setAttribute("g", levelBg[e.attribute("id", "")].green());
+				e.setAttribute("b", levelBg[e.attribute("id", "")].blue());
+
+			}
+		}
+		conNod = conNod.nextSibling();
+	}
+
+	if(!configFile->open(QIODevice::WriteOnly)){
+		QMessageBox::critical(this, "ERROR", "Config-File could no be written", QMessageBox::Ok, QMessageBox::NoButton);
+		return;
+	}
+	QTextStream out(configFile);
+	out << config.toString();
+	configFile->close();
+	colSave->setEnabled(false);
+}
+
+// Show Hex-Code of the Color
+void MyWidget::showColHex(const QString &id){
+	hexCol->setText(levelBg[id].name());
+}
+
+void MyWidget::colorDialog(){
+	hexCol->setText(QColorDialog::getColor(QColor(hexCol->text()), this).name());
+	levelBg[level->currentText()] = QColor(hexCol->text());
+	colSave->setEnabled(true);
+}
+
+// build initial config-file
+
+void MyWidget::buildConfig(){
+	QDomDocument *configTemp = new QDomDocument("y2log_ana-settings");
+	QDomElement root = configTemp->createElement("y2log_ana-settings");
+	configTemp->appendChild(root);
+
+	// insert Section for levelBG
+	map<QString, QColor>::iterator pIterMap;
+
+	for(pIterMap = levelBg.begin(); pIterMap != levelBg.end(); pIterMap++){
+		QDomElement child = configTemp->createElement("levelBg");
+		child.setAttribute("id", pIterMap->first);
+		child.setAttribute("r", pIterMap->second.red());
+		child.setAttribute("g", pIterMap->second.green());
+		child.setAttribute("b", pIterMap->second.blue());	
+		root.appendChild(child);
+	}
+	
+	QFile *configFile = new QFile(configPath);
+	
+	if(!configFile->open(QIODevice::WriteOnly))
+		return;
+
+	QTextStream out(configFile);
+	out << configTemp->toString();
+	configFile->close();
+
 }

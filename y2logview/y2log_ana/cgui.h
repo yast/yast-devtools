@@ -21,20 +21,25 @@ class MyWidget : public QWidget{
 		void init(QString);
 		void hideItems(QString, QString, QString, int);
 		void loadConfigs();
+		void buildConfig();
 
 	private:
+		QString configPath;
 		QTreeWidget *listview;
 		QLineEdit *searchLine;
+		QLineEdit *hexCol;
 		QTextEdit *editor;
 		QList<QTreeWidgetItem*> cItems;
 		QList<QTreeWidgetItem*> sItems;
 		QList<QString> hTypes;
 		QStringList types;
 		QPushButton *upDown;
+		QPushButton *colSave;
 		QComboBox *cTypes;
 		QComboBox *cColor;
 		QComboBox *cLevel;
 		QComboBox *cFunct;
+		QComboBox *level;
 		QLCDNumber *from;
 		QLCDNumber *till;
 		QScrollBar *scroll;
@@ -56,6 +61,10 @@ class MyWidget : public QWidget{
 		void saveEditor();
 		void help();
 		void upDownEditor();
+		void saveConfigs();
+		void writeConf();
+		void showColHex(const QString&);
+		void colorDialog();
 };
 
 #endif

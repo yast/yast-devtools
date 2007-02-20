@@ -17,6 +17,8 @@
 #include <QCursor>
 #include <QDomDocument>
 #include <QColorDialog>
+#include <QPixmap>
+#include <QLabel>
 #include "cgui.h"
 
 #include <QtDebug>
@@ -36,12 +38,12 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 	//Menu-Bar
 
 	connect(&hMenu, SIGNAL(aboutToShow()), SLOT(buildHMenu()));
-	QMenuBar *menu = new QMenuBar();
+	QMenuBar *menu = new QMenuBar(this);
 
 	hMenu.setTitle("H&idden Types");
 	hMenu.setEnabled(false);
 	
-	fMenu = new QMenu();
+	fMenu = new QMenu(this);
 	fMenu->setTitle("&File");
 	fMenu->addAction("Open", this, SLOT(open()), QKeySequence(tr("Ctrl+O", "File|Open")));
 	fMenu->addAction("Save", this, SLOT(saveEditor()), QKeySequence(tr("Ctrl+S", "File|Save")));
@@ -53,9 +55,9 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 	menu->addAction("&Config", this, SLOT(saveConfigs()));
 	menu->addAction("&Help", this, SLOT(help()));
 
-	QPushButton *quit = new QPushButton("Quit");
-	QPushButton *save = new QPushButton("Save");
-	upDown = new QPushButton("Editor");
+	QPushButton *quit = new QPushButton("Quit", this);
+	QPushButton *save = new QPushButton("Save", this);
+	upDown = new QPushButton("Editor", this);
 	upDown->setMaximumHeight(20);
 	
 	connect(quit, SIGNAL(clicked()), qApp, SLOT(quit()));
@@ -139,13 +141,13 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 
 	//Defintion of Widget-Layout
 	
+	QVBoxLayout *mainLayout = new QVBoxLayout();
+	QVBoxLayout *layout = new QVBoxLayout();
 	QHBoxLayout *hLayout = new QHBoxLayout();
 	QHBoxLayout *hOptionLayout = new QHBoxLayout();
 	QHBoxLayout *hScrollLayout = new QHBoxLayout();
-	QVBoxLayout *layout = new QVBoxLayout();
 	QHBoxLayout *hEndLayout = new QHBoxLayout();
 	QVBoxLayout *vEditorLayout = new QVBoxLayout();
-	QVBoxLayout *mainLayout = new QVBoxLayout();
 
 	hLayout->addWidget(searchLine);
 	hLayout->addWidget(searchButton);
@@ -304,11 +306,11 @@ void MyWidget::highlight(QList<QTreeWidgetItem*> items, QString col){
 
 void MyWidget::highLine(QTreeWidgetItem *item){
 	
-	QColor *color = new QColor;
+	QColor color;
 
-	*color = levelBg[item->text(3)];
+	color = levelBg[item->text(3)];
 	for(int i = 0; i < listview->columnCount(); i++){
-		item->setBackgroundColor(i, *color);
+		item->setBackgroundColor(i, color);
 	}
 }
 
@@ -408,18 +410,7 @@ void MyWidget::scrollView(int val){
 	}
 }
 
-// Destructor FIXME
-
 MyWidget::~MyWidget(){
-	delete listview;
-	delete searchLine;
-	delete cTypes;
-	delete cColor;
-	delete cFunct;
-	delete cLevel;
-	delete from;
-	delete till;
-	delete scroll;
 }
 
 // Resize columns to contents
@@ -540,18 +531,18 @@ void MyWidget::loadConfigs(){
 
 	QDomDocument config("y2log_ana-settings");
 
-	QFile *configFile = new QFile(configPath);	
+	QFile configFile(configPath);	
 	
-	if(!configFile->open(QIODevice::ReadOnly)){
+	if(!configFile.open(QIODevice::ReadOnly)){
 		return;
 	}
 
-	if(!config.setContent(configFile)){
-		configFile->close();
+	if(!config.setContent(&configFile)){
+		configFile.close();
 		return;
 	}
 
-	configFile->close();
+	configFile.close();
 
 	QDomElement conElem = config.documentElement();
 	QDomNode conNod = conElem.firstChild();
@@ -599,12 +590,18 @@ void MyWidget::saveConfigs(){
 	hexCol->setText(levelBg[level->currentText()].name());
 	connect(level, SIGNAL(currentIndexChanged(const QString&)), SLOT(showColHex(const QString&)));
 
+	colLabel = new QLabel(confDialog);
+	QPixmap colPix(30, 30);
+	colPix.fill(levelBg[level->currentText()]);
+	colLabel->setPixmap(colPix);
+
 	QPushButton *colChooser = new QPushButton("Choose Color", bgColWidget);
 	connect(colChooser, SIGNAL(clicked()), SLOT(colorDialog()));
 
 	bgColLay->addWidget(level, 0, 0);
 	bgColLay->addWidget(hexCol, 0, 1);
-	bgColLay->addWidget(colChooser, 0, 2);
+	bgColLay->addWidget(colChooser, 0, 3);
+	bgColLay->addWidget(colLabel, 0, 2);
 	bgColWidget->setLayout(bgColLay);
 	
 	QVBoxLayout *vLayout = new QVBoxLayout(confDialog);
@@ -635,13 +632,13 @@ void MyWidget::saveConfigs(){
 void MyWidget::writeConf(){
 QDomDocument config("y2log_ana-settings");
 
-	QFile *configFile = new QFile(configPath);	
+	QFile configFile(configPath);	
 	
 	// Look for existing config-File otherwise build one
-	if(!configFile->exists())
+	if(!configFile.exists())
 		buildConfig();
 
-	if(!configFile->open(QIODevice::ReadOnly)){
+	if(!configFile.open(QIODevice::ReadOnly)){
 		qDebug() << "Datei nicht da";
 		return;
 	}
@@ -650,15 +647,15 @@ QDomDocument config("y2log_ana-settings");
 	int errorLine;
 	int errorColumn;
 	
-	if(!config.setContent(configFile, true, &errorStr, &errorLine, &errorColumn)){
-		configFile->close();
+	if(!config.setContent(&configFile, true, &errorStr, &errorLine, &errorColumn)){
+		configFile.close();
 		qDebug() << "ErrorString" << errorStr;
 		qDebug() << "ErrorLine" << errorLine;
 		qDebug() << "ErrorColumn" << errorColumn;
 		return;
 	}
 	
-	configFile->close();	
+	configFile.close();	
 
 	QDomElement conElem = config.documentElement();
 	QDomNode conNod = conElem.firstChild();
@@ -678,39 +675,45 @@ QDomDocument config("y2log_ana-settings");
 		conNod = conNod.nextSibling();
 	}
 
-	if(!configFile->open(QIODevice::WriteOnly)){
+	if(!configFile.open(QIODevice::WriteOnly)){
 		QMessageBox::critical(this, "ERROR", "Config-File could no be written", QMessageBox::Ok, QMessageBox::NoButton);
 		return;
 	}
-	QTextStream out(configFile);
+	QTextStream out(&configFile);
 	out << config.toString();
-	configFile->close();
+	configFile.close();
 	colSave->setEnabled(false);
 }
 
 // Show Hex-Code of the Color
 void MyWidget::showColHex(const QString &id){
 	hexCol->setText(levelBg[id].name());
+	QPixmap colPix(30, 30);
+	colPix.fill(levelBg[id]);
+	colLabel->setPixmap(colPix);
 }
 
 void MyWidget::colorDialog(){
 	hexCol->setText(QColorDialog::getColor(QColor(hexCol->text()), this).name());
 	levelBg[level->currentText()] = QColor(hexCol->text());
 	colSave->setEnabled(true);
+	QPixmap colPix(30, 30);
+	colPix.fill(QColor(hexCol->text()));
+	colLabel->setPixmap(colPix);
 }
 
 // build initial config-file
 
 void MyWidget::buildConfig(){
-	QDomDocument *configTemp = new QDomDocument("y2log_ana-settings");
-	QDomElement root = configTemp->createElement("y2log_ana-settings");
-	configTemp->appendChild(root);
+	QDomDocument configTemp("y2log_ana-settings");
+	QDomElement root = configTemp.createElement("y2log_ana-settings");
+	configTemp.appendChild(root);
 
 	// insert Section for levelBG
 	map<QString, QColor>::iterator pIterMap;
 
 	for(pIterMap = levelBg.begin(); pIterMap != levelBg.end(); pIterMap++){
-		QDomElement child = configTemp->createElement("levelBg");
+		QDomElement child = configTemp.createElement("levelBg");
 		child.setAttribute("id", pIterMap->first);
 		child.setAttribute("r", pIterMap->second.red());
 		child.setAttribute("g", pIterMap->second.green());
@@ -718,13 +721,13 @@ void MyWidget::buildConfig(){
 		root.appendChild(child);
 	}
 	
-	QFile *configFile = new QFile(configPath);
+	QFile configFile(configPath);
 	
-	if(!configFile->open(QIODevice::WriteOnly))
+	if(!configFile.open(QIODevice::WriteOnly))
 		return;
 
-	QTextStream out(configFile);
-	out << configTemp->toString();
-	configFile->close();
+	QTextStream out(&configFile);
+	out << configTemp.toString();
+	configFile.close();
 
 }

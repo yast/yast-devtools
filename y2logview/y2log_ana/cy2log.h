@@ -1,6 +1,5 @@
 #include <map>
 #include <vector>
-#include <QTreeWidgetItem>
 
 #ifndef CY2LOG_H
 #define CY2LOG_H
@@ -16,12 +15,9 @@ class entry{
 			string host;
 			string file;
 			string msg;
-			QTreeWidgetItem *item;
 		public:
 			entry(string type, string date, string time, string i, string host, string file, string msg);
 			~entry();
-			void setItem(QTreeWidgetItem*);
-			QTreeWidgetItem* getItem();
 			string getType();
 			string getDate();
 			string getTime();

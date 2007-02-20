@@ -6,6 +6,7 @@
 #include <QTextEdit>
 #include <QLCDNumber>
 #include <QMenu>
+#include <QLabel>
 #include "cy2log.h"
 
 #ifndef CGUI_H
@@ -43,6 +44,7 @@ class MyWidget : public QWidget{
 		QLCDNumber *from;
 		QLCDNumber *till;
 		QScrollBar *scroll;
+		QLabel *colLabel;
 		QMenu hMenu;
 		QMenu *fMenu;
 		map<QString, QColor> levelBg;

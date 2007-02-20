@@ -19,14 +19,6 @@ entry::entry(string nType, string nDate, string nTime, string nI, string nHost, 
 entry::~entry(){
 }
 
-void entry::setItem(QTreeWidgetItem *nItem){
-		item = nItem;
-}
-
-QTreeWidgetItem* entry::getItem(){
-		return item;
-}
-
 string entry::getType(){
 		return type;
 }
@@ -213,4 +205,5 @@ int logFile::readout(){
 }
 
 logFile::~logFile(){
+	delete[] file;
 }

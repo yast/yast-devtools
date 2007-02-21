@@ -19,6 +19,7 @@
 #include <QColorDialog>
 #include <QPixmap>
 #include <QLabel>
+#include <QCheckBox>
 #include "cgui.h"
 
 #include <QtDebug>
@@ -119,9 +120,13 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 	cFunct->addItem("Highlight");
 
 	cColor = new QComboBox(this);
-	cColor->addItem("red");
-	cColor->addItem("yellow");
-	cColor->addItem("green");
+	QPixmap redpix(50, 25);
+	redpix.fill(Qt::red);
+	cColor->addItem(QIcon(redpix), "red");
+	redpix.fill(Qt::yellow);
+	cColor->addItem(QIcon(redpix), "yellow");
+	redpix.fill(Qt::green);
+	cColor->addItem(QIcon(redpix), "green");
 
 	QPushButton *OKButton = new QPushButton("OK", this);
 	
@@ -590,6 +595,7 @@ void MyWidget::saveConfigs(){
 	hexCol->setText(levelBg[level->currentText()].name());
 	connect(level, SIGNAL(currentIndexChanged(const QString&)), SLOT(showColHex(const QString&)));
 
+	colApply = new QCheckBox("apply after save", bgColWidget);
 	colLabel = new QLabel(confDialog);
 	QPixmap colPix(30, 30);
 	colPix.fill(levelBg[level->currentText()]);
@@ -602,6 +608,7 @@ void MyWidget::saveConfigs(){
 	bgColLay->addWidget(hexCol, 0, 1);
 	bgColLay->addWidget(colChooser, 0, 3);
 	bgColLay->addWidget(colLabel, 0, 2);
+	bgColLay->addWidget(colApply, 1, 0);
 	bgColWidget->setLayout(bgColLay);
 	
 	QVBoxLayout *vLayout = new QVBoxLayout(confDialog);
@@ -683,6 +690,17 @@ QDomDocument config("y2log_ana-settings");
 	out << config.toString();
 	configFile.close();
 	colSave->setEnabled(false);
+
+	//apply if colApply is checked
+	if(colApply->checkState() == 2){
+		QList<QTreeWidgetItem*> allItems = listview->findItems("*", Qt::MatchWildcard);
+		for(int i = 0; i < allItems.size(); i++){
+			for(int y = 0; y < allItems.at(i)->childCount(); y++){
+				highLine(allItems.at(i)->child(y));	
+			}
+		}
+	}
+
 }
 
 // Show Hex-Code of the Color

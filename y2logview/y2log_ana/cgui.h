@@ -7,6 +7,7 @@
 #include <QLCDNumber>
 #include <QMenu>
 #include <QLabel>
+#include <QCheckBox>
 #include "cy2log.h"
 
 #ifndef CGUI_H
@@ -36,6 +37,7 @@ class MyWidget : public QWidget{
 		QStringList types;
 		QPushButton *upDown;
 		QPushButton *colSave;
+		QCheckBox *colApply;
 		QComboBox *cTypes;
 		QComboBox *cColor;
 		QComboBox *cLevel;

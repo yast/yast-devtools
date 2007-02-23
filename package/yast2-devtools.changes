@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb 23 14:59:51 CET 2007 - od@suse.de
+
+- showy2log: accept lines containing parentheses around the
+  hostname as in '(none)' for pretty-printing
+
+-------------------------------------------------------------------
 Fri Feb 16 17:28:49 CET 2007 - locilka@suse.cz
 
 - Added yast2-add-on into all-packages.

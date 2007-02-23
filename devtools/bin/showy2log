@@ -249,7 +249,7 @@ function print_log_line( line,    rest, indent )
 		# <date> <time>,<PID?> <level>  <component> - <namespace>::<subroutine>: <message>
 		#
 		#                    date                        time                         level   host   PID         comp.    file  line      message
-		if ( match( line, /^([0-9]{4}-[0-9]{2}-[0-9]{2} +[0-9]{2}:[0-9]{2}:[0-9]{2} +<[^>]*> +[^(]+\([0-9]+\) +\[[^]]*\] +[^:]*:[0-9]* +)(.*)/, parts ) != 0 ) {
+		if ( match( line, /^([0-9]{4}-[0-9]{2}-[0-9]{2} +[0-9]{2}:[0-9]{2}:[0-9]{2} +<[^>]*> +\(?[^()]\)?+\([0-9]+\) +\[[^]]*\] +[^:]*:[0-9]* +)(.*)/, parts ) != 0 ) {
 			if ( Debug )
 				print_line( line " <--- orig" )
 			print_text( parts[1] )

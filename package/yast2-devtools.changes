@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Feb 26 18:07:58 CET 2007 - mvidner@suse.cz
+
+- y2autoconf: Changed -Wformat to -Wformat=2 to catch more bugs (#246807).
+
+-------------------------------------------------------------------
 Fri Feb 23 14:59:51 CET 2007 - od@suse.de
 
 - showy2log: accept lines containing parentheses around the

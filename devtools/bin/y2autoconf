@@ -269,8 +269,8 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
-CFLAGS="${CFLAGS} -Wall -Wformat -Wmissing-prototypes"
-CXXFLAGS="${CXXFLAGS} -Wall -Wformat"
+CFLAGS="${CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
+CXXFLAGS="${CXXFLAGS} -Wall -Wformat=2"
 
 : ${AGENT_LIBADD:=\'-L$(libdir) -lscr\'}
 AC_SUBST(AGENT_LIBADD)

@@ -35,7 +35,8 @@ our @exclude_list =
      "CVS",
      ".svn",
      "certify",
-     "debugger"
+     "debugger",
+     "ipsec"
      );
 
 # Personal favourites - those directories will be processed first (in this order).

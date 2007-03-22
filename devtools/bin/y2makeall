@@ -836,18 +836,14 @@ sub make_in_build_order()
 
 	if ( -d $dir )
 	{
-	    if ( ! exists( $dont_process{ $pkg } ) )
+	    if ( ! exists( $dont_process{ $rpm_dirs{ $pkg } } ) )
 	    {
 		# log_progress( "Building $pkg" );
 		make( $dir );
 	    }
 	    else
 	    {
-		if ( exists( $exclude_dirs{ $pkg } ) or
-		     exists( $exclude_dirs{ $rpm_names{ $pkg } } ) )
-		{
-		    log_progress( "\nExcluding $pkg\n" );
-		}
+		log_progress( "Excluding $pkg" );
 	    }
 	}
 	else
@@ -967,7 +963,7 @@ sub make()
 
 sub print_summary()
 {
-    my $failed_count = scalar( @failed_dirs ) + 1;
+    my $failed_count = scalar( @failed_dirs );
     return if $successful_count + $failed_count < 1;	# didn't really build anything
 
     log_milestone( "\n$prog_name $make_target summary:\n" );
@@ -975,7 +971,7 @@ sub print_summary()
 
     if ( $failed_count > 0 )
     {
-	log_milestone( "    Failed  in " . $failed_count . " directories:\n" );
+	log_milestone( "    Failure in " . $failed_count . " directories:\n" );
 	my $failed_dir;
 
 	foreach $failed_dir ( @failed_dirs )

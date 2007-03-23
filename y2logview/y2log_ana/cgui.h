@@ -69,6 +69,7 @@ class MyWidget : public QWidget{
 		void writeConf();
 		void showColHex(const QString&);
 		void colorDialog();
+		void searchAhead(QTreeWidgetItem*, int);
 };
 
 #endif

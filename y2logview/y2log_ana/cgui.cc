@@ -72,6 +72,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent){
 
 	connect(listview, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), SLOT(highOne(QTreeWidgetItem*, int)));
 	connect(listview, SIGNAL(itemExpanded(QTreeWidgetItem*)), SLOT(resizeColumns()));
+	connect(listview, SIGNAL(itemClicked(QTreeWidgetItem*, int)), SLOT(searchAhead(QTreeWidgetItem*, int)));
 
 	listview->setColumnCount(7);
 	listview->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -331,6 +332,7 @@ void MyWidget::clear(){
 	if(sItems.isEmpty() != true){
 		sItems.clear();
 	}
+	till->display(0);
 }
 
 // Selection-Options
@@ -410,8 +412,50 @@ void MyWidget::open(){
 
 void MyWidget::scrollView(int val){
 	if (sItems.isEmpty() != true && val != 0){
-		listview->setCurrentItem(sItems.at(val - 1));
-		from->display(val);
+		if (listview->isItemExpanded(sItems.at(val - 1)->parent())){
+			listview->setCurrentItem(sItems.at(val - 1));
+			from->display(val);
+		
+		//If Item is not expanded
+		}else{
+			if (from->intValue() != scroll->value()){	
+				if (from->intValue() > scroll->value()){
+					//BACKWARD
+					if(listview->currentItem() == sItems.at(scroll->value() -1)->parent()){
+						int indx = from->intValue();
+						while(sItems.at(from->intValue())->parent() == sItems.at(indx)->parent()){
+							indx--;
+							if(indx == 0){
+								indx = sItems.size();
+								break;
+							}
+						}
+						scroll->setValue(indx);	
+						listview->setCurrentItem(sItems.at(indx)->parent());
+					}else{
+						listview->setCurrentItem(sItems.at(from->intValue() - 2)->parent());	
+					}
+				}else{
+					//FORWARD
+					if(listview->currentItem() == sItems.at(scroll->value() - 1)->parent()){
+						int indx = from->intValue();
+						while(sItems.at(from->intValue())->parent() == sItems.at(indx)->parent()){
+							indx++;
+							if(indx == sItems.size()){
+								indx = 0;
+								break;
+							}
+						}
+						scroll->setValue(indx);	
+						listview->setCurrentItem(sItems.at(indx)->parent());
+					}else{
+						listview->setCurrentItem(sItems.at(scroll->value() - 1)->parent());
+					}
+				}
+
+				from->display(scroll->value());
+			}
+		}	
 	}
 }
 
@@ -748,4 +792,16 @@ void MyWidget::buildConfig(){
 	out << configTemp.toString();
 	configFile.close();
 
+}
+
+// set clicked item to start point for search
+
+void MyWidget::searchAhead(QTreeWidgetItem *item, int column){
+	if(sItems.isEmpty() == true)
+		return;
+
+	if(sItems.contains(item)){
+		from->display(sItems.indexOf(item));
+		scroll->setSliderPosition(sItems.indexOf(item) + 1);
+	}
 }

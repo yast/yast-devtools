@@ -511,14 +511,15 @@ sub tsort_dependencies()
 
     foreach $favourite ( @ycp_favourites )
     {
-    	if ( defined( $leaf_rpms{ $favourite } ) or		 # RPM name specified in favourites
-    	     defined( $leaf_rpms{ $rpm_names{ $favourite } } ) ) # directory specified
-    	{
+	if ( defined( $leaf_rpms{ $favourite } ) or		 # RPM name specified in favourites
+	     ( defined( $rpm_names{ $favourite } ) and
+	       defined( $leaf_rpms{ $rpm_names{ $favourite } } ) ) ) # directory specified
+	{
 	    $favourite = $rpm_names{ $favourite } unless defined $leaf_rpms{ $favourite };
-    	    log_info( "Preferring favourite $favourite" );
-    	    push( @build_order, $favourite );
-    	    $leaf_rpms{ $favourite } = undef;
-    	}
+	    log_info( "Preferring favourite $favourite" );
+	    push( @build_order, $favourite );
+	    $leaf_rpms{ $favourite } = undef;
+	}
     }
 
     #

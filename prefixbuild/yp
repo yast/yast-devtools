@@ -4,9 +4,10 @@ case $0 in
       *yp1) UI=ncurses;;
 esac
 
-while getopts v FLAG; do
+while getopts vg FLAG; do
     case $FLAG in
 	v) VALGRIND=valgrind;;
+	g) VALGRIND="gdb --args";;
 	*) echo Ugh; exit 1;;
     esac
 done

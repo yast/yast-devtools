@@ -159,7 +159,7 @@ module mouse		"$PFX"
 
 ## yast2-deps says installation needs xml
 ## but apparently that's not the case
-module installation	"$PFX" "$FILLUPDIR"
+module installation	"$PFX" "$FILLUPDIR" 'fvwmdir=$(prefix)/fvwm'
 module firewall		"$PFX"
 
 module perl-bindings	"$PFX" "$CFLAGS"

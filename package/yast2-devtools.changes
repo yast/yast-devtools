@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 30 11:44:51 CEST 2007 - mvidner@suse.cz
+
+- Fixed filelist because of reduced default buildsystem.
+- 2.15.0
+
+-------------------------------------------------------------------
 Thu Mar 22 15:04:56 CET 2007 - aschnell@suse.de
 
 - y2makeall: fixed excluding of packages/directories;

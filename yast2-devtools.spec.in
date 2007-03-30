@@ -42,6 +42,8 @@ EOF
 %files
 %defattr(-,root,root)
 %{prefix}/bin/y2tool
+%dir %{prefix}/share/emacs
+%dir %{prefix}/share/emacs/site-lisp
 %{prefix}/share/emacs/site-lisp/*ycp-mode.el
 %dir %{prefix}/lib/YaST2
 @ybindir@

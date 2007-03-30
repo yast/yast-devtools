@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 22 15:04:56 CET 2007 - aschnell@suse.de
+
+- y2makeall: fixed excluding of packages/directories;
+  added obsolete ipsec to exclude_list
+
+-------------------------------------------------------------------
 Mon Feb 26 18:07:58 CET 2007 - mvidner@suse.cz
 
 - y2autoconf: Changed -Wformat to -Wformat=2 to catch more bugs (#246807).
@@ -13,6 +19,12 @@ Fri Feb 23 14:59:51 CET 2007 - od@suse.de
 Fri Feb 16 17:28:49 CET 2007 - locilka@suse.cz
 
 - Added yast2-add-on into all-packages.
+
+-------------------------------------------------------------------
+Fri Jan 26 13:44:18 CET 2007 - shaas@suse.de
+
+- y2log_ana is a Qt-Viewer for all logfiles in y2log-syntax
+  (it needs Qt4 so it is not built by default)
 
 -------------------------------------------------------------------
 Fri Jan 12 14:45:33 CET 2007 - jsrain@suse.cz

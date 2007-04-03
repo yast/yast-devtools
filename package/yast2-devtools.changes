@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Apr  3 18:38:43 CEST 2007 - mvidner@suse.cz
+
+- Added Get/SetModified to skeleton *_auto.ycp (#260263)
+
+-------------------------------------------------------------------
 Fri Mar 30 11:44:51 CEST 2007 - mvidner@suse.cz
 
 - Fixed filelist because of reduced default buildsystem.

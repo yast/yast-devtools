@@ -102,6 +102,22 @@ else if (func == "Write") {
     ret = XXPkgXX::Write();
     Progress::set (progress_orig);
 }
+/**
+ * did configuration changed
+ * return boolean
+ */
+else if (func == "GetModified") {
+    ret = XXPkgXX::Modified ();
+}
+/**
+ * set configuration as changed
+ * return boolean
+ */
+else if (func == "SetModified") {
+    XXPkgXX::SetModified ();
+    ret = true;
+}
+
 /* Unknown function */
 else {
     y2error("Unknown function: %1", func);

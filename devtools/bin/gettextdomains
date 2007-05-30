@@ -44,7 +44,7 @@ function get_domains_and_err()
     done
 
     # we can specify additional files to .pot creation
-    POTFILES=`test -e $SRCDIR/POTFILES && sed "s,^,$SRCDIR/," < $SRCDIR/POTFILES`
+    POTFILES=`test -e $SRCDIR/POTFILES && grep -v '^$' $SRCDIR/POTFILES | sed "s,^,$SRCDIR/," `
 
     DOMAINS="" ;
     for F in $TR_FILES $POTFILES; do

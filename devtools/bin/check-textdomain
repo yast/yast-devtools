@@ -5,8 +5,8 @@ CWD=`dirname $0`
 . $CWD/gettextdomains
 
 
-if [ -z $1 ]; then
-    echo "check-textdomain: no source-directory"
+if ! [ -d "$1" ]; then
+    echo "Usage: check-textdomain source-directory"
     exit 1
 else
     SRCDIR=$1

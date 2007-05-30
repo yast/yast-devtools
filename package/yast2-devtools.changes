@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed May 30 14:56:36 CEST 2007 - mvidner@suse.cz
+
+- check-textdomain: Fixed --help and issues with empty lines
+  in POTFILES (#278784).
+- 2.15.1
+
+-------------------------------------------------------------------
 Thu May 17 12:45:20 CEST 2007 - locilka@suse.cz
 
 - Added more words into the YaST dictionary.

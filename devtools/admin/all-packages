@@ -20,6 +20,8 @@
 yast2			inst-sys,default	all
 yast2-core		inst-sys,default	all
 yast2-control-center	default			all
+yast2-gtk			default		all
+yast2-control-center-gnome	default		all
 yast2-ncurses		inst-sys,default	all
 yast2-qt		inst-sys,default	all
 yast2-packager		inst-sys,default	all

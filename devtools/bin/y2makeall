@@ -340,6 +340,8 @@ sub read_all_dependencies()
     foreach $spec_in_file ( <*/*.spec.in> )
     {
 	my $rpm = $rpm_names{ dirname( $spec_in_file ) };
+	log_error( "No dir name for $spec_in_file" ) unless defined $rpm;
+
 	my ( $this_pkg_requires, $this_pkg_provides ) = read_dependencies( $rpm, $spec_in_file );
 	$pkg_requires{ $rpm } = $this_pkg_requires;
 	$pkg_provides{ $rpm } = $this_pkg_provides;

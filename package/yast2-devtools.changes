@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jul 25 14:28:05 CEST 2007 - sh@suse.de
+
+- Added YAST2-CHECKS-QT4 to y2autoconf for Qt-4.x support 
+- V 2.15.2
+
+-------------------------------------------------------------------
 Wed May 30 14:56:36 CEST 2007 - mvidner@suse.cz
 
 - check-textdomain: Fixed --help and issues with empty lines

@@ -312,7 +312,21 @@ if test -n "$x_libraries"; then
 fi
 ',
 
-    # check: qt
+    # check: Qt4
+    '@YAST2-CHECKS-QT4@' =>
+'dnl Check Qt4 paths
+dnl both QTDIR and QTLIBDIR are obsolete with Qt4
+dnl Try to find the X includes and libraries
+AC_PATH_X
+if test -n "$x_includes"; then
+	CPPFLAGS="$CPPFLAGS -I$x_includes"
+fi
+if test -n "$x_libraries"; then
+	LDFLAGS="$LDFLAGS -L$x_libraries"
+fi
+',
+
+    # check: testsuite
     '@YAST2-CHECKS-TESTSUITE@' =>
 'dnl Check packages expect and dejagnu
 AC_PATH_PROG(MYEXPECT, expect, false)

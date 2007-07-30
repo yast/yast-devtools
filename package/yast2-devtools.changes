@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jul 30 14:19:53 CEST 2007 - locilka@suse.cz
+
+- Added yast2-sshd into all-packages.
+
+-------------------------------------------------------------------
 Wed Jul 25 14:28:05 CEST 2007 - sh@suse.de
 
 - Added YAST2-CHECKS-QT4 to y2autoconf for Qt-4.x support 

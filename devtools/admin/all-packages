@@ -118,6 +118,7 @@ yast2-scanner		default			scanner
 yast2-security		default			security
 yast2-slp-server	default			slp daemon
 yast2-sound		default			sound
+yast2-sshd		default			SSHD configuration
 yast2-storage		inst-sys,default	storage
 yast2-sudo		default			/etc/sudoers
 yast2-support		default			support

@@ -63,6 +63,7 @@ our @ycp_favourites =
 my %ignored_requires =
     (
      "yast2-installation"	=> 1,
+     "yast2-nis-server"		=> 1,
      "yast2-inetd"		=> 1,
      "yast2_theme"		=> 1
      );

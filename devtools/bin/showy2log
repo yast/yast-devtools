@@ -1,598 +1,678 @@
-#! /bin/bash
+#! /usr/bin/perl -w
+# vim: set et ts=8 sts=4 sw=4 ai si:
 # ########################################################################
 #
-# 'cat' a y2log file and pipe the output through a filter that coloures
+# 'cat' a y2log file and pipe the output through a filter that colours
 # messages according to their loglevel.
 #
-# Author: Michael Andres <ma@suse.de>
+# Original Author: Michael Andres <ma@suse.de>
+# Pretty printing: Olaf Dabrunz <od@suse.de>
+# Porting to perl: Olaf Dabrunz <od@suse.de>
+#
+# April 2007
 #
 # ########################################################################
-
-PROGNAME=$(basename $0)
-
-function Err() {
-	echo "$PROGNAME: $*" >&2
-}
-
-function ErrExit() {
-	test -z "$1" || Err "$*"
-	exit 1
-}
-
-# ########################################################################
-# filter function
-# ########################################################################
-
-function ShowLog() {
-awk --re-interval "$@" '
 #
-function max( a, b )
-{
-	return ( a > b ? a : b )
-}
-# return a string of spaces corresponding to the current Indent setting and the
-# prefix length at the containing level
-function GetIndent( prefix,     indent )
-{
-	if ( Indent == "a" ) {
-		indent = length( prefix ) + 1
-	} else {
-		indent = Indent
-	}
-	# make string of spaces
-	return sprintf("%*s", indent, "")
-}
 
-# Recursively print a list or map, including a prefix like the key of a map or
-# the leading text of a message
-#
-# This function iterates over one of these constructs:
-#       simple_message:	string1
-# 	map: 		string1  "$[" string2 ":" string3 ["," ...] "]"
-# 	list:		[string1] "[" string2 ["," ...] "]"
-#
-# nesting_level:The nesting level of this list or map. Level 0 means that we
-# 		work on the top level, ie. string1 is message text rather than
-# 		a map key.
-# indent:	a string (of spaces) that is printed before each line and
-# 		corresponds to the current indentation
-# rest:		the rest of the message from this log entry
-# type:		awk-style "local" variable: internally, this function early on
-# 		sets this to "$[" for a map and to "[" for a list
-#
-# returns the rest of the string after the list or map
-#
-function print_message_list_or_map( nesting_level, indent, rest ,      type, parts, saved_indent, key, old_rest)
-{
-	if ( match ( rest, /(\[|\$\[)(.*)$/, parts ) != 0 ) {
-		# find the part of the message up to and including the opening
-		# bracket (ie string1 "[" or string1 "$[")
-		string1_and_bracket = substr( rest, 1, parts[2, "start"] - 1 )
-		type = parts[1]
-		rest = parts[2]
+use strict;
+use Getopt::Long qw(:config no_ignore_case bundling_override);
+use POSIX qw(geteuid WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG WIFSTOPPED WSTOPSIG);
+# handle HUP INT PIPE TERM ABRT QUIT with die, so the END block is executed
+# which unlinks temporary files
+use sigtrap qw(die untrapped normal-signals ABRT QUIT);
+use Encode;
 
-		# heuristic: "-[" is not the start of a map or list
-		if ( match ( string1_and_bracket, /-(\[|\$\[)/ ) != 0 ) {
-			# simple_message: just print it and return
-			print_line( rest )
-			return ""
-		}
+$0 =~ m/([^\/]*)$/;
+my $progname = $1;
 
-		# at top-level the whole first part has not yet been printed,
-		# below only the "[" or "$["
-		if ( nesting_level == 0 ) {
-			print_text( string1_and_bracket, indent )
-		} else {
-			print_text( type, indent )
-		}
+# set up $stdout, $stderr and the current output filehandle $outfh
+open my $stdout, ">&STDOUT";
+open my $stderr, ">&STDERR";
+my $outfh = $stdout;
 
-		# adapt indentation:
-		# for the top level, indentation corersponding to the
-		# introductive message is never added, so we print like this:
-		#   file:line message var: $[
-		#                 "key":"value"
-		# for other nesting levels we have to change indentation
-		# according to indentation settings:
-		#   - adaptive:
-		#     "key1":[
-		#              "item1",
-		#              "item2"
-		#   - fixed:
-		#     "key1":[
-		#         "item1",
-		#         "item2"
-		#
-		if ( nesting_level == 0 ) {
-			saved_indent = indent
-			indent = indent GetIndent("    ")
-		} else {
-			saved_indent = indent
-			indent = indent GetIndent(string1_and_bracket)
-		}
+# Make sure output is in UTF8
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+binmode($stdout, ":utf8");
+binmode($stderr, ":utf8");
 
-	} else {
-		# simple_message: just print it and return
-		print_text( rest, indent )
-		print_line( "" )
-		return ""
-	}
+my $debuglvl = 0;
 
-	if ( ShortFormat ) {
-		# print some additional indentation when we stay on the same line
-		print_text( sprintf( "%*s", max( 1, length( GetIndent(string1_and_bracket) ) - length( string1_and_bracket ) ), "" ), indent )
-	} else {
-		# for long format, start printing the data on the next line
-		print_line( "" )
-	}
-	# we are now on the correct line, but we do not know yet whether we
-	# need to print indentation (a closing bracket may be printed for an
-	# empty structure, and it may need less indentation)
+my $vcs_id = '$Id$';
+my $vcs_date = '$Date$';
+$vcs_id =~ /^\$[[:alpha:]]+: [^ ]+ ([^ ]+ [^ ]+ [^ ]+) [^ ]+ [^ ]+ \$$/;
+my $version = $1;
 
-	# Loop over the components of the list or map
-	old_rest = ""
-	while ( rest != "" ) {
-		if ( Debug >= 3 )
-			print_line( rest " <--- rest in print_message_list_or_map" )
-		# make sure we make progress
-		if ( old_rest == rest ) {
-			# otherwise, find next "]" or end of line and return
-			# with rest of line from there
-			if ( Debug >= 4 )
-				print_line( "making no progress, return with rest after ``]`` or nothing" )
-			if ( match ( rest, /](.*)$/, parts ) != 0 ) {
-				print_line( substr( rest, 1, parts[1, "start"] - 1 ) )
-				return parts[1]
-			} else {
-				print_line( rest )
-				return ""
-			}
-		}
-		old_rest = rest
-		key = ""
-		if ( is_map( type ) ) {
-			if ( Debug >= 4 )
-				print_line( "looping over map components" )
-			# find the key
-			if ( match ( rest, /^( *"(\\"|\\.|[^"\\])*":| *[^]\[:,$]+:)(.*)$/, parts ) != 0 ) {
-				# we have ``key:value``, now print the key:
-				key = parts[1]
-				rest = parts[3]
-				print_text( key, indent )
-				if ( Debug >= 4 )
-					print_line( rest " <--- rest in print_message_list_or_map after printing map key " parts[1] )
-			}
-		}
-		# the rest may start with a value (if any) corresponding to the
-		# map key or with a value (if any) of a list
-		if ( match ( rest, /^( *\[| *\$\[)(.*)$/, parts ) != 0 ) {
-			if ( Debug >= 4 )
-				print_line( "found nested list or map as value" )
-			# we have a nested list or map ``value``, recurse into it
-			# also pass down key string (if any) to allow calculation of indent
-			rest = print_message_list_or_map( nesting_level + 1, indent, key rest )
-		} else if ( match ( rest, /^( *"(\\"|\\.|[^"\\])*"| *[^]\[:,$]+)(.*)$/, parts ) != 0 ) {
-			if ( Debug >= 4 )
-				print_line( "found plain value" )
-			# we have a plain ``value``, print it
-			rest = parts[3]
-			print_text( parts[1], indent )
-		}
-		# after a (possibly empty) value, the rest starts either with "," or "]"
-		# if ", " -> next component
-		# if "]"  -> finish this nesting level and return with rest of string
-		if ( match ( rest, /^ *(,) *(.*)$/, parts ) != 0 ) {
-			# we have a ``,``, print it and finish this line
-			rest = parts[2]
-			print_line( parts[1] )
-		} else if ( match ( rest, /^ *(\]) *(.*)$/, parts ) != 0 ) {
-			# we have a ``]``, maybe finish this line, print it,
-			# and maybe finish that line as well
-			rest = parts[2]
-			if ( ShortFormat ) {
-				print_text( " " parts[1], saved_indent )
-			} else {
-				print_line( "" )
-				print_text( parts[1], saved_indent )
-			}
-			if ( nesting_level == 0 )
-				print_line( "" )
-			if ( Debug >= 4 )
-				print_line( rest " <--- rest in print_message_list_or_map after printing ``]``" )
-			return rest
-		}
-	}
-	return ""
+# defaults for program variables that need to be printed in the usage message
+my $default_file        = "/var/log/YaST2/y2log";
+my $defindent           = "a";
+
+# set up color codes
+my ($black, $red, $green, $yellow, $blue, $magenta, $cyan, $white) =
+    ("\033[30m", "\033[31m", "\033[32m", "\033[33m",
+     "\033[34m", "\033[35m", "\033[36m", "\033[37m");
+
+my ($normal, $boldseq, $whiteback) = ("\033[0m", "\033[1m", "\033[47m");
+
+my $maxlevel        = 5;
+my ($debug, $milestone, $warning, $error, $security, $internal) =
+    (0, 1, 2, 3, 4, 5);
+
+my @color           = ();
+
+$color[$debug   .0] = $blue;
+$color[$milestone.0]= $cyan;
+$color[$warning .0] = $yellow;
+$color[$error   .0] = $red;
+$color[$security.0] = $magenta;
+$color[$internal.0] = $green;
+
+$color[$debug   .1] = $boldseq . $color[$milestone .0];
+$color[$milestone.1]= $boldseq . $color[$milestone .0];
+$color[$warning .1] = $boldseq . $color[$warning   .0];
+$color[$error   .1] = $boldseq . $color[$error     .0];
+$color[$security.1] = $boldseq . $color[$security  .0];
+$color[$internal.1] = $boldseq . $color[$internal  .0];
+
+# print a demonstration of log line coloring
+sub show_demo_colors {
+    print STDERR "Level 0: debug:     " . $color[$debug      .0] . "default  " . $color[$debug       .1] . "highlight" . $normal . "\n";
+    print STDERR "Level 1: milestone: " . $color[$milestone  .0] . "default  " . $color[$milestone   .1] . "highlight" . $normal . "\n";
+    print STDERR "Level 2: warning:   " . $color[$warning    .0] . "default  " . $color[$warning     .1] . "highlight" . $normal . "\n";
+    print STDERR "Level 3: error:     " . $color[$error      .0] . "default  " . $color[$error       .1] . "highlight" . $normal . "\n";
+    print STDERR "Level 4: security:  " . $color[$security   .0] . "default  " . $color[$security    .1] . "highlight" . $normal . "\n";
+    print STDERR "Level 5: internal:  " . $color[$internal   .0] . "default  " . $color[$internal    .1] . "highlight" . $normal . "\n";
 }
 
-# "$[" -> 1
-# "["  -> 0
-function is_map( introducer )
-{
-	return ( introducer == "$[" ? 1 : 0 )
+# on exit/interrupt, make sure we finish the current output line by resetting
+# to normal colors
+END { printf($outfh "%s", "$normal" . "\n"); }
+
+# Usage message
+sub version {
+    print STDERR <<"EOF";
+$progname version 1.0 (rev: $version)
+EOF
 }
 
-# print some text, but first, if not yet printed for this line, print
-#   - current color escape sequence
-#   - the prefix string (this is used for indenting pretty-printed follow-up
-#     lines -- simply do not supply this parameter if you do not want this (it
-#     will be initialized to "" by awk then))
-function print_text( text, prefix )
-{
-	if ( ! line_started ) {
-		printf("%s%s", color[level,bold], prefix)
-		line_started = 1
-	}
-	printf("%s", text)
-}
+# Usage message
+sub usage {
+    &version ();
 
-# print a single line of output, including color:
-# print current color escape sequence (if needed for this line), some text and
-# switch back to normal color
-function print_line( text )
-{
-	print_text( text normal, "" )
-	printf("\n")
-	line_started = 0
-}
+    print STDERR <<"EOF";
 
-# print a log line, including color and pretty-printing
-function print_log_line( line,    rest, indent )
-{
-	if ( PrettyPrint ) {
-		# this heuristic looks for the message part of the line; only
-		# YaST messages are recognized and pretty-printed
-		# YaST:
-		# <date> <time> <<level>> <host>(<PID>) [<component>] <file>:<line> <message>
-		# libstorage:
-		# <date> <time>,<PID?> <level>  <component> - <file>(<function>):<line> <message>
-		# perl-Bootloader:
-		# <date> <time>,<PID?> <level>  <component> - <namespace>::<subroutine>: <message>
-		#
-		#                    date                        time                         level   host   PID         comp.    file  line      message
-		if ( match( line, /^([0-9]{4}-[0-9]{2}-[0-9]{2} +[0-9]{2}:[0-9]{2}:[0-9]{2} +<[^>]*> +\(?[^()]\)?+\([0-9]+\) +\[[^]]*\] +[^:]*:[0-9]* +)(.*)/, parts ) != 0 ) {
-			if ( Debug )
-				print_line( line " <--- orig" )
-			print_text( parts[1] )
-			indent = PrintAtFront ? "" : sprintf("%*s", length( parts[1] ), "" )
-			rest = parts[2]
-			# loop to print components: message1 list_or_map1 [message2 list_or_map2 ...]
-			while ( rest != "" ) {
-				if ( Debug >= 2 )
-					print_line( rest " <--- rest" )
-				rest = print_message_list_or_map( 0, indent , rest )
-			}
-		} else
-			print_line( line )
+Usage: $progname [OPTION]... [[--] COMMAND [args]...]
+'cat' a y2log file and pipe the output through a filter that colours
+messages according to their loglevel.
 
-	} else
-		print_line( line )
-}
+EOF
 
-BEGIN {
-	black	= "\033[30m";	debug	 = 0;	normal	= "\033[0m";
-	red	= "\033[31m";	milestone= 1;	bold	= "\033[1m";
-	green	= "\033[32m";	warning	 = 2;
-	yellow	= "\033[33m";	error	 = 3;
-	blue	= "\033[34m";	security = 4;
-	magenta	= "\033[35m";	internal = 5;
-	cyan	= "\033[36m";
-	white	= "\033[37m";
+    show_demo_colors();
 
-	color[debug	,0]	= blue;
-	color[milestone	,0]	= cyan;
-	color[warning	,0]	= yellow;
-	color[error	,0]	= red;
-	color[security	,0]	= magenta;
-	color[internal	,0]	= green;
+    print STDERR <<"EOF";
 
-	color[debug	,1]	= white;
-	color[milestone	,1]	= bold color[milestone	,0];
-	color[warning	,1]	= bold color[warning	,0];
-	color[error	,1]	= bold color[error	,0];
-	color[security	,1]	= bold color[security	,0];
-	color[internal	,1]	= bold color[internal	,0];
+Command:
+Specify an alternate command to use instead of 'cat'. Everything that
+follows is passed as argument to COMMAND. The name of the y2log file
+is appended automagically. If the command has options, putting a "--"
+in front of the command prevents $progname from using them as options
+for itself.
 
-	if ( DEMO == 1 ) {
-		print normal "Level 0: debug:     " color[debug,    0] "default  " color[debug,    1] "highlight"
-		print normal "Level 1: milestone: " color[milestone,0] "default  " color[milestone,1] "highlight"
-		print normal "Level 2: warning:   " color[warning,  0] "default  " color[warning,  1] "highlight"
-		print normal "Level 3: error:     " color[error,    0] "default  " color[error,    1] "highlight"
-		print normal "Level 4: security:  " color[security, 0] "default  " color[security, 1] "highlight"
-		print normal "Level 5: internal:  " color[internal, 0] "default  " color[internal, 1] "highlight"
-		exit 0
-	}
+  $progname -- tail -f
 
-	SEP = "@"
+File selection:
+By default $default_file is processed, unless you're not root
+and ~/.y2log exists.
 
-	AcceptComponent = split( c, ACCEPTCOMPONENT, SEP )
-	RejectComponent = split( C, REJECTCOMPONENT, SEP )
-	AcceptLevel     = split( l, ACCEPTLEVEL, SEP )
-	RejectLevel     = split( L, REJECTLEVEL, SEP )
-	AcceptFilter    = split( p, ACCEPTFILTER, SEP )
-	RejectFilter    = split( P, REJECTFILTER, SEP )
+  -f FILE       use FILE as y2log file
 
-	BoldComponent   = split( b, BOLDCOMPONENT, SEP )
-	BoldFilter      = split( B, BOLDFILTER, SEP )
+Filter options:
+Those options allow to select which message lines are actually printed
+and which should be suppressed. Each option takes a '\@' separated list
+of regular expressions as argument. A message line is selecetd if there
+is a match for at least one of the regular expressions found in the line.
 
-	PrettyPrint     = ( v == 1 ? 1 : 0 )
-	ShortFormat	= ( s == 1 ? 1 : 0 )
-	Indent		= ( i != "" ? i : ( ShortFormat ? "a" : 4 ) )
-	PrintAtFront	= ( F == 1 ? 1 : 0 )
-	Debug		= d
+  -p PATTERN    print only messages matching PATTERN
+  -l PATTERN    as -p, but match PATTERN against loglevel
+  -c PATTERN    as -p, but match PATTERN against componentname
 
-	AcceptLine = 0
-}
-!/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ {
-	# this is a follow up line
-	if ( AcceptLine )
-		print_log_line($0)
-	next
-}
-{
-	level = $3;
-	gsub( "[^0-9]", "", level );
+  -P PATTERN    suppress messages matching PATTERN
+  -L PATTERN    as -P, but match PATTERN against loglevel
+  -C PATTERN    as -P, but match PATTERN against componentname
 
-	component = $4;
-	gsub( ".*:", "", component );
-	gsub( "\\[.*", "", component );
+If you combine these options, those supressing messages take precedence
+over those printing messages.
 
-	AcceptLine = -1
+  $progname -L 0                everything except debug messages
+  $progname -c lib              print messages of all components with
+                                a 'lib' in their name
+  $progname -c '^ui\$' -L 0     all messages except debug from
+                                component ui.
 
-	if ( AcceptLine != 1 && AcceptLevel ) {
-		AcceptLine = 0
-		for ( p in ACCEPTLEVEL )
-			if ( match( level, ACCEPTLEVEL[p] ) ) {
-				AcceptLine = 1
-				break
-			}
-	}
+Highlighting:
+  -B PATTERN    highlight printed message if PATTERN matches
+  -b PATTERN    as -B, but match PATTERN against componentname
 
-	if ( AcceptLine != 1 && AcceptComponent ) {
-		AcceptLine = 0
-		for ( p in ACCEPTCOMPONENT )
-			if ( match( component, ACCEPTCOMPONENT[p] ) ) {
-				AcceptLine = 1
-				break
-			}
-	}
+Pretty printing:
+  -v            look for maps and lists in the log lines and print them
+                with a more readable broken down layout over several
+                lines
+  -s            use short format: the first component is on the same
+                line as the opening bracket and the closing bracket on
+                the same line as the last component
+  -i INDENT     if INDENT is a number, this is the number of columns
+                added for every level of indentation (default: $defindent)
+                if INDENT is an 'a' (for "adaptive"), indent nested
+                data to the right of the nesting component (default for
+                short format)
 
-	if ( AcceptLine != -1 && AcceptFilter ) {
-		AcceptLine = 0
-		for ( p in ACCEPTFILTER )
-			if ( match( $0, ACCEPTFILTER[p] ) ) {
-				AcceptLine = 1
-				break
-			}
-	}
-
-	if ( AcceptLine && RejectLevel ) {
-		for ( p in REJECTLEVEL ) {
-			if ( match( level, REJECTLEVEL[p] ) ) {
-				AcceptLine = 0
-				break
-			}
-		}
-	}
-
-	if ( AcceptLine && RejectComponent ) {
-		for ( p in REJECTCOMPONENT ) {
-			if ( match( component, REJECTCOMPONENT[p] ) ) {
-				AcceptLine = 0
-				break
-			}
-		}
-	}
-
-	if ( AcceptLine && RejectFilter ) {
-		for ( p in REJECTFILTER ) {
-			if ( match( $0, REJECTFILTER[p] ) ) {
-				AcceptLine = 0
-				break
-			}
-		}
-	}
-
-	if ( !AcceptLine )
-		next
-}
-{
-	bold = 0
-	if ( !bold && BoldComponent ) {
-		for ( p in BOLDCOMPONENT ) {
-			if ( match( component, BOLDCOMPONENT[p] ) ) {
-				bold = 1
-				break
-			}
-		}
-	}
-
-	if ( !bold && BoldFILTER ) {
-		for ( p in BOLDFILTER ) {
-			if ( match( $0, BOLDFILTER[p] ) ) {
-				bold = 1
-				break
-			}
-		}
-	}
-
-	print_log_line($0)
-}
-END {
-	print normal
-}
-'
+Other options:
+    -h|--help               print this help message
+       --version            print program version
+    -d|--debug <level>      set debugging level (for pretty-printing)
+                            (currently at $debuglvl)
+EOF
 }
 
 # ########################################################################
 # setup and options
 # ########################################################################
 
-OPTSTR="?hc:C:l:L:p:P:b:B:f:vsi:Fd:"
+my $opt_help            = 0;
+my $opt_version         = 0;
+my $opt_pretty_print    = 0;
+my $opt_short_format    = 0;
 
-function ChkArg() {
-	case "$1" in
-        -*)
-        	Usage "Illegal argument to -$OPTNAME '$1'"
-        	return 1
-                ;;
-        esac
-        return 0
+my $indent                      = $defindent;
+my $file                        = $default_file;
+my $line_pattern                = "";
+my $line_reject_pattern         = "";
+my $loglevel_pattern            = "";
+my $loglevel_reject_pattern     = "";
+my $component_pattern           = "";
+my $component_reject_pattern    = "";
+my $highlight_pattern           = "";
+my $highlight_component_pattern = "";
+
+if (geteuid() != 0 and -f $ENV{'HOME'} . "/.y2log") {
+    $file = $ENV{'HOME'} . "/.y2log";
 }
 
-function Usage() {
-	test -z "$1" || Err "$*"
-	cat <<- EOF >&2
-	Usage: $PROGNAME [OPTION]... [COMMAND [args]...]
-	'cat' a y2log file and pipe the output through a filter that coloures
-	messages according to their loglevel.
-
-	$(ShowLog -vDEMO=1)
-	Command:
-	Specify an alternate command to use instead of 'cat'. Everything that
-	follows is passed as argument to COMMAND. The name of the y2log file
-	is appended automagically.
-
-	  $PROGNAME tail -f
-
-	File selection:
-	By default /var/log/YaST2/y2log is processed, unless you're not root
-	and ~/.y2log exists.
-
-	  -f FILE	use FILE as y2log file
-
-	Filter options:
-	Those options allow to select which message lines are actually printed
-	and which should be suppressed. Each option takes a '@' separated list
-	of regular expressions as argument. A message line is selecetd if there
-	is a match for at least one of the regular expressions found in the line.
-
-	  -p PATTERN	print only messages matching PATTERN
-	  -l PATTERN	as -p, but match PATTERN against loglevel
-	  -c PATTERN	as -p, but match PATTERN against componentname
-
-	  -P PATTERN	suppress messages matching PATTERN
-	  -L PATTERN	as -P, but match PATTERN against loglevel
-	  -C PATTERN	as -P, but match PATTERN against componentname
-
-	If you combine these options, those supressing messages take precedence
-	over those printing messages.
-
-	  $PROGNAME -L 0		everything except debug messages
-	  $PROGNAME -c lib		print messages of all components with
-	  				a 'lib' in their name
-	  $PROGNAME -c '^ui$' -L 0	all messages except debug from
-	  				component ui.
-
-	Highlighting:
-	  -B PATTERN	highlight printed message if PATTERN matches
-	  -b PATTERN	as -B, but match PATTERN against componentname
-
-	Pretty printing:
-	  -v		look for maps and lists in the log lines and print them
-	    		with a more readable broken down layout over several
-	    		lines
-	  -s		use short format: the first component is on the same
-	    		line as the opening bracket and the closing bracket on
-	    		the same line as the last component
-	  -i INDENT	if INDENT is a number, this is the number of columns
-	    		added for every level of indentation (default: 4)
-	    		if INDENT is an 'a' (for "adaptive"), indent nested
-	    		data to the right of the nesting component (default for
-	    		short format)
-	  -F		follow-up lines start printing at the first column
-	    		(normal indentation of components is still applied)
-	  -d NUMBER	debugging level for pretty-printing
-	EOF
-	exit 1
+# parse command line options
+unless (GetOptions(
+           'help|h|?'               =>  \$opt_help,
+           'version'                =>  \$opt_version,
+           'debug|d=i'              =>  \$debuglvl,
+           'pattern|p=s'            =>  \$line_pattern,
+           'reject_pattern|P=s'     =>  \$line_reject_pattern,
+           'loglevel|l=s'           =>  \$loglevel_pattern,
+           'reject_loglevel|L=s'    =>  \$loglevel_reject_pattern,
+           'component|c=s'          =>  \$component_pattern,
+           'reject_component|C=s'   =>  \$component_reject_pattern,
+           'file|f=s'               =>  \$file,
+           'highlight|B=s'          =>  \$highlight_pattern,
+           'highlight_component|b=s' => \$highlight_component_pattern,
+           'pretty_print|v'         =>  \$opt_pretty_print,
+           'short_format|s'         =>  \$opt_short_format,
+           'indent|i=s'             =>  \$indent,
+          )) {
+  &usage ();
+  exit 1;
 }
 
-c=""
-C=""
-l=""
-L=""
-p=""
-P=""
-b=""
-B=""
-v=""
-s=""
-i=""
-F=""
-d=0
-Y2LOG=/var/log/YaST2/y2log
-if [ $(id -u) != 0 -a -f ~/.y2log ]; then
-	Y2LOG=~/.y2log
-fi
+if ($opt_version) {
+  &version ();
+  exit 0;
+}
 
-if [ -n "$OPTSTR" ]; then
-	while getopts "$OPTSTR" OPTNAME; do
-		ChkArg $OPTARG $OPTNAME
-		case $OPTNAME in
-		[?h])
-			Usage
-			;;
-		c)
-			c="$OPTARG"
-			;;
-		C)
-			C="$OPTARG"
-			;;
-		l)
-			l="$OPTARG"
-			;;
-		L)
-			L="$OPTARG"
-			;;
-		p)
-			p="$OPTARG"
-			;;
-		P)
-			P="$OPTARG"
-			;;
-		b)
-			b="$OPTARG"
-			;;
-		B)
-			B="$OPTARG"
-			;;
-		v)
-			v="1"
-			;;
-		s)
-			s="1"
-			i="a"
-			;;
-		i)
-			i="$OPTARG"
-			;;
-		F)
-			F="1"
-			;;
-		d)
-			d="$OPTARG"
-			;;
-		f)
-			Y2LOG="$OPTARG"
-			;;
-		*)
-			Err "unhandled option $OPTNAME($OPTARG)"
-			;;
-		esac
-	done
-	shift $(($OPTIND-1))
-fi
+if ($opt_help) {
+  &usage ();
+  exit 0;
+}
+
+if ($opt_short_format) {
+    $indent = "a"
+}
+
+if ( ! -r "$file" ) {
+    die "Can't read file '$file'";
+}
+
+
+# post-process some options
+
+my $SEP = "@";
+
+my @AcceptComponent = split(/$SEP/, $component_pattern);
+my @RejectComponent = split(/$SEP/, $component_reject_pattern);
+my @AcceptLevel     = split(/$SEP/, $loglevel_pattern);
+my @RejectLevel     = split(/$SEP/, $loglevel_reject_pattern);
+my @AcceptFilter    = split(/$SEP/, $line_pattern);
+my @RejectFilter    = split(/$SEP/, $line_reject_pattern);
+
+my @BoldComponent   = split(/$SEP/, $highlight_component_pattern);
+my @BoldFilter      = split(/$SEP/, $highlight_pattern);
+
+# internal global variables
+my $line_started    = 0;
+my $level           = 0;
+my $component       = "";
+my $bold            = 0;
+
+
+# ########################################################################
+# filter function
+# ########################################################################
+
+#
+sub max {
+    my ($a, $b) = $@;
+
+    return ( $a > $b ? $a : $b );
+}
+
+# return a string of spaces corresponding to the current indent setting and the
+# prefix length at the containing level
+sub GetIndent {
+    my ($prefix) = @_;
+    my $indent_len = 0;
+
+    if ( $indent eq "a" ) {
+        $indent_len = length( $prefix ) + 1;
+    } else {
+        $indent_len = $indent;
+    }
+    # make string of spaces
+    return sprintf("%*s", $indent_len, "");
+}
+
+# Recursively print a list or map, including a prefix like the key of a map or
+# the leading text of a message
+#
+# This function iterates over one of these constructs:
+#       simple_message: string1
+#       map:            string1  "$[" string2 ":" string3 ["," ...] "]"
+#       list:           [string1] "[" string2 ["," ...] "]"
+#
+# nesting_level:The nesting level of this list or map. Level 0 means that we
+#               work on the top level, i.e. string1 is message text rather than
+#               a map key.
+# indent:       a string (of spaces) that is printed before each line and
+#               corresponds to the current indentation
+# rest:         the rest of the message from this log entry
+#
+# type:         local variable: internally, this function early on sets this to
+#               "$[" for a map and to "[" for a list
+#
+# returns the rest of the string after the list or map
+#
+sub print_message_list_or_map {
+    my ($nesting_level, $indent, $rest) = @_;
+    my ($string1_and_bracket, $type, $parts, $saved_indent, $key, $old_rest) =
+        ("", "", "", "", "", "");
+
+    study $rest;
+
+    # 1. find and print first part up to the introducer of a list or map (if any)
+    if ( $rest =~ /^(.*?(\[|\$\[))(.*)$/o ) {
+        # find the part of the message up to and including the opening
+        # bracket (ie string1 "[" or string1 "$[")
+        $string1_and_bracket = $1;
+        $type = $2;
+        $rest = $3 || "";
+
+        # heuristic: "-[" is not the start of a map or list
+        if ( $string1_and_bracket =~ /-(\[|\$\[)/o ) {
+            # simple_message: just print it and return
+            print_line( $rest );
+            return "";
+        }
+
+        # at top-level the whole first part has not yet been printed,
+        # below the top-level, only the "[" or "$["
+        if ( $nesting_level == 0 ) {
+            print_text( $string1_and_bracket, $indent );
+        } else {
+            print_text( $type, $indent );
+        }
+
+        # adapt indentation:
+        # for the top level, indentation corresponding to the
+        # introductive message is never added, so we print like this:
+        #   file:line message var: $[
+        #                 "key":"value"
+        # for other nesting levels we have to change indentation
+        # according to indentation settings:
+        #   - adaptive:
+        #     "key1":[
+        #              "item1",
+        #              "item2"
+        #   - fixed:
+        #     "key1":[
+        #         "item1",
+        #         "item2"
+        #
+        if ( $nesting_level == 0 ) {
+            $saved_indent = $indent;
+            $indent = $indent . GetIndent("    ");
+        } else {
+            $saved_indent = $indent;
+            $indent = $indent . GetIndent($string1_and_bracket);
+        }
+
+    } else {
+        # simple_message: just print it and return
+        print_text( $rest, $indent );
+        print_line( "" );
+        return "";
+    }
+
+    # 2. handle list or map
+    if ( $opt_short_format ) {
+        # print some additional indentation when we stay on the same line
+        print_text( sprintf( "%*s", max( 1, length( GetIndent($string1_and_bracket) ) - length( $string1_and_bracket ) ), "" ), $indent );
+    } else {
+        # for long format, start printing the data on the next line
+        print_line( "" );
+    }
+    # we are now on the correct line, but we do not know yet whether we
+    # need to print indentation (a closing bracket may be printed for an
+    # empty structure, and it may need less indentation)
+
+    # Loop over the components of the list or map
+    $old_rest = "";
+    while ( $rest ne "" ) {
+        debug_print_line( $rest . " <--- rest in print_message_list_or_map", 3 );
+
+        # make sure we make progress
+        if ( $old_rest eq $rest ) {
+            # otherwise, find next "]" or end of line and return
+            # with rest of line from there
+            debug_print_line( "making no progress, return with rest after ``]`` or nothing", 4 );
+            if ( $rest =~ /^(.*?])(.*)$/o ) {
+                print_line( $1 );
+                return ( $2 || "" );
+            } else {
+                print_line( $rest );
+                return "";
+            }
+        }
+        $old_rest = $rest;
+
+        # if it is a map, the next thing on the line will be a ``"key":`` -- find it
+        $key = "";
+        if ( is_map( $type ) ) {
+            debug_print_line( "looping over map components", 4 );
+            # find the key
+            if ( $rest =~ /^( *"(?:[^"\\]+|\\"|\\.)*":| *[^]\[:,\$]+:)(.*)$/o ) {
+                # we have ``key:value_and_rest``, now print the key:
+                $key = $1;
+                $rest = $2 || "";
+                print_text( $key, $indent );
+                debug_print_line( $rest . " <--- rest in print_message_list_or_map after printing map key " . $key, 4 );
+            }
+        }
+
+        # the rest may start with a value (if any) corresponding to the
+        # map key or with a value (if any) of a list
+        if ( $rest =~ /^( *\[| *\$\[)(.*)$/o ) {
+            debug_print_line( "found nested list or map as value", 4 );
+            # we have a nested list or map ``value``, recurse into it
+            # also pass down key string (if any) to allow calculation of indent
+            $rest = print_message_list_or_map( $nesting_level + 1, $indent, $key . $rest );
+        } elsif ( $rest =~ /^( *"(?:[^"\\]+|\\"|\\.)*"| *[^]\[:,\$]+)(.*)$/o ) {
+            debug_print_line( "found plain value", 4 );
+            # we have a plain ``value``, print it
+            $rest = $2 || "";
+            print_text( $1, $indent );
+        }
+        # after a (possibly empty) value, the rest starts either with "," or "]"
+        # if ", " -> next component
+        # if "]"  -> finish this nesting level and return with rest of string
+        if ( $rest =~ /^ *(,) *(.*)$/o ) {
+            # we have a ``,``, print it and finish this line
+            $rest = $2;
+            print_line( $1 );
+        } elsif ( $rest =~ /^ *(\]) *(.*)$/o ) {
+            # we have a ``]``, maybe finish this line, print it,
+            # and maybe finish that line as well
+            $rest = $2 || "";
+            if ( $opt_short_format ) {
+                print_text( " " . $1, $saved_indent );
+            } else {
+                print_line( "" );
+                print_text( $1, $saved_indent );
+            }
+            if ( $nesting_level == 0 ) {
+                print_line( "" )
+            }
+            debug_print_line( $rest . " <--- rest in print_message_list_or_map after printing ``]``", 4 );
+            return $rest;
+        }
+    }
+ ;   return "";
+}
+
+# "$[" -> 1
+# "["  -> 0
+sub is_map {
+    my ($introducer) = @_;
+
+    return ( $introducer eq "\$[" ? 1 : 0 );
+}
+
+# print some text, but first, if not yet printed for this line, print
+#   - current color escape sequence
+#   - the prefix string (this is used for indenting pretty-printed follow-up
+#     lines -- simply do not supply this parameter if you do not want this (it
+#     will be initialized to "" by print_text() then))
+sub print_text {
+    my ($text, $prefix) = @_;
+    $prefix = $prefix || "";
+
+    if ( ! $line_started ) {
+            printf($outfh "%s%s", ( $level <= $maxlevel ? $color[$level.$bold] : $whiteback . $color[$milestone.$bold] ), $prefix);
+            $line_started = 1;
+    }
+    printf($outfh "%s", $text);
+}
+
+# print a single line of output, including color:
+# print current color escape sequence (if needed for this line), some text and
+# switch back to normal color
+sub print_line {
+    my ($text) = @_;
+
+    print_text( $text . $normal, "" );
+    printf($outfh "\n");
+    $line_started = 0;
+}
+
+# version of print_line that prints to STDERR  and takes a minimum debug level
+# as the second argument
+sub debug_print_line {
+    my ($text, $mindebuglvl) = @_;
+
+    return      if $debuglvl < $mindebuglvl;
+
+    my $old_outfh = $outfh;
+
+    $outfh = $stderr;
+    print_line( $text );
+    $outfh = $old_outfh;
+}
+
+# print a log line, including color and pretty-printing
+sub print_log_line {
+    my ($line) = @_;
+    my ($rest, $indent) = ("", "");
+    my @parts = ();
+
+    # this heuristic looks for the message part of the line; only
+    # YaST messages are recognized and pretty-printed
+    # YaST:
+    # <date> <time> <<level>> <host>(<PID>) [<component>] <file>:<line> <message>
+    # libstorage:
+    # <date> <time>,<PID?> <level>  <component> - <file>(<function>):<line> <message>
+    # perl-Bootloader:
+    # <date> <time>,<PID?> <level>  <component> - <namespace>::<subroutine>: <message>
+    #
+    #                date                        time                        level    host          PID        comp.     file  line      message
+    if ( $opt_pretty_print and 
+         $line =~ /^([0-9]{4}-[0-9]{2}-[0-9]{2} +[0-9]{2}:[0-9]{2}:[0-9]{2} +<[^>]*> +\(?[^()]+\)?\([0-9]+\) +\[[^]]*\] +[^:]*:[0-9]* +)(.*)/o ) {
+        debug_print_line( $line . " <--- orig", 1 );
+        print_text( $1, "" );
+        $indent = "";
+        $rest = $2 || "";
+
+        # loop to print components: message1 list_or_map1 [message2 list_or_map2 ...]
+        while ( $rest ne "" ) {
+            debug_print_line( $rest . " <--- rest", 2 );
+            $rest = print_message_list_or_map( 0, $indent , $rest );
+        }
+    } else {
+        print_line( $line );
+    }
+}
+
+sub showlog {
+    my $AcceptLine = 0;
+    my ($line, $p) = ("", "");
+
+    while (<FILE>) {
+        chomp;
+        $line = $_;
+
+        if ( $line !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ ) {
+            # this is a followup line
+            print_log_line($line)       if $AcceptLine;
+
+            next;
+        }
+
+        my @parts = split(' ',  $line);
+
+        $level = $parts[2];
+        $level =~ s/[^0-9]//og;
+
+        # probably the awk code meant field 5 (which is #4 in the perl array);
+        # also it probably meant to remove the brackets only
+        $component = $parts[4];
+        $component =~ s/^\[(.*)\]$/$1/og;
+#        gsub( ".*:", "", component );
+#        gsub( "\\[.*", "", component );
+
+        #  1  if some filter accepted this line (and thereby followup lines)
+        #  0  if some filter rejected this line (and thereby followup lines)
+        # -1  if no filter made a decision on this line (yet), meaning:
+        #       - no accept-filter was used before this point in the code AND
+        #       - a used reject-filter before this point in the code did not match
+        $AcceptLine = -1;
+
+        if ( $AcceptLine != 1 && $#AcceptLevel != -1 ) {
+            $AcceptLine = 0;
+            foreach $p (@AcceptLevel) {
+                if ( $level =~ /$p/ ) {
+                    $AcceptLine = 1;
+                    last;
+                }
+            }
+        }
+
+        if ( $AcceptLine != 1 && $#AcceptComponent != -1 ) {
+            $AcceptLine = 0;
+            foreach $p (@AcceptComponent) {
+                if ( $component =~ /$p/ ) {
+                    $AcceptLine = 1;
+                    last;
+                }
+            }
+        }
+
+        if ( $AcceptLine != 1 && $#AcceptFilter != -1 ) {
+            $AcceptLine = 0;
+            foreach $p (@AcceptFilter) {
+                if ( $line =~ /$p/ ) {
+                    $AcceptLine = 1;
+                    last;
+                }
+            }
+        }
+
+        if ( $AcceptLine != 0 && $#RejectLevel != -1 ) {
+            foreach $p (@RejectLevel) {
+                if ( $level =~ /$p/ ) {
+                    $AcceptLine = 0;
+                    last;
+                }
+            }
+        }
+
+        if ( $AcceptLine != 0 && $#RejectComponent != -1 ) {
+            foreach $p (@RejectComponent) {
+                if ( $component =~ /$p/ ) {
+                    $AcceptLine = 0;
+                    last;
+                }
+            }
+        }
+
+        if ( $AcceptLine != 0 && $#RejectFilter != -1 ) {
+            foreach $p (@RejectFilter) {
+                if ( $line =~ /$p/ ) {
+                    $AcceptLine = 0;
+                    last;
+                }
+            }
+        }
+
+        next        if ! $AcceptLine;
+
+        $bold = 0;
+        if ( ! $bold && $#BoldComponent != -1 ) {
+            foreach $p (@BoldComponent) {
+                if ( $component =~ /$p/ ) {
+                    $bold = 1;
+                    last;
+                }
+            }
+        }
+
+        if ( ! $bold && $#BoldFilter != -1 ) {
+            foreach $p (@BoldFilter) {
+                if ( $line =~ /$p/ ) {
+                    $bold = 1;
+                    last;
+                }
+            }
+        }
+
+        # make sure we have a numeric level, even if the log has something like
+        # "INFO" (libstorage), which we do not know to handle (we need an at
+        # least half-way reliable list of words that we can convert into a
+        # numeric level)
+        $level = $level eq "" ? $milestone : $level;
+        print_log_line($line);
+    }
+
+#    print $normal;
+}
 
 # ########################################################################
 # main
 # ########################################################################
 
-test -r "$Y2LOG" || ErrExit "Can't read file '$Y2LOG'"
+my $command = "";
+if ( $#ARGV != -1 ) {
+    $command .= "$_ "  foreach (@ARGV);
+} else {
+    $command = "cat ";
+}
 
-${@:-cat} $Y2LOG | ShowLog \
-	-vc="$c" -vC="$C" \
-	-vl="$l" -vL="$L" \
-	-vp="$P" -vP="$P" \
-	-vb="$b" -vB="$B" \
-	-vv="$v" -vs="$s" \
-	-vi="$i" -vF="$F" \
-	-vd="$d"
+open(FILE, "$command '$file'|");
+binmode(FILE, ":utf8");
+
+showlog();
+
+close(FILE);
+

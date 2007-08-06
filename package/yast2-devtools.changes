@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Mon Aug  6 19:20:56 CEST 2007 - od@suse.de
+
+- ported showy2log to perl, average speedup for pretty-print is 20x
+- using a "command" with options now needs a "--" in front of the
+  command (Getopt::Long cannot handle this better)
+- fixed matching the component
+- fixed logic that decides when to call the "accept line" filter
+- 2.15.3
+
+-------------------------------------------------------------------
 Mon Jul 30 14:19:53 CEST 2007 - locilka@suse.cz
 
 - Added yast2-sshd into all-packages.

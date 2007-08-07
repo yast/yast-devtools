@@ -25,6 +25,9 @@ use Encode;
 $0 =~ m/([^\/]*)$/;
 my $progname = $1;
 
+# set to 1 when normal output was printed, so we can reset the color on exit
+my $output_printed  = 0;
+
 # set up $stdout, $stderr and the current output filehandle $outfh
 open my $stdout, ">&STDOUT";
 open my $stderr, ">&STDERR";
@@ -40,7 +43,7 @@ my $debuglvl = 0;
 
 my $vcs_id = '$Id$';
 my $vcs_date = '$Date$';
-$vcs_id =~ /^\$[[:alpha:]]+: [^ ]+ ([^ ]+ [^ ]+ [^ ]+) [^ ]+ [^ ]+ \$$/;
+$vcs_id =~ /^\$[[:alpha:]]+: [^ ]+ ([^ ]+ [^ ]+ [^ ]+) [^ ]+.*$/;
 my $version = $1;
 
 # defaults for program variables that need to be printed in the usage message
@@ -86,7 +89,11 @@ sub show_demo_colors {
 
 # on exit/interrupt, make sure we finish the current output line by resetting
 # to normal colors
-END { printf($outfh "%s", "$normal" . "\n"); }
+END {
+    if (defined($output_printed) and $output_printed) {
+        printf($outfh "%s", "$normal" . "\n");
+    }
+}
 
 # Usage message
 sub version {
@@ -469,6 +476,8 @@ sub is_map {
 sub print_text {
     my ($text, $prefix) = @_;
     $prefix = $prefix || "";
+
+    $output_printed = 1;
 
     if ( ! $line_started ) {
             printf($outfh "%s%s", ( $level <= $maxlevel ? $color[$level.$bold] : $whiteback . $color[$milestone.$bold] ), $prefix);

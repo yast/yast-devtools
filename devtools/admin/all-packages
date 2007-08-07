@@ -34,6 +34,8 @@ yast2-hardware-detection	inst-sys,default	all
 
 # language bindings
 yast2-perl-bindings	default			all
+yast2-python-bindings	default			all
+yast2-ruby-bindings	default			all
 
 # themes
 yast2-theme		inst-sys,default	all (only for subpackages)
@@ -89,6 +91,7 @@ yast2-irda		default			IrDA
 yast2-iscsi-client	default			iSCSI initiator
 yast2-iscsi-server	default			iSCSI target
 yast2-kerberos-client	default			kerberos client
+yast2-kdump		default			kdump (kernel)
 yast2-ldap-client	default			ldap client
 yast2-ldap-server	default			LDAP server
 yast2-mail		default			mail
@@ -119,6 +122,7 @@ yast2-security		default			security
 yast2-slp-server	default			slp daemon
 yast2-sound		default			sound
 yast2-sshd		default			SSHD configuration
+yast2-squid		default			SQUID configuration
 yast2-storage		inst-sys,default	storage
 yast2-sudo		default			/etc/sudoers
 yast2-support		default			support

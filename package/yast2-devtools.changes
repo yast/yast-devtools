@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue Aug  7 17:07:18 CEST 2007 - od@suse.de
+
+- changes for showylog:
+  - fixed --version output: show revision, date, time but no extra
+    line
+  - print extra line / line finisher with color reset only when
+    normal output was printed
+- 2.15.4
+
+-------------------------------------------------------------------
 Tue Aug  7 10:51:08 CEST 2007 - locilka@suse.cz
 
 - Added yast2-kdump, yast2-python-bindings, yast2-squid,

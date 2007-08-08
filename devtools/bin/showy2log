@@ -20,7 +20,6 @@ use POSIX qw(geteuid WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG WIFSTOPPED WSTOP
 # handle HUP INT PIPE TERM ABRT QUIT with die, so the END block is executed
 # which unlinks temporary files
 use sigtrap qw(die untrapped normal-signals ABRT QUIT);
-use Encode;
 
 $0 =~ m/([^\/]*)$/;
 my $progname = $1;

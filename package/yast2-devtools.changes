@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug  9 01:30:28 CEST 2007 - od@suse.de
+
+- remove unused "use Encode" from showy2log
+- 2.15.5
+
+-------------------------------------------------------------------
 Tue Aug  7 17:07:18 CEST 2007 - od@suse.de
 
 - changes for showylog:

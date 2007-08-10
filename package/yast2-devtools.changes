@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 10 16:55:50 CEST 2007 - mvidner@suse.cz
+
+- Fixed make package for gtk.
+
+-------------------------------------------------------------------
 Thu Aug  9 01:30:28 CEST 2007 - od@suse.de
 
 - remove unused "use Encode" from showy2log

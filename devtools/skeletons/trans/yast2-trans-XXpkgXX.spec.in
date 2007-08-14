@@ -22,4 +22,5 @@ Summary:	YaST2 translations for XXpkgXX localization
 %files
 %defattr(-,root,root)
 %doc @docdir@
-@localedir@
+%dir @localedir@
+%lang(@ISO639@) @localedir@/@LL@

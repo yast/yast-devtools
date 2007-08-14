@@ -47,7 +47,9 @@ $execcompdir = "$PREFIX/lib/YaST2";
 
 $provides_locale = "";
 if ($RPMNAME =~ /^yast2-trans-(.*)/) {
-    $provides_locale = "Provides:\tlocale(yast2:$1)\n"
+    $provides_locale = "Provides:\tlocale(yast2:$1)\n";
+    $LL = "$1";
+    $ISO639 = `echo -n $1 | sed -e 's/_.*//'`;
 }
 
 if ($#ARGV > 0)
@@ -212,6 +214,10 @@ rm -rf \"\$RPM_BUILD_ROOT\""
     "\@scrconfdir\@" => "${yast2dir}/scrconf",
     "\@desktopdir\@" => "%{prefix}/share/applications/YaST2",
     '@fillupdir@' => '/var/adm/fillup-templates',
+
+    "\@LL\@" => "$LL",
+    "\@ISO639\@" => "$ISO639",
+
 );
 
 # The main program

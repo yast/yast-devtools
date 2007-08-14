@@ -185,6 +185,8 @@ AC_SUBST(fillupdir)
     '@YAST2-INIT-PO@' =>
 'LL=${RPMNAME##*-}
 AC_SUBST(LL)
+ISO639=${LL%_*}
+AC_SUBST(ISO639)
 
 AC_ARG_WITH(own_compendium,
 	    AS_HELP_STRING([--with-own_compendium=FILE],

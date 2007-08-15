@@ -189,6 +189,8 @@ module schema		"$PFX"
 module runlevel		"$PFX"
 module firstboot	"$PFX" "$FILLUPDIR" '--sysconfdir=$(prefix)/etc'
 
+module metapackage	"$PFX" '--sbindir=$(prefix)/sbin'
+
 if $RESOLVE_DEPS; then
     echo >&2 "Getting dependencies"
     MODULES=`yast2-deps $1 | tsort | tac`

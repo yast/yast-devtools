@@ -18,4 +18,9 @@ MY_PERL_VENDORARCH=`perl -V:vendorarch | sed "s,.*=',,;s,'.*,," | sed "s,/usr,$P
 prepend PKG_CONFIG_PATH "$PREFIX/share/pkgconfig:$PREFIX/lib/pkgconfig"
 prepend PERL5LIB "$MY_PERL_VENDORARCH"
 prepend PATH "$PREFIX/bin"
+LIB=lib
+if [ -d /usr/lib64 ]; then
+    LIB=lib64
+fi
+prepend LD_LIBRARY_PATH "$PREFIX/$LIB"
 "$@"

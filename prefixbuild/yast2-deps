@@ -10,7 +10,7 @@ trap "touch .yast2-deps-failed" ERR
 # $1: a yast rpm name
 # stdout: the corresponding module in SVN
 function rpm_to_svn() {
-    RPM="${1%-devel}"
+    RPM="${1%-devel*}"
     case "$RPM" in
 	yast2|liby2util)
 	    echo "$RPM" ;;

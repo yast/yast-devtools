@@ -24,13 +24,15 @@
 # Authors: Jan Holesovsky <kendy@suse.cz>, 2001
 #          Arvin Schnell <arvin@suse.de>, 2002
 
-# Import the content of some files
-$RPMNAME = `cat RPMNAME`;
-$VERSION = `cat VERSION`;
-$MAINTAINER = `cat MAINTAINER`;
-$LICENSE = -f "YAST_LICENSE" ? "YaST License" : "GPL";
+use strict;
 
-$PREFIX = "/usr";
+# Import the content of some files
+my $RPMNAME = `cat RPMNAME`;
+my $VERSION = `cat VERSION`;
+my $MAINTAINER = `cat MAINTAINER`;
+my $LICENSE = -f "YAST_LICENSE" ? "YaST License" : "GPL";
+
+my $PREFIX = "/usr";
 
 # Clean them and check them
 chomp $RPMNAME;
@@ -42,10 +44,12 @@ if ($VERSION eq "" || $RPMNAME eq "" || $MAINTAINER eq "")
 }
 
 # Default values
-$yast2dir = "$PREFIX/share/YaST2";
-$execcompdir = "$PREFIX/lib/YaST2";
+my $yast2dir = "$PREFIX/share/YaST2";
+my $execcompdir = "$PREFIX/lib/YaST2";
 
-$provides_locale = "";
+my $provides_locale = "";
+my $LL = "";
+my $ISO639 = "";
 if ($RPMNAME =~ /^yast2-trans-(.*)/) {
     $provides_locale = "Provides:\tlocale(yast2:$1)\n";
     $LL = "$1";
@@ -60,7 +64,7 @@ if ($#ARGV > 0)
 }
 
 # Definition of the macros
-%macros =
+my %macros =
 (
     "\@RPMNAME\@" => "$RPMNAME",
 
@@ -180,7 +184,7 @@ rm -rf \"\$RPM_BUILD_ROOT\""
 
 
 # And some tiny macros. Must be separate since the big macros contain them.
-%tiny_macros =
+my %tiny_macros =
 (
     # FIXME: kind of double definition of paths
     # we should use configure to create a mapping of paths
@@ -224,18 +228,18 @@ rm -rf \"\$RPM_BUILD_ROOT\""
 my $warn_defattr = 1;
 my $warn_doc     = 0;
 
-$unknown_macro = 0;
+my $unknown_macro = 0;
 
 while (<STDIN>)
 {
     if (! /^##.*/)
     {
-	foreach $macro_name ( keys %macros )
+	foreach my $macro_name ( keys %macros )
 	{
 	    s/$macro_name/$macros{$macro_name}/g;
 	}
 
-	foreach $macro_name ( keys %tiny_macros )
+	foreach my $macro_name ( keys %tiny_macros )
 	{
 	    s/$macro_name/$tiny_macros{$macro_name}/g;
 	}

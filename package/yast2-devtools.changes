@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 15 18:40:15 CEST 2007 - mvidner@suse.cz
+
+- Fixed spec creation for non-trans packages.
+- 2.15.7
+
+-------------------------------------------------------------------
 Wed Aug 15 14:41:31 CEST 2007 - mvidner@suse.cz
 
 - prefixbuild: handle lib64, yast2-metapackage, and *-devel-doc

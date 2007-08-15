@@ -2,7 +2,7 @@
 Tue Aug 14 16:32:18 CEST 2007 - ke@suse.de
 
 - Better language handling on spec file level for *trans* packages;
-  introduce @ISO639@.
+  introduce @ISO639@ (#279869).
 
 -------------------------------------------------------------------
 Fri Aug 10 16:55:50 CEST 2007 - mvidner@suse.cz

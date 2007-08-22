@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Aug 22 17:51:45 CEST 2007 - mvidner@suse.cz
+
+- prefixbuild/recreate: Accomodate for libzypp
+
+-------------------------------------------------------------------
 Wed Aug 15 18:40:15 CEST 2007 - mvidner@suse.cz
 
 - Fixed spec creation for non-trans packages.

@@ -67,23 +67,17 @@ if [ $MAKE = false ]; then
     exit 1
 fi
 
-# $1 package directory
-# configure arguments are take from MODULE_ARGUMENTS_$1
-function build_module() {
+function init_cmake() {
     local MODULE="$1"; shift
-    if $SKIP_RECENT; then
-	T=$(mktemp /tmp/skip_recent.XXXXXX) || exit
-	touch -d '12 hours ago' $T
-	BYE=0
-	test "$MODULE"/.recreated -nt $T && BYE=1
-	rm $T
-	if [ "$BYE" = 1 ]; then
-	    echo "Module $MODULE was recently recreated, skipping"
-	    return
-	fi
-    fi
-    $NETWORK && condup "$MODULE"
-    pushd "$MODULE"
+
+    mkdir -p _build
+    cd _build
+
+    PATH=/opt/icecream/bin:$PATH cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DZYPP_PREFIX=$PREFIX  -DSYSCONFDIR=$PREFIX/etc -DMANDIR=$PREFIX/share/man -DCMAKE_BUILD_TYPE=Debug ..
+}
+
+function init_autotools() {
+    local MODULE="$1"; shift
 
     if $AUTORECONF || ! test -x ./configure; then
 	if $YAST; then
@@ -112,6 +106,37 @@ function build_module() {
 	# pfx ./configure $CACHE "${MODULE_ARGUMENTS_foo[@]-$PFX}"
 	eval pfx ./configure \$CACHE "\"\${${MODULE_ARGUMENTS_r}[@]-\$PFX}\""
     fi
+}
+# $1 package directory
+# configure arguments are take from MODULE_ARGUMENTS_$1
+function build_module() {
+    local MODULE="$1"; shift
+    if $SKIP_RECENT; then
+	T=$(mktemp /tmp/skip_recent.XXXXXX) || exit
+	touch -d '12 hours ago' $T
+	BYE=0
+	test "$MODULE"/.recreated -nt $T && BYE=1
+	rm $T
+	if [ "$BYE" = 1 ]; then
+	    echo "Module $MODULE was recently recreated, skipping"
+	    return
+	fi
+    fi
+    $NETWORK && condup "$MODULE"
+
+    pushd "$MODULE"
+
+    case "$MODULE" in
+	zypper|libzypp) init_cmake "$MODULE";;
+	*) init_autotools "$MODULE";;
+    esac
+
+    # special case not to drag in old libzypp: force linking from scratch
+    case "$MODULE" in
+	pkg-bindings) : ;;
+	*-bindings) find -name \*.la | xargs rm -v ;;
+    esac
+
     pfx $MAKE
     pfx make install
 

@@ -149,6 +149,7 @@ sub main()
     my $no_sudo			= 0;
     my $dump_build_order	= 0;
     my $dump_dependencies	= 0;
+    my $ignore_libzypp		= 0;
 
     GetOptions( "favourites-only"	=> \$favourites_only,
 		"fast"			=> \$disable_make_makefile_cvs,
@@ -157,6 +158,7 @@ sub main()
 		"dump-build-order"	=> \$dump_build_order,
 		"dump-dependencies"	=> \$dump_dependencies,
 		"dry-run"		=> \$dry_run,
+		"ignore-libzypp"	=> \$ignore_libzypp,
 		"verbose"		=> \$verbose,
 		"debug"			=> \$debug,
 		"silent"		=> \$silent,
@@ -191,6 +193,14 @@ sub main()
 
     die "FATAL: Call \"$prog_name\" from your YaST2 CVS or Subversion working directory! (yast2/source)\n"
 	unless -f "devtools/RPMNAME";
+
+
+    #
+    # Make sure we have exactly one version of libzypp installed
+    #
+
+    check_libzypp() unless $ignore_libzypp;
+
 
     #
     # All remaining command line parameters go to "make".
@@ -1019,6 +1029,65 @@ sub find_files()
     return @files;
 }
 
+
+#-----------------------------------------------------------------------------
+
+# Check if exactly one version of libzypp is installed.
+#
+# Multiple versions of libzypp ususally result in very subtle problems or in
+# crashing build components like the YCP byte code compiler: If one YaST2
+# binary package is built with libzypp.so.42 and another with libzypp.so.43,
+# they will be binary incompatible. This typically affects yast2-pkg-bindings,
+# yast2-perl-bindings, yast2-qt, yast2-ncurses.
+#
+# Result:
+#	Terminate program upon error
+
+sub check_libzypp()
+{
+    my $libdir = -d "/usr/lib64" ? "/usr/lib64" : "/usr/lib";
+    my @libs = <$libdir/libzypp.so*>;
+    my @libzypp;
+    my $libzypp_count = 0;
+    my $lib;
+
+    foreach $lib ( @libs )
+    {
+	if ( ! -l $lib )	# disregard symlinks
+	{
+	    push @libzypp, $lib;
+	    $libzypp_count++;
+	}
+    }
+
+    if ( $libzypp_count > 1 )
+    {
+
+	die <<EOF
+
+FATAL: Found $libzypp_count versions of libzypp:
+
+    @libzypp
+
+If you are absolutely sure that this is OK, use
+--ignore-libzypp to override.
+
+EOF
+    }
+    elsif ( $libzypp_count == 0 )
+    {
+	die <<EOF
+
+FATAL: No libzypp found below $libdir
+
+If you are absolutely sure that this is OK, use
+--ignore-libzypp to override.
+
+EOF
+    }
+}
+
+
 #-----------------------------------------------------------------------------
 
 # Logging functions - messages go to stdout and to the log file (make.log)
@@ -1134,6 +1203,7 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 	--dump-build-order	only dump the build order to stdout and log
 	--dump-dependencies	only dump package dependencies to stdout and log
 	--dry-run		do not build anything, only print what would be done
+	--ignore-libzypp	do not complain if multiple versions of libzypp are installed
 
 	-v  (--verbose)		verbose output
 	-d  (--debug)		debug output (even more verbose)

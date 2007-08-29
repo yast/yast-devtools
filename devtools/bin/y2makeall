@@ -36,7 +36,9 @@ our @exclude_list =
      ".svn",
      "certify",
      "debugger",
-     "ipsec"
+     "ipsec",
+     "packagemanager",
+     "packagemanager-test"
      );
 
 # Personal favourites - those directories will be processed first (in this order).

@@ -1045,8 +1045,7 @@ sub find_files()
 
 sub check_libzypp()
 {
-    my $libdir = -d "/usr/lib64" ? "/usr/lib64" : "/usr/lib";
-    my @libs = <$libdir/libzypp.so*>;
+    my @libs = </usr/lib/libzypp.so* /usr/lib64/libzypp.so.*>;
     my @libzypp;
     my $libzypp_count = 0;
     my $lib;
@@ -1078,7 +1077,7 @@ EOF
     {
 	die <<EOF
 
-FATAL: No libzypp found below $libdir
+FATAL: No libzypp found below /usr/lib or /usr/lib64
 
 If you are absolutely sure that this is OK, use
 --ignore-libzypp to override.

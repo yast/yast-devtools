@@ -130,7 +130,8 @@ File selection:
 By default $default_file is processed, unless you're not root
 and ~/.y2log exists.
 
-  -f FILE       use FILE as y2log file
+  -f FILE       use FILE as y2log file, if FILE equals to '-' script reads
+                the log from stdin
 
 Filter options:
 Those options allow to select which message lines are actually printed
@@ -240,7 +241,7 @@ if ($opt_short_format) {
     $indent = "a"
 }
 
-if ( ! -r "$file" ) {
+if ( ! -r "$file" and "$file" ne "-") {
     die "Can't read file '$file'";
 }
 
@@ -670,14 +671,18 @@ sub showlog {
 # main
 # ########################################################################
 
-my $command = "";
-if ( $#ARGV != -1 ) {
-    $command .= "$_ "  foreach (@ARGV);
-} else {
-    $command = "cat ";
+if ("$file" ne "-"){
+    my $command = "";
+    if ( $#ARGV != -1 ) {
+        $command .= "$_ "  foreach (@ARGV);
+    } else {
+        $command = "cat ";
+    }
+    open(FILE, "$command '$file'|");
+}else{
+    open(FILE, "-");
 }
 
-open(FILE, "$command '$file'|");
 binmode(FILE, ":utf8");
 
 showlog();

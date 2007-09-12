@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Sep 12 13:50:10 CEST 2007 - dfiser@suse.cz
+
+- Added support for reading from stdin to showy2log script.
+- 2.15.9
+
+-------------------------------------------------------------------
 Wed Aug 29 14:31:04 CEST 2007 - mvidner@suse.cz
 
 - "make dist" will create only a tar.bz2, not a tar.gz (#289571).

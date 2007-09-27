@@ -73,6 +73,7 @@ my %ignored_requires =
 
 
 my $work_root	= $ENV{'PWD'};
+my $build_root  = $work_root . "/build";
 my $make_log	= $work_root . "/make.log";
 my $failed_log	= $work_root . "/failed-packages.log";
 
@@ -86,6 +87,14 @@ my $favourites_only				= 0;
 my $dry_run					= 0;
 my $prefix					= "/usr";
 my $enable_print_summary			= 1;
+my $enable_make_zypp				= 0;
+my $libzypp_source				= "";
+my $libzypp_prefix				= "/usr";
+my $icecream_prefix				= "/opt/icecream";
+my $jobs					= 8;
+
+# cmake defines
+my $zypp_defines				= "";
 
 # Verbosity values
 
@@ -152,6 +161,8 @@ sub main()
     my $dump_build_order	= 0;
     my $dump_dependencies	= 0;
     my $ignore_libzypp		= 0;
+    my $build_libzypp		= 0;
+    my $enable_icecream		= 0;
 
     GetOptions( "favourites-only"	=> \$favourites_only,
 		"fast"			=> \$disable_make_makefile_cvs,
@@ -161,6 +172,12 @@ sub main()
 		"dump-dependencies"	=> \$dump_dependencies,
 		"dry-run"		=> \$dry_run,
 		"ignore-libzypp"	=> \$ignore_libzypp,
+		"build-libzypp"		=> \$build_libzypp,
+		"libzypp-source=s"	=> \$libzypp_source,
+		"libzypp-prefix=s"	=> \$libzypp_prefix,
+		"icecream"		=> \$enable_icecream,
+		"icecream-prefix=s"	=> \$icecream_prefix,
+		"jobs=i"		=> \$jobs,
 		"verbose"		=> \$verbose,
 		"debug"			=> \$debug,
 		"silent"		=> \$silent,
@@ -196,13 +213,36 @@ sub main()
     die "FATAL: Call \"$prog_name\" from your YaST2 CVS or Subversion working directory! (yast2/source)\n"
 	unless -f "devtools/RPMNAME";
 
+    #
+    # Check if correct zypp directory was specified
+    #
+
+    if ( $build_libzypp ) {
+	die "FATAL: wrong zypp source dir specified!\n"
+	    unless -f "$libzypp_source/libzypp.pc.cmake";
+    }
 
     #
-    # Make sure we have exactly one version of libzypp installed
+    # Set up logs
     #
 
+    open( LOG,        ">" . $make_log   ) or warn "Couldn't open $make_log";
+    open( FAILED_LOG, ">" . $failed_log ) or warn "Couldn't open $failed_log";
+    $OUTPUT_AUTOFLUSH = 1;
+
+    #
+    # Build libzypp if necessary and
+    # make sure we have exactly one version of libzypp installed
+    # 
+
+    make_libzypp_build() if $build_libzypp;
     check_libzypp() unless $ignore_libzypp;
 
+    #
+    # disable icecream_prefix if we don't need it 
+    #
+
+    $icecream_prefix = "" unless $enable_icecream;
 
     #
     # All remaining command line parameters go to "make".
@@ -221,14 +261,6 @@ sub main()
 
     eval { require $user_config_file } if ( -f $user_config_file );
 
-
-    #
-    # Set up logs
-    #
-
-    open( LOG,        ">" . $make_log   ) or warn "Couldn't open $make_log";
-    open( FAILED_LOG, ">" . $failed_log ) or warn "Couldn't open $failed_log";
-    $OUTPUT_AUTOFLUSH = 1;
 
     #
     # Make a hash from the exclude list
@@ -828,6 +860,20 @@ sub sudo_system_int($)
 
 #-----------------------------------------------------------------------------
 
+# Build libzypp
+
+sub make_libzypp_build()
+{
+    # zypp cmake defines
+
+    my $zypp_defines = "-DCMAKE_INSTALL_PREFIX=$libzypp_prefix";
+
+    cmake( $libzypp_source, $zypp_defines );
+
+}
+
+#-----------------------------------------------------------------------------
+
 # Build in build order
 
 sub make_in_build_order()
@@ -870,6 +916,101 @@ sub make_in_build_order()
     }
 }
 
+#-----------------------------------------------------------------------------
+
+# Make cmake package.
+#
+# Parameters:
+#	$dir		source dir
+#	$defines	cmake build defines
+
+sub cmake()
+{
+    my( $pkg_dir, $defines ) = @_;
+    my $error = 0;
+    my $pkg = basename( $pkg_dir );
+
+    chdir $work_root;
+
+    log_progress( "Building", $pkg );
+    log_progress( "\tcreate temp. build dir" );
+
+    system_int( "mkdir -p $build_root/$pkg >>$make_log 2>&1" );
+
+    if ( $CHILD_ERROR )
+    {
+	log_error( "'mkdir -p $build_root/$pkg' failed for $pkg: $!" );
+	$error = 1;
+    }
+
+    #
+    # cmake in build dir
+    #
+
+    if ( ! $error )
+    {
+	chdir "$build_root/$pkg";
+
+	log_progress( "\tcmake build in $pkg_dir" );
+
+	system_int( "cmake $defines $pkg_dir >>$make_log 2>&1" );
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'cmake $defines $pkg_dir' failed for $pkg" );
+	    $error = 1;
+	}
+    }
+
+    #
+    # make
+    #
+
+    if ( ! $error )
+    {
+	log_progress ( "\tmake $pkg" );
+	system_int( "make -C $build_root/$pkg -j$jobs $make_target >>$make_log 2>&1" );
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'make -C $build_root/$pkg -j$jobs $make_target' failed for $pkg" );
+	    $error = 1;
+	}
+    }
+
+    #
+    # sudo make install
+    #
+
+    if ( $make_target eq "" && ! $error )
+    {
+	log_progress( "\t$sudo_cmd make -C $build_root/$pkg install" );
+	sudo_system_int( "make -C $build_root/$pkg install >>$make_log 2>&1" );
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'$sudo_cmd make -C $build_root/$pkg install' failed for $pkg" );
+	    $error = 1;
+	}
+    }
+
+    #
+    # Summary
+    #
+
+    if ( $error )
+    {
+	push( @failed_dirs, $pkg );
+	print FAILED_LOG "$pkg\n";
+    }
+    else
+    {
+	log_progress( "\tOK" );
+	$successful_count++;
+    }
+
+    chdir $work_root;
+}
 
 #-----------------------------------------------------------------------------
 
@@ -887,6 +1028,38 @@ sub make()
     chdir $pkg_dir;
 
     log_progress( "Building", basename( $pkg_dir ) );
+
+    my $make_env = "";
+    my $path = "";
+    my $pkg_config_path = "";
+    my $ld_library_path = "";
+    my $perllib = "";
+
+    #
+    # prepare make environment
+    #
+
+    # libzypp pkgconfig path
+    $ld_library_path = "$libzypp_prefix/lib64:$libzypp_prefix/lib";
+    $pkg_config_path = "$libzypp_prefix/lib64/pkgconfig:$libzypp_prefix/lib/pkgconfig:";
+
+    # YaST pkgconfig path
+
+    $pkg_config_path .= "$prefix/lib64/pkgconfig:$prefix/lib/pkgconfig:$prefix/share/pkgconfig:";
+
+    # perl libs
+    $perllib = "$prefix/lib/perl5/5.8.8/x86_64-linux-thread-multi:$prefix/lib/perl5/5.8.8:" .
+	"$prefix/lib/perl5/vendor_perl/5.8.8/x86_64-linux-thread-multi:$prefix/lib/perl5/vendor_perl/5.8.8:" .
+	"$prefix/lib/perl5/vendor_perl";
+
+    # PATH
+    
+    $path = "$prefix/bin:\$PATH";
+    $path = "$icecream_prefix/bin:" . $path if $icecream_prefix;
+
+    # install prefix and PKG_CONFIG_PATH
+
+    $make_env = "YCPC_Y2DIR=$prefix/share/YaST2 PREFIX=$prefix PKG_CONFIG_PATH=\"$pkg_config_path\$PKG_CONFIG_PATH\" PATH=\"$path\" YCPC_LD_LIBRARY_PATH=\"$ld_library_path\" PERLLIB=\"$perllib\"";
 
 
     # Check if "make -f Makefile.cvs" must be performed.
@@ -908,7 +1081,7 @@ sub make()
 	system_int( "rm -rf autom4te.cache >>$make_log 2>&1" ) unless $dry_run;
 
 	log_progress( "\tmake -f Makefile.cvs" );
-	system_int( "make -f Makefile.cvs >>$make_log 2>&1" ) unless $dry_run;
+	system_int( "$make_env make -e -f Makefile.cvs >>$make_log 2>&1" ) unless $dry_run;
 
 	if ( $CHILD_ERROR )
 	{
@@ -925,11 +1098,11 @@ sub make()
     if ( ! $error )
     {
 	log_progress( "\tmake $make_target" );
-	system_int( "make $make_target >>$make_log 2>&1" ) unless $dry_run;
+	system_int( "$make_env make -e -j$jobs $make_target >>$make_log 2>&1" ) unless $dry_run;
 
 	if ( $CHILD_ERROR )
 	{
-	    log_error( "'make $make_target' failed for $pkg_dir" );
+	    log_error( "'make -j$jobs $make_target' failed for $pkg_dir" );
 	    $error = 1;
 	}
     }
@@ -1047,7 +1220,7 @@ sub find_files()
 
 sub check_libzypp()
 {
-    my @libs = </usr/lib/libzypp.so* /usr/lib64/libzypp.so.*>;
+    my @libs = <$libzypp_prefix/lib/libzypp.so* $libzypp_prefix/lib64/libzypp.so.*>;
     my @libzypp;
     my $libzypp_count = 0;
     my $lib;
@@ -1079,7 +1252,7 @@ EOF
     {
 	die <<EOF
 
-FATAL: No libzypp found below /usr/lib or /usr/lib64
+FATAL: No libzypp found below $libzypp_prefix/lib or $libzypp_prefix/lib64
 
 If you are absolutely sure that this is OK, use
 --ignore-libzypp to override.
@@ -1201,10 +1374,18 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 	--prefix <prefix>	use <prefix> instead of /usr
 	-n  (--no-sudo)		do not sudo certain commands (useful with --prefix)
 
+	--build-libzypp		build libzypp, too
+	--libzypp-source <dir>	libzypp source directory, required for building libzypp
+	--libzypp-prefix <prefix>	use <prefix> instead of /usr
+
 	--dump-build-order	only dump the build order to stdout and log
 	--dump-dependencies	only dump package dependencies to stdout and log
 	--dry-run		do not build anything, only print what would be done
 	--ignore-libzypp	do not complain if multiple versions of libzypp are installed
+
+	--icecream		build on icecream
+	--icecream-prefix <prefix>	use <prefix> instead of /opt/icecream
+	--jobs			Specifies the number of jobs to run simultaneously (default 8)
 
 	-v  (--verbose)		verbose output
 	-d  (--debug)		debug output (even more verbose)

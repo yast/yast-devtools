@@ -23,7 +23,7 @@ DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir)/devtools,$(Y2DEVTOOLS_PREFIX)/sha
 ALL_PACKAGES		= $(DEVTOOLS_DIR)/admin/all-packages
 LEGALESE_DIR		= $(if $(HAS_YAST_LICENSE),$(DEVTOOLS_DIR)/admin/copyright/yast,$(DEVTOOLS_DIR)/admin/copyright/gpl)
 
-COPYRIGHT_files_gpl	= README COPYING COPYRIGHT.english
+COPYRIGHT_files_gpl	= README COPYING
 
 COPYRIGHT_files_yast	= YAST_LICENSE README COPYING COPYRIGHT.english \
 			  COPYRIGHT.french COPYRIGHT.german COPYRIGHT.spanish

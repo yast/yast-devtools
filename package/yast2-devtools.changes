@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct  2 10:23:44 CEST 2007 - mvidner@suse.cz
+
+- One copy of the license is enough (COPYING), removed
+  COPYRIGHT.english (#299144).
+- 2.16.0
+
+-------------------------------------------------------------------
 Wed Sep 12 13:50:10 CEST 2007 - dfiser@suse.cz
 
 - Added support for reading from stdin to showy2log script.

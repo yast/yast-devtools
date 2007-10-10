@@ -98,7 +98,7 @@ else if (func == "Read") {
 else if (func == "Write") {
     import "Progress";
     boolean progress_orig = Progress::set (false);
-    XXPkgXX::write_only = true;
+    XXPkgXX::SetWriteOnly (true);
     ret = XXPkgXX::Write();
     Progress::set (progress_orig);
 }
@@ -114,7 +114,7 @@ else if (func == "GetModified") {
  * return boolean
  */
 else if (func == "SetModified") {
-    XXPkgXX::SetModified ();
+    XXPkgXX::SetModified (true);
     ret = true;
 }
 

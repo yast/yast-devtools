@@ -71,6 +71,38 @@ sub Modified {
     return Boolean($modified);
 }
 
+##
+ # Mark as modified, for Autoyast.
+ #
+BEGIN { $TYPEINFO {SetModified} = ["function", "void", "boolean" ]; }
+sub SetModified {
+    my $value = $_[1];
+    $modified = $value;
+}
+
+BEGIN { $TYPEINFO {ProposalValid} = ["function", "boolean"]; }
+sub ProposalValid {
+    return Boolean($proposal_valid);
+}
+
+BEGIN { $TYPEINFO {SetProposalValid} = ["function", "void", "boolean" ]; }
+sub SetProposalValid{
+    my $value = $_[1];
+    $proposal_valid = $value;
+}
+
+BEGIN { $TYPEINFO {WriteOnly} = ["function", "boolean"]; }
+sub WriteOnly {
+    return Boolean($write_only);
+}
+
+BEGIN { $TYPEINFO {SetWriteOnly} = ["function", "void", "boolean" ]; }
+sub SetWriteOnly{
+    my $value = $_[1];
+    $write_only = $value;
+}
+
+
 # Settings: Define all variables needed for configuration of XXpkgXX
 # TODO FIXME: Define all the variables necessary to hold
 # TODO FIXME: the configuration here (with the appropriate
@@ -104,7 +136,7 @@ sub Read {
 
     # TODO FIXME Names of real stages
     # We do not set help text here, because it was set outside
-    Progress::New( $caption, " ", $steps, [
+    Progress->New( $caption, " ", $steps, [
 	    # Progress stage 1/3
 	    __("Read the database"),
 	    # Progress stage 2/3
@@ -125,43 +157,43 @@ sub Read {
     );
 
     # read database
-    Progress::NextStage();
+    Progress->NextStage();
     # Error message
     if(0)
     {
-	Report::Error(__("Cannot read the database1."));
+	Report->Error(__("Cannot read the database1."));
     }
     sleep($sl);
 
     # read another database
-    Progress::NextStep();
+    Progress->NextStep();
     # Error message
     if(0)
     {
-	Report::Error(__("Cannot read the database2."));
+	Report->Error(__("Cannot read the database2."));
     }
     sleep($sl);
 
     # read current settings
-    Progress::NextStage();
+    Progress->NextStage();
     # Error message
     if(0)
     {
-	Report::Error(Message::CannotReadCurrentSettings());
+	Report->Error(Message->CannotReadCurrentSettings());
     }
     sleep($sl);
 
     # detect devices
-    Progress::NextStage();
+    Progress->NextStage();
     # Error message
     if(0)
     {
-	Report::Warning(__("Cannot detect devices."));
+	Report->Warning(__("Cannot detect devices."));
     }
     sleep($sl);
 
     # Progress finished
-    Progress::NextStage();
+    Progress->NextStage();
     sleep($sl);
 
     $modified = 0;
@@ -186,7 +218,7 @@ sub Write {
 
     # TODO FIXME Names of real stages
     # We do not set help text here, because it was set outside
-    Progress::New($caption, " ", $steps, [
+    Progress->New($caption, " ", $steps, [
 	    # Progress stage 1/2
 	    __("Write the settings"),
 	    # Progress stage 2/2
@@ -203,25 +235,25 @@ sub Write {
     );
 
     # write settings
-    Progress::NextStage();
+    Progress->NextStage();
     # Error message
     if(0)
     {
-	Report::Error (__("Cannot write settings."));
+	Report->Error (__("Cannot write settings."));
     }
     sleep($sl);
 
     # run SuSEconfig
-    Progress::NextStage ();
+    Progress->NextStage ();
     # Error message
     if(0)
     {
-	Report::Error (Message::SuSEConfigFailed());
+	Report->Error (Message->SuSEConfigFailed());
     }
     sleep($sl);
 
     # Progress finished
-    Progress::NextStage();
+    Progress->NextStage();
     sleep($sl);
 
     return Boolean(1);

@@ -48,23 +48,23 @@ global boolean Modified();
 /**
  * Data was modified?
  */
-global boolean modified = false;
+boolean modified = false;
 
 /**
  */
-global boolean proposal_valid = false;
+boolean proposal_valid = false;
 
 /**
  * Write only, used during autoinstallation.
  * Don't run services and SuSEconfig, it's all done at one place.
  */
-global boolean write_only = false;
+boolean write_only = false;
 
 /**
  * Abort function
  * return boolean return true if abort
  */
-global boolean() AbortFunction = Modified;
+boolean() AbortFunction = Modified;
 
 /**
  * Abort function
@@ -90,9 +90,37 @@ global boolean Modified() {
 /**
  * Mark as modified, for Autoyast.
  */
-global void SetModified() {
-    modified = true;
+global void SetModified(boolean value) {
+      modified = true;
+  }
+
+global boolean ProposalValid() {
+    return proposal_valid;
 }
+
+global void SetProposalValid(boolean value) {
+    proposal_valid = value;
+}
+
+/**
+ * @return true if module is marked as "write only" (don't start services etc...)
+ */
+global boolean WriteOnly() {
+    return write_only;
+}
+
+/**
+ * Set write_only flag (for autoinstalation).
+ */
+global void SetWriteOnly(boolean value) {
+    write_only = value;
+}
+
+
+global void SetAbortFunction(boolean() function) {
+    AbortFunction = function;
+}
+
 
 // Settings: Define all variables needed for configuration of XXpkgXX
 // TODO FIXME: Define all the variables necessary to hold

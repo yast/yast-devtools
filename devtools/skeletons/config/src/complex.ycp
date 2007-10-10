@@ -63,7 +63,7 @@ boolean PollAbort() {
  */
 symbol ReadDialog() {
     Wizard::RestoreHelp(HELPS["read"]:"");
-    // XXPkgXX::AbortFunction = PollAbort;
+    // XXPkgXX::SetAbortFunction(PollAbort);
     if (!Confirm::MustBeRoot()) return `abort;
     boolean ret = XXPkgXX::Read();
     return ret ? `next : `abort;
@@ -75,7 +75,7 @@ symbol ReadDialog() {
  */
 symbol WriteDialog() {
     Wizard::RestoreHelp(HELPS["write"]:"");
-    // XXPkgXX::AbortFunction = PollAbort;
+    // XXPkgXX::SetAbortFunction(PollAbort);
     boolean ret = XXPkgXX::Write();
     return ret ? `next : `abort;
 }

@@ -18,7 +18,8 @@ desktop_DATA =			\
 
 module_DATA =			\
 	XXPkgXX.ycp		\
-	XXPkgXX2.pm
+	XXPkgXX2.pm		\
+	XXPkgXX3.py
 
 # create a symlink for local build, #145327
 XXpkgXX:

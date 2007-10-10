@@ -101,7 +101,8 @@ AC_ARG_PROGRAM
 
 AC_PREFIX_DEFAULT(/usr)
 
-AM_INIT_AUTOMAKE(tar-ustar) dnl searches for some needed programs
+dnl long filenames; we use GNU Make extensions and that's ok
+AM_INIT_AUTOMAKE(tar-ustar -Wno-portability)
 
 dnl Important YaST2 variables
 VERSION=\"$VERSION\"

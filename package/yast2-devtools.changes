@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct 10 14:34:01 CEST 2007 - mvidner@suse.cz
+
+- Suppresed portability warnings from automake. We know that we use
+  GNU Make extensions.
+- 2.16.1
+
+-------------------------------------------------------------------
 Tue Oct  2 10:23:44 CEST 2007 - mvidner@suse.cz
 
 - One copy of the license is enough (COPYING), removed

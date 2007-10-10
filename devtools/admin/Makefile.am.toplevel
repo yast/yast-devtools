@@ -30,6 +30,7 @@ COPYRIGHT_files_yast	= YAST_LICENSE README COPYING COPYRIGHT.english \
 
 extra_COPYRIGHT_files =  $(if $(HAS_YAST_LICENSE), $(COPYRIGHT_files_yast), $(COPYRIGHT_files_gpl))
 
+# less strict; prefer bzip2
 AUTOMAKE_OPTIONS = foreign dist-bzip2 no-dist-gzip
 # where devtools instal m4 snippets
 # argh, executed literally

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Nov  9 17:11:58 CET 2007 - dfiser@suse.cz
+
+- Added script for generating graph of includes/imports from YCP
+  called ycp_graph.
+
+-------------------------------------------------------------------
 Fri Nov  9 11:10:19 CET 2007 - locilka@suse.cz
 
 - Added new check_deps script for basic checking of imported

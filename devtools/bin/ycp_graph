@@ -1,0 +1,208 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+
+##
+# Constants:
+YaST_INCLUDE_DIR = "/usr/share/YaST2/include/"
+YaST_IMPORT_DIR = "/usr/share/YaST2/modules/"
+
+class Pair:
+    def __init__(self, first, sec):
+        self.first = first
+        self.second = sec
+
+class List:
+    def __init__(self, list=None):
+        self._items = []
+        if list is not None:
+            for item in list:
+                self.append(item)
+
+    def __len__(self):
+        return len(self._items)
+
+    def __iter__(self):
+        return self._items.__iter__()
+
+    def append(self, name):
+        for item in self._items:
+            if item == name:
+                return
+        self._items.append(name)
+
+    def getItems(self):
+        return self._items
+
+    def isIn(self, name):
+        for item in self._items:
+            if name == item:
+                return True
+        return False
+
+##
+# Read files from include or import clause
+include_files = List()
+import_files = List()
+
+##
+# List of includes/imports which must be done in next cycle
+new_includes = List()
+new_imports = List()
+
+##
+# List of connections (Pair)
+includes = []
+imports = []
+
+##
+# List of modules which should be scanned into.
+# None means all modules
+important_modules = None
+
+
+def usage():
+    print """
+This program generate dot definition of graph to stdout by scanning given
+files recursively.
+"""
+    print "Usage:", sys.argv[0], "filename max_depth [list of modules to scan]"
+    print "      ", "    if no modules given, all modules will be scaned"
+    print ""
+    print "Example:", sys.argv[0], "src/clients/bootloader.ycp 10 Bootloader BootGRUB"
+    print "        ", "    - will scan Bootloader and BootGRUB modules"
+    print "        ", sys.argv[0], "src/clients/bootloader.ycp 10 \"\""
+    print "        ", "    - won't scan any modules"
+    print "        ", sys.argv[0], "src/clients/bootloader.ycp 10"
+    print "        ", "    - will scan all modules"
+
+    print ""
+    print "How to use this program:"
+    print "     Generate graph definition into graph.txt:"
+    print "         $", sys.argv[0], "src/squid.ycp 10 Squid > graph.txt"
+    print "     Create graph.png from graph.txt:"
+    print "         $ dot -Tpng -ograph.png graph.txt"
+    print "     See generated graph:"
+    print "         $ display graph.png"
+
+
+def printDotGraph(include_files, import_files, includes, imports):
+    color_import = "blue"
+    color_include = "black"
+
+    print """
+digraph "include/import" {
+"""
+
+    for item in include_files:
+        print "    ",
+        print "\"" + item + "\" [fontcolor=" + color_include + "];"
+
+    for item in import_files:
+        print "    ",
+        print "\"" + item + "\"[fontcolor=" + color_import + "];"
+
+    for conn in includes:
+        print "    ",
+        print "\"" + conn.first + "\"",
+        print " -> ",
+        print "\"" + conn.second + "\"", "[ color=\"" + color_include + "\"]"
+
+    for conn in imports:
+        print "    ",
+        print "\"" + conn.first + "\"",
+        print " -> ",
+        print "\"" + conn.second + "\"", "[ color=\"" + color_import + "\"]"
+
+    print """
+}
+"""
+
+def getNameFromFilename(filename):
+    pattern = re.compile(r'^/{0,}([^/]+/){0,}([^/]+)(\.[^/]*){1,}$')
+    match = pattern.match(filename)
+    if match is not None:
+        return match.group(2)
+    else:
+        return filename
+
+
+def scanFile(name, filename):
+    p_include = re.compile(r'^.*include.*"(.*)".*$')
+    p_import = re.compile(r'^.*import.*"(.*)".*$')
+
+    try:
+        file = open(filename, "r")
+    except IOError, e:
+        print >>sys.stderr, "Error: Unable to read from " +filename
+        return
+
+    line = file.readline()
+    while len(line) > 0:
+        # scan includes
+        match = p_include.match(line)
+        if match is not None:
+            tmp = match.group(1)
+            # if not already scanned
+            if not include_files.isIn(tmp):
+                new_includes.append(tmp)
+            include_files.append(tmp)
+            includes.append(Pair(name, tmp))
+
+        # scan imports
+        match = p_import.match(line)
+        if match is not None:
+            tmp = match.group(1)
+            # if this modules is important for me
+            if important_modules is None or important_modules.isIn(tmp):
+                # if not already scanned
+                if not import_files.isIn(tmp):
+                    new_imports.append(tmp)
+                import_files.append(tmp)
+                imports.append(Pair(name, tmp))
+
+        line = file.readline()
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        usage()
+        sys.exit(1)
+
+    try:
+        max_depth = int(sys.argv[2])
+    except:
+        print >>sys.stderr, "Error: Second argument is not a number."
+        sys.exit(1)
+
+    # set up important_modules
+    if len(sys.argv) > 3:
+        important_modules = List(sys.argv[3:])
+    else:
+        important_modules = None
+
+    current_depth = 0
+
+    print >>sys.stderr, "Start scanning"
+    filename = sys.argv[1]
+    scanFile(getNameFromFilename(filename), filename)
+
+    while (len(new_includes) > 0 or len(new_imports) > 0) and \
+          current_depth < max_depth:
+        new_includes_tmp = new_includes
+        new_imports_tmp = new_imports
+        new_includes = []
+        new_imports = []
+        for filename in new_includes_tmp:
+            scanFile(filename, YaST_INCLUDE_DIR + filename)
+
+        for filename in new_imports_tmp:
+            scanFile(filename, YaST_IMPORT_DIR + filename + ".ycp")
+
+        current_depth += 1
+    print >>sys.stderr, "Scanning successfuly stoped in depth:", current_depth
+
+    printDotGraph(include_files, import_files, includes, imports)
+    sys.exit(0)

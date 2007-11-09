@@ -25,6 +25,9 @@
 #   --> Testing.txt
 #   --> Testing.png
 #
+# ==TODO==
+#   Nicer 'regexptouse' :)?
+#
 
 USE_FILE=$1
 

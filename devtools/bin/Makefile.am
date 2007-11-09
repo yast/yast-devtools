@@ -29,7 +29,9 @@ pkgdata_SCRIPTS = 				\
 	y2makeall               		\
 	y2makepot				\
 	check_icons				\
-	check_deps
+	check_deps				\
+	gen_logic_deps				\
+	gen_logic_deps_nodes
 
 EXTRA_DIST = $(bin_SCRIPTS) $(ybin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
 

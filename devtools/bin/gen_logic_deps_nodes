@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# ==Authors==
+#   Lukas Ocilka <locilka@suse.cz>
+#
+# ==About==
+#   A very simple script for getting only those dependency-nodes we are
+#   interested in. It uses output of another script 'gen_logic_deps'
+#   as its input. Greps nodes and generates a PNG graph.
+#
+# ==Usage==
+#   ./gen_logic_deps_nodes file_to_read regexptouse file_to_write [without_zero_deps]
+#
+#   * file_to_read - output from 'gen_logic_deps' script
+#   * regexptouse - part of 'sed' regexp :) e.g., "yast2-network\|yast2-country"
+#   * file_to_write - script creates thise files ${file_to_write}.txt, ${file_to_write}.png
+#   * without_zero_deps - if defined nodes with (0) are not visible
+#
+# ==Examples==
+#   /usr/share/YaST2/data/devtools/bin/gen_logic_deps_nodes dot-in.txt "yast2-country" Testing
+#   --> Testing.txt
+#   --> Testing.png
+#
+#   /usr/share/YaST2/data/devtools/bin/gen_logic_deps_nodes dot-in.txt "yast2-country" Testing without
+#   --> Testing.txt
+#   --> Testing.png
+#
+
+USE_FILE=$1
+
+NODES_INCLUDED=$2
+
+SAVE_TO_FILE=$3
+
+GREP_ZERODEPS=$4
+
+if [ "${USE_FILE}" == "" ]; then
+    echo "No input file defined";
+    exit 1;
+else
+    echo "Using file: "${USE_FILE}
+fi
+
+if [ "${NODES_INCLUDED}" == "" ]; then
+    echo "No nodes defined";
+    exit 1;
+else
+    echo "Using nodes: "${NODES_INCLUDED}
+fi
+
+if [ "${SAVE_TO_FILE}" == "" ]; then
+    echo "No file to save to defined";
+    exit 1;
+else
+    echo "Writing to: "${SAVE_TO_FILE}.txt
+fi
+
+echo
+echo "grep command: >>>\({\|}\|${NODES_INCLUDED}\)<<<";
+
+if [ "${GREP_ZERODEPS}" == "" ]; then
+    grep "\({\|}\|${NODES_INCLUDED}\)" ${USE_FILE} > ${SAVE_TO_FILE}.txt;
+else
+    echo "Grepping out zero-deps";
+    grep "\({\|}\|${NODES_INCLUDED}\)" ${USE_FILE} | grep -v "(0)" > ${SAVE_TO_FILE}.txt;
+fi
+
+echo
+echo "See ${SAVE_TO_FILE}.png file"
+dot -Tpng -o${SAVE_TO_FILE}.png ${SAVE_TO_FILE}.txt

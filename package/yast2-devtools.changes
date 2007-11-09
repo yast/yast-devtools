@@ -1,8 +1,12 @@
 -------------------------------------------------------------------
 Fri Nov  9 11:10:19 CET 2007 - locilka@suse.cz
 
-- Addded new check_deps script for basic checking of imported
+- Added new check_deps script for basic checking of imported
   YCP or Perl (YaST) modules.
+- Added new gen_logic_deps script for generating dependency graphs.
+- Added new gen_logic_deps_nodes script for picking up just nodes
+  we are interested in.
+- 2.16.2
 
 -------------------------------------------------------------------
 Wed Oct 10 14:34:01 CEST 2007 - mvidner@suse.cz

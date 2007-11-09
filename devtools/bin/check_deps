@@ -1,0 +1,111 @@
+#!/bin/bash
+
+MODULES_DIRECTORY="/usr/share/YaST2/modules"
+
+#
+# ==Authors==
+#   Lukas Ocilka <locilka@suse.cz>
+#
+# ==About==
+#   This script greps for all imported YCP or YaST-Perl modules
+#   and finds out to which RPM those YCP or Perl modules belong.
+#
+# ==Syntax==
+#   ./check_deps [src_directory [be_verbose [RPM_root]]]
+#
+# ==Usage==
+#   1.) ./check_deps
+#       Writes all imported modules
+#       Writes all used RPMs
+#
+#   2.) ./check_deps /SVN/openSUSE_11.0/yast2-network/
+#       Checks the /SVN/openSUSE_11.0/yast2-network/ directory
+#
+#   3.) ./check_deps . .
+#       Checks the current directory and it's more verbose
+#       (writes which module belongs to which RPM)
+#
+#   4.) ./check_deps . . /other_directory/
+#       Checks the current directory and it's more verbose
+#       Information which module belongs to which RPM is taken
+#       from /other_directory/ directory (RPMs have to be installed
+#       there, not only copied, see `man rpm` and '--root').
+#
+
+CHECK_DIRECTORY=$1
+
+BE_VERBOSE=$2
+
+ROOT=$3
+
+##################################################################
+
+if [ "${CHECK_DIRECTORY}" != "" ]; then
+    echo "Working in directory: "${CHECK_DIRECTORY}
+    cd "${CHECK_DIRECTORY}"
+else
+    echo "Working in directory: "`pwd`
+fi
+
+if [ "${ROOT}" == "" ]; then
+    ROOT="/"
+fi
+echo "Root: "${ROOT}
+
+TMPFILE=`mktemp`
+
+USED_MODULES_YCP=`grep -r "import \".*\"" * 2>/dev/null | \
+    grep -v "\(/\*\|//\).*import \".*\"" | \
+    grep "\.ycp:" | \
+    grep -v "\(\.svn\|doc/\|testsuite\/\|.changes:\)" | \
+    sed 's/.*import "\([^"]*\)".*/\1/' \
+    >> ${TMPFILE}
+`
+
+USED_MODULES_PERL=`grep -r "YaST::YCP::Import[^#]*\"" * * 2>/dev/null | \
+    grep -v "#.*YaST::YCP::Import" | \
+    grep "\.pm:" | \
+    grep -v "\(\.svn\|doc/\|testsuite\/\|.changes:\)" | \
+    sed 's/.*YaST::YCP::Import *( *"\([^"]*\)" *).*/\1/' \
+    >> ${TMPFILE}
+`
+USED_MODULES=`cat ${TMPFILE} | grep -v "^\(SCR\|UI\|Pkg\)$" | sort | uniq`
+rm -rf ${TMPFILE}
+
+if [ "$USED_MODULES" == "" ]; then
+    echo "No imported YCP modules..."
+    exit 0;
+fi
+
+echo
+echo "All imported modules:"
+echo "---------------------"
+echo ${USED_MODULES}
+
+ALL_USED_MODULES=""
+for MODULE in ${USED_MODULES}; do
+    if [ -e "${MODULES_DIRECTORY}/${MODULE}.ycp" ]; then
+	ALL_USED_MODULES=${ALL_USED_MODULES}" ${MODULES_DIRECTORY}/${MODULE}.ycp"
+    elif [ -e "${MODULES_DIRECTORY}/${MODULE}.pm" ]; then
+	ALL_USED_MODULES=${ALL_USED_MODULES}" ${MODULES_DIRECTORY}/${MODULE}.pm"
+    else
+	echo "Can't find ${MODULE} module!"
+    fi
+done
+
+# echo ${ALL_USED_MODULES}
+
+echo
+echo "All imported YaST packages:"
+echo "---------------------------"
+if [ "${BE_VERBOSE}" == "" ]; then
+    rpm --queryformat "%{NAME}\n" -qf ${ALL_USED_MODULES} | sort | uniq
+else
+    OUTPUT=""
+    for MODULE in ${ALL_USED_MODULES}; do
+	OUTPUT="${OUTPUT}"`rpm --root=${ROOT} --queryformat "%{NAME}\n" -qf ${MODULE}`"\\tFile: ${MODULE}\\n"
+    done
+    echo -e ${OUTPUT} | sort
+fi
+
+echo

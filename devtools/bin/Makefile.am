@@ -28,7 +28,8 @@ pkgdata_SCRIPTS = 				\
 	y2compile				\
 	y2makeall               		\
 	y2makepot				\
-	check_icons
+	check_icons				\
+	check_deps
 
 EXTRA_DIST = $(bin_SCRIPTS) $(ybin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
 

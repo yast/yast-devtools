@@ -31,6 +31,7 @@ sub parse_arguments
     Getopt::Long::Configure ("bundling");
     GetOptions (
 		"output-file|o=s" => \$xml_output,
+		"debug|d=i" => \$debug,
 	       );
 
 }

@@ -46,6 +46,7 @@ EOF
 %dir %{prefix}/share/emacs/site-lisp
 %{prefix}/share/emacs/site-lisp/*ycp-mode.el
 %dir %{prefix}/lib/YaST2
+%{prefix}/share/cmake/Modules/*
 @ybindir@
 %dir %{prefix}/share/YaST2
 @ydatadir@

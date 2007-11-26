@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Nov 26 14:55:32 CET 2007 - dmacvicar@suse.de
+
+- added basic cmake infrastructure
+- 2.16.3
+
+-------------------------------------------------------------------
 Fri Nov  9 17:11:58 CET 2007 - dfiser@suse.cz
 
 - Added script for generating graph of includes/imports from YCP

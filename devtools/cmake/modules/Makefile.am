@@ -1,4 +1,4 @@
-cmakedir = /usr/share/cmake/Modules
+cmakedir = $(datadir)/cmake/Modules
 ycmakedir = @YAST2DEVTOOLS@/cmake/modules
 
 cmake_DATA = FindYast.cmake

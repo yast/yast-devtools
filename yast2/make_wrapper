@@ -22,6 +22,10 @@
 # or, when using "icecream":
 #
 #     (setq compile-command "make_wrapper -k -j20 && sudo make_wrapper install")
+#
+#
+# Author:	Stefan Hundhammer <sh@suse.de>
+# License:	GPL
 
 out_of_tree_build_dir="build"
 

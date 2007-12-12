@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# make_wrapper: Call "make" in this director if there is a Makefile or search
+# ../build or ../../build etc. for Makefiles and start "make -C" with that
+# directory.
+#
+# This is useful when working in parallel on projects based on pure "make" or
+#"automake" / "autoconf" and "cmake": "cmake" is intended to build outside of
+# the source tree while the others build inside the source tree.
+#
+# If you just follow a simple convention and use a directory ../build or
+#../../build for building out of source tree for "cmake" based projects, you
+# can simply always call this script instead of "make": It searches the current
+# directory for a file "Makefile", and if there is none, goes up the directory
+# tree (10 levels max to avoid infinite loops) and looks if there is a
+# directory "build" that contains a "Makefile".
+#
+# Emacs users might want to set their "compile-command" variable in ~/.emacs :
+#
+#     (setq compile-command "make_wrapper -k && sudo make_wrapper install")
+#
+# or, when using "icecream":
+#
+#     (setq compile-command "make_wrapper -k -j20 && sudo make_wrapper install")
+
+out_of_tree_build_dir="build"
+
+if [ -f Makefile ]; then 
+    cmd="make $*"
+    echo "$cmd"
+    $cmd
+else
+    dir="..";
+    cd_up_count=0
+    
+    while [ ! -f "$dir/$out_of_tree_build_dir/Makefile" ]; do
+        if [ $cd_up_count -gt 10 ]; then
+	    echo "No Makefile here or in any ../$out_of_tree_build_dir directory. Aborting."
+	    exit 1
+	fi
+
+	cd_up_count=$(($cd_up_count+1))
+	dir="../$dir"
+    done
+    
+    dir="$dir/$out_of_tree_build_dir"
+    abs_dir=`cd $dir; pwd`
+    cmd="make -C $abs_dir $*"
+    echo "$cmd"
+    $cmd
+fi

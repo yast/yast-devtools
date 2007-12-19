@@ -34,7 +34,7 @@ if [ -f Makefile ]; then
     echo "$cmd"
     $cmd
 else
-    dir="..";
+    dir=".";
     cd_up_count=0
     
     while [ ! -f "$dir/$out_of_tree_build_dir/Makefile" ]; do

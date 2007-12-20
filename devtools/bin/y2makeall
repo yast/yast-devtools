@@ -72,10 +72,11 @@ my %ignored_requires =
      );
 
 
-my $work_root	= $ENV{'PWD'};
-my $build_root  = $work_root . "/build";
-my $make_log	= $work_root . "/make.log";
-my $failed_log	= $work_root . "/failed-packages.log";
+my $work_root		= $ENV{'PWD'};
+my $build_root  	= $work_root . "/build";
+my $make_log		= $work_root . "/make.log";
+my $failed_log		= $work_root . "/failed-packages.log";
+my $cmake_build_dir	= "build"; # relative to project directory
 
 
 #
@@ -92,8 +93,6 @@ my $libzypp_source				= "";
 my $libzypp_prefix				= "/usr";
 my $icecream_prefix				= "/opt/icecream";
 my $jobs					= 8;
-
-# cmake defines
 my $zypp_defines				= "";
 
 # Verbosity values
@@ -233,13 +232,13 @@ sub main()
     #
     # Build libzypp if necessary and
     # make sure we have exactly one version of libzypp installed
-    # 
+    #
 
     make_libzypp_build() if $build_libzypp;
     check_libzypp() unless $ignore_libzypp;
 
     #
-    # disable icecream_prefix if we don't need it 
+    # disable icecream_prefix if we don't need it
     #
 
     $icecream_prefix = "" unless $enable_icecream;
@@ -860,19 +859,6 @@ sub sudo_system_int($)
 
 #-----------------------------------------------------------------------------
 
-# Build libzypp
-
-sub make_libzypp_build()
-{
-    # zypp cmake defines
-
-    my $zypp_defines = "-DCMAKE_INSTALL_PREFIX=$libzypp_prefix";
-
-    cmake( $libzypp_source, $zypp_defines );
-
-}
-
-#-----------------------------------------------------------------------------
 
 # Build in build order
 
@@ -916,15 +902,192 @@ sub make_in_build_order()
     }
 }
 
+
 #-----------------------------------------------------------------------------
 
-# Make cmake package.
+# Make one package.
+#
+# Parameters:
+#	$pkg	package to build (from $work)
+
+sub make()
+{
+    my( $pkg_dir ) = @_;
+    my $error = 0;
+
+    chdir $work_root;
+    chdir $pkg_dir;
+
+
+    # Check if this is a CMake-based project.
+
+    my $is_cmake_project = 0;
+    $is_cmake_project = 1 if -f "CMakeLists.txt" && ! ( -f "configure.in.in" || -f "configure.in" );
+
+    #
+    # Display progress
+    #
+
+    log_progress( "Building", basename( $pkg_dir ),
+		  $is_cmake_project ? "(cmake based)" : "" );
+
+
+    #
+    # Prepare make environment
+    #
+
+    my $path = "$prefix/bin:\$PATH";
+    $path = "$icecream_prefix/bin:$path" if $icecream_prefix;
+
+    my $ld_library_path =
+	"$libzypp_prefix/lib64"
+	. ":$libzypp_prefix/lib"
+	;
+
+    my $pkg_config_path =
+	"$libzypp_prefix/lib64/pkgconfig"
+	. ":$libzypp_prefix/lib/pkgconfig"
+	. ":$prefix/lib64/pkgconfig"
+	. ":$prefix/lib/pkgconfig"
+	. ":$prefix/share/pkgconfig"
+	;
+
+    my $perllib =
+	"$prefix/lib/perl5/5.8.8/x86_64-linux-thread-multi"
+	. ":$prefix/lib/perl5/5.8.8"
+	. ":$prefix/lib/perl5/vendor_perl/5.8.8/x86_64-linux-thread-multi"
+	. ":$prefix/lib/perl5/vendor_perl/5.8.8"
+	. ":$prefix/lib/perl5/vendor_perl"
+	;
+
+    my $make_env =
+	"PATH=\"$path\""
+	. " YCPC_Y2DIR=$prefix/share/YaST2"
+	. " PREFIX=$prefix"
+	. " PKG_CONFIG_PATH=\"$pkg_config_path\$PKG_CONFIG_PATH\""
+	. " YCPC_LD_LIBRARY_PATH=\"$ld_library_path\""
+	. " PERLLIB=\"$perllib\""
+	;
+
+
+    # Check if "make -f Makefile.cvs" must be performed.
+    # Even if command line option "-f" (fast mode - sets $disable_make_makefile_cvs)
+    # is given, it still needs to be done if there is no toplevel Makefile.
+
+    my $do_make_makefile_cvs = 1;
+    $do_make_makefile_cvs = 0 if $disable_make_makefile_cvs;
+    my $toplevel_makefile = $is_cmake_project ? "$cmake_build_dir/Makefile" : "Makefile";
+    $do_make_makefile_cvs = 1 unless -f $toplevel_makefile;
+
+    #
+    # make -f Makefile.cvs
+    #
+
+    if ( $do_make_makefile_cvs )
+    {
+	log_info( "\trm -rf autom4te.cache" );
+	system_int( "rm -rf autom4te.cache >>$make_log 2>&1" ) unless $dry_run;
+
+	log_progress( "\tmake -f Makefile.cvs" );
+	system_int( "$make_env make -e -f Makefile.cvs >>$make_log 2>&1" ) unless $dry_run;
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'make -f Makefile.cvs' failed for $pkg_dir" );
+	    $error = 1;
+	}
+    }
+
+
+    #
+    # make
+    #
+
+    if ( $is_cmake_project )
+    {
+	chdir( $cmake_build_dir );
+	my $dir = basename( $pkg_dir );
+	log_progress( "\tcd $dir/$cmake_build_dir" );
+	# system_int( "pwd" );
+    }
+
+    if ( ! $error )
+    {
+	log_progress( "\tmake $make_target" );
+	system_int( "$make_env make -e -j$jobs $make_target >>$make_log 2>&1" ) unless $dry_run;
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'make -j$jobs $make_target' failed for $pkg_dir" );
+	    $error = 1;
+	}
+    }
+
+
+    #
+    # sudo make install
+    #
+
+    if ( $make_target eq "" && ! $error )
+    {
+	log_progress( "\t$sudo_cmd make install" );
+	sudo_system_int( "make install >>$make_log 2>&1" ) unless $dry_run;
+
+	if ( $CHILD_ERROR )
+	{
+	    log_error( "'$sudo_cmd make install' failed for $pkg_dir" );
+	    $error = 1;
+	}
+    }
+
+
+    #
+    # Summary
+    #
+
+    if ( $error )
+    {
+	my $dir = basename( $pkg_dir );
+	push( @failed_dirs, $dir );
+	my $rpm = $rpm_names{ $dir };
+	my $msg = "$dir";
+	$msg .= "\t\t\t(base package)" if defined( $base_rpms{ $rpm } );
+	print FAILED_LOG "$msg\n";
+    }
+    else
+    {
+	log_progress( "\tOK" );
+	$successful_count++;
+    }
+
+    chdir $work_root;
+}
+
+
+#-----------------------------------------------------------------------------
+
+
+# Build libzypp
+
+sub make_libzypp_build()
+{
+    # zypp cmake defines
+
+    my $zypp_defines = "-DCMAKE_INSTALL_PREFIX=$libzypp_prefix";
+
+    non_y2_cmake( $libzypp_source, $zypp_defines );
+}
+
+
+#-----------------------------------------------------------------------------
+
+# Make a non-YaST2 project that is based on cmake.
 #
 # Parameters:
 #	$dir		source dir
 #	$defines	cmake build defines
 
-sub cmake()
+sub non_y2_cmake()
 {
     my( $pkg_dir, $defines ) = @_;
     my $error = 0;
@@ -1002,141 +1165,6 @@ sub cmake()
     {
 	push( @failed_dirs, $pkg );
 	print FAILED_LOG "$pkg\n";
-    }
-    else
-    {
-	log_progress( "\tOK" );
-	$successful_count++;
-    }
-
-    chdir $work_root;
-}
-
-#-----------------------------------------------------------------------------
-
-# Make one package.
-#
-# Parameters:
-#	$pkg	package to build (from $work)
-
-sub make()
-{
-    my( $pkg_dir ) = @_;
-    my $error = 0;
-
-    chdir $work_root;
-    chdir $pkg_dir;
-
-    log_progress( "Building", basename( $pkg_dir ) );
-
-    my $make_env = "";
-    my $path = "";
-    my $pkg_config_path = "";
-    my $ld_library_path = "";
-    my $perllib = "";
-
-    #
-    # prepare make environment
-    #
-
-    # libzypp pkgconfig path
-    $ld_library_path = "$libzypp_prefix/lib64:$libzypp_prefix/lib";
-    $pkg_config_path = "$libzypp_prefix/lib64/pkgconfig:$libzypp_prefix/lib/pkgconfig:";
-
-    # YaST pkgconfig path
-
-    $pkg_config_path .= "$prefix/lib64/pkgconfig:$prefix/lib/pkgconfig:$prefix/share/pkgconfig:";
-
-    # perl libs
-    $perllib = "$prefix/lib/perl5/5.8.8/x86_64-linux-thread-multi:$prefix/lib/perl5/5.8.8:" .
-	"$prefix/lib/perl5/vendor_perl/5.8.8/x86_64-linux-thread-multi:$prefix/lib/perl5/vendor_perl/5.8.8:" .
-	"$prefix/lib/perl5/vendor_perl";
-
-    # PATH
-    
-    $path = "$prefix/bin:\$PATH";
-    $path = "$icecream_prefix/bin:" . $path if $icecream_prefix;
-
-    # install prefix and PKG_CONFIG_PATH
-
-    $make_env = "YCPC_Y2DIR=$prefix/share/YaST2 PREFIX=$prefix PKG_CONFIG_PATH=\"$pkg_config_path\$PKG_CONFIG_PATH\" PATH=\"$path\" YCPC_LD_LIBRARY_PATH=\"$ld_library_path\" PERLLIB=\"$perllib\"";
-
-
-    # Check if "make -f Makefile.cvs" must be performed.
-    # Even if command line option "-f" (fast mode - sets $disable_make_makefile_cvs)
-    # is given, it still needs to be done if there is no toplevel Makefile.
-
-    my $do_make_makefile_cvs = 1;
-    $do_make_makefile_cvs = 0 if $disable_make_makefile_cvs;
-    $do_make_makefile_cvs = 1 unless -f "Makefile";
-
-    #
-    # make -f Makefile.cvs
-    #
-
-    if ( $do_make_makefile_cvs )
-    {
-
-	log_info( "\trm -rf autom4te.cache" );
-	system_int( "rm -rf autom4te.cache >>$make_log 2>&1" ) unless $dry_run;
-
-	log_progress( "\tmake -f Makefile.cvs" );
-	system_int( "$make_env make -e -f Makefile.cvs >>$make_log 2>&1" ) unless $dry_run;
-
-	if ( $CHILD_ERROR )
-	{
-	    log_error( "'make -f Makefile.cvs' failed for $pkg_dir" );
-	    $error = 1;
-	}
-    }
-
-
-    #
-    # make
-    #
-
-    if ( ! $error )
-    {
-	log_progress( "\tmake $make_target" );
-	system_int( "$make_env make -e -j$jobs $make_target >>$make_log 2>&1" ) unless $dry_run;
-
-	if ( $CHILD_ERROR )
-	{
-	    log_error( "'make -j$jobs $make_target' failed for $pkg_dir" );
-	    $error = 1;
-	}
-    }
-
-
-    #
-    # sudo make install
-    #
-
-    if ( $make_target eq "" && ! $error )
-    {
-	log_progress( "\t$sudo_cmd make install" );
-	sudo_system_int( "make install >>$make_log 2>&1" ) unless $dry_run;
-
-	if ( $CHILD_ERROR )
-	{
-	    log_error( "'$sudo_cmd make install' failed for $pkg_dir" );
-	    $error = 1;
-	}
-    }
-
-
-    #
-    # Summary
-    #
-
-    if ( $error )
-    {
-	my $dir = basename( $pkg_dir );
-	push( @failed_dirs, $dir );
-	my $rpm = $rpm_names{ $dir };
-	my $msg = "$dir";
-	$msg .= "\t\t\t(base package)" if defined( $base_rpms{ $rpm } );
-	print FAILED_LOG "$msg\n";
     }
     else
     {
@@ -1376,7 +1404,7 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 
 	--build-libzypp		build libzypp, too
 	--libzypp-source <dir>	libzypp source directory, required for building libzypp
-	--libzypp-prefix <prefix>	use <prefix> instead of /usr
+	--libzypp-prefix <prefix> use <prefix> instead of /usr
 
 	--dump-build-order	only dump the build order to stdout and log
 	--dump-dependencies	only dump package dependencies to stdout and log
@@ -1384,7 +1412,7 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 	--ignore-libzypp	do not complain if multiple versions of libzypp are installed
 
 	--icecream		build on icecream
-	--icecream-prefix <prefix>	use <prefix> instead of /opt/icecream
+	--icecream-prefix <prefix> use <prefix> instead of /opt/icecream
 	--jobs			Specifies the number of jobs to run simultaneously (default 8)
 
 	-v  (--verbose)		verbose output

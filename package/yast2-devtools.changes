@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Dec 20 13:23:44 CET 2007 - sh@suse.de
+
+- Added support for cmake-based projects to y2makeall 
+  (Not just completely out of tree like libzypp, even subdirs
+   in the normal yast2 SVN tree)
+
+-------------------------------------------------------------------
 Mon Dec  3 10:02:27 CET 2007 - coolo@suse.de
 
 - include cmake directories

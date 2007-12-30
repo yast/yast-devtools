@@ -70,6 +70,7 @@ yast2-transfer		inst-sys		transfer/curl agent (autoinst)
 yast2-xml		inst-sys		xml agent (autoinst)
 
 # config packages
+yast2-autofs		default			autofs
 yast2-backup		default			backup
 yast2-bluetooth		default			bluetooth
 yast2-bootloader	default			bootloader
@@ -95,7 +96,6 @@ yast2-kdump		default			kdump (kernel)
 yast2-ldap-client	default			ldap client
 yast2-ldap-server	default			LDAP server
 yast2-mail		default			mail
-yast2-mail-server	default			mail server
 yast2-mouse		default			mouse
 yast2-network		default			network
 yast2-nfs-client	default			nfs client

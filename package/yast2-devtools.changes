@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jan 18 13:35:21 CET 2008 - locilka@suse.cz
+
+- Recommends: doxygen (needed by ydoxygen).
+
+-------------------------------------------------------------------
 Thu Dec 20 13:23:44 CET 2007 - sh@suse.de
 
 - Added support for cmake-based projects to y2makeall 

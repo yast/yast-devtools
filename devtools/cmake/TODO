@@ -1,0 +1,8 @@
+- when doing "make srcpackage", create package/ subdir if it doesn't exist
+  (the tarball will become a file named "package" then and copying the .changes
+  file to package/ will fail) 
+
+- make sure to recreate the .spec file upon "make srcpackage"
+  (.spec.in might have changed since the last "cmake" call)
+
+- make sure to use the latest VERSION file upon "make srcpackage"

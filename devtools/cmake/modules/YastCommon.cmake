@@ -18,7 +18,7 @@ SET ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 ####################################################################
 MESSAGE(STATUS "Writing spec file...")
 
-SET(HEADER-COMMENT
+SET(HEADERCOMMENT
 "#
 # spec file for package ${RPMNAME} (Version ${VERSION})
 #

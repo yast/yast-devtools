@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan 24 13:57:49 CET 2008 - sh@suse.de
+
+- In cmake-based projects, use @HEADERCOMMENT@ instead of
+  @HEADER-COMMENT@ (the "-" seems to be an illegal character) 
+
+-------------------------------------------------------------------
 Fri Jan 18 13:35:21 CET 2008 - locilka@suse.cz
 
 - Recommends: doxygen (needed by ydoxygen).

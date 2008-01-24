@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan 24 14:07:52 CET 2008 - mzugec@suse.de
+
+- replace deprecated NetworkDevices by NetworkInterfaces (from yast2)
+
+-------------------------------------------------------------------
 Thu Jan 24 13:57:49 CET 2008 - sh@suse.de
 
 - In cmake-based projects, use @HEADERCOMMENT@ instead of

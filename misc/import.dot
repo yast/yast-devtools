@@ -36,13 +36,12 @@ digraph import {
 	X11Version -> Require;
 	X11Version -> Package;
 	PackageAI -> Wizard;
-	NetworkModules -> NetworkDevices;
 	Security -> Pam;
 	Security -> Progress;
 	OSRFloppy -> StorageDevices;
 	OSRFloppy -> OSRModuleLoading;
 	"YaPI::LdapServer" -> Ldap;
-	Routing -> NetworkDevices;
+	Routing -> NetworkInterfaces;
 	SambaServerWidgets -> LogView;
 	SambaServerWidgets -> TablePopup;
 	SambaServerWidgets -> SambaServer;
@@ -153,7 +152,7 @@ digraph import {
 	Initrd -> Misc;
 	Initrd -> Report;
 	Encoding -> Mode;
-	Proxy -> NetworkDevices;
+	Proxy -> NetworkInterfaces;
 	Confirm -> Popup;
 	DSL -> Lan;
 	Hotplug -> Arch;
@@ -221,7 +220,7 @@ digraph import {
 	Runlevel -> Service;
 	CUPS -> Printerlib;
 	CUPS -> SuSEFirewall;
-	Firewall -> NetworkDevices;
+	Firewall -> NetworkInterfaces;
 	OSRSwap -> OSRExecute;
 	OSRSwap -> OSRPopup;
 	OSRSwap -> Storage;
@@ -259,7 +258,7 @@ digraph import {
 	NfsServer -> Progress;
 	LdapPopup -> Ldap;
 	SuSEFirewall -> Remote;
-	SuSEFirewall -> NetworkDevices;
+	SuSEFirewall -> NetworkInterfaces;
 	Console -> Language;
 	TftpServer -> Service;
 	TftpServer -> Report;
@@ -328,7 +327,7 @@ digraph import {
 	Samba -> Autologin;
 	ProfileLocation -> AutoInstallRules;
 	AutoinstImage -> Progress;
-	Internet -> NetworkDevices;
+	Internet -> NetworkInterfaces;
 	CWMTab -> CWM;
 	InitHWinfo -> String;
 	InitHWinfo -> Confirm;
@@ -359,7 +358,7 @@ digraph import {
 	DNS -> Detection;
 	DNS -> Host;
 	DNS -> NetworkConfig;
-	DNS -> NetworkDevices;
+	DNS -> NetworkInterfaces;
 	DNS -> Package;
 	DNS -> Service;
 	PackagesUI -> Label;
@@ -411,11 +410,11 @@ digraph import {
 	Remote -> Service;
 	ISDN -> Firewall;
 	Display -> Mode;
-	NetworkDevices -> Call;
-	NetworkDevices -> Progress;
-	NetworkDevices -> Require;
-	NetworkDevices -> DNS;
-	NetworkDevices -> Provider;
+	NetworkInterfaces -> Call;
+	NetworkInterfaces -> Progress;
+	NetworkInterfaces -> Require;
+	NetworkInterfaces -> DNS;
+	NetworkInterfaces -> Provider;
 	Bootloader -> Progress;
 	Bootloader -> BootABOOT;
 	Bootloader -> BootELILO;

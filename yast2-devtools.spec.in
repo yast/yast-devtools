@@ -7,6 +7,8 @@ Requires:	perl-XML-Writer
 Requires:       libxslt
 # we install our .pc under $prefix/share
 Requires:	pkgconfig >= 0.16
+# /usr/lib/YaST2/bin/ydoxygen needs it
+Recommends:	doxygen
 Provides:	ycpdoc ydoc
 Obsoletes:	ycpdoc ydoc
 Provides:	yast2-config-newmodule yast2-trans-newmodule

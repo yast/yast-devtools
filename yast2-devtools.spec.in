@@ -7,6 +7,9 @@ Requires:	perl-XML-Writer
 Requires:       libxslt
 # we install our .pc under $prefix/share
 Requires:	pkgconfig >= 0.16
+Requires:	automake autoconf
+Requires:	gettext-tools
+Recommends:	cmake
 # /usr/lib/YaST2/bin/ydoxygen needs it
 Recommends:	doxygen
 Provides:	ycpdoc ydoc

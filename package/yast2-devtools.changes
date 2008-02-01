@@ -4,6 +4,7 @@ Fri Feb  1 17:09:30 CET 2008 - mvidner@suse.cz
 - Require autotools, gettext-tools, recommend cmake (bnc#356996).
 - y2makepot: look for gettext() in addition to _() and __() (bnc#354678).
 - prefixbuild: cmake fixes, small fixes for individual modules
+- 2.16.4
 
 -------------------------------------------------------------------
 Thu Jan 24 14:07:52 CET 2008 - mzugec@suse.de

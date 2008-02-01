@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb  1 17:09:30 CET 2008 - mvidner@suse.cz
+
+- y2makepot: look for gettext() in addition to _() and __() (bnc#354678).
+- prefixbuild: cmake fixes, small fixes for individual modules
+
+-------------------------------------------------------------------
 Thu Jan 24 14:07:52 CET 2008 - mzugec@suse.de
 
 - replace deprecated NetworkDevices by NetworkInterfaces (from yast2)

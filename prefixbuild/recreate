@@ -127,19 +127,22 @@ function build_module() {
     pushd "$MODULE"
 
     case "$MODULE" in
-	zypper|libzypp) init_cmake "$MODULE";;
+	zypper|libzypp|qt) init_cmake "$MODULE";;
 	*) init_autotools "$MODULE";;
     esac
 
     # special case not to drag in old libzypp: force linking from scratch
     case "$MODULE" in
 	pkg-bindings) : ;;
-	*-bindings) find -name \*.la | xargs rm -v ;;
+	*-bindings) find -name \*.la | xargs --no-run-if-empty rm -v ;;
     esac
 
     pfx $MAKE
     pfx make install
 
+    case "$MODULE" in
+	zypper|libzypp|qt) cd ..;;
+    esac
     touch .recreated
     popd
 }
@@ -189,7 +192,7 @@ module firewall		"$PFX"
 
 module perl-bindings	"$PFX" "$CFLAGS"
 
-module storage		"$PFX" "$CFLAGS" '--sbindir=$(prefix)/sbin'
+module storage		"$PFX" "$CFLAGS" "$FILLUPDIR" '--sbindir=$(prefix)/sbin'
 module bootloader	"$PFX" "$FILLUPDIR"
 
 module x11		"$PFX" "$CFLAGS"
@@ -215,6 +218,7 @@ module runlevel		"$PFX"
 module firstboot	"$PFX" "$FILLUPDIR" '--sysconfdir=$(prefix)/etc'
 
 module metapackage	"$PFX" '--sbindir=$(prefix)/sbin'
+module product-creator	"$PFX" "$FILLUPDIR"
 
 if $RESOLVE_DEPS; then
     echo >&2 "Getting dependencies"

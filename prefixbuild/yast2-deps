@@ -14,6 +14,8 @@ function rpm_to_svn() {
     case "$RPM" in
 	yast2|liby2util)
 	    echo "$RPM" ;;
+	yast2-country-data)
+	    echo country ;;
 	yast2-mail-aliases)
 	    echo mail ;;
 	yast2-storage-lib)

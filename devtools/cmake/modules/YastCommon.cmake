@@ -52,52 +52,101 @@ SET(INSTALL
 make install DESTDIR=\"$RPM_BUILD_ROOT\""
 )
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/${RPMNAME}.spec.in ${CMAKE_BINARY_DIR}/package/${RPMNAME}.spec @ONLY)
-####################################################################
-
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "-")
-SET(CPACK_PACKAGE_VENDOR "-")
-SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
-SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
-SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-
-SET( CPACK_GENERATOR "TBZ2")
-SET( CPACK_SOURCE_GENERATOR "TBZ2")
-SET( CPACK_SOURCE_PACKAGE_FILE_NAME "${RPMNAME}-${VERSION}" )
-
-# The following components are regex's to match anywhere (unless anchored)
-# in absolute path + filename to find files or directories to be excluded
-# from source tarball.
-SET (CPACK_SOURCE_IGNORE_FILES
-"/CVS/;/.svn/;/.libs/;/.deps/;.swp$;.#;/#;/build/"
-"~$"
-"\\\\.cvsignore$"
-"/package"
-"Makefile\\\\.in$"
-)
-INCLUDE(CPack)
-
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-ADD_CUSTOM_TARGET( svncheck
-  COMMAND cd $(CMAKE_SOURCE_DIR) && ! LC_ALL=C svn status --show-updates --quiet | grep -v '^Status against revision'
-)
+####################################################################
+# RPM SPEC                                                         #
+####################################################################
 
-SET( AUTOBUILD_COMMAND
-  COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/package/*.tar.bz2
-  COMMAND ${CMAKE_MAKE_PROGRAM} package_source
-  COMMAND ${CMAKE_COMMAND} -E copy ${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.bz2 ${CMAKE_BINARY_DIR}/package
-  COMMAND ${CMAKE_COMMAND} -E remove ${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.bz2
-  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/package/${RPMNAME}.changes" "${CMAKE_BINARY_DIR}/package/${RPMNAME}.changes"
-)
+MACRO(SPECFILE)
+  MESSAGE(STATUS "Writing spec file...")
+  
+  SET(SPECIN ${CMAKE_SOURCE_DIR}/${PACKAGE}.spec.cmake)
+  IF (NOT EXISTS ${SPECIN})
+    SET(SPECIN ${CMAKE_SOURCE_DIR}/${PACKAGE}.spec.in)
+  ENDIF (NOT EXISTS ${SPECIN})
+  
+  CONFIGURE_FILE(${SPECIN} ${CMAKE_BINARY_DIR}/package/${PACKAGE}.spec @ONLY)
+  MESSAGE(STATUS "I hate you rpm-lint...!!!")
+  IF (EXISTS ${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake)
+    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake ${CMAKE_BINARY_DIR}/package/${PACKAGE}-rpmlintrc @ONLY)
+  ENDIF (EXISTS ${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake)
+ENDMACRO(SPECFILE)
 
-ADD_CUSTOM_TARGET( srcpackage_local
-  ${AUTOBUILD_COMMAND}
-)
+MACRO(PKGCONFGFILE)
+  MESSAGE(STATUS "Writing pkg-config file...")
+  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/libzypp.pc.cmake ${CMAKE_BINARY_DIR}/libzypp.pc @ONLY)
+  INSTALL( FILES ${CMAKE_BINARY_DIR}/libzypp.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+ENDMACRO(PKGCONFGFILE)
 
-ADD_CUSTOM_TARGET( srcpackage
-  COMMAND ${CMAKE_MAKE_PROGRAM} svncheck
-  ${AUTOBUILD_COMMAND}
-)
+MACRO(GENERATE_PACKAGING PACKAGE VERSION)
+  # The following components are regex's to match anywhere (unless anchored)
+  # in absolute path + filename to find files or directories to be excluded
+  # from source tarball.
+  SET (CPACK_SOURCE_IGNORE_FILES
+  #svn files
+  "\\\\.svn/"
+  "\\\\.cvsignore$"
+  # temporary files
+  "\\\\.swp$"
+  # backup files
+  "~$"
+  # eclipse files
+  "\\\\.cdtproject$"
+  "\\\\.cproject$"
+  "\\\\.project$"
+  "\\\\.settings/"
+  # others
+  "\\\\.#"
+  "/#"
+  "/build/"
+  "/_build/"
+  "/\\\\.git/"
+  # used before
+  "/CVS/"
+  "/\\\\.libs/"
+  "/\\\\.deps/"
+  "\\\\.o$"
+  "\\\\.lo$"
+  "\\\\.la$"
+  "Makefile\\\\.in$"
+  )
+
+  #SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Novell's package management core engine.")
+  SET(CPACK_PACKAGE_VENDOR "Novell Inc.")
+  #SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+  #SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
+  #SET(CPACK_PACKAGE_VERSION_MAJOR ${version_major})
+  #SET(CPACK_PACKAGE_VERSION_MINOR ${version_minor})
+  #SET(CPACK_PACKAGE_VERSION_PATCH ${version_patch})
+  SET( CPACK_GENERATOR "TBZ2")
+  SET( CPACK_SOURCE_GENERATOR "TBZ2")
+  SET( CPACK_SOURCE_PACKAGE_FILE_NAME "${PACKAGE}-${VERSION}" )
+  INCLUDE(CPack)
+  
+  SET(PACKAGE ${RPMNAME})
+  SPECFILE()
+  
+  ADD_CUSTOM_TARGET( svncheck
+    COMMAND cd $(CMAKE_SOURCE_DIR) && ! LC_ALL=C svn status --show-updates --quiet | grep -v '^Status against revision'
+  )
+
+  SET( AUTOBUILD_COMMAND
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/package/*.tar.bz2
+    COMMAND ${CMAKE_MAKE_PROGRAM} package_source
+    COMMAND ${CMAKE_COMMAND} -E copy ${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.bz2 ${CMAKE_BINARY_DIR}/package
+    COMMAND ${CMAKE_COMMAND} -E remove ${CPACK_SOURCE_PACKAGE_FILE_NAME}.tar.bz2
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/package/${PACKAGE}.changes" "${CMAKE_BINARY_DIR}/package/${PACKAGE}.changes"
+  )
+  
+  ADD_CUSTOM_TARGET( srcpackage_local
+    ${AUTOBUILD_COMMAND}
+  )
+  
+  ADD_CUSTOM_TARGET( srcpackage
+    COMMAND ${CMAKE_MAKE_PROGRAM} svncheck
+    ${AUTOBUILD_COMMAND}
+  )
+ENDMACRO(GENERATE_PACKAGING)
 
 

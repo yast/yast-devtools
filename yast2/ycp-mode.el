@@ -60,7 +60,7 @@
        (ycp-builtin-funcs
 	(eval-when-compile
 	 (regexp-opt '("is" "select" "lookup" "contains" "setcontains"
-		       "size" "haskey" "add" "prepend" "union" "foreach" "filter"
+		       "size" "haskey" "add" "prepend" "union" "merge" "foreach" "filter"
 		       "find" "maplist" "flatten" "sort" "time" "toset" "listmap" "mapmap"
 		       "tointeger" "tofloat" "tostring" "topath"
 		       "crypt" "substring" "findfirstnotof" "tolower"

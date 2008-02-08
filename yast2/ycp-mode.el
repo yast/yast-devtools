@@ -98,6 +98,7 @@
 		       "`Heading"
 		       "`IconButton"
 		       "`Image"
+		       "`InputField"
 		       "`IntField"
 		       "`Label"
 		       "`Left"

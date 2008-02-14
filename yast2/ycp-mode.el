@@ -235,6 +235,7 @@
 			"`Enabled"
 			"`ExpectedSize"
 			"`Filename"
+			"`IconPath"
 			"`InputMaxLength"
 			"`Item"
 			"`Items"

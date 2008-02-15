@@ -28,7 +28,7 @@ fi
 cmd=$1
 shift
 
-if [ "$cmd" == "--help" ]; then
+if [ "$cmd" == "--help" -o "$cmd" == "-h" ]; then
     cd $y2toolpath
     ls
     exit 0

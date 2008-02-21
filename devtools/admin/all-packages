@@ -19,6 +19,8 @@
 # core packages
 yast2			inst-sys,default	all
 yast2-core		inst-sys,default	all
+yast2-libyui		inst-sys,default	all
+yast2-ycp-ui-bindings	inst-sys,default	all
 yast2-control-center	default			all
 yast2-gtk			default		all
 yast2-control-center-gnome	default		all

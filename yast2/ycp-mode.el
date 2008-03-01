@@ -50,6 +50,7 @@
 	(eval-when-compile
 	 (regexp-opt '("if" "else" "while" "do" "repeat" "until"
 		       "continue" "return" "define" "break"
+		       "switch" "case" "default"
 		       "empty" "textdomain"))))
        (ycp-builtin-types
 	(eval-when-compile

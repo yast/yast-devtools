@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Mar 12 15:02:20 CET 2008 - mvidner@suse.cz
+
+- Moved VIM simtax highlighting here from vim-data (bnc#364509).
+- prefixbuild: accounted for recent package splits
+- 2.16.7
+
+-------------------------------------------------------------------
 Fri Feb 15 12:34:15 CET 2008 - coolo@suse.de
 
 - several fixes in the cmake modules

@@ -50,6 +50,9 @@ EOF
 %dir %{prefix}/share/emacs
 %dir %{prefix}/share/emacs/site-lisp
 %{prefix}/share/emacs/site-lisp/*ycp-mode.el
+%dir %{prefix}/share/vim/site
+%{prefix}/share/vim/site/syntax/ycp.vim
+%{prefix}/share/vim/site/ftdetect/ycp_filetype.vim
 %dir %{prefix}/lib/YaST2
 %{prefix}/share/cmake
 @ybindir@

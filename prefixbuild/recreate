@@ -52,8 +52,8 @@ fi
 
 #check that we are  in the right directory: .../trunk or .../branches/$B
 if $DIRECTORY_CHECK; then
-    if ! test -f extra-packages; then
-	echo "Not in the right directory. extra-packages not seen."
+    if ! test -f extra-packages -o -d libzypp; then
+	echo "Not in the right directory. extra-packages or libzypp not seen."
 	exit 1
     fi
 fi
@@ -127,7 +127,7 @@ function build_module() {
     pushd "$MODULE"
 
     case "$MODULE" in
-	zypper|libzypp|qt) init_cmake "$MODULE";;
+	zypper|libzypp|qt*) init_cmake "$MODULE";;
 	*) init_autotools "$MODULE";;
     esac
 
@@ -141,7 +141,7 @@ function build_module() {
     pfx make install
 
     case "$MODULE" in
-	zypper|libzypp|qt) cd ..;;
+	zypper|libzypp|qt*) cd ..;;
     esac
     touch .recreated
     popd

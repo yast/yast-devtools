@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 12 16:19:20 CET 2008 - mvidner@suse.cz
+
+- Fixed file list.
+- 2.16.8
+
+-------------------------------------------------------------------
 Wed Mar 12 15:02:20 CET 2008 - mvidner@suse.cz
 
 - Moved VIM simtax highlighting here from vim-data (bnc#364509).

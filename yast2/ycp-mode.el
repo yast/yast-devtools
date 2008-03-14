@@ -76,6 +76,7 @@
 	  (regexp-opt '(
 		       "`BarGraph"
 		       "`Bottom"
+		       "`Center"
 		       "`CheckBox"
 		       "`CheckBoxFrame"
 		       "`ColoredLabel"

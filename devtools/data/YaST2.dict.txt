@@ -145,3 +145,11 @@ unmount
 unmounting
 workflow
 xntp
+UML
+iSCSI
+DASD
+ZFCP
+openSUSE
+smb
+umount
+strace

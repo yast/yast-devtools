@@ -6,9 +6,10 @@ usage () {
     echo "  -h, --help:    this help"
     echo "  -n, --echo:    don't tag, just echo tag name"
     echo "  -u, --echourl: don't tag, just echo tag url (Subversion only)"
+    echo "  -r, --remove:  remove the tag (after adding it by mistake, SVN only)"
 }
 
-OPTIONS=`getopt --name $0 --options hnu --longoptions help,echo,echourl -- "$@"` || { usage; exit 1; }
+OPTIONS=`getopt --name $0 --options hnru --longoptions help,echo,echourl,remove -- "$@"` || { usage; exit 1; }
 eval set -- "$OPTIONS"
 while true; do
     case "$1" in
@@ -22,6 +23,9 @@ while true; do
 	    ;;
 	-n|--echo)
 	    ECHO=1
+	    ;;
+	-r|--remove)
+	    REMOVE=1
 	    ;;
 	-u|--echourl)
 	    ECHOURL=1
@@ -49,6 +53,8 @@ if [ -d CVS ]; then
 	echo "$t"
     elif [ "$ECHOURL" ]; then
 	echo "echo tag url not supported in CVS"
+    elif [ "$REMOVE" ]; then
+	echo "echo tag removing not supported in CVS"
     else
 	echo "$p $t"
 	cvs tag $t
@@ -77,6 +83,8 @@ else
 	echo "$t"
     elif [ "$ECHOURL" ]; then
 	echo "$URL_t/$MODULE"
+    elif [ "$REMOVE" ]; then
+	svn rm --message "Removed tag $t for $MODULE" "$URL_t/$MODULE"
     else
 	echo "$p $t"
 	svn mkdir --message "Created tag $t" $REPOSITORY/tags/$t

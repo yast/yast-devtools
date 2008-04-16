@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Apr 16 18:20:55 CEST 2008 - mvidner@suse.cz
+
+- tagversion --remove: remove tag after adding it by mistake
+
+-------------------------------------------------------------------
 Mon Mar 31 16:55:56 CEST 2008 - locilka@suse.cz
 
 - Some more words added to the current YaST dictionary.

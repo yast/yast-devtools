@@ -127,7 +127,7 @@ function build_module() {
     pushd "$MODULE"
 
     case "$MODULE" in
-	zypper|libzypp|qt*) init_cmake "$MODULE";;
+	zypper|libzypp|sat-solver|libyui-bindings|qt*) init_cmake "$MODULE";;
 	*) init_autotools "$MODULE";;
     esac
 
@@ -141,7 +141,7 @@ function build_module() {
     pfx make install
 
     case "$MODULE" in
-	zypper|libzypp|qt*) cd ..;;
+	zypper|libzypp|sat-solver|libyui-bindings|qt*) cd ..;;
     esac
     touch .recreated
     popd

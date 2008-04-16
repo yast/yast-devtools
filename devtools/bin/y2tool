@@ -9,7 +9,7 @@
 
 self=`basename $0`
 
-if [ "$1" == "--prefix" -o "$1" == "-p" ]; then
+if [ "$1" = "--prefix" -o "$1" = "-p" ]; then
     shift
     PREFIX="$1"
     shift
@@ -21,14 +21,14 @@ if [ -z "$PREFIX" ]; then
 fi
 
 y2toolpath=${PREFIX}/share/YaST2/data/devtools/bin
-if [ `dirname $0` == "." ]; then
+if [ `dirname $0` = "." ]; then
     y2toolpath=.
 fi
 
 cmd=$1
 shift
 
-if [ "$cmd" == "--help" -o "$cmd" == "-h" ]; then
+if [ "$cmd" = "--help" -o "$cmd" = "-h" ]; then
     cd $y2toolpath
     ls
     exit 0

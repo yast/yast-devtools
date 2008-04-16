@@ -1,6 +1,9 @@
 -------------------------------------------------------------------
-Wed Apr 16 18:20:55 CEST 2008 - mvidner@suse.cz
+Wed Apr 16 18:23:31 CEST 2008 - mvidner@suse.cz
 
+- removed bash constructs from y2tool and y2automake which are marked
+  with /bin/sh (bnc#379849)
+- exposed warnings in ydoc2 (docs for YCP builtins)
 - tagversion --remove: remove tag after adding it by mistake
 
 -------------------------------------------------------------------

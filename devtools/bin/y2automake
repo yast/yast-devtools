@@ -102,7 +102,7 @@ echo "SUBDIRS = $subdirs" >>Makefile.am
 # Generate po/Makefile.am
 #
 
-if [ x"yast2-trans" = x$(cat RPMNAME | sed 's:\(yast2-trans\).*:\1:') -a \
+if [ x"yast2-trans" = x`cat RPMNAME | sed 's:\(yast2-trans\).*:\1:'` -a \
      -d po ]; then
 
     po_adminpath=$y2adminpath/po

@@ -52,6 +52,7 @@ yast2-firstboot 	default	                firstboot
 yast2-slide-show	inst-sys		install
 yast2-slide-show-SLES	inst-sys		install
 yast2-live-installer	-			install
+yast2-dirinstall	-			install
 
 # auto installation
 autoyast2		default			all,autoinstall

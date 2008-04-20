@@ -1,3 +1,18 @@
+# Generic macros for YaST
+#
+# The module defined the following functions and variables
+#
+# LIB_INSTALL_DIR - where to install libraries
+#                   usually ${CMAKE_INSTALL_PREFIX}/lib or lib64
+#
+# YAST_PLUGIN_DIR - where YaST plugins, agents etc, go
+#                   ${LIB_INSTALL_DIR}/YaST2/plugins
+# YAST_IMAGE_DIR
+# YAST_DATA_DIR
+#
+#
+
+
 #SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -Wall -Woverloaded-virtual" )
 #SET( CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -g -O3 -Wall" )
 
@@ -27,7 +42,6 @@ MESSAGE(STATUS "Libraries will be installed in ${LIB_INSTALL_DIR}" )
 SET(YAST_PLUGIN_DIR ${LIB_INSTALL_DIR}/YaST2/plugin)
 SET(YAST_IMAGE_DIR ${CMAKE_INSTALL_PREFIX}/YaST2/plugin)
 SET(YAST_DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/YaST2/data)
-
 
 IF (NOT DEFINED RPMNAME)
   FILE(READ "${CMAKE_SOURCE_DIR}/RPMNAME" RPMNAME)
@@ -175,12 +189,10 @@ MACRO(GENERATE_PACKAGING PACKAGE VERSION)
 ENDMACRO(GENERATE_PACKAGING)
 
 macro(y2_add_agent)
-  MESSAGE(STATUS "${ARGV0} ${ARGV2}") 
   set(name ${ARGV0})
   set(srcs ${ARGV1})
   if(NOT srcs)
      file( GLOB srcs ${CMAKE_CURRENT_SOURCE_DIR}/*.cc )
-     MESSAGE(STATUS "${srcs}") 
   endif(NOT srcs)
   add_library(pyag_${name} SHARED ${srcs})
   SET_TARGET_PROPERTIES( pyag_${name} PROPERTIES VERSION 2.0 )

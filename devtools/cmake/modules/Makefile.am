@@ -1,7 +1,5 @@
 cmakedir = $(datadir)/cmake/Modules
-ycmakedir = @YAST2DEVTOOLS@/cmake/modules
 
-cmake_DATA = FindYast.cmake
-ycmake_DATA = YastCommon.cmake
+cmake_DATA = FindYast.cmake YastCommon.cmake
 
-EXTRA_DIST = $(cmake_DATA) $(ycmake_DATA)
+EXTRA_DIST = $(cmake_DATA) 

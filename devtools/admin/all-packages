@@ -113,6 +113,7 @@ yast2-phone-services	default			isdn
 yast2-power-management	default			power management
 yast2-powertweak	expert_user		powertweak configuration
 yast2-printer		default			printer
+yast2-product-creator	default			create installation CDs (obsoletes cd-crator module)
 yast2-profile-manager	default			profile-manager
 yast2-repair		inst-sys,default	repair
 yast2-restore		default			restore

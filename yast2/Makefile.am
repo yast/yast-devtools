@@ -4,7 +4,11 @@
 
 SUBDIRS = check_ycp
 
-ybin_SCRIPTS = ycp_puttext
+# bnc#396315 
+pkgdatadir = @YAST2DEVTOOLS@/bin
+pkgdata_SCRIPTS = ycp_puttext
+install-data-local:
+	ln -snf $(pkgdatadir)/ycp_puttext $(DESTDIR)$(ybindir)
 
 emacsdir = $(prefix)/share/emacs/site-lisp
 emacs_DATA = ycp-mode.el suse-start-ycp-mode.el
@@ -15,4 +19,4 @@ vimsyntax_DATA = ycp.vim
 vimftdir = $(prefix)/share/vim/site/ftdetect
 vimft_DATA = ycp_filetype.vim
 
-EXTRA_DIST = $(ybin_SCRIPTS) $(emacs_DATA) $(vimsyntax_DATA) $(vimft_DATA)
+EXTRA_DIST = $(pkgdata_SCRIPTS) $(emacs_DATA) $(vimsyntax_DATA) $(vimft_DATA)

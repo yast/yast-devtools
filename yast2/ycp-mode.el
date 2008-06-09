@@ -66,7 +66,7 @@
 		       "tointeger" "tofloat" "tostring" "topath" "toterm"
 		       "crypt" "substring" "findfirstnotof" "tolower"
 		       "toascii" "filterchars" "eval" "symbolof" "argsof"
-		       "sleep" "sformat" "y2log" "mergestring" "splitstring"
+		       "sleep" "sformat" "y2log" "mergestring" "splitstring" "sublist"
 		       "findfirstof" "issubstring"
 		       "fileexist" "checkIP" "isnil" "include" "module" "import"
 		       "y2debug" "y2milestone" "y2warning" "y2error" "y2security" "y2internal"

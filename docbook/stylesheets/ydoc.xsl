@@ -25,35 +25,27 @@
 
     <xsl:template match="entries_item">
         <refentry>
-            <xsl:choose>
-                <xsl:when test="type = 'widget'">
-                    <xsl:attribute name="id">
-                        <xsl:choose>
-                            <xsl:when test="id != ''">
-                                <xsl:value-of select="id"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="names/names_item"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                        <xsl:text>_widget</xsl:text>
-                    </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:attribute name="id">
-                        <xsl:value-of select="filename"/>
-                        <xsl:text>_</xsl:text>
-                        <xsl:choose>
-                            <xsl:when test="id != ''">
-                                <xsl:value-of select="id"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="names/names_item"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:attribute name="id">
+                <xsl:if test="type != 'widget'">
+                    <xsl:value-of select="filename"/>
+                    <xsl:text>_</xsl:text>
+                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="id != ''">
+                        <xsl:value-of select="id"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="replace-substring">
+                            <xsl:with-param name="from" select="'::'" />
+                            <xsl:with-param name="to" select="'_'" />
+                            <xsl:with-param name="value" select="names/names_item"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:if test="type = 'widget'">
+                    <xsl:text>_widget</xsl:text>
+                </xsl:if>
+            </xsl:attribute>
             <refmeta>
                     <refentrytitle>
                         <xsl:if test="namespace != ''">

@@ -1,6 +1,7 @@
 -------------------------------------------------------------------
 Mon Jun  9 11:29:04 CEST 2008 - mvidner@suse.cz
 
+- ydoc.xsl: don't break on builtins in namespaces.
 - Fixed some perl warnings in ydoc2.
 
 -------------------------------------------------------------------

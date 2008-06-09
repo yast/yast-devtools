@@ -327,15 +327,13 @@ sub parse_comments (@)
 	}
 	elsif ($line =~ /\@note\s+(.*)/)
 	{
-            $para = "";
 	    $lastwas = "note";
-            $para .= $1;
+	    $para = $1;
 	}
-	elsif ($line =~ /\@description\s+(.*)/ || $line =~ /\@description$/)
+	elsif ($line =~ /\@description\s*(.*)/)
 	{
-            $para = "";
 	    $lastwas = "description";
-            $para .= $1;
+	    $para = $1;
 	}
 	elsif($line =~ /\@see\s+(.*)/)
 	{
@@ -596,7 +594,7 @@ sub parse_comments (@)
                 }
             }
 	}
-	elsif ($lastwas == '')
+	elsif ($lastwas eq "")
 	{
             $lastwas = "short";
 	    $entry->{"short"} .= $line;
@@ -770,6 +768,10 @@ sub write_docs
 sub dump_data
 {
     my $node = shift;
+    if (!defined($node))
+    {
+	return;
+    }
 
     if (!ref ($node))
     {

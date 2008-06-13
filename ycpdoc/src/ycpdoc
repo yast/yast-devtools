@@ -102,6 +102,8 @@ Flags: Stable Unstable
 	    @stable or @unstable
 	    @struct name		begins a struct description, <pre>
 	    @ref function		(inline, otherwise like @see)
+	    @internal			marks the module for internal
+					use only (bnc #344926)
 
 First line is automatically taken as short if it has no tag. Empty line after
 the first line indicates begin of the description. Every following new line
@@ -692,6 +694,11 @@ sub do_shipout ($$$$$@)
 	    $entry->{stability} = $tag;
 	    $addto = undef;
 	}
+	elsif ($tag eq "internal")
+	{
+	    $entry->{internal} = 1;
+	    $addto = undef;
+	}
 	elsif ($tag eq "struct" || $tag eq "tuple")
 	{
 	    $tag = $lastwas = "scruple";
@@ -852,6 +859,11 @@ sub parse_header (@)
 	{
 	    $key = "stability";
 	    $a = lc $1;
+	}
+	elsif ($a =~ /^\s*(Internal)\s*$/)
+	{
+	    $key = "internal";
+	    $a = "1";
 	}
 	elsif ($a =~ /^\s*\$Id/)
 	{
@@ -1360,11 +1372,19 @@ sub write_onefile ($$)
 
     $O->elem ("tr");
     $O->elem ("td");
+
     my $stability = $parsed_header->{stability} || "unstable";
     if ($stability eq "unstable")
     {
 	$O->tree (["p", ["-", "This module has an unstable interface."]]);
     }
+
+    my $internal = $parsed_header->{internal} || "0";
+    if ($internal)
+    {
+	$O->tree (["p", ["-", "This module is for internal use only."]]);
+    }
+
     #TODO maybe add something about "stable"
     $O->close ("td");
     $O->close ("tr");

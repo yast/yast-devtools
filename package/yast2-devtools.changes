@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jun 13 13:01:45 CEST 2008 - locilka@suse.cz
+
+- Script ycpdoc has been extended to understand new header-tag
+  'Internal'. Internal modules are skipped while creating the YaST
+  overall documentation (bnc #344926).
+
+-------------------------------------------------------------------
 Mon Jun  9 11:29:04 CEST 2008 - mvidner@suse.cz
 
 - ydoc.xsl: don't break on builtins in namespaces.

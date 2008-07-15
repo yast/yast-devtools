@@ -3,6 +3,7 @@ Tue Jul 15 17:33:33 CEST 2008 - locilka@suse.cz
 
 - Killed some ycpdoc lamentation (leaving the worthy complaints).
 - Added some docu-bug tolerancy level (@tag:->@tag, @tags->@tag).
+- Testsuites forced to accept my changes!
 - 2.17.1
 
 -------------------------------------------------------------------

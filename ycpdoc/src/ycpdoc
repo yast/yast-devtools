@@ -642,14 +642,18 @@ sub do_shipout ($$$$$@)
 	    $lastwas = $tag;
 	}
 
-	if ($tag eq "param")
+	# "@tag:" == "@tag"
+	# better to include a wrong tag than nothing
+	$tag =~ s/:$//;
+
+	if ($tag eq "param" || $tag eq "params")
 	{
 	    $arg =~ /($ycp_symbol)\s*(.*)/o;
 	    $last_param = $1;
 	    $addto = \ $param_incomment{$last_param};
 	    $$addto = almost_html ($2);
 	}
-	elsif ($tag eq "return")
+	elsif ($tag eq "return" || $tag eq "returns")
 	{
 	    $arg =~ /($ycp_typedecl)?\s*(.*)/o;
 	    $documented_type = $1 || "";
@@ -766,10 +770,10 @@ sub do_shipout ($$$$$@)
 	my $name = $param_mapref->{"name"};
 	my $cmt = $param_incomment{$name} || "";
 	$param_mapref->{"description"} = $cmt;
-	if ($cmt eq "")
-	{
-	    warning ("Parameter $name declared in function header but not documented.");
-	}
+#	if ($cmt eq "")
+#	{
+#	    warning ("Parameter $name declared in function header but not documented.");
+#	}
 	}
     # for commented parameters: warn if no such actual parameter
     foreach my $key (sort keys %param_incomment)
@@ -778,7 +782,7 @@ sub do_shipout ($$$$$@)
 	if (!defined ($param_infunc{$key})) {
 	    if ($entry->{"kind"} eq "function")
 	    {
-		warning ("Parameter $key documented but not declared in function header.");
+#		warning ("Parameter $key documented but not declared in function header.");
 	    }
 	    else
 	    {

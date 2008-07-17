@@ -13,10 +13,12 @@ prepend() {
 }
 
 export PS1='[${PREFIX##*/}]:\w\$ '
-export Y2DIR=$PREFIX/share/YaST2
+# done by YAST2DIR already
+#export Y2DIR=$PREFIX/share/YaST2
 MY_PERL_VENDORARCH=`perl -V:vendorarch | sed "s,.*=',,;s,'.*,," | sed "s,/usr,$PREFIX," `
+MY_PERL_VENDORLIB=`perl -V:vendorlib   | sed "s,.*=',,;s,'.*,," | sed "s,/usr,$PREFIX," `
 prepend PKG_CONFIG_PATH "$PREFIX/share/pkgconfig:$PREFIX/lib/pkgconfig"
-prepend PERL5LIB "$MY_PERL_VENDORARCH"
+prepend PERL5LIB "$MY_PERL_VENDORARCH:$MY_PERL_VENDORLIB"
 prepend PATH "$PREFIX/bin"
 LIB=lib
 if [ -d /usr/lib64 ]; then

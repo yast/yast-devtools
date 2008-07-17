@@ -73,7 +73,7 @@ function init_cmake() {
     mkdir -p _build
     cd _build
 
-    PATH=/opt/icecream/bin:$PATH cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DZYPP_PREFIX=$PREFIX  -DSYSCONFDIR=$PREFIX/etc -DMANDIR=$PREFIX/share/man -DCMAKE_BUILD_TYPE=Debug ..
+    PATH=/opt/icecream/bin:/usr/lib/icecc/bin:$PATH cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DZYPP_PREFIX=$PREFIX  -DSYSCONFDIR=$PREFIX/etc -DMANDIR=$PREFIX/share/man -DCMAKE_BUILD_TYPE=Debug ..
 }
 
 function init_autotools() {
@@ -187,7 +187,7 @@ module mouse		"$PFX"
 
 ## yast2-deps says installation needs xml
 ## but apparently that's not the case
-module installation	"$PFX" "$FILLUPDIR" 'fvwmdir=$(prefix)/fvwm'
+module installation	"$PFX" "$FILLUPDIR" '--sysconfdir=$(prefix)/etc' 'fvwmdir=$(prefix)/fvwm'
 module firewall		"$PFX"
 
 module perl-bindings	"$PFX" "$CFLAGS"

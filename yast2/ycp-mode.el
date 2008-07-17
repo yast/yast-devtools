@@ -178,6 +178,7 @@
 			"`infocolor"
 			"`keepSorting"
 			"`keyEvents"
+			"`multiSelection"
 			"`noAutoEnable"
 			"`notify"
 			"`outputField"

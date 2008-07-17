@@ -272,8 +272,15 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
-CFLAGS="${CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
-CXXFLAGS="${CXXFLAGS} -Wall -Wformat=2"
+# core defines it, others use it
+if test $PACKAGE != yast2-core; then
+    PKG_CHECK_MODULES(Y2CORE, yast2-core)
+else
+    : # core has already defined Y2CORE_CFLAGS
+fi
+
+CFLAGS="${CFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
+CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2"
 
 : ${AGENT_LIBADD:=\'-L$(libdir) -lscr\'}
 AC_SUBST(AGENT_LIBADD)

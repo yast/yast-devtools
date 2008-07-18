@@ -272,12 +272,11 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
-# core defines it, others use it
-if test $PACKAGE != yast2-core; then
+# If we have core, get its Y2CORE_CFLAGS.
+# When building core itself, it has set Y2CORE_CFLAGS elsewhere already
+PKG_CHECK_EXISTS([yast2-core],[
     PKG_CHECK_MODULES(Y2CORE, yast2-core)
-else
-    : # core has already defined Y2CORE_CFLAGS
-fi
+])
 
 CFLAGS="${CFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
 CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2"

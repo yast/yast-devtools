@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-
+<!DOCTYPE xsl:stylesheet [
+<!ENTITY undocumented "[DOCS MISSING]">
+]>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" indent="yes" encoding="ISO-8859-1"/> 
@@ -318,9 +320,7 @@
                                             </programlisting>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <para>
                                                 <xsl:value-of select="."/>
-                                            </para>
                                         </xsl:otherwise>
                                     </xsl:choose>
                     </para>
@@ -363,6 +363,9 @@
                                 </type>
                             </term>
                             <listitem>
+ 			        <xsl:if test="not(description)">
+                                  <para>&undocumented;</para>
+				</xsl:if>
                                 <xsl:for-each select="description">
                                     <para>
                                         <xsl:value-of select="."/>

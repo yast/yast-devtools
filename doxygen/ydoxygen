@@ -33,7 +33,7 @@ Use this prefix for the template, don't deduce it from the script's path.
 =item B<-d>, B<--debug>
 
 Show what is substituted.
-Write doxygen.log and doxygen.conf.
+Keep doxygen.conf.
 
 =item I<param>=I<value>
 
@@ -108,15 +108,9 @@ foreach (@ARGV)
 # open input file
 open (IN, "<$template") or die "Cannot open $template: $!";
 
-# open output - pipe
-# man perlipc
-$SIG{PIPE} = 'IGNORE';
-my $run_doxygen = "|doxygen -";
-if ($debug)
-{
-    $run_doxygen = "|tee doxygen.conf ". $run_doxygen;
-}
-open (OUT, $run_doxygen) or die "can't fork doxygen: $!";
+# open output
+my $conf = "doxygen.conf";
+open (OUT, ">$conf") or die "Cannot open $conf for writing: $!";
 
 # $_ holds the whole definition of a parameter
 # that may be split over multiple lines
@@ -153,9 +147,28 @@ while (defined ($single = <IN>))
 
 	$_ = "$param$ws= $value";
     }
-    print OUT "$_\n" or die "can't write to doxygen: $!";
+    print OUT "$_\n" or die "Cannot write to $conf: $!";
     $_ = "";			# this line does not continue
 }
 
-close(OUT) or die "can't close pipe to doxygen: status=$?";
+close(OUT) or die "Cannot close $conf: $!";
 close(IN);
+
+# config is ready, run it:
+my $doxygen = "doxygen";
+print "$doxygen $conf\n";
+system($doxygen, $conf);
+
+if ($? == -1) {
+    die "Cannot run $doxygen: $!";
+}
+elsif ($? & 127) {
+    my $s = $? & 127;
+    die "$doxygen died with signal $s";
+}
+elsif ($? != 0) {
+    my $e =  $? >> 8;
+    die "$doxygen exited with value $e, see doxygen.log";
+}
+
+unlink $conf unless $debug;

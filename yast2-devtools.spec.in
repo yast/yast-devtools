@@ -12,6 +12,8 @@ Requires:	gettext-tools
 Recommends:	cmake
 # /usr/lib/YaST2/bin/ydoxygen needs it
 Recommends:	doxygen
+# for svn builds of binary packages
+Recommends:	libtool
 Provides:	ycpdoc ydoc
 Obsoletes:	ycpdoc ydoc
 Provides:	yast2-config-newmodule yast2-trans-newmodule

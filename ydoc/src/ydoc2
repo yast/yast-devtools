@@ -39,8 +39,6 @@ sub scan_file ($)
 {
     my ($file) = @_;
 
-    tie @{$f->{"entries"}}, "entries";
-
     my $in_comment = 0;
     my $line = '';                      # collected input line
     my $comment = '';                   # last comment block
@@ -740,9 +738,12 @@ sub read_class_file()
 
 sub main () 
 {
+    tie @{$f->{"entries"}}, "entries";
     parse_arguments();
-    ($filename,$filepath,$filesuffix) = fileparse($ARGV[0],qr{\.cc});
-    scan_file($ARGV[0]);
+    foreach my $arg (@ARGV) {
+	($filename,$filepath,$filesuffix) = fileparse($arg,qr{\.cc});
+	scan_file($arg);
+    }
     yastdoc::XML::write_docs();
 
 }

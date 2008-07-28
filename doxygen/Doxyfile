@@ -201,9 +201,7 @@ SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
 # Configuration::additions related to external references   
 #---------------------------------------------------------------------------
-TAGFILES               = /usr/share/doc/packages/liby2util/autodocs/liby2util.tag=/usr/share/doc/packages/liby2util/autodocs \
-                         /usr/share/doc/packages/yast2-packagemanager/autodocs/yast2-packagemanager.tag=/usr/share/doc/packages/yast2-packagemanager/autodocs \
-                         /usr/share/doc/packages/yast2-core/autodocs/yast2-core.tag=/usr/share/doc/packages/yast2-core/autodocs
+TAGFILES               = /usr/share/doc/packages/yast2-core/autodocs/yast2-core.tag=/usr/share/doc/packages/yast2-core/autodocs
 GENERATE_TAGFILE       = doxygen.tag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES

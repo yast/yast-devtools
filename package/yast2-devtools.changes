@@ -1,4 +1,22 @@
 -------------------------------------------------------------------
+Tue Jul 29 09:38:52 CEST 2008 - mvidner@suse.cz
+
+- Recommend libtool for svn builds of binary packages.
+- YDoxygen:
+  - Updated template Doxyfile to doxygen 1.5.5, enabled built in STL
+    support.
+  - Made it easier to troubleshoot by using a real config file instead
+    of a pipe, pointed out the log (bnc#412465).
+- Stylesheets for documentation of builtins (and WFM, Pkg):
+  - Assist a straightforward mapping between source code
+    usage and reference docs URLs: list::reduce should be
+    .../ycp/list/reduce.html, not .../YCPListBuiltins_reduce.html.
+  - Enabled processing multiple chapters at once to make overload
+    disambiguation possible.
+  - Minor Docbook validity fixes.
+- 2.17.4
+
+-------------------------------------------------------------------
 Fri Jul 18 11:15:53 CEST 2008 - mvidner@suse.cz
 
 - The previous change broke the few packages that do not need

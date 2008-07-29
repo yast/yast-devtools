@@ -1,53 +1,93 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xsl:stylesheet [
-<!ENTITY undocumented "[DOCS MISSING]">
+<!ENTITY undocumented "">
+<!ENTITY undocumented2 "[DOCS MISSING]">
 ]>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="xml" indent="yes" encoding="ISO-8859-1"/> 
+    <xsl:output method="xml" indent="yes" encoding="UTF-8" /> 
 
     <xsl:template match="/">
         <xsl:apply-templates/> 
+        <xsl:call-template name="disambiguate" />
     </xsl:template>
-    <xsl:template match="entries">
-        <reference>
-           <xsl:attribute name="id">
-               <xsl:value-of select="entries_item/filename"/>
-           </xsl:attribute>
-            <title>
-                <xsl:value-of select="entries_item/file_summary"/>
-            </title>
-	    <xsl:for-each select="entries_item">
-		<xsl:sort order="ascending" select="./names/names_item"/>
-        	<xsl:apply-templates select="."/>
-	    </xsl:for-each>
+
+    <!-- googled "xslt grouping":
+         http://www.jenitennison.com/xslt/grouping/muenchian.html -->
+    <xsl:key name="entries-by-file" match="entries_item" use="filename" />
+    <xsl:key name="entries-by-name" match="entries_item" use="names/names_item" />
+
+    <xsl:template match="yast2doc/entries">
+      <xsl:for-each select="entries_item [
+                            count(. | key('entries-by-file', filename)[1]) = 1
+                            ]">
+        <xsl:sort select="filename" />
+
+        <reference id="{filename}">
+          <title>
+            <xsl:value-of select="file_summary"/>
+          </title>
+          <xsl:for-each select="key('entries-by-file', filename)">
+            <xsl:sort select="names/names_item"/>
+            <xsl:apply-templates select="."/>
+          </xsl:for-each>
         </reference>
+
+      </xsl:for-each>
     </xsl:template>
 
+    <xsl:template name="refentry-id-chunk-meta">
+      <xsl:param name="use-id" select="/.." />
 
-    <xsl:template match="entries_item">
-        <refentry>
-            <xsl:attribute name="id">
-                <xsl:if test="type != 'widget'">
-                    <xsl:value-of select="filename"/>
-                    <xsl:text>_</xsl:text>
-                </xsl:if>
+      <!-- dirsep must be allowed in IDs -->
+      <xsl:variable name="dirsep">.</xsl:variable>
+      <xsl:variable name="id">
                 <xsl:choose>
-                    <xsl:when test="id != ''">
-                        <xsl:value-of select="id"/>
+                    <xsl:when test="$use-id != ''">
+                        <xsl:value-of select="$use-id"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:call-template name="replace-substring">
                             <xsl:with-param name="from" select="'::'" />
-                            <xsl:with-param name="to" select="'_'" />
+                            <xsl:with-param name="to" select="$dirsep" />
                             <xsl:with-param name="value" select="names/names_item"/>
                         </xsl:call-template>
                     </xsl:otherwise>
-                </xsl:choose>
-                <xsl:if test="type = 'widget'">
-                    <xsl:text>_widget</xsl:text>
-                </xsl:if>
-            </xsl:attribute>
+                </xsl:choose>       
+      </xsl:variable>
+      <xsl:variable name="dir">
+        <xsl:if test="contains($id, $dirsep)">
+            <xsl:value-of select="substring-before($id, $dirsep)" />          
+        </xsl:if>
+      </xsl:variable>
+      <xsl:variable name="filename">
+        <xsl:choose>
+          <xsl:when test="contains($id, $dirsep)">
+            <xsl:value-of select="substring-after($id, $dirsep)" />          
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$id" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:attribute name="id">
+        <xsl:value-of select="$id" />
+      </xsl:attribute>
+
+      <!-- produce file names according to yastdoc rules -->
+      <xsl:if test="$dir != ''">
+        <xsl:processing-instruction name="dbhtml">
+          <xsl:text>dir="</xsl:text>
+          <xsl:value-of select="$dir" />
+          <xsl:text>"</xsl:text>
+        </xsl:processing-instruction>
+      </xsl:if>
+      <xsl:processing-instruction name="dbhtml">
+        <xsl:text>filename="</xsl:text>
+        <xsl:value-of select="$filename" />
+        <xsl:text>.html"</xsl:text>
+      </xsl:processing-instruction>
             <refmeta>
                     <refentrytitle>
                         <xsl:if test="namespace != ''">
@@ -56,8 +96,21 @@
                         </xsl:if>
                         <xsl:value-of select="names/names_item"/>
                     </refentrytitle>
-                    <manvolnum>3</manvolnum>
+                    <manvolnum>
+                      <xsl:value-of select="file_summary"/>
+                      <xsl:text>, </xsl:text>
+                      <xsl:value-of select="$filename" />
+                    </manvolnum>
                 </refmeta>
+    </xsl:template>
+
+    <xsl:template match="entries_item">
+
+        <refentry>
+		<xsl:call-template name="refentry-id-chunk-meta">
+                  <xsl:with-param name="use-id" select="id" />
+                </xsl:call-template>
+
                 <refnamediv>
                     <xsl:for-each select="names/names_item">
                         <refname>
@@ -376,6 +429,45 @@
                 </variablelist>
             </refsect1>
         </xsl:if>
+    </xsl:template>
+
+    <!-- create add.html for add-list.html and add-map.html -->
+    <xsl:template name="disambiguate">
+      <reference id="Disambiguation">
+        <title>Disambiguation</title>
+
+        <!--  id!='' assumes all duplicates have id defined. -->
+        <xsl:for-each select="yast2doc/entries/entries_item [
+                              id != '' and
+                 count(. | key('entries-by-name', names/names_item)[1]) = 1]">
+          <xsl:sort select="names/names_item" />
+
+          <refentry>
+            <xsl:call-template name="refentry-id-chunk-meta" />
+
+            <refnamediv>
+              <refname>
+                <xsl:value-of select="names/names_item"/>
+              </refname>
+              <refpurpose>disambiguation</refpurpose>
+            </refnamediv>
+
+            <refsect1>
+              <title>Variants</title>
+              <simplelist>
+                <xsl:for-each select="key('entries-by-name', names/names_item)">
+                  <xsl:sort select="id" />
+                  <member>
+                    <xref linkend="{id}" />
+                  </member>
+                </xsl:for-each>
+              </simplelist>
+            </refsect1>
+
+          </refentry>
+
+        </xsl:for-each>
+      </reference>
     </xsl:template>
 
    <xsl:template name="html-replace-entities">

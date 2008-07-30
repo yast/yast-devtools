@@ -7,9 +7,13 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" indent="yes" encoding="UTF-8" /> 
 
+    <xsl:param name="disambiguate" select="'no'" />
+
     <xsl:template match="/">
         <xsl:apply-templates/> 
-        <xsl:call-template name="disambiguate" />
+        <xsl:if test="$disambiguate = 'yes'">
+          <xsl:call-template name="disambiguate" />
+        </xsl:if>
     </xsl:template>
 
     <!-- googled "xslt grouping":

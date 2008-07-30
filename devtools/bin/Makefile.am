@@ -4,7 +4,7 @@
 
 pkgdatadir = @YAST2DEVTOOLS@/bin
 
-bin_SCRIPTS = y2tool
+bin_SCRIPTS = y2tool yastdoc
 ybin_SCRIPTS = ycpmakedep
 
 pkgdata_SCRIPTS = 				\

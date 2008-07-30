@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Jul 30 15:19:51 CEST 2008 - mvidner@suse.cz
+
+- Added yastdoc (http://en.opensuse.org/YaST/yastdoc).
+- Create a disambiguation chapter only if requested by a xslt
+  parameter.
+- 2.17.5
+
+-------------------------------------------------------------------
 Tue Jul 29 09:38:52 CEST 2008 - mvidner@suse.cz
 
 - Recommend libtool for svn builds of binary packages.

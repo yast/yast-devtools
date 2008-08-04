@@ -5,9 +5,9 @@
 ><header
 ><authors
 ><ITEM
->   Petr Blahos &amp;lt;&lt;a href="mailto:pblahos@suse.cz"&gt;pblahos@suse.cz&lt;/a&gt;&amp;gt;</ITEM
+>   Petr Blahos &lt;pblahos@suse.cz&gt;</ITEM
 ><ITEM
->   Other Author &amp;lt;&lt;a href="mailto:his_mail@suse.de"&gt;his_mail@suse.de&lt;/a&gt;&amp;gt;</ITEM
+>   Other Author &lt;his_mail@suse.de&gt;</ITEM
 ></authors
 ><descr
 >
@@ -207,7 +207,7 @@
 ><header
 ><authors
 ><ITEM
->   Petr Blahos &amp;lt;&lt;a href="mailto:pblahos@suse.cz"&gt;pblahos@suse.cz&lt;/a&gt;&amp;gt;</ITEM
+>   Petr Blahos &lt;pblahos@suse.cz&gt;</ITEM
 ></authors
 ><descr
 >
@@ -272,7 +272,7 @@
 ><header
 ><authors
 ><ITEM
->   Petr Blahos &amp;lt;&lt;a href="mailto:pblahos@suse.cz"&gt;pblahos@suse.cz&lt;/a&gt;&amp;gt;</ITEM
+>   Petr Blahos &lt;pblahos@suse.cz&gt;</ITEM
 ></authors
 ><descr
 >

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Aug  4 14:55:49 CEST 2008 - locilka@suse.cz
+
+- Generating better XML (Authors section) to be easier-to-process
+  by XSLT transformations (bnc #401680).
+- 2.17.6
+
+-------------------------------------------------------------------
 Wed Jul 30 15:19:51 CEST 2008 - mvidner@suse.cz
 
 - Added yastdoc (http://en.opensuse.org/YaST/yastdoc).

@@ -851,7 +851,7 @@ sub parse_header (@)
     foreach my $a (@lines)
     {
 	#TODO: warn on unknown key, missing field
-	if ($a =~ s/^\s*(Module|Package|File|Summary|Depends|Authors|Author):\s*(.*)/$2/)
+	if ($a =~ s/^\s*(Module|Package|File|Summary|Depends|Authors|Author|Flags):\s*(.*)/$2/)
 	{
 	    $key = lc $1;
 	    # Module is old style, Package is new style. TODO, define meaning
@@ -880,7 +880,8 @@ sub parse_header (@)
 	{
 	    my $mail = $a;
 	    $mail =~ s/[^<(]*[(<]([^>)]*).*/$1/g;
-	    $a =~ s/[(<][^>)]*[>)]/&lt;<a href=\"mailto:$mail\">$mail<\/a>&gt;/g; # "emacs
+	     # $a =~ s/[(<][^>)]*[>)]/&lt;<a href=\"mailto:$mail\">$mail<\/a>&gt;/g; # "emacs
+
 	    if ($a !~ /^\s*$/)
 	    {
 		push @{$parsed_header->{$key}}, $a;
@@ -902,6 +903,7 @@ sub parse_header (@)
 		$parsed_header->{$key} = almost_html ($a);
 	    }
 	}
+
     }
     return $parsed_header;
 }

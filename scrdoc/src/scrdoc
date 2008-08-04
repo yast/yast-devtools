@@ -722,7 +722,11 @@ sub generateSCRXMLDoc {
 
 		if (defined $MP->{'Authors'}) {
 		$writer->startTag('authors');
-		$writer->characters($MP->{'Authors'});
+		foreach my $author (split (/\n/, $MP->{'Authors'})) {
+		    $writer->startTag('ITEM');
+		    $writer->characters($author);
+		    $writer->endTag('ITEM');
+		}
 		$writer->endTag('authors');
 		}
 

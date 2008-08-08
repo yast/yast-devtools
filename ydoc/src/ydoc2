@@ -192,7 +192,19 @@ sub parse_comments (@)
 
     my ($pre, $post);
 
-    foreach my $line (@comments)
+    # add newlines before all tags
+    # multiline tags then can be proceeded one by one
+    # even more descriptions or examples can be supported
+    my @new_comments = ();
+    foreach my $line (@comments) {
+	if ($line =~ /^[ \t]*\@(note|description|example|examples|arg|optarg|param|builtin|widget|widgets|return|returns|id|since|class|short|usage|deprecated)( |\t|$)/) {
+	    push @new_comments, "\n";
+	}
+	push @new_comments, $line;
+    }
+    push @new_comments, "\n";
+
+    foreach my $line (@new_comments)
     {
         my $empty_line = $line;
         $empty_line =~ s/\s+//;
@@ -206,7 +218,7 @@ sub parse_comments (@)
         {
             $keepformat = 0;
         }
-        
+
 	if($line =~ /\@(param|arg)\s+(.*)/o)
 	{
 	    $lastwas = "param";
@@ -389,6 +401,8 @@ sub parse_comments (@)
 		$entry->{"deprecated"} .= "magicnumber";
 	    }
 	}
+
+	# continues on next line
 	elsif($lastwas eq "optargs")
 	{
             $lastwas = "optargs";
@@ -542,7 +556,6 @@ sub parse_comments (@)
         }
 	elsif($lastwas eq "note")
 	{
-            $lastwas = "note";
             if ($empty_line eq "")
             { 
                 if ($para ne "")
@@ -568,7 +581,6 @@ sub parse_comments (@)
 	}
 	elsif($lastwas eq "short" || $lastwas eq "description")
 	{
-            $lastwas = "description";
             if ($empty_line eq "")
             { 
                 if ($para ne "")
@@ -600,8 +612,6 @@ sub parse_comments (@)
         else {
         }
     }
-
-
 
     push @{$entry->{"description"}}, @description;
     push @{$entry->{"note"}}, @note;

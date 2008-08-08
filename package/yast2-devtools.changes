@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug  8 12:57:22 CEST 2008 - locilka@suse.cz
+
+- Fixed ydoc2 to generate builtin/widget description even if there
+  is no empty line between description and the following  tag
+  (adding newlines between all known tags before parsing).
+
+-------------------------------------------------------------------
 Mon Aug  4 14:55:49 CEST 2008 - locilka@suse.cz
 
 - Generating better XML (Authors section) to be easier-to-process

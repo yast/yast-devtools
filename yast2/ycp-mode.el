@@ -172,6 +172,7 @@
 			"`boldFont"
 			"`cancelButton"
 			"`centered"
+			"`customButton"
 			"`debugLayout"
 			"`decorated"
 			"`default"

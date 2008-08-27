@@ -67,6 +67,7 @@ syn keyword	ycpBuiltin	flatten toset sort sformat tointeger
 syn keyword	ycpBuiltin	crypt cryptmd5 cryptbigcrypt cryptblowfish
 syn keyword	ycpBuiltin	eval find isnil
 syn keyword	ycpBuiltin	random srandom
+syn keyword	ycpBuiltin	getenv setenv
 
 " WFM builtins
 syn keyword	ycpBuiltin	WFM UI SCR Args
@@ -219,6 +220,7 @@ syn keyword	ycpWidget	MinWidth
 syn keyword	ycpWidget	MultiLineEdit
 syn keyword	ycpWidget	MultiSelectionBox
 syn keyword	ycpWidget	PackageSelector
+syn keyword	ycpWidget	SimplePatchSelector
 syn keyword	ycpWidget	Password
 syn keyword	ycpWidget	ProgressBar
 syn keyword	ycpWidget	PushButton

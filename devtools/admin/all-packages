@@ -74,7 +74,7 @@ yast2-xml		inst-sys		xml agent (autoinst)
 
 # config packages
 yast2-autofs		default			autofs
-yast2-audit-laf     default         Linux Audit Framework (LAF)
+yast2-audit-laf		default			Linux Audit Framework (LAF)
 yast2-backup		default			backup
 yast2-bluetooth		default			bluetooth
 yast2-bootloader	default			bootloader

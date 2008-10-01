@@ -385,15 +385,6 @@ sub check_header()
     my $line_no = count_lines( $header ) + 1;
 
 
-    # Check for $ Id $ marker
-
-    if ( $header !~ m{[\$]Id.*[\$]}m )
-    {
-	warning( $line_no, "No \$" . "Id" . "\$ CVS/Subversion marker in header" );
-
-    }
-
-
     # Check for "Author(s)" or "Maintainer(s)" entries
 
     my $author_count = 0;

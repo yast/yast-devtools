@@ -145,18 +145,6 @@ make %{?jobs:-j%jobs}",
 autoreconf --force --install
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --prefix=%{prefix}
-\%if \%ul_version > 0
-for f in po/*.po ; do
-  cp \$f \$f.orig
-  awk -f \@ybindir\@/cleanuppo.awk \$f.orig >\$f
-done
-\%endif
-\%if \%sles_version == 8
-for f in po/*.po ; do
-  cp \$f \$f.orig
-  awk -f \@ybindir\@/cleanuppo.awk -v sles=8 \$f.orig >\$f
-done
-\%endif
 make %{?jobs:-j%jobs}",
 
 ##### INSTALL #####

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Nov 14 15:58:39 CET 2008 - ke@suse.de
+
+- bin/create-spec: Remove sles version check from yast2-trans-spec
+  files.
+
+-------------------------------------------------------------------
 Fri Aug  8 12:57:22 CEST 2008 - locilka@suse.cz
 
 - Fixed ydoc2 to generate builtin/widget description even if there

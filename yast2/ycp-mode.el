@@ -63,7 +63,7 @@
 	 (regexp-opt '("is" "select" "lookup" "contains" "setcontains"
 		       "size" "haskey" "add" "prepend" "union" "merge" "foreach" "filter"
 		       "find" "maplist" "flatten" "sort" "time" "toset" "listmap" "mapmap"
-		       "tointeger" "tofloat" "tostring" "topath" "toterm"
+		       "tointeger" "tofloat" "tostring" "topath" "toterm" "tosymbol"
 		       "crypt" "substring" "findfirstnotof" "tolower"
 		       "toascii" "filterchars" "eval" "symbolof" "argsof"
 		       "sleep" "sformat" "y2log" "mergestring" "splitstring" "sublist"

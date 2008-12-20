@@ -60,7 +60,7 @@
 		       "list" "map" "block" "global"))))
        (ycp-builtin-funcs
 	(eval-when-compile
-	 (regexp-opt '("is" "select" "lookup" "contains" "setcontains"
+	 (regexp-opt '("is" "select" "lookup" "contains" "setcontains" "isempty"
 		       "size" "haskey" "add" "prepend" "union" "merge" "foreach" "filter"
 		       "find" "maplist" "flatten" "sort" "time" "toset" "listmap" "mapmap"
 		       "tointeger" "tofloat" "tostring" "topath" "toterm" "tosymbol"

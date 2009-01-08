@@ -57,15 +57,15 @@
 	 (regexp-opt '("any" "void" "integer" "boolean" "float"
 		       "string" "byteblock" "path"
 		       "locale" "symbol" "declaration" "term"
-		       "list" "map" "block" "global"))))
+		       "list" "map" "multiset" "block" "global"))))
        (ycp-builtin-funcs
 	(eval-when-compile
 	 (regexp-opt '("is" "select" "lookup" "contains" "setcontains" "isempty"
 		       "size" "haskey" "add" "prepend" "union" "merge" "foreach" "filter"
 		       "find" "maplist" "flatten" "sort" "time" "toset" "listmap" "mapmap"
 		       "tointeger" "tofloat" "tostring" "topath" "toterm" "tosymbol"
-		       "crypt" "substring" "findfirstnotof" "tolower"
-		       "toascii" "filterchars" "eval" "symbolof" "argsof"
+		       "crypt" "substring" "findfirstnotof" "tolower" "difference"
+		       "toascii" "filterchars" "eval" "symbolof" "argsof" "includes"
 		       "sleep" "sformat" "y2log" "mergestring" "splitstring" "sublist"
 		       "findfirstof" "issubstring"
 		       "fileexist" "checkIP" "isnil" "include" "module" "import"

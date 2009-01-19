@@ -88,6 +88,7 @@
 			"`DummySpecialWidget"
 			"`Empty"
 			"`Frame"
+			"`Graph"
 			"`HBox"
 			"`HCenter"
 			"`HMultiProgressMeter"

@@ -21,6 +21,7 @@ pkgdata_SCRIPTS = 				\
 	rny2rnc					\
 	showy2log				\
 	svnall					\
+	svnignore				\
 	tagversion 				\
 	version					\
 	y2autoconf 				\

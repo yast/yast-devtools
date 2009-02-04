@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
-Wed Feb  4 14:55:59 CET 2009 - coolo@suse.de
+Wed Feb  4 15:07:16 CET 2009 - mvidner@suse.cz
 
-- remove .cvsignore files
+- Added 'y2tool svnignore' to convert .cvsignore to svn:ignore (bnc#470981).
+- Renamed .cvsignore to _cvsignore in the skeletons.
+- remove .cvsignore files (coolo)
+- 2.18.1
 
 -------------------------------------------------------------------
 Fri Jan 16 23:24:00 CET 2009 - aschnell@suse.de

@@ -153,7 +153,9 @@ sub main()
     }
 
     print ("\n\n Your package '$new_name' was successfully created\n\n");
-    print ("(To work with, do not forget:    cd $target_dir)\n\n");
+    print ("(To work with it, do not forget:    cd $target_dir)\n\n")
+    print ("If you 'svn import' *before* building it, it will be easier.\n");
+    print ("After that, 'y2tool svnignore' will be useful\n");
 }
 
 #-----------------------------------------------------------------------------

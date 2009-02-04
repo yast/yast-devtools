@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb  4 14:55:59 CET 2009 - coolo@suse.de
+
+- remove .cvsignore files
+
+-------------------------------------------------------------------
 Fri Jan 16 23:24:00 CET 2009 - aschnell@suse.de
 
 - added some new YCP keywords to emacs mode

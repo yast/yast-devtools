@@ -177,6 +177,8 @@ syn keyword	ycpBuiltin	regexpsub
 syn keyword	ycpBuiltin	y2error
 syn keyword	ycpBuiltin	y2security
 syn keyword	ycpBuiltin	y2internal
+syn keyword	ycpBuiltin	y2usernote
+syn keyword	ycpBuiltin	y2useritem
 syn keyword	ycpBuiltin	regexptokenize
 syn keyword	ycpBuiltin	tohexstring
 

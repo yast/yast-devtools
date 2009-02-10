@@ -73,7 +73,7 @@ function init_cmake() {
     mkdir -p _build
     cd _build
 
-    PATH=/opt/icecream/bin:/usr/lib/icecc/bin:$PATH cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DZYPP_PREFIX=$PREFIX  -DSYSCONFDIR=$PREFIX/etc -DMANDIR=$PREFIX/share/man -DCMAKE_BUILD_TYPE=Debug ..
+    PATH=/opt/icecream/bin:/usr/lib/icecc/bin:$PATH cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_MODULE_PATH=$PREFIX/share/cmake/Modules -DZYPP_PREFIX=$PREFIX  -DSYSCONFDIR=$PREFIX/etc -DMANDIR=$PREFIX/share/man -DCMAKE_BUILD_TYPE=Debug ..
 }
 
 function init_autotools() {
@@ -127,7 +127,7 @@ function build_module() {
     pushd "$MODULE"
 
     case "$MODULE" in
-	zypper|libzypp|sat-solver|libyui-bindings|qt*) init_cmake "$MODULE";;
+	zypper|libzypp|sat-solver|libyui-bindings|ruby-bindings|qt*) init_cmake "$MODULE";;
 	*) init_autotools "$MODULE";;
     esac
 

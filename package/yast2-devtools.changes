@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Feb 10 12:49:57 CET 2009 - mvidner@suse.cz
+
+- ydoxygen: omit timestamps in the output to avoid unnecessary
+  rebuilds (bnc#474281).
+- 2.18.2
+
+-------------------------------------------------------------------
 Wed Feb  4 15:07:16 CET 2009 - mvidner@suse.cz
 
 - Added 'y2tool svnignore' to convert .cvsignore to svn:ignore (bnc#470981).

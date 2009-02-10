@@ -40,6 +40,10 @@ Keep doxygen.conf.
 Replace a parameter in the template configuration file.
 Setting PROJECT_NAME also sets GENERATE_TAGFILE to $PROJECT_NAME.tag
 
+ydoxygen sets HTML_FOOTER to .../footer-notimestamp.html to avoid
+unnecessary rebuilds. To re-enable the default, pass "HTML_FOOTER="
+(bnc#474281).
+
 =back
 
 =cut
@@ -94,6 +98,9 @@ $template ||= "${y2datadir}/devtools/Doxyfile";
 
 # - arguments
 my %replacements = ();
+
+$replacements{"HTML_FOOTER"} = "${y2datadir}/devtools/footer-notimestamp.html";
+
 foreach (@ARGV)
 {
     my ($param, $value) = split ('=', $_, 2);

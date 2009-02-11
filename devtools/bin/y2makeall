@@ -14,7 +14,7 @@ use English;
 use Getopt::Long;
 use File::Basename;
 use IPC::Open2;
-
+use Data::Dumper;
 #
 # Configuration variables.
 #
@@ -41,6 +41,12 @@ our @exclude_list =
      "packagemanager-test"
      );
 
+if ( $ENV{'Y2MAKEALL_EXCLUDE'} )
+{
+    push @exclude_list, split(/ /, $ENV{'Y2MAKEALL_EXCLUDE'});
+    print Dumper(@exclude_list);
+}
+
 # Personal favourites - those directories will be processed first (in this order).
 # This is what most YCP package maintainers will want to change in their personal
 # ~/.yast2/y2makeallrc file to get their personal packages processed first.
@@ -55,6 +61,14 @@ our @ycp_favourites =
      "installation",
      "packager"
      );
+
+if ( $ENV{'Y2MAKEALL_FAVOURITES'} )
+{
+   print "favoritos";
+   @ycp_favourites = split(/ /, $ENV{'Y2MAKEALL_FAVOURITES'});
+   Dumper(@ycp_favourites);
+
+}
 
 # Dependencies (from all other YaST2 packages) that are deliberately ignored.
 # This is necessary to break up dependency cycles which otherwise would make
@@ -124,6 +138,7 @@ my %rpm_dirs;
 my %relevant_rpms;
 my %pkg_provides;
 my %pkg_requires;
+my %pkg_buildrequires;
 my %provided_by;
 my %base_rpms;
 my @build_order;
@@ -159,6 +174,7 @@ sub main()
     my $no_sudo			= 0;
     my $dump_build_order	= 0;
     my $dump_dependencies	= 0;
+    my $dump_builddependencies	= 0;
     my $ignore_libzypp		= 0;
     my $build_libzypp		= 0;
     my $enable_icecream		= 0;
@@ -169,6 +185,7 @@ sub main()
 		"no-sudo"		=> \$no_sudo,
 		"dump-build-order"	=> \$dump_build_order,
 		"dump-dependencies"	=> \$dump_dependencies,
+		"dump-builddependencies"=> \$dump_builddependencies,
 		"dry-run"		=> \$dry_run,
 		"ignore-libzypp"	=> \$ignore_libzypp,
 		"build-libzypp"		=> \$build_libzypp,
@@ -177,6 +194,7 @@ sub main()
 		"icecream"		=> \$enable_icecream,
 		"icecream-prefix=s"	=> \$icecream_prefix,
 		"jobs=i"		=> \$jobs,
+		"rcfile=s"		=> \$user_config_file,
 		"verbose"		=> \$verbose,
 		"debug"			=> \$debug,
 		"silent"		=> \$silent,
@@ -282,6 +300,12 @@ sub main()
 	exit;
     }
 
+    if ( $dump_builddependencies )
+    {
+	dump_builddependencies();
+	exit;
+    }
+
     if ( $dump_build_order )
     {
 	dump_build_order();
@@ -367,6 +391,7 @@ sub calc_build_order()
 {
     read_all_dependencies();
     expand_provides();
+    %pkg_buildrequires = %pkg_requires;
     kick_irrelevant_requires();
     tsort_dependencies();
 }
@@ -618,6 +643,26 @@ sub dump_dependencies()
     }
 }
 
+#-----------------------------------------------------------------------------
+
+# Dump all build depencencies to stdout.
+
+sub dump_builddependencies()
+{
+    my $rpm;
+
+    foreach $rpm ( sort( keys( %pkg_buildrequires ) ) )
+    {
+	my $req = $pkg_buildrequires{ $rpm };
+	my $this_pkg_requires;
+
+	foreach $this_pkg_requires ( sort( keys( %$req ) ) )
+	{
+	    log_always( "$rpm", $this_pkg_requires );
+	}
+    }
+}
+
 
 #-----------------------------------------------------------------------------
 
@@ -740,6 +785,7 @@ sub kick_irrelevant_requires()
     {
 	my $old_requires = $pkg_requires{ $pkg };
 	my %new_requires;
+	my %new_buildrequires;
 	my $req;
 
 	foreach $req ( keys %$old_requires )
@@ -758,11 +804,13 @@ sub kick_irrelevant_requires()
 		else
 		{
 		    log_debug( "Kicking irrelevant dependency \"$pkg requires $req\"" );
+		    $new_buildrequires{ $req } = 1;
 		}
 	    }
 	}
 
 	$pkg_requires{ $pkg } = \%new_requires;
+	$pkg_buildrequires{ $pkg } = \%new_buildrequires;
     }
 }
 
@@ -1408,6 +1456,7 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 
 	--dump-build-order	only dump the build order to stdout and log
 	--dump-dependencies	only dump package dependencies to stdout and log
+	--dump-builddependencies only dump package dependencies outside of YaST to stdout and log
 	--dry-run		do not build anything, only print what would be done
 	--ignore-libzypp	do not complain if multiple versions of libzypp are installed
 
@@ -1415,6 +1464,7 @@ Call this from your toplevel yast2/source CVS or SVN working directory!
 	--icecream-prefix <prefix> use <prefix> instead of /opt/icecream
 	--jobs			Specifies the number of jobs to run simultaneously (default 8)
 
+	--rcfile <rcfile> 	use alternative location for reading y2makeallrc file
 	-v  (--verbose)		verbose output
 	-d  (--debug)		debug output (even more verbose)
 	-s  (--silent)		turn verbosity down

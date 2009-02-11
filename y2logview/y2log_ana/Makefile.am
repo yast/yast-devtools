@@ -21,4 +21,9 @@ y2log_ana_LDADD = $(Qt4_LIBS)
 y2log_ana_SOURCES	= cgui.cc	\
 				 	 cman.cc	\
 				 	 cy2log.cc	\
-				  	moc_cgui.cc
+           cgui.moc.cc
+
+%.moc.cc: %.h
+		$(MOC) $< -o $@
+
+CLEANFILES = *.moc.cpp

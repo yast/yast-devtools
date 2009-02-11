@@ -47,8 +47,12 @@ AX_CHECK_DOCBOOK
 ## this is for y2log_ana 
 
 pkg_modules="QtCore, QtGui, QtXml"
-PKG_CHECK_MODULES(Qt4,[$pkg_modules],[qt=true],[AC_MSG_RESULT(not found)])
+PKG_CHECK_MODULES(Qt4, [$pkg_modules],[qt=true
+                                      MOC=`$PKG_CONFIG --variable=moc_location QtCore`],
+                                                         [AC_MSG_RESULT(not found)])
 AM_CONDITIONAL(CHECK_QT4, test "$qt" = "true")
+
+AC_SUBST(MOC)
 
 ## needed for documentation
 CHECK_PERL_MODULE(XML::Writer, XMLWRITER)

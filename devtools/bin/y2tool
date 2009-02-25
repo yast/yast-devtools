@@ -23,6 +23,9 @@ fi
 y2toolpath=${PREFIX}/share/YaST2/data/devtools/bin
 if [ `dirname $0` = "." ]; then
     y2toolpath=.
+# another bootstrapping yuck. *hack*
+elif [ "$0" = "devtools/bin/y2tool" ]; then
+    y2toolpath=devtools/bin
 fi
 
 cmd=$1

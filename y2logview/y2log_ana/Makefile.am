@@ -8,7 +8,7 @@ else
 Y2L =
 endif
 
-INCLUDES = $(Qt4_CFLAGS) 
+INCLUDES = $(Qt4_CFLAGS) -I.
 
 noinst_PROGRAMS		= $(Y2L)
 

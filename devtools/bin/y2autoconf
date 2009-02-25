@@ -398,7 +398,15 @@ AC_OUTPUT
 );
 
 # mark created packages with the devtools version
-my $devtools_version = `y2tool version`;
+my $devtools_version;
+if ($#ARGV >= 0 && $ARGV[0] eq "--bootstrap")
+{
+    $devtools_version = $VERSION;
+}
+else
+{
+    $devtools_version = `y2tool version`;
+}
 chomp $devtools_version;
 
 # main program

@@ -21,7 +21,7 @@ with_compendium =
 stat=status.txt
 PO_STATS=@ybindir@/po-stats
 
-MSGMERGE = @MSGMERGE@ --no-wrap --force-po
+MSGMERGE = @MSGMERGE@ --no-wrap --force-po --previous
 MSGFMT = @MSGFMT@
 MSGCAT = @MSGCAT@ --no-wrap --force-po
 MSGCONV = @MSGCONV@ --no-wrap --force-po

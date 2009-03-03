@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Mar  3 13:47:20 CET 2009 - ke@suse.de
+
+- Call msgmerge with the --previous option.
+
+-------------------------------------------------------------------
 Tue Feb 10 12:49:57 CET 2009 - mvidner@suse.cz
 
 - ydoxygen: omit timestamps in the output to avoid unnecessary

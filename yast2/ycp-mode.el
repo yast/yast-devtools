@@ -173,6 +173,7 @@
 			"`boldFont"
 			"`cancelButton"
 			"`centered"
+			"`contextMenu"
 			"`customButton"
 			"`debugLayout"
 			"`decorated"

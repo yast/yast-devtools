@@ -236,6 +236,7 @@ syn keyword	ycpWidget	Table
 syn keyword	ycpWidget	TextEntry
 syn keyword	ycpWidget	Top
 syn keyword	ycpWidget	Tree
+syn keyword	ycpWidget	ButtonBox
 syn keyword	ycpWidget	VBox
 syn keyword	ycpWidget	VCenter
 syn keyword	ycpWidget	VSpacing

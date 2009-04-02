@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Thu Apr  2 16:52:23 CEST 2009 - mvidner@suse.cz
+
+- FindYast.cmake: make it a bit more verbose on error (kkaempf)
+- ycp.vim: added ButtonBox (jsuchome)
+- ycp-mode.el: added notifyContextMenu (aschnell)
+- y2autoconf: Fixed bootstrapping via Makefile.cvs
+- y2makeall: merge back the one used on Hudson,
+   with additional features like printing the base buildrequires (visnov)
+- y2log_ana: remove hardcoded moc that broke with new qt (dmacvicar)
+
+-------------------------------------------------------------------
 Tue Mar  3 13:47:20 CET 2009 - ke@suse.de
 
 - Call msgmerge with the --previous option.

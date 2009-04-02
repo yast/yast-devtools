@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Apr  2 16:56:13 CEST 2009 - mvidner@suse.cz
+
+- Makefile.am.toplevel: do not mkdir "`if" (bnc#490713).
+- 2.18.3
+
+-------------------------------------------------------------------
 Thu Apr  2 16:52:23 CEST 2009 - mvidner@suse.cz
 
 - FindYast.cmake: make it a bit more verbose on error (kkaempf)

@@ -16,7 +16,7 @@ syn keyword	ycpStatement	break return continue define global
 syn keyword	ycpStatement	module import include textdomain
 
 " YCP conditionals
-syn keyword	ycpConditional	if else
+syn keyword	ycpConditional	if else switch case default
 syn keyword	ycpRepeat	while do repeat until
 
 " YCP todos
@@ -63,7 +63,7 @@ syn match	ycpComment	"//.*" contains=ycpTodo,ycpCommentError,ycpSpaceError
 syn keyword	ycpBuiltin	is select remove change contains
 syn keyword	ycpBuiltin	setcontains lookup haskey add union merge size
 syn keyword	ycpBuiltin	symbolof sleep foreach filter maplist mapmap
-syn keyword	ycpBuiltin	flatten toset sort sformat tointeger
+syn keyword	ycpBuiltin	flatten toset sort sformat tointeger argsof
 syn keyword	ycpBuiltin	crypt cryptmd5 cryptbigcrypt cryptblowfish
 syn keyword	ycpBuiltin	eval find isnil
 syn keyword	ycpBuiltin	random srandom

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Apr  9 08:25:38 CEST 2009 - jreidinger@suse.cz
+
+- ycp.vim : add switch condition and argsof builtin 
+
+-------------------------------------------------------------------
 Thu Apr  2 16:56:13 CEST 2009 - mvidner@suse.cz
 
 - Makefile.am.toplevel: do not mkdir "`if" (bnc#490713).

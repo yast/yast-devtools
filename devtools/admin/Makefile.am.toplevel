@@ -32,7 +32,7 @@ extra_COPYRIGHT_files =  $(if $(HAS_YAST_LICENSE), $(COPYRIGHT_files_yast), $(CO
 
 # less strict; prefer bzip2
 AUTOMAKE_OPTIONS = foreign dist-bzip2 no-dist-gzip
-# where devtools instal m4 snippets
+# where devtools install m4 snippets
 # argh, executed literally
 #ACLOCAL_AMFLAGS = -I $(Y2DEVTOOLS_PREFIX)/share/aclocal
 ACLOCAL_AMFLAGS = -I . -I `if test -d ./devtools/admin; then echo ./devtools/admin; else pkg-config --print-errors --variable=datadir yast2-devtools; fi`/aclocal

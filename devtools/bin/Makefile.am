@@ -23,6 +23,7 @@ pkgdata_SCRIPTS = 				\
 	svnall					\
 	svnignore				\
 	tagversion 				\
+	oscsubmit 				\
 	version					\
 	y2autoconf 				\
 	y2automake 				\

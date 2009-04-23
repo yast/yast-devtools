@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# usage:
+# y2submit [<OBS_Project> [<logfile>]]
+
+
+OBS_PROJECT=$1;
+OBS_MOVE_PROJECT=$2;
+LOGFILE=$3;
+PACKAGE=`cat RPMNAME`;
+test -z $OBS_PROJECT && OBS_PROJECT=YaST:SVN
+test -z $OBS_MOVE_PROJECT && OBS_MOVE_PROJECT=openSUSE:Factory
+test -z "$LOGFILE" && LOGFILE=~/.y2submitlog
+
+rm $LOGFILE
+echo "Submitting $PACKAGE to $OBS_PROJECT, forwarding to $OBS_MOVE_PROJECT" | tee -a $LOGFILE
+
+echo -n "Checking out module from OBS... " | tee -a $LOGFILE
+echo "" >>$LOGFILE;
+if osc co $OBS_PROJECT $PACKAGE >>$LOGFILE 2>&1; then
+    echo "OK" | tee -a $LOGFILE
+else
+    echo "Failed" | tee -a $LOGFILE; exit 3
+fi
+
+echo -n "Preparing new package for submission... " | tee -a $LOGFILE
+echo "" >>$LOGFILE;
+rm $OBS_PROJECT/$PACKAGE/*
+cp package/* $OBS_PROJECT/$PACKAGE
+osc addremove $OBS_PROJECT/$PACKAGE >>$LOGFILE
+echo "OK" | tee -a $LOGFILE
+diff $OBS_PROJECT/$PACKAGE/*changes $OBS_PROJECT/$PACKAGE/.osc/*changes >diff
+cat diff | tee -a $LOGFILE
+if grep '^>' diff ; then
+    echo "There are changes in OBS only not reflected in SVN. Merge them first." | tee -a $LOGFILE
+    exit 4
+fi
+
+if grep '^<' diff ; then
+    echo -n "";
+else
+    echo "There are no new changes in SVN." | tee -a $LOGFILE
+    exit 4
+fi
+
+echo -n "Submitting the package... " | tee -a $LOGFILE
+echo "" >>$LOGFILE;
+find $OBS_PROJECT >>$LOGFILE;
+if osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1 ; then
+    echo "OK" | tee -a $LOGFILE
+else
+    echo "Failed" | tee -a $LOGFILE; exit 5
+fi
+
+echo -n "Forwarding package from $OBS_PROJECT to $OBS_MOVE_PROJECT... " | tee -a $LOGFILE
+echo "" >>$LOGFILE;
+if osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
+    echo "OK" | tee -a $LOGFILE
+else
+    echo "Failed" | tee -a $LOGFILE; exit 6
+fi
+
+echo -n "Cleaning up... " | tee -a $LOGFILE
+echo "" >>$LOGFILE;
+rm diff;
+rm -rf $OBS_PROJECT;
+echo "OK" | tee -a $LOGFILE
+exit 0;

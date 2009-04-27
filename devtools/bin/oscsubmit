@@ -36,11 +36,12 @@ fi
 
 echo -n "Preparing new package for submission... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
-rm $OBS_PROJECT/$PACKAGE/*
+
+rm $OBS_PROJECT/$PACKAGE/* 2>&1 | tee -a $LOGFILE
 cp package/* $OBS_PROJECT/$PACKAGE
-osc addremove $OBS_PROJECT/$PACKAGE >>$LOGFILE
 echo "OK" | tee -a $LOGFILE
 diff $OBS_PROJECT/$PACKAGE/*changes $OBS_PROJECT/$PACKAGE/.osc/*changes >diff
+test -f $OBS_PROJECT/$PACKAGE/.osc/*changes || echo "< New package" >diff
 cat diff | tee -a $LOGFILE
 if grep '^>' diff ; then
     echo "There are changes in OBS only not reflected in SVN. Merge them first." | tee -a $LOGFILE
@@ -56,6 +57,7 @@ fi
 
 echo -n "Submitting the package... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
+osc addremove $OBS_PROJECT/$PACKAGE >>$LOGFILE
 find $OBS_PROJECT >>$LOGFILE;
 if osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1 ; then
     echo "OK" | tee -a $LOGFILE

@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
-Mon Apr 27 15:31:41 CEST 2009 - jsrain@suse.cz
+Mon Apr 27 16:39:40 CEST 2009 - jsrain@suse.cz
 
 - fixed y2tool oscsubmit when submitting package the first time
+- make oscsubmit work correctly with cmake-based modules
 
 -------------------------------------------------------------------
 Mon Apr 27 14:19:14 CEST 2009 - jsrain@suse.cz

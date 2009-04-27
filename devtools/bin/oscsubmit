@@ -38,6 +38,7 @@ echo -n "Preparing new package for submission... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
 
 rm $OBS_PROJECT/$PACKAGE/* 2>&1 | tee -a $LOGFILE
+cp build/package/* $OBS_PROJECT/$PACKAGE  # needed for cmake-based modules
 cp package/* $OBS_PROJECT/$PACKAGE
 echo "OK" | tee -a $LOGFILE
 diff $OBS_PROJECT/$PACKAGE/*changes $OBS_PROJECT/$PACKAGE/.osc/*changes >diff

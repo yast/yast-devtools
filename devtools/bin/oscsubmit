@@ -1,14 +1,25 @@
 #!/bin/bash
 
-# usage:
-# y2submit [<OBS_Project> [<logfile>]]
-
+#####
+#Usage:
+#   oscsubmit [<OBS_Project> [<OBS_Target> [<logfile>]]]
+#
+#   OBS_Project - BuildService project to submit the package to.
+#                 If not definet, YaST:Head is used
+#   OBS_Target  - Target project to create request to move to.
+#                 If not defined, openSUSE:Factory is used
+#   logfile     - File to write submission log to.
+#                 If not defined, ~/.y2submitlog is used.
+#                 File is deleted prior each package submission
+#####
+# Author: Jiri Srain <jsrain@suse.cz>
+#####
 
 OBS_PROJECT=$1;
 OBS_MOVE_PROJECT=$2;
 LOGFILE=$3;
 PACKAGE=`cat RPMNAME`;
-test -z $OBS_PROJECT && OBS_PROJECT=YaST:SVN
+test -z $OBS_PROJECT && OBS_PROJECT=YaST:Head
 test -z $OBS_MOVE_PROJECT && OBS_MOVE_PROJECT=openSUSE:Factory
 test -z "$LOGFILE" && LOGFILE=~/.y2submitlog
 

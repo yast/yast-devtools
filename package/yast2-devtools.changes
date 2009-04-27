@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Apr 27 14:19:14 CEST 2009 - jsrain@suse.cz
+
+- added y2tool oscsubmit (for Factory only)
+- 2.18.4
+
+-------------------------------------------------------------------
 Thu Apr  9 08:25:38 CEST 2009 - jreidinger@suse.cz
 
 - ycp.vim : add switch condition and argsof builtin 

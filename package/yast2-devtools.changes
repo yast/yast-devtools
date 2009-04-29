@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Wed Apr 29 10:41:19 CEST 2009 - lslezak@suse.cz
+
+- updated vim YCP syntax file - added missing built-ins: lsort,
+  lsubstring, ClientExists, GetEncoding, GetEnvironmentEncoding,
+  dgettext, dngettext, dpgettext, float::abs, float::ceil,
+  float::floor, float::pow, float::trunc, list::reduce, sublist,
+  added type name: const, added UI option: Cell
+
+-------------------------------------------------------------------
 Mon Apr 27 16:39:40 CEST 2009 - jsrain@suse.cz
 
 - fixed y2tool oscsubmit when submitting package the first time

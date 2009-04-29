@@ -2,7 +2,7 @@
 " Filename:     ycp.vim
 " Language:     YCP: SuSE YaST2 scripting language
 " Maintainer:   Michal Svec <msvec@suse.cz>
-" Last change:  20.8.2003
+" $Id$
 
 " Remove any old syntax stuff hanging around
 if version < 600
@@ -63,16 +63,16 @@ syn match	ycpComment	"//.*" contains=ycpTodo,ycpCommentError,ycpSpaceError
 syn keyword	ycpBuiltin	is select remove change contains
 syn keyword	ycpBuiltin	setcontains lookup haskey add union merge size
 syn keyword	ycpBuiltin	symbolof sleep foreach filter maplist mapmap
-syn keyword	ycpBuiltin	flatten toset sort sformat tointeger argsof
+syn keyword	ycpBuiltin	flatten toset sort lsort sformat tointeger argsof
 syn keyword	ycpBuiltin	crypt cryptmd5 cryptbigcrypt cryptblowfish
 syn keyword	ycpBuiltin	eval find isnil
 syn keyword	ycpBuiltin	random srandom
 syn keyword	ycpBuiltin	getenv setenv
 
 " WFM builtins
-syn keyword	ycpBuiltin	WFM UI SCR Args
+syn keyword	ycpBuiltin	WFM UI SCR Args ClientExists
 syn keyword	ycpBuiltin	Read Write Dir Execute
-syn keyword	ycpBuiltin	CallFunction CallModule SetLanguage GetLanguage
+syn keyword	ycpBuiltin	CallFunction CallModule SetLanguage GetLanguage GetEncoding GetEnvironmentEncoding
 syn keyword	ycpBuiltin	SCROpen SCRClose SCRGetName GetClientName
 syn keyword	ycpBuiltin	SCRSetDefault SCRGetDefault
 
@@ -148,6 +148,7 @@ syn keyword	ycpBuiltin	cryptbigcrypt
 syn keyword	ycpBuiltin	cryptblowfish
 syn keyword	ycpBuiltin	timestring
 syn keyword	ycpBuiltin	substring
+syn keyword	ycpBuiltin	lsubstring
 syn keyword	ycpBuiltin	findfirstof
 syn keyword	ycpBuiltin	findlastof
 syn keyword	ycpBuiltin	findfirstnotof
@@ -181,11 +182,21 @@ syn keyword	ycpBuiltin	y2usernote
 syn keyword	ycpBuiltin	y2useritem
 syn keyword	ycpBuiltin	regexptokenize
 syn keyword	ycpBuiltin	tohexstring
+syn keyword	ycpBuiltin	dgettext
+syn keyword	ycpBuiltin	dngettext
+syn keyword	ycpBuiltin	dpgettext
+syn keyword	ycpBuiltin	float::abs
+syn keyword	ycpBuiltin	float::ceil
+syn keyword	ycpBuiltin	float::floor
+syn keyword	ycpBuiltin	float::pow
+syn keyword	ycpBuiltin	float::trunc
+syn keyword	ycpBuiltin	list::reduce
+syn keyword	ycpBuiltin	sublist
 
 " YCP types
 syn keyword	ycpType		any void boolean integer float string locale
 syn keyword	ycpType		symbol list map term path block declaration
-syn keyword	ycpType		expression byteblock
+syn keyword	ycpType		expression byteblock const
 
 " YCP boolean
 syn keyword	ycpBoolean	true false nil
@@ -269,6 +280,7 @@ syn keyword	ycpWidget	ExpectedSize
 syn keyword	ycpWidget	Filename
 syn keyword	ycpWidget	Item
 syn keyword	ycpWidget	Items
+syn keyword	ycpWidget	Cell
 syn keyword	ycpWidget	Label
 syn keyword	ycpWidget	Labels
 syn keyword	ycpWidget	LastLine

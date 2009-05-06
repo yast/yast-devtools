@@ -99,9 +99,7 @@ echo -n "Submitting the package... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
 osc addremove $OBS_PROJECT/$PACKAGE >>$LOGFILE
 find $OBS_PROJECT >>$LOGFILE;
-if echo "osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1" ; then
-$FIXME
-#if osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1 ; then
+if osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1 ; then
     echo "OK" | tee -a $LOGFILE
 else
     echo "Failed" | tee -a $LOGFILE; exit 5
@@ -118,9 +116,7 @@ osc sr create --nodevelproject $OBS_PROJECT $PACKAGE openSUSE:Factory
 else
     echo -n "Forwarding package from $OBS_PROJECT to $OBS_MOVE_PROJECT... " | tee -a $LOGFILE
     echo "" >>$LOGFILE;
-    if echo "osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT "; then
-# FIXME
-#    if osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
+    if osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
         echo "OK" | tee -a $LOGFILE
     else
         echo "Failed" | tee -a $LOGFILE; exit 6

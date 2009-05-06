@@ -15,16 +15,54 @@
 # Author: Jiri Srain <jsrain@suse.cz>
 #####
 
-OBS_PROJECT=$1;
-OBS_MOVE_PROJECT=$2;
-LOGFILE=$3;
-PACKAGE=`cat RPMNAME`;
-test -z $OBS_PROJECT && OBS_PROJECT=YaST:Head
-test -z $OBS_MOVE_PROJECT && OBS_MOVE_PROJECT=openSUSE:Factory
-test -z "$LOGFILE" && LOGFILE=~/.y2submitlog
+printhelp()
+{
+        echo "Usage: $0 [OPTIONS]"
+        echo
+        echo "OPTIONS:"
+        echo "  -h, --help          this message"
+        echo "  -d, --devel-project development project to submit to; default YaST:Head"
+        echo "  -p, --project       project to create submit request to"
+        echo "  -l, --log           the logfile, default ~/.y2submitlog"
+        echo "  -e, --empty_log     empty the log before starting"
+        echo
+}
 
-rm $LOGFILE
-echo "Submitting $PACKAGE to $OBS_PROJECT, forwarding to $OBS_MOVE_PROJECT" | tee -a $LOGFILE
+# inirialize default values
+OBS_PROJECT=YaST:Head
+OBS_MOVE_PROJECT=""
+LOGFILE=~/.y2submitlog
+
+# parse parameters
+TEMP=`/usr/bin/getopt -o hl:d:p:e --long help,log:,devel-project:,project:,empty-log \
+     -n 'oscsubmit' -- "$@"`
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+        case "$1" in
+                -h|--help) printhelp; exit 0 ;;
+		-l|--log) LOGFILE="$2"; shift 2; ;;
+		-d|--devel-project) OBS_PROJECT="$2"; shift 2; ;;
+		-p|--project) OBS_MOVE_PROJECT="$2"; shift 2; ;;
+                -e|--empty-log) EMPTY_LOG=1; shift; ;;
+		--) shift ; break ;;
+                *) echo "Unrecognized option $1" ; exit 1 ;;
+
+                # IMPORTANT: Remember to change that "getopt" call above, too
+                # if you change anything here!
+        esac
+done
+
+PACKAGE=`cat RPMNAME`;
+
+test -f $LOGFILE && test -z $EMPTY_LOG || rm $LOGFILE
+if test -z $OBS_MOVE_PROJECT; then
+    echo "Submitting $PACKAGE to $OBS_PROJECT" | tee -a $LOGFILE
+else
+    echo "Submitting $PACKAGE to $OBS_PROJECT, forwarding to $OBS_MOVE_PROJECT" | tee -a $LOGFILE
+fi
 
 echo -n "Checking out module from OBS... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
@@ -37,8 +75,9 @@ fi
 echo -n "Preparing new package for submission... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
 
+# FIXME directory may be empty
 rm $OBS_PROJECT/$PACKAGE/* 2>&1 | tee -a $LOGFILE
-cp build/package/* $OBS_PROJECT/$PACKAGE  # needed for cmake-based modules
+test -d build/package && cp build/package/* $OBS_PROJECT/$PACKAGE  # needed for cmake-based modules
 cp package/* $OBS_PROJECT/$PACKAGE
 echo "OK" | tee -a $LOGFILE
 diff $OBS_PROJECT/$PACKAGE/*changes $OBS_PROJECT/$PACKAGE/.osc/*changes >diff
@@ -60,18 +99,32 @@ echo -n "Submitting the package... " | tee -a $LOGFILE
 echo "" >>$LOGFILE;
 osc addremove $OBS_PROJECT/$PACKAGE >>$LOGFILE
 find $OBS_PROJECT >>$LOGFILE;
-if osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1 ; then
+if echo "osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1" ; then
+$FIXME
+#if osc ci -F diff $OBS_PROJECT/$PACKAGE >>$LOGFILE 2>&1 ; then
     echo "OK" | tee -a $LOGFILE
 else
     echo "Failed" | tee -a $LOGFILE; exit 5
 fi
 
-echo -n "Forwarding package from $OBS_PROJECT to $OBS_MOVE_PROJECT... " | tee -a $LOGFILE
-echo "" >>$LOGFILE;
-if osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
-    echo "OK" | tee -a $LOGFILE
+if [ -z $OBS_MOVE_PROJECT ]; then
+    echo "To create submit request, run
+osc sr create --nodevelproject $OBS_PROJECT $PACKAGE <project>,
+to sobmit to Factory, run.
+osc sr create --nodevelproject $OBS_PROJECT $PACKAGE openSUSE:Factory
+
+
+" | tee -a $LOGFILE
 else
-    echo "Failed" | tee -a $LOGFILE; exit 6
+    echo -n "Forwarding package from $OBS_PROJECT to $OBS_MOVE_PROJECT... " | tee -a $LOGFILE
+    echo "" >>$LOGFILE;
+    if echo "osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT "; then
+# FIXME
+#    if osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
+        echo "OK" | tee -a $LOGFILE
+    else
+        echo "Failed" | tee -a $LOGFILE; exit 6
+    fi
 fi
 
 echo -n "Cleaning up... " | tee -a $LOGFILE

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May  6 14:52:13 CEST 2009 - jsrain@suse.cz
+
+- updates of oscupdate
+- 2.18.5
+
+-------------------------------------------------------------------
 Wed Apr 29 10:41:19 CEST 2009 - lslezak@suse.cz
 
 - updated vim YCP syntax file - added missing built-ins: lsort,

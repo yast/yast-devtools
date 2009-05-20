@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed May 20 17:23:49 CEST 2009 - lslezak@suse.cz
+
+- create-new-package - fixed syntax error (missing semicolon)
+
+-------------------------------------------------------------------
 Wed May 20 13:17:00 CEST 2009 - mvidner@suse.cz
 
 - y2tool tagversion: fixed branch tagging for tmp/* branches such as

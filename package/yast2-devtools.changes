@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May 20 13:17:00 CEST 2009 - mvidner@suse.cz
+
+- y2tool tagversion: fixed branch tagging for tmp/* branches such as
+  tmp/SLE-11-SP1-Stash.
+
+-------------------------------------------------------------------
 Wed May  6 14:52:13 CEST 2009 - jsrain@suse.cz
 
 - updates of oscupdate

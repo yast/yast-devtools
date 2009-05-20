@@ -66,16 +66,18 @@ else
     # means: print just the line on which the subst succeeded
 
     # URLs don't contain spaces so it's safe to use them as delimiters
-    svn info | sed -n -e 's@^URL: \(.*\)/\(trunk\|branches/[^/]*\)/\(.*\)$@\1 \2 \3@;T;p;q' | {
+    svn info | sed -n -e 's@^URL: \(.*\)/\(trunk\|branches/.*\)/\([^/]*\)$@\1 \2 \3@;T;p;q' | {
     # the pipe creates a subshell. the variables will be lost when it's left
     # therefore the {braces}
     read REPOSITORY BRANCH MODULE
-    
-    b=`echo "$BRANCH" | sed -n -e 's@^branches/SuSE-\([^/]*\)-Branch$@\1@;T;p'`
-    if [ "$b" ]; then
-	t=branch-$b-$v
-    else
+    : $REPOSITORY $BRANCH $MODULE
+    b=${BRANCH##branches*/}
+    b=${b#SuSE-}
+    b=${b%-Branch}
+    if [ "$b" = "trunk" ]; then
 	t=stable-$v
+    else
+	t=branch-$b-$v
     fi
 
     URL_t=$REPOSITORY/tags/$t

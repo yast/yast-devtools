@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon May 25 17:32:05 CEST 2009 - lslezak@suse.cz
+
+- added new skeleton 'rest-plugin' for webservice plugins,
+  initial version
+
+-------------------------------------------------------------------
 Wed May 20 17:23:49 CEST 2009 - lslezak@suse.cz
 
 - create-new-package - fixed syntax error (missing semicolon)

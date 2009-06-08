@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jun  8 13:58:32 CEST 2009 - lslezak@suse.cz
+
+- 2.18.6
+
+-------------------------------------------------------------------
 Mon May 25 17:32:05 CEST 2009 - lslezak@suse.cz
 
 - added new skeleton 'rest-plugin' for webservice plugins,

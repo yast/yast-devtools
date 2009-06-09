@@ -24,7 +24,7 @@ printhelp()
         echo "  -d, --devel-project development project to submit to; default YaST:Head"
         echo "  -p, --project       project to create submit request to"
         echo "  -l, --log           the logfile, default ~/.y2submitlog"
-        echo "  -e, --empty_log     empty the log before starting"
+        echo "  -e, --empty-log     empty the log before starting"
         echo
 }
 
@@ -108,7 +108,7 @@ fi
 if [ -z $OBS_MOVE_PROJECT ]; then
     echo "To create submit request, run
 osc sr create --nodevelproject $OBS_PROJECT $PACKAGE <project>,
-to sobmit to Factory, run.
+to submit to Factory, run.
 osc sr create --nodevelproject $OBS_PROJECT $PACKAGE openSUSE:Factory
 
 

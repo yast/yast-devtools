@@ -80,6 +80,7 @@ function init_autotools() {
     local MODULE="$1"; shift
 
     if $AUTORECONF || ! test -x ./configure; then
+	export AUTOMAKE_JOBS=$(grep '^processor' /proc/cpuinfo | wc -l)
 	if $YAST; then
 	    if [ "$MODULE" = devtools ]; then
 		local DTPATH="./devtools/bin"

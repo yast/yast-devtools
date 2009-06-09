@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jun  9 16:28:38 CEST 2009 - mvidner@suse.cz
+
+- Take advantage of AM_SILENT_RULES and AUTOMAKE_JOBS if supported
+  (in automake-1.11)
+
+-------------------------------------------------------------------
 Mon Jun  8 13:58:32 CEST 2009 - lslezak@suse.cz
 
 - 2.18.6

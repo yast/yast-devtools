@@ -190,6 +190,7 @@ syn keyword	ycpBuiltin	float::ceil
 syn keyword	ycpBuiltin	float::floor
 syn keyword	ycpBuiltin	float::pow
 syn keyword	ycpBuiltin	float::trunc
+syn keyword	ycpBuiltin	float::tolstring
 syn keyword	ycpBuiltin	list::reduce
 syn keyword	ycpBuiltin	sublist
 

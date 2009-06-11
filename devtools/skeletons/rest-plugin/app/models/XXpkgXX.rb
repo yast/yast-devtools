@@ -6,12 +6,12 @@ require "yast_service"
 class XXPkgXX
 
     # FIXME: adapt to your model, add members to store all needed properties
-    attr_accessor   :name,
+    attr_accessor   :id,
 		    :parameters
 
     def initialize
 	# unique identification (name, ID number, ...)
-	@name = nil
+	@id = nil
 
 	# attributes
 	# FIXME: adapt to your model, add as many members as needed...
@@ -37,7 +37,7 @@ class XXPkgXX
 	    item = XXPkgXX.new
 
 	    # set only ID, the other parameters should have default or empty values
-	    item.name = p
+	    item.id = p
 
 	    result << item
 	}
@@ -47,12 +47,12 @@ class XXPkgXX
 
     def find
         # cannot find invalid object
-	return false if @name.blank? 
+	return false if @id.blank? 
 
 	# get properties of the object
 
 	# FIXME: Use the correct Yast function call, e.g.
-	# properties = YastService.Call("YaPI::XXPkgXX::Get", @name)
+	# properties = YastService.Call("YaPI::XXPkgXX::Get", @id)
 
 	properties = { :p1 => "foo", :p2 => "bar" } # FIXME: remove this dummy line
 
@@ -68,15 +68,15 @@ class XXPkgXX
     end
 
     def update_attributes(attribs)
-	if attribs.has_key?(:name)
-	    new_name = attribs[:name]
+	if attribs.has_key?(:id)
+	    new_name = attribs[:id]
 
 	    # FIXME: valide the option
 	    if new_name.class != :String
 		return false
 	    end
 
-	    @name = new_name
+	    @id = new_name
 	end
 
 	if attribs.has_key?(:parameters)
@@ -97,34 +97,34 @@ class XXPkgXX
 
     def add
 	# FIXME: Use the correct Yast function call, e.g.
-	# return YastService.Call("YaPI::XXPkgXX::Add", @name, @parameters) if !@name.blank?
+	# return YastService.Call("YaPI::XXPkgXX::Add", @id, @parameters) if !@id.blank?
 
 	return false
     end
 
     def edit
 	# FIXME: Use the correct Yast function call, e.g.
-	# return YastService.Call("YaPI::XXPkgXX::Edit", @name, @parameters) if !@name.blank?
+	# return YastService.Call("YaPI::XXPkgXX::Edit", @id, @parameters) if !@id.blank?
 
 	return false
     end
 
     def delete
 	# FIXME: Use the correct Yast function call, e.g.
-	# return YastService.Call("YaPI::XXPkgXX::Delete", @name) if !@name.blank?
+	# return YastService.Call("YaPI::XXPkgXX::Delete", @id) if !@id.blank?
 
 	return false
     end
 
     # FIXME: export all members in XML
     def to_xml( options = {} )
-	return nil if @name.nil?
+	return nil if @id.nil?
 
 	xml = options[:builder] ||= Builder::XmlMarkup.new(options)
 	xml.instruct! unless options[:skip_instruct]
 
 	xml.XXpkgXX do
-	    xml.tag!(:name, @name)
+	    xml.tag!(:id, @id)
 
 	    if !@parameters.blank?
 		# FIXME: Note: the first parameter of tag! is tag name, the second is value,

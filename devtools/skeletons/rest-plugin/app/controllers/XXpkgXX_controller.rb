@@ -38,7 +38,7 @@ class XXPkgXXController < ApplicationController
 # FIXME: ^^^^ uncomment this block!!
 
 	@item = XXPkgXX.new
-	@item.name = params[:id]
+	@item.id = params[:id]
 
 	if !@item.find
 	    render ErrorResult.error(404, 2, "item not found") and return
@@ -66,12 +66,12 @@ class XXPkgXXController < ApplicationController
 		render ErrorResult.error(404, 2, "input error") and return
 	    end
 
-	    if !@item.name.blank?
+	    if !@item.id.blank?
 		if !@item.add
 		    render ErrorResult.error(404, 3, "adding share failed") and return
 		end
 	    else
-		render ErrorResult.error(404, 4, "empty share name") and return
+		render ErrorResult.error(404, 4, "empty id") and return
 	    end
 	end
 
@@ -92,7 +92,7 @@ class XXPkgXXController < ApplicationController
 	    render ErrorResult.error(403, 1, "no permission") and return
 	end
 
-	@item = XXPkgXX.find(params[:id][:name])
+	@item = XXPkgXX.find(params[:id][:id])
 
 	render ErrorResult.error(403, 1, "share not found") and return if @item.properties.blank?
 
@@ -122,7 +122,7 @@ class XXPkgXXController < ApplicationController
 	end
 
 	@item = XXPkgXX.new 	
-	@item.name = params[:id]
+	@item.id = params[:id]
 
 	if !@item.delete
 	    render ErrorResult.error(404, 2, "delete failed") and return

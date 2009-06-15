@@ -11,7 +11,7 @@
 
 htmldir = $(docdir)/autodocs
 
-html_DATA = index.html $(wildcard *.html)
+html_DATA = index.html $(filter-out index.html, $(wildcard *.html))
 CLEANFILES = $(html_DATA) pod2htm*.tmp
 
 AUTODOCS_YCP ?= $(wildcard $(srcdir)/../../src/*.ycp)

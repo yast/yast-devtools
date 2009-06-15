@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jun 15 15:33:00 CEST 2009 - mvidner@suse.cz
+
+- Fixed makefile includes (*.ami) to work with "install" calls changed
+  via automake-1.11.
+- 2.18.7
+
+-------------------------------------------------------------------
 Thu Jun 11 17:47:42 CEST 2009 - lslezak@suse.cz
 
 - added float::tolstring builtin to the vim syntax file

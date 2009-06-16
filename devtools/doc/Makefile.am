@@ -16,7 +16,6 @@ xml_files =  $(wildcard *.xml)
 
 html_DATA = $(wildcard html/*.html) \
 	    rny2rnc.html \
-	    html/index.html \
 	    html/yast2docs.css
 
 

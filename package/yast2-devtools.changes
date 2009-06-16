@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jun 16 16:42:33 CEST 2009 - mvidner@suse.cz
+
+- autodocs-ycp.ami: Added AUTODOCS_SUBDIR, for yast2.rpm
+- oscsubmit: Adjusted "osc sr" syntax to work with old and new (0.119) osc.
+
+-------------------------------------------------------------------
 Tue Jun 16 08:30:54 CEST 2009 - coolo@novell.com
 
 - fixed more makefiles

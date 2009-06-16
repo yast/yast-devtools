@@ -8,8 +8,10 @@
 #   		  Optional - the default is $(srcdir)/../../src/*.ycp
 #   AUTODOCS_PM: Files that the perl autodocs is built from
 #   		  Optional - the default is $(srcdir)/../../src/*.pm
+#   AUTODOCS_SUBDIR: To install the result to $(docdir)/SUBDIR/autodocs
+#		Optional - the default is no subdir, $(docdir)/autodocs
 
-htmldir = $(docdir)/autodocs
+htmldir = $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
 
 html_DATA = index.html $(filter-out index.html, $(wildcard *.html))
 CLEANFILES = $(html_DATA) pod2htm*.tmp

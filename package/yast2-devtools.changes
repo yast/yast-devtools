@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jun 16 08:30:54 CEST 2009 - coolo@novell.com
+
+- fixed more makefiles
+
+-------------------------------------------------------------------
 Mon Jun 15 15:33:00 CEST 2009 - mvidner@suse.cz
 
 - Fixed makefile includes (*.ami) to work with "install" calls changed

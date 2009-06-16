@@ -57,6 +57,14 @@ done
 
 PACKAGE=`cat RPMNAME`;
 
+OSCVER=$(osc --version)
+OSCVER=$((1000*${OSCVER/./+}))
+if [ $OSCVER -lt 119 ]; then
+    SUBMITREQ="sr create"
+else
+    SUBMITREQ="sr"
+fi
+
 test -f $LOGFILE && test -z $EMPTY_LOG || rm $LOGFILE
 if test -z $OBS_MOVE_PROJECT; then
     echo "Submitting $PACKAGE to $OBS_PROJECT" | tee -a $LOGFILE
@@ -107,16 +115,16 @@ fi
 
 if [ -z $OBS_MOVE_PROJECT ]; then
     echo "To create submit request, run
-osc sr create --nodevelproject $OBS_PROJECT $PACKAGE <project>,
+osc $SUBMITREQ --nodevelproject $OBS_PROJECT $PACKAGE <project>,
 to submit to Factory, run.
-osc sr create --nodevelproject $OBS_PROJECT $PACKAGE openSUSE:Factory
+osc $SUBMITREQ --nodevelproject $OBS_PROJECT $PACKAGE openSUSE:Factory
 
 
 " | tee -a $LOGFILE
 else
     echo -n "Forwarding package from $OBS_PROJECT to $OBS_MOVE_PROJECT... " | tee -a $LOGFILE
     echo "" >>$LOGFILE;
-    if osc sr create --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
+    if osc $SUBMITREQ --nodevelproject $OBS_PROJECT $PACKAGE $OBS_MOVE_PROJECT ; then
         echo "OK" | tee -a $LOGFILE
     else
         echo "Failed" | tee -a $LOGFILE; exit 6

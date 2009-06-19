@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jun 19 10:37:43 CEST 2009 - mvidner@suse.cz
+
+- autodocs-ycp.ami: fixes to work with subdirectories:
+  introduced AUTODOCS_STRIP.
+- 2.18.8
+
+-------------------------------------------------------------------
 Tue Jun 16 16:42:33 CEST 2009 - mvidner@suse.cz
 
 - autodocs-ycp.ami: Added AUTODOCS_SUBDIR, for yast2.rpm

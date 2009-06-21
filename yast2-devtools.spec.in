@@ -19,7 +19,7 @@ Obsoletes:	ycpdoc ydoc
 Provides:	yast2-config-newmodule yast2-trans-newmodule
 Obsoletes:	yast2-config-newmodule yast2-trans-newmodule
 
-Summary:	YaST2 development tools
+Summary:	YaST2 - Development Tools
 
 BuildArchitectures: noarch
 

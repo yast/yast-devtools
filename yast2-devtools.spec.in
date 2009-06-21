@@ -24,7 +24,9 @@ Summary:	YaST2 - Development Tools
 BuildArchitectures: noarch
 
 %description
--
+Scripts and templates for developing YaST2 modules and components.
+Required for rebuilding the existing YaST2 modules and components (both
+YCP and C++).
 
 @PREP@
 

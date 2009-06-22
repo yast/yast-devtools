@@ -63,6 +63,33 @@ if ($#ARGV > 0)
     die "$message";
 }
 
+# Some fields used to be part of @MACROS@ but since the demise of PDB
+# they need to be correctly filled manually. So take care to only provide them
+# if they are not present.
+my $DEFAULTLICENSE = "License:\t$LICENSE";
+my $DEFAULTGROUP = "Group:\t\tSystem/YaST";
+my $DEFAULTSUBGROUP = "Group:\t\tDevelopment/Libraries";
+# needed for modifying the build environment variables
+my $DEFAULTBUILDTAG = '%build';
+if (! seek(STDIN, 0, 0))
+{
+    print STDERR "create-spec: WARNING: Input not seekable, magic disabled.\n";
+}
+else
+{
+    my $subpac = 0;
+    while (<STDIN>)
+    {
+	$subpac = 1 if (/^\@HEADER-DEVEL@/);
+
+	$DEFAULTLICENSE = ""	if (/^License:/);
+	$DEFAULTGROUP = ""	if (/^Group:/ && ! $subpac);
+	$DEFAULTSUBGROUP = ""	if (/^Group:/ && $subpac);
+	$DEFAULTBUILDTAG = ""	if (/^\%build/);
+    }
+    seek(STDIN, 0, 0);		# rewind
+}
+
 # Definition of the macros
 my %macros =
 (
@@ -79,29 +106,24 @@ my %macros =
 # norootforbuild",
 #",
 
-# The group tag is only a dummy entry. The correct one is inserted by
-# prepare_spec.
-
     "\@HEADER\@" =>
 "Name:		$RPMNAME
 Version:	$VERSION
 Release:	0
-License:	$LICENSE
-Group:		System/YaST
+$DEFAULTLICENSE
+$DEFAULTGROUP
 BuildRoot:	%{_tmppath}/%{name}-%{version}-build
 Source0:	$RPMNAME-$VERSION.tar.bz2
 
 prefix:		/usr
 $provides_locale",
 
-# The group tag is only a dummy entry. The correct one is inserted by
-# prepare_spec.
-
     "\@HEADER-DEVEL\@" =>
 "\%package devel
 Requires:	$RPMNAME = %version
-Group:		Development/Libraries",
+$DEFAULTSUBGROUP",
 
+# not used in today's packages, maybe useful for maintenance
     "\@HEADER-INSTSYS\@" =>
 "\%package instsys
 Group:		SuSE internal",
@@ -115,7 +137,7 @@ Group:		SuSE internal",
 ##### BUILD #####
 
     "\@BUILD\@" =>
-"\%build
+"$DEFAULTBUILDTAG
 %{prefix}/bin/y2tool y2autoconf
 %{prefix}/bin/y2tool y2automake
 autoreconf --force --install
@@ -130,7 +152,7 @@ export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 make %{?jobs:-j%jobs} V=1",
 
     "\@BUILD-QT\@" =>
-"\%build
+"$DEFAULTBUILDTAG
 %{prefix}/bin/y2tool y2autoconf
 %{prefix}/bin/y2tool y2automake
 autoreconf --force --install
@@ -145,7 +167,7 @@ export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 make %{?jobs:-j%jobs} V=1",
 
     "\@BUILD-PO\@" =>
-"\%build
+"$DEFAULTBUILDTAG
 autoreconf --force --install
 \%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --prefix=%{prefix}

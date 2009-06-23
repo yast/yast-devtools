@@ -2,6 +2,7 @@
 Mon Jun 22 15:49:50 CEST 2009 - mvidner@suse.cz
 
 - create-spec: don't override License, Group, %build
+- 2.18.9
 
 -------------------------------------------------------------------
 Fri Jun 19 10:37:43 CEST 2009 - mvidner@suse.cz

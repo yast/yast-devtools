@@ -52,45 +52,6 @@ MESSAGE(STATUS "package name set to '${RPMNAME}'")
 INCLUDE(${CMAKE_SOURCE_DIR}/VERSION.cmake)
 SET ( VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
 
-####################################################################
-# RPM SPEC                                                         #
-####################################################################
-MESSAGE(STATUS "Writing spec file...")
-
-SET(HEADERCOMMENT
-"#
-# spec file for package ${RPMNAME} (Version ${VERSION})
-#
-# norootforbuild",
-#"/work/built/info/failed/
-)
-
-SET(HEADER
-"Name:           ${RPMNAME}
-Version:        ${VERSION}
-Release:        0
-License:        GPL
-Group:          System/YaST
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build\n
-Source0:        ${RPMNAME}-${VERSION}.tar.bz2"
-)
-
-SET(PREP
-"%prep
-%setup -n ${RPMNAME}-${VERSION}"
-)
-
-SET(CLEAN
-"%clean
-rm -rf \"\$RPM_BUILD_ROOT\""
-)
-
-
-SET(INSTALL
-"%install
-make install DESTDIR=\"$RPM_BUILD_ROOT\""
-)
-
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 ####################################################################
@@ -104,7 +65,39 @@ MACRO(SPECFILE)
   IF (NOT EXISTS ${SPECIN})
     SET(SPECIN ${CMAKE_SOURCE_DIR}/${PACKAGE}.spec.in)
   ENDIF (NOT EXISTS ${SPECIN})
-  
+
+  SET(HEADERCOMMENT
+    "#
+# spec file for package ${RPMNAME} (Version ${VERSION})
+#
+# norootforbuild",
+    )
+
+  SET(HEADER
+"Name:           ${RPMNAME}
+Version:        ${VERSION}
+Release:        0
+License:        GPL
+Group:          System/YaST
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Source0:        ${RPMNAME}-${VERSION}.tar.bz2"
+    )
+
+  SET(PREP
+"%prep
+%setup -n ${RPMNAME}-${VERSION}"
+    )
+
+  SET(CLEAN
+"%clean
+rm -rf \"\$RPM_BUILD_ROOT\""
+    )
+
+  SET(INSTALL
+"%install
+make install DESTDIR=\"$RPM_BUILD_ROOT\""
+    )
+
   CONFIGURE_FILE(${SPECIN} ${CMAKE_BINARY_DIR}/package/${PACKAGE}.spec @ONLY)
   MESSAGE(STATUS "I hate you rpm-lint...!!!")
   IF (EXISTS ${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake)

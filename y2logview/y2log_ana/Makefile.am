@@ -28,4 +28,4 @@ y2log_ana_SOURCES	= cgui.cc	\
 %.moc.cc: %.h
 		$(MOC) $< -o $@
 
-CLEANFILES = *.moc.cpp
+CLEANFILES = *.moc.cc

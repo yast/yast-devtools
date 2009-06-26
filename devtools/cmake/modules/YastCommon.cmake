@@ -66,6 +66,17 @@ MACRO(SPECFILE)
     SET(SPECIN ${CMAKE_SOURCE_DIR}/${PACKAGE}.spec.in)
   ENDIF (NOT EXISTS ${SPECIN})
 
+  # License and Group may be present(new) or missing(old)
+  FILE(READ ${SPECIN} SPECIN_S)
+  # test only in main package, HEADER is not used for subpackages
+  STRING(REGEX REPLACE "\n%package.*" "" SPECIN_S ${SPECIN_S})
+  IF(NOT SPECIN_S MATCHES "\nLicense:")
+    SET(DEFAULTLICENSE "License:\tGPL")
+  ENDIF(NOT SPECIN_S MATCHES "\nLicense:")
+  IF(NOT SPECIN_S MATCHES "\nGroup:")
+    SET(DEFAULTGROUP "Group:\tSystem/YaST")
+  ENDIF(NOT SPECIN_S MATCHES "\nGroup:")
+
   SET(HEADERCOMMENT
     "#
 # spec file for package ${RPMNAME} (Version ${VERSION})
@@ -77,8 +88,8 @@ MACRO(SPECFILE)
 "Name:           ${RPMNAME}
 Version:        ${VERSION}
 Release:        0
-License:        GPL
-Group:          System/YaST
+${DEFAULTLICENSE}
+${DEFAULTGROUP}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        ${RPMNAME}-${VERSION}.tar.bz2"
     )

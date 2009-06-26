@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jun 26 11:44:08 CEST 2009 - mvidner@suse.cz
+
+- YastCommon.cmake: don't override License, Group
+
+-------------------------------------------------------------------
 Mon Jun 22 15:49:50 CEST 2009 - mvidner@suse.cz
 
 - create-spec: don't override License, Group, %build

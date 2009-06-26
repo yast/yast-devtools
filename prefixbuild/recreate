@@ -127,10 +127,11 @@ function build_module() {
 
     pushd "$MODULE"
 
-    case "$MODULE" in
-	zypper|libzypp|sat-solver|libyui-bindings|ruby-bindings|qt*) init_cmake "$MODULE";;
-	*) init_autotools "$MODULE";;
-    esac
+    if [ -f CMakeLists.txt ]; then
+	init_cmake "$MODULE"
+    else
+	init_autotools "$MODULE"
+    fi
 
     # special case not to drag in old libzypp: force linking from scratch
     case "$MODULE" in

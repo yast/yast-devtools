@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul  2 15:52:56 CEST 2009 - mzugec@suse.cz
+
+- added yast2-isns module 
+
+-------------------------------------------------------------------
 Fri Jun 26 11:44:08 CEST 2009 - mvidner@suse.cz
 
 - YastCommon.cmake: don't override License, Group

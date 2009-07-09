@@ -30,7 +30,7 @@ use strict;
 my $RPMNAME = `cat RPMNAME`;
 my $VERSION = `cat VERSION`;
 my $MAINTAINER = `cat MAINTAINER`;
-my $LICENSE = -f "YAST_LICENSE" ? "YaST License" : "GPL v2 or later";
+my $LICENSE = -f "YAST_LICENSE" ? "YaST License" : "GPL";
 
 my $PREFIX = "/usr";
 

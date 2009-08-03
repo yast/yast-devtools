@@ -72,7 +72,7 @@ yast2-pam		inst-sys,default	pam agent (users)
 yast2-slp		default		        slp agent/browser
 yast2-transfer		inst-sys		transfer/curl agent (autoinst)
 yast2-xml		inst-sys		xml agent (autoinst)
-yast2-dbus-client	inst-sys		DBus agent
+yast2-dbus-client	-			DBus agent
 yast2-dbus-server	-			Yast DBus service
 
 # config packages

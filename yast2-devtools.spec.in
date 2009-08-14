@@ -41,6 +41,14 @@ make
 
 @INSTALL@
 
+%ifarch %arm
+# disable testsuite on ARM architecture
+cat > "$RPM_BUILD_ROOT/@ydatadir@/devtools/NO_MAKE_CHECK" <<EOF
+Disabling testsuite on ARM architecture, it should be enabled again
+once yast2-core is fixed.
+EOF
+%endif
+
 # Change false to true in the following line when yast2 core is broken
 false && cat > "$RPM_BUILD_ROOT/@ydatadir@/devtools/NO_MAKE_CHECK" <<EOF
 When yast2 core is broken and the interpreter does not work,

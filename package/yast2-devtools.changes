@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Sep 24 10:11:46 CEST 2009 - mvidner@suse.cz
+
+- create-spec: recognize plain rpm subpackages.
+- 2.18.11
+
+-------------------------------------------------------------------
 Fri Aug 14 21:38:13 CEST 2009 - lslezak@suse.cz
 
 - disable testsuite on ARM

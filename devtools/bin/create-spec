@@ -80,7 +80,7 @@ else
     my $subpac = 0;
     while (<STDIN>)
     {
-	$subpac = 1 if (/^\@HEADER-DEVEL@/);
+	$subpac = 1 if (/^\@HEADER-DEVEL@/ || /^\%package/);
 
 	$DEFAULTLICENSE = ""	if (/^License:/);
 	$DEFAULTGROUP = ""	if (/^Group:/ && ! $subpac);

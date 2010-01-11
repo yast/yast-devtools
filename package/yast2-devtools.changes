@@ -1484,12 +1484,11 @@ Thu Sep 05 17:47:24 CEST 2002 - arvin@suse.de
 
 - added themedir definition for theme-able images
 
-------------------------------------------------------------------------
+-------------------------------------------------------------------
 Thu Sep  5 13:24:47 2002 - ke@suse.de
 
 - Update to version 2.6.11.
 
--------------------------------------------------------------------
 Thu Sep  5 12:07:50 CEST 2002
 
 - devtools/devtools/admin/all-packages: add yast2-trans-da.

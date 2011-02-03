@@ -315,6 +315,7 @@ syn keyword	ycpWidgetSpecial	invertAutoEnable
 syn keyword	ycpWidgetSpecial	keepSorting
 syn keyword	ycpWidgetSpecial	keyEvents
 syn keyword	ycpWidgetSpecial	mainDialog
+syn keyword	ycpWidgetSpecial	multiSelection
 syn keyword	ycpWidgetSpecial	noAutoEnable
 syn keyword	ycpWidgetSpecial	notify
 syn keyword	ycpWidgetSpecial	outputField

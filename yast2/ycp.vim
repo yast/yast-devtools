@@ -64,7 +64,7 @@ syn keyword	ycpBuiltin	is select remove change contains
 syn keyword	ycpBuiltin	setcontains lookup haskey add union merge size
 syn keyword	ycpBuiltin	symbolof sleep foreach filter maplist mapmap
 syn keyword	ycpBuiltin	flatten toset sort lsort sformat tointeger argsof
-syn keyword	ycpBuiltin	crypt cryptmd5 cryptbigcrypt cryptblowfish
+syn keyword	ycpBuiltin	crypt cryptmd5 cryptbigcrypt cryptblowfish cryptsha256 cryptsha512
 syn keyword	ycpBuiltin	eval find isnil
 syn keyword	ycpBuiltin	random srandom
 syn keyword	ycpBuiltin	getenv setenv

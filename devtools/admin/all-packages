@@ -129,6 +129,7 @@ yast2-samba-server	default                 samba server
 yast2-scanner		default			scanner
 yast2-security		default			security
 yast2-slp-server	default			slp daemon
+yast2-snapper		default			Frontend for snapper
 yast2-sound		default			sound
 yast2-sshd		default			SSHD configuration
 yast2-squid		default			SQUID configuration

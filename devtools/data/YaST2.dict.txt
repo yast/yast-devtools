@@ -31,6 +31,7 @@ GPG
 Georgia
 GnuPG
 HTTPS
+IDs
 IMAP
 IMAPS
 IP
@@ -79,6 +80,7 @@ RSA
 RTC
 ReiserFS
 SASL
+SDB
 SHA
 SLP
 SMB
@@ -123,6 +125,7 @@ ZFCP
 ZMD
 autodetect
 autodetected
+autodetection
 autoinstallation
 bootable
 chipset
@@ -173,6 +176,7 @@ subdomain
 subdomains
 sysconfig
 syslog
+udev
 umount
 uncheck
 unchecked

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul  1 14:51:22 CEST 2011 - locilka@suse.cz
+
+- Added some more known words to the spellcheck whitelist.
+
+-------------------------------------------------------------------
 Fri Nov 14 15:58:39 CET 2008 - ke@suse.de
 
 - bin/create-spec: Remove sles version check from yast2-trans-spec

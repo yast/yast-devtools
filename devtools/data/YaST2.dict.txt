@@ -17,6 +17,7 @@ DDNS
 DHCP
 DN
 DNS
+DSA
 DSL
 DTD
 DVB
@@ -74,6 +75,7 @@ PHP
 PPC
 PTR
 Perl
+RSA
 RTC
 ReiserFS
 SASL
@@ -85,6 +87,7 @@ SMTPD
 SOA
 SRV
 SSH
+SSHD
 SSL
 SUSE
 SaX
@@ -161,6 +164,8 @@ reinstallation
 runlevel
 runlevels
 smb
+ssh
+sshd
 strace
 subarchive
 subarchives

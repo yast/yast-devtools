@@ -1,3 +1,5 @@
+AAAA
+ACLs
 ADSL
 AMAVIS
 AutoYaST
@@ -81,6 +83,7 @@ SMB
 SMS
 SMTPD
 SOA
+SRV
 SSH
 SSL
 SUSE
@@ -91,6 +94,7 @@ SuSEfirewall
 TLS
 TSIG
 TSL
+TXT
 Tajikistan
 UDP
 UML
@@ -140,6 +144,7 @@ loopback
 masqueraded
 multiboot
 ncurses
+netconfig
 netmask
 openSUSE
 passphrase

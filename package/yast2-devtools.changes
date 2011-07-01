@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul  1 14:51:22 CEST 2011 - locilka@suse.cz
+
+- Added some more known words to the spellcheck whitelist.
+
+-------------------------------------------------------------------
 Thu Sep 24 10:11:46 CEST 2009 - mvidner@suse.cz
 
 - create-spec: recognize plain rpm subpackages.

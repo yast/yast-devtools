@@ -17,7 +17,7 @@ X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=XXpkgXX
 
 Icon=yast-XXpkgXX
-Exec=/sbin/yast2 XXpkgXX 
+Exec=/usr/bin/xdg-su -c '/sbin/yast2 XXpkgXX'
 
 Name=XXPkgXX
 GenericName=XXpkgXX

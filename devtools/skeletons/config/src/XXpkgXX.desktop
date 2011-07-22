@@ -21,5 +21,4 @@ Exec=/usr/bin/xdg-su -c '/sbin/yast2 XXpkgXX'
 
 Name=XXPkgXX
 GenericName=XXpkgXX
-X-KDE-SubstituteUID=true
 StartupNotify=true

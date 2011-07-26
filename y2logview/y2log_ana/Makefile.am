@@ -22,8 +22,8 @@ y2log_ana_SOURCES	= cgui.cc	\
 			  cgui.h	\
 				 	 cman.cc	\
 				 	 cy2log.cc	\
-				 	 cy2log.h	\
-           cgui.moc.cc
+				 	 cy2log.h
+nodist_y2log_ana_SOURCES = cgui.moc.cc
 
 %.moc.cc: %.h
 		$(MOC) $< -o $@

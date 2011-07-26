@@ -3,7 +3,6 @@ Fri Jul 22 15:40:56 CEST 2011 - locilka@suse.cz
 
 - Obsoleted X-KDE-SubstituteUID replaced with xdg-su in Exec in
   desktop files (bnc#540627)
-- 2.21.0
 
 -------------------------------------------------------------------
 Fri Jul  1 14:51:22 CEST 2011 - locilka@suse.cz

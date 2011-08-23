@@ -19,7 +19,7 @@ compendium = @COMPENDIUM@
 with_compendium =
 
 stat=status.txt
-PO_STATS=@ybindir@/po-stats
+PO_STATS= grep -v warning: | @ybindir@/po-stats
 
 MSGMERGE = @MSGMERGE@ --no-wrap --force-po --previous
 MSGFMT = @MSGFMT@

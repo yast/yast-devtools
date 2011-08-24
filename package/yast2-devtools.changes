@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Aug 24 14:53:48 CEST 2011 - ke@suse.de
+
+- Makefile.am.center: Ignore warnings when building po file statistics.
+
+-------------------------------------------------------------------
 Fri Aug  5 12:31:21 CEST 2011 - tgoettlicher@suse.de
 
 - fixed .desktop file (bnc #681249)

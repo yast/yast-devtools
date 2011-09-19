@@ -132,6 +132,8 @@ any XXPkgXXSequence() {
 
     Wizard::CreateDialog();
 
+    Wizard::SetDesktopTitleAndIcon("XXpkgXX");
+
     any ret = Sequencer::Run(aliases, sequence);
 
     UI::CloseDialog();

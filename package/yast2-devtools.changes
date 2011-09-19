@@ -2,7 +2,8 @@
 Mon Sep 19 09:28:33 CEST 2011 - visnov@suse.cz
 
 - Simplify config module skeleton
-- Remove dependency on Wizard_hw 
+- Remove dependency on Wizard_hw
+- Add setting window title and icon to config skeleton
 
 -------------------------------------------------------------------
 Wed Aug 24 14:53:48 CEST 2011 - ke@suse.de

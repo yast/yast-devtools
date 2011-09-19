@@ -73,32 +73,19 @@ any MainSequence() {
 
     /* FIXME: adapt to your needs */
     map aliases = $[
-	"summary"	:   ``( SummaryDialog() ),
 	"overview"	:   ``( OverviewDialog() ),
-	"configure"	: [ ``( AddSequence() ), true ],
 	"add"		: [ ``( AddSequence() ), true ],
 	"edit"		: [ ``( AddSequence() ), true ]
     ];
 
     /* FIXME: adapt to your needs */
     map sequence = $[
-	"ws_start" : "summary",
-	"summary" : $[
-	    `abort	: `abort,
-	    `next	: `next,
-	    `overview	: "overview",
-	    `configure	: "configure",
-	    `other	: "configure",
-	],
+	"ws_start" : "overview",
 	"overview" : $[
 	    `abort	: `abort,
 	    `next	: `next,
 	    `add	: "add",
 	    `edit	: "edit",
-	],
-	"configure" : $[
-	    `abort	: `abort,
-	    `next	: "summary",
 	],
 	"add" : $[
 	    `abort	: `abort,

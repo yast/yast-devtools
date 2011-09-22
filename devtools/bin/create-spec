@@ -126,7 +126,7 @@ Version:        $VERSION
 Release:        0
 ${DEFAULTLICENSE}${DEFAULTGROUP}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Source0:        $RPMNAME-$VERSION.tar.bz2
+Source0:        $RPMNAME-%{version}.tar.bz2
 
 Prefix:         /usr
 $provides_locale",
@@ -145,7 +145,7 @@ Group:          SuSE internal",
 
     "\@PREP\@" =>
 "\%prep
-\%setup -n $RPMNAME-$VERSION",
+\%setup -n $RPMNAME-%{version}",
 
 ##### BUILD #####
 

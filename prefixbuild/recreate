@@ -125,6 +125,7 @@ function build_module() {
     fi
     $NETWORK && condup "$MODULE"
 
+    figlet "$MODULE" || echo "===== $MODULE ====="
     pushd "$MODULE"
 
     if [ -f CMakeLists.txt ]; then

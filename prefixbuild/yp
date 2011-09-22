@@ -4,10 +4,11 @@ case $0 in
       *yp1) UI=ncurses;;
 esac
 
-while getopts vg FLAG; do
+while getopts vgs FLAG; do
     case $FLAG in
 	v) : ${VALGRIND=valgrind} ;;
 	g) : ${VALGRIND="gdb --args"} ;;
+	s) : ${VALGRIND="strace -f -o strace.log"} ;;
 	*) echo Ugh; exit 1;;
     esac
 done

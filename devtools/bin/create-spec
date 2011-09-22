@@ -66,9 +66,9 @@ if ($#ARGV > 0)
 # Some fields used to be part of @MACROS@ but since the demise of PDB
 # they need to be correctly filled manually. So take care to only provide them
 # if they are not present.
-my $DEFAULTLICENSE = "License:\t$LICENSE";
-my $DEFAULTGROUP = "Group:\t\tSystem/YaST";
-my $DEFAULTSUBGROUP = "Group:\t\tDevelopment/Libraries";
+my $DEFAULTLICENSE = "License:\t$LICENSE\n";
+my $DEFAULTGROUP = "Group:\t\tSystem/YaST\n";
+my $DEFAULTSUBGROUP = "Group:\t\tDevelopment/Libraries\n";
 # needed for modifying the build environment variables
 my $DEFAULTBUILDTAG = '%build';
 if (! seek(STDIN, 0, 0))
@@ -101,7 +101,7 @@ my %macros =
 
     "\@HEADER-COMMENT\@" =>
 "#
-# spec file for package $RPMNAME (Version $VERSION)
+# spec file for package $RPMNAME
 #
 # Copyright (c) 2011 SUSE LINUX Products GmbH, Nuernberg, Germany.
 #
@@ -113,22 +113,22 @@ my %macros =
 # case the license is the MIT License). An \"Open Source License\" is a
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
- 
+
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
-# norootforbuild",
-#",
+
+# norootforbuild
+",
 
     "\@HEADER\@" =>
-"Name:		$RPMNAME
-Version:	$VERSION
-Release:	0
-$DEFAULTLICENSE
-$DEFAULTGROUP
-BuildRoot:	%{_tmppath}/%{name}-%{version}-build
-Source0:	$RPMNAME-$VERSION.tar.bz2
+"Name:           $RPMNAME
+Version:        $VERSION
+Release:        0
+${DEFAULTLICENSE}${DEFAULTGROUP}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Source0:        $RPMNAME-$VERSION.tar.bz2
 
-prefix:		/usr
+Prefix:         /usr
 $provides_locale",
 
     "\@HEADER-DEVEL\@" =>
@@ -139,7 +139,7 @@ $DEFAULTSUBGROUP",
 # not used in today's packages, maybe useful for maintenance
     "\@HEADER-INSTSYS\@" =>
 "\%package instsys
-Group:		SuSE internal",
+Group:          SuSE internal",
 
 ##### PREP #####
 

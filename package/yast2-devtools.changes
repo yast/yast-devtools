@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Sep 22 15:45:46 CEST 2011 - mvidner@suse.cz
+
+- create-spec: adjusted whitespace to comply with prepare_spec
+- 2.21.2
+
+-------------------------------------------------------------------
 Mon Sep 19 09:28:33 CEST 2011 - visnov@suse.cz
 
 - Simplify config module skeleton

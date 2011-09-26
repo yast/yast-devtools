@@ -89,6 +89,7 @@ yast2-dhcp-server	defalut			DHCP server
 yast2-dns-server	default			DNS server
 yast2-firewall		default			firewall
 yast2-firewall-cd	firewall		firewall CD
+yast2-ftp-server	default			FTP Server
 yast2-heartbeat		default			HA (heartbeat)
 yast2-http-server	default			HTTP server
 yast2-imap-server	email			IMAP server
@@ -100,6 +101,7 @@ yast2-isns		default			iSNS
 yast2-iscsi-client	default			iSCSI initiator
 yast2-iscsi-server	default			iSCSI target
 yast2-kerberos-client	default			kerberos client
+yast2-kerberos-server	default			kerberos server
 yast2-kdump		default			kdump (kernel)
 yast2-ldap-client	default			ldap client
 yast2-ldap-server	default			LDAP server

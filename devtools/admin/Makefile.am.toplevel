@@ -20,7 +20,6 @@ HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
 DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir)/devtools,$(Y2DEVTOOLS_PREFIX)/share/YaST2/data/devtools)
-ALL_PACKAGES		= $(DEVTOOLS_DIR)/admin/all-packages
 LEGALESE_DIR		= $(if $(HAS_YAST_LICENSE),$(DEVTOOLS_DIR)/admin/copyright/yast,$(DEVTOOLS_DIR)/admin/copyright/gpl)
 
 COPYRIGHT_files_gpl	= README COPYING
@@ -155,7 +154,7 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 	    $(Y2TOOL) create-spec < $$i > $$here/package/$${newname} ; \
 	done
 
-package: check-up-to-date check-tagversion check-all-packages check-textdomain package-local
+package: check-up-to-date check-tagversion check-textdomain package-local
 
 TAGVERSION	 = $(Y2TOOL) tagversion
 
@@ -184,21 +183,6 @@ check-parse-old:
 
 check-parse:
 	@echo "Not running parseycp."
-
-check-all-packages:
-	@if [ ! -e "$(ALL_PACKAGES)" ]; then				\
-		echo ERROR: "Can't find $(ALL_PACKAGES)"; false;	\
-	fi
-	@if ! grep -q "^$(RPMNAME)[[:space:]]" $(ALL_PACKAGES); then		\
-		echo ERROR: "$(RPMNAME) not in $(ALL_PACKAGES)"; false;	\
-	fi
-	@if grep -q "^$(RPMNAME)[[:space:]]\+.*?" $(ALL_PACKAGES); then	\
-		echo ERROR: "$(RPMNAME) info in $(ALL_PACKAGES) contains some unknown (?) fields:";	\
-		echo;							\
-		grep "^$(RPMNAME)[[:space:]]\+.*?" $(ALL_PACKAGES);	\
-		echo;							\
-		false;							\
-	fi
 
 check-textdomain:
 	$(Y2TOOL) check-textdomain $(srcdir)

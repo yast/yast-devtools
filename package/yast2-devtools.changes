@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 27 11:23:22 CEST 2011 - visnov@suse.cz
+
+- dropped all-packages and devel-packages lists
+- 2.21.3 
+
+-------------------------------------------------------------------
 Thu Sep 22 15:45:46 CEST 2011 - mvidner@suse.cz
 
 - create-spec: adjusted whitespace to comply with prepare_spec

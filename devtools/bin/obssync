@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#####
+#Usage:
+#   obssync [<OBS_Project>]
+#
+#####
+
+printhelp()
+{
+	echo "Usage: $0 <target-project>"
+	echo 
+	echo "Synchronize changes from YaST:Head to target project. To synchronize with factory, use"
+	echo "    $0 openSUSE:Factory"
+	echo
+	echo "OPTIONS:"
+	echo "  -h, --help          this message"
+	echo "  -a, --api	    OBS API server"
+}
+
+APIHOST=api.opensuse.org
+TARGET_PROJECT=""
+
+# parse parameters
+TEMP=`/usr/bin/getopt -o ha: --long help,api: \
+     -n 'obssync' -- "$@"`
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+while true ; do
+	case "$1" in
+		-h|--help) printhelp; exit 0 ;;
+		-a|--api) APIHOST=$2; shift 2 ;;
+		--) shift ; TARGET_PROJECT=$1 ; break;;
+		*) echo "Unrecognized option $1" ; exit 1 ;;
+		# IMPORTANT: Remember to change that "getopt" call above, too
+                # if you change anything here!
+        esac
+done
+
+if [ -z "$TARGET_PROJECT" ]; then
+	echo "Target project missing"
+	exit 1
+fi
+
+DEVEL_PROJECT="YaST:Head"
+MESSAGE="Sync packages from YaST:Head devel project to $TARGET_PROJECT (using $APIHOST)"
+
+echo $MESSAGE
+echo "Generating list of candidates..."
+
+PACKAGES=`osc -A https://$APIHOST list $DEVEL_PROJECT`
+
+TO_SUBMIT=""
+
+for package in $PACKAGES; do
+
+  osc -A https://$APIHOST rdiff $DEVEL_PROJECT $package $TARGET_PROJECT | grep \\.changes
+
+  if [ $? -eq 0 ]; then
+    echo "Changes in $package"
+    TO_SUBMIT="$TO_SUBMIT $package"
+  else
+    echo "Skipping $package"
+  fi
+
+done
+
+echo "Summary:"
+echo "========"
+echo "$TO_SUBMIT"
+echo
+
+echo -n "Press ENTER to continue"
+
+read
+
+for package in $TO_SUBMIT; do
+  echo -n "$package: "
+  osc -A https://$APIHOST sr -m "$MESSAGE" $DEVEL_PROJECT $package $TARGET_PROJECT
+done
+
+echo "Done"

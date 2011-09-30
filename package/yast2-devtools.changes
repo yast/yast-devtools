@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep 30 12:26:20 CEST 2011 - visnov@suse.cz
+
+- added 'y2tool obssync' 
+
+-------------------------------------------------------------------
 Tue Sep 27 11:23:22 CEST 2011 - visnov@suse.cz
 
 - dropped all-packages and devel-packages lists

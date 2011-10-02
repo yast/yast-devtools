@@ -24,6 +24,7 @@ pkgdata_SCRIPTS = 				\
 	svnignore				\
 	tagversion 				\
 	oscsubmit 				\
+	obssync					\
 	version					\
 	y2autoconf 				\
 	y2automake 				\

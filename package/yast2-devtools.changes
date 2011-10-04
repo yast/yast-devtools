@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct  4 15:12:21 CEST 2011 - visnov@suse.cz
+
+- remove definition of Prefix in spec file (create-spec)
+- use _prefix in .spec file
+- 2.21.5 
+
+-------------------------------------------------------------------
 Fri Sep 30 12:26:20 CEST 2011 - visnov@suse.cz
 
 - added 'y2tool obssync' 

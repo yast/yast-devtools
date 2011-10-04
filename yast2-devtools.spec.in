@@ -36,7 +36,7 @@ YCP and C++).
 autoreconf --force --install
 
 %{?suse_update_config:%{suse_update_config -f}}
-./configure --prefix=%{prefix} --libdir=%{_libdir}
+./configure --prefix=%{_prefix} --libdir=%{_libdir}
 make
 
 @INSTALL@
@@ -59,23 +59,23 @@ EOF
 
 %files
 %defattr(-,root,root)
-%{prefix}/bin/y2tool
-%{prefix}/bin/yastdoc
-%dir %{prefix}/share/emacs
-%dir %{prefix}/share/emacs/site-lisp
-%{prefix}/share/emacs/site-lisp/*ycp-mode.el
-%dir %{prefix}/share/vim
-%dir %{prefix}/share/vim/site
-%dir %{prefix}/share/vim/site/syntax
-%{prefix}/share/vim/site/syntax/ycp.vim
-%dir %{prefix}/share/vim/site/ftdetect
-%{prefix}/share/vim/site/ftdetect/ycp_filetype.vim
-%dir %{prefix}/lib/YaST2
-%{prefix}/share/cmake
+%{_prefix}/bin/y2tool
+%{_prefix}/bin/yastdoc
+%dir %{_prefix}/share/emacs
+%dir %{_prefix}/share/emacs/site-lisp
+%{_prefix}/share/emacs/site-lisp/*ycp-mode.el
+%dir %{_prefix}/share/vim
+%dir %{_prefix}/share/vim/site
+%dir %{_prefix}/share/vim/site/syntax
+%{_prefix}/share/vim/site/syntax/ycp.vim
+%dir %{_prefix}/share/vim/site/ftdetect
+%{_prefix}/share/vim/site/ftdetect/ycp_filetype.vim
+%dir %{_prefix}/lib/YaST2
+%{_prefix}/share/cmake
 @ybindir@
-%dir %{prefix}/share/YaST2
+%dir %{_prefix}/share/YaST2
 @ydatadir@
-%{prefix}/share/aclocal/*.m4
+%{_prefix}/share/aclocal/*.m4
 @pkgconfigdatadir@/@RPMNAME@.pc
 %doc @docdir@
 

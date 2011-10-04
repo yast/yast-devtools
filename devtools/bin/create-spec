@@ -128,7 +128,6 @@ ${DEFAULTLICENSE}${DEFAULTGROUP}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        $RPMNAME-%{version}.tar.bz2
 
-Prefix:         /usr
 $provides_locale",
 
     "\@HEADER-DEVEL\@" =>
@@ -151,30 +150,30 @@ Group:          SuSE internal",
 
     "\@BUILD\@" =>
 "$DEFAULTBUILDTAG
-%{prefix}/bin/y2tool y2autoconf
-%{prefix}/bin/y2tool y2automake
+%{_prefix}/bin/y2tool y2autoconf
+%{_prefix}/bin/y2tool y2automake
 autoreconf --force --install
 
 export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir} --prefix=%{prefix} --mandir=%{_mandir}
+./configure --libdir=%{_libdir} --prefix=%{_prefix} --mandir=%{_mandir}
 # V=1: verbose build in case we used AM_SILENT_RULES(yes)
 # so that RPM_OPT_FLAGS check works
 make %{?jobs:-j%jobs} V=1",
 
     "\@BUILD-QT\@" =>
 "$DEFAULTBUILDTAG
-%{prefix}/bin/y2tool y2autoconf
-%{prefix}/bin/y2tool y2automake
+%{_prefix}/bin/y2tool y2autoconf
+%{_prefix}/bin/y2tool y2automake
 autoreconf --force --install
 
 export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir} --prefix=%{prefix} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
+./configure --libdir=%{_libdir} --prefix=%{_prefix} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
 # V=1: verbose build in case we used AM_SILENT_RULES(yes)
 # so that RPM_OPT_FLAGS check works
 make %{?jobs:-j%jobs} V=1",
@@ -183,7 +182,7 @@ make %{?jobs:-j%jobs} V=1",
 "$DEFAULTBUILDTAG
 autoreconf --force --install
 \%{?suse_update_config:\%{suse_update_config -f}}
-./configure --libdir=%{_libdir} --prefix=%{prefix}
+./configure --libdir=%{_libdir} --prefix=%{_prefix}
 make %{?jobs:-j%jobs}",
 
 ##### INSTALL #####
@@ -191,7 +190,7 @@ make %{?jobs:-j%jobs}",
     "\@INSTALL\@" =>
 "\%install
 make install DESTDIR=\"\$RPM_BUILD_ROOT\"
-[ -e \"%{prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK\" ] || Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check DESTDIR=\"\$RPM_BUILD_ROOT\"
+[ -e \"%{_prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK\" ] || Y2DIR=\"\$RPM_BUILD_ROOT$yast2dir\" make check DESTDIR=\"\$RPM_BUILD_ROOT\"
 for f in `find \$RPM_BUILD_ROOT/\@desktopdir\@/ -name \"*.desktop\"` ; do
     d=\${f##*/}
     \%suse_update_desktop_file -d ycc_\${d\%.desktop} \${d\%.desktop}
@@ -218,20 +217,20 @@ my %tiny_macros =
     # and use it here. (cannot use configure directly because
     # makefile has ${prefix} and spec file has %{prefix}
     # FIXME: $prefix unfunctional
-    #"\@yast2dir@" => "\\\${prefix}/share/YaST2",
+    #"\@yast2dir@" => "\\\${_prefix}/share/YaST2",
     "\@pkgconfigdir\@" => "%{_libdir}/pkgconfig",
-    "\@pkgconfigdatadir\@" => "%{prefix}/share/pkgconfig",
+    "\@pkgconfigdatadir\@" => "%{_prefix}/share/pkgconfig",
 
-    "\@ybindir\@" => "%{prefix}/lib/YaST2/bin",
-	"\@ystartupdir\@" => "%{prefix}/lib/YaST2",
+    "\@ybindir\@" => "%{_prefix}/lib/YaST2/bin",
+	"\@ystartupdir\@" => "%{_prefix}/lib/YaST2",
     "\@plugindir\@" => "%{_libdir}/YaST2/plugin",
-    "\@includedir\@" => "%{prefix}/include/YaST2",
-    "\@docdir\@" => "%{prefix}/share/doc/packages/$RPMNAME",
+    "\@includedir\@" => "%{_prefix}/include/YaST2",
+    "\@docdir\@" => "%{_prefix}/share/doc/packages/$RPMNAME",
     "\@logdir\@" => "/var/log/YaST2",
     "\@vardir\@" => "/var/lib/YaST2",
     "\@mandir\@" => "%{_mandir}",
 
-    "\@execcompdir\@" => "%{prefix}/lib/YaST2",
+    "\@execcompdir\@" => "%{_prefix}/lib/YaST2",
     "\@agentdir\@" => "${execcompdir}/servers_non_y2",
 
     "\@ydatadir\@" => "${yast2dir}/data",
@@ -243,7 +242,7 @@ my %tiny_macros =
     "\@yncludedir\@" => "${yast2dir}/include",
     "\@schemadir\@" => "${yast2dir}/schema",
     "\@scrconfdir\@" => "${yast2dir}/scrconf",
-    "\@desktopdir\@" => "%{prefix}/share/applications/YaST2",
+    "\@desktopdir\@" => "%{_prefix}/share/applications/YaST2",
     '@fillupdir@' => '/var/adm/fillup-templates',
 
     "\@LL\@" => "$LL",

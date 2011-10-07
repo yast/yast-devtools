@@ -1,27 +1,27 @@
-@HEADER-COMMENT@ 
+@HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	docbook-xsl-stylesheets gcc-c++ libxslt perl-XML-Writer sgml-skel pkgconfig
-Requires:	perl
-Requires:	perl-XML-Writer
+BuildRequires:  docbook-xsl-stylesheets gcc-c++ libxslt perl-XML-Writer pkgconfig sgml-skel
+Requires:       perl
+Requires:       perl-XML-Writer
 Requires:       libxslt
 # we install our .pc under $prefix/share
-Requires:	pkgconfig >= 0.16
-Requires:	automake autoconf
-Requires:	gettext-tools
-Recommends:	cmake
+Requires:       pkgconfig >= 0.16
+Requires:       automake autoconf
+Requires:       gettext-tools
+Recommends:     cmake
 # /usr/lib/YaST2/bin/ydoxygen needs it
-Recommends:	doxygen
+Recommends:     doxygen
 # for svn builds of binary packages
-Recommends:	libtool
-Provides:	ycpdoc ydoc
-Obsoletes:	ycpdoc ydoc
-Provides:	yast2-config-newmodule yast2-trans-newmodule
-Obsoletes:	yast2-config-newmodule yast2-trans-newmodule
+Recommends:     libtool
+Provides:       ycpdoc ydoc
+Obsoletes:      ycpdoc ydoc
+Provides:       yast2-config-newmodule yast2-trans-newmodule
+Obsoletes:      yast2-config-newmodule yast2-trans-newmodule
 
-Summary:	YaST2 development tools
+Summary:        YaST2 development tools
 
-BuildArchitectures: noarch
+BuildArch:      noarch
 
 %description
 -
@@ -67,3 +67,5 @@ EOF
 %{prefix}/share/aclocal/*.m4
 @pkgconfigdatadir@/@RPMNAME@.pc
 %doc @docdir@
+
+%changelog

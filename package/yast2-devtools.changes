@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Oct  7 14:56:33 CEST 2011 - mvidner@suse.cz
+
+- create_spec: Specify the license: GPL-2.0+ instead of just GPL (bnc#709814).
+
+-------------------------------------------------------------------
 Thu Oct  6 15:00:59 CEST 2011 - visnov@suse.cz
 
 - Drop all-packages (bnc #722483)

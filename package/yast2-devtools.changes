@@ -5,6 +5,7 @@ Fri Oct  7 14:56:33 CEST 2011 - mvidner@suse.cz
 - create-spec: added spec file license
 - create-spec: adjusted whitespace to comply with prepare_spec
 - create-spec: use %version to minimize diffs
+- 2.17.9
 
 -------------------------------------------------------------------
 Thu Oct  6 15:00:59 CEST 2011 - visnov@suse.cz

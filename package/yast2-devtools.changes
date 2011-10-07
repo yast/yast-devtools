@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
 Fri Oct  7 14:56:33 CEST 2011 - mvidner@suse.cz
 
-- create_spec: Specify the license: GPL-2.0+ instead of just GPL (bnc#709814).
+- create-spec: Specify the license: GPL-2.0+ instead of just GPL (bnc#709814).
+- create-spec: added spec file license
+- create-spec: adjusted whitespace to comply with prepare_spec
+- create-spec: use %version to minimize diffs
 
 -------------------------------------------------------------------
 Thu Oct  6 15:00:59 CEST 2011 - visnov@suse.cz

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct 25 12:14:21 UTC 2011 - lslezak@suse.cz
+
+- fixed oscsubmit to not submit *.rej and *.orig files left after
+  failed merging
+- 2.21.6
+
+-------------------------------------------------------------------
 Tue Oct  4 15:12:21 CEST 2011 - visnov@suse.cz
 
 - remove definition of Prefix in spec file (create-spec)

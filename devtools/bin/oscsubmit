@@ -86,7 +86,11 @@ echo "" >>$LOGFILE;
 # FIXME directory may be empty
 rm $OBS_PROJECT/$PACKAGE/* 2>&1 | tee -a $LOGFILE
 test -d build/package && cp build/package/* $OBS_PROJECT/$PACKAGE  # needed for cmake-based modules
+
 cp package/* $OBS_PROJECT/$PACKAGE
+# do not submit *.rej and *.orig files left after failed patching/merging
+rm -rf $OBS_PROJECT/$PACKAGE/*.rej $OBS_PROJECT/$PACKAGE/*.orig
+
 echo "OK" | tee -a $LOGFILE
 diff $OBS_PROJECT/$PACKAGE/*changes $OBS_PROJECT/$PACKAGE/.osc/*changes >diff
 test -f $OBS_PROJECT/$PACKAGE/.osc/*changes || echo "< New package" >diff

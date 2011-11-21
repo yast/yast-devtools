@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Nov 21 08:59:17 UTC 2011 - coolo@suse.com
+
+- add libtool as buildrequire to avoid implicit dependency
+- remove clean section
+
+-------------------------------------------------------------------
 Tue Oct 25 12:14:21 UTC 2011 - lslezak@suse.cz
 
 - fixed oscsubmit to not submit *.rej and *.orig files left after

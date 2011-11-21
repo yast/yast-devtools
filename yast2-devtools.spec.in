@@ -3,7 +3,14 @@
 @HEADER@
 Group:          System/YaST
 License:        GPL-2.0+
-BuildRequires:  docbook-xsl-stylesheets gcc-c++ libxslt perl-XML-Writer pkgconfig sgml-skel
+BuildRequires:  docbook-xsl-stylesheets 
+BuildRequires:  gcc-c++
+BuildRequires:  libxslt 
+BuildRequires:  perl-XML-Writer 
+BuildRequires:  pkgconfig
+BuildRequires:  sgml-skel
+BuildRequires:  libtool
+BuildRequires:  automake
 Requires:       perl
 Requires:       perl-XML-Writer
 Requires:       libxslt
@@ -54,8 +61,6 @@ When yast2 core is broken and the interpreter does not work,
 submitting yast2-devtools with the flag file existing will
 prevent ycp developers being flooded by testsuite failures.
 EOF
-
-@CLEAN@
 
 %files
 %defattr(-,root,root)

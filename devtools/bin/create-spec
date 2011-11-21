@@ -116,8 +116,6 @@ my %macros =
 
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
-
-# norootforbuild
 ",
 
     "\@HEADER\@" =>

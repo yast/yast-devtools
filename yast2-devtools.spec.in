@@ -42,7 +42,6 @@ YCP and C++).
 %build
 autoreconf --force --install
 
-%{?suse_update_config:%{suse_update_config -f}}
 ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 make
 

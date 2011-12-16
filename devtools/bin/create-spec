@@ -155,7 +155,6 @@ autoreconf --force --install
 export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
-\%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --prefix=%{_prefix} --mandir=%{_mandir}
 # V=1: verbose build in case we used AM_SILENT_RULES(yes)
 # so that RPM_OPT_FLAGS check works
@@ -170,7 +169,6 @@ autoreconf --force --install
 export CFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 export CXXFLAGS=\"\$RPM_OPT_FLAGS -DNDEBUG\"
 
-\%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --prefix=%{_prefix} --with-qt-dir=/usr/lib/qt3 --with-qt-libdir=/usr/lib/qt3/%{_lib} --mandir=%{_mandir}
 # V=1: verbose build in case we used AM_SILENT_RULES(yes)
 # so that RPM_OPT_FLAGS check works
@@ -179,7 +177,6 @@ make %{?jobs:-j%jobs} V=1",
     "\@BUILD-PO\@" =>
 "$DEFAULTBUILDTAG
 autoreconf --force --install
-\%{?suse_update_config:\%{suse_update_config -f}}
 ./configure --libdir=%{_libdir} --prefix=%{_prefix}
 make %{?jobs:-j%jobs}",
 

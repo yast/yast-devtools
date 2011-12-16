@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Dec 16 08:54:17 UTC 2011 - coolo@suse.com
+
+- autoreconf and suse_config_update are doing the same thing, so leave
+  out suse specifics
+
+-------------------------------------------------------------------
 Mon Nov 21 08:59:17 UTC 2011 - coolo@suse.com
 
 - add libtool as buildrequire to avoid implicit dependency

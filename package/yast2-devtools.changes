@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan 12 15:49:16 UTC 2012 - coolo@suse.com
+
+- yast's license is GPL-2.0 in doubt, not "GPL"
+- 2.21.8
+
+-------------------------------------------------------------------
 Tue Jan  3 10:02:13 CET 2012 - ke@suse.de
 
 - ydoc/po-tools/po-stats: filter file name (FILE.LL.po:) that 'msgfmt

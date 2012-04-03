@@ -280,7 +280,7 @@ PKG_CHECK_EXISTS([yast2-core],[
     PKG_CHECK_MODULES(Y2CORE, yast2-core)
 ])
 
-CFLAGS="${CFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
+CFLAGS="${CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
 CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2"
 
 : ${AGENT_LIBADD:=\'-L$(libdir) -lscr\'}

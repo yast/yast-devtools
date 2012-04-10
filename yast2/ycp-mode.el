@@ -64,10 +64,10 @@
 		       "size" "haskey" "add" "prepend" "union" "merge" "foreach" "filter"
 		       "find" "maplist" "flatten" "sort" "time" "toset" "listmap" "mapmap"
 		       "tointeger" "tofloat" "tostring" "topath" "toterm" "tosymbol"
-		       "crypt" "substring" "findfirstnotof" "tolower" "difference"
+		       "crypt" "substring" "findfirstnotof" "tolower" "toupper" "difference"
 		       "toascii" "filterchars" "eval" "symbolof" "argsof" "includes"
 		       "sleep" "sformat" "y2log" "mergestring" "splitstring" "sublist"
-		       "findfirstof" "issubstring"
+		       "findfirstof" "findlastof" "findlastnotof" "issubstring"
 		       "fileexist" "checkIP" "isnil" "include" "module" "import"
 		       "y2debug" "y2milestone" "y2warning" "y2error" "y2security" "y2internal"
 		       ))))

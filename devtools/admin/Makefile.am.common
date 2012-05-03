@@ -30,7 +30,7 @@ NEWDEP=${top_builddir}/.dep.new
 dist-hook: check-syntax
 
 CHECK_SYNTAX = true
-check-syntax: $(client_DATA) $(ycpchook)
+check-syntax: $(client_DATA) $(ycpchook) $(ybcfiles)
 	@if test "$(client_DATA)"; then \
 	  if $(CHECK_SYNTAX); then \
 	    TO_CHECK="$(filter %.ycp,$^)"; \

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu May  3 08:12:00 UTC 2012 - mfilka@suse.com
+
+- updated Makefile.am.common - rebuilds ybc when make package-local 
+- 2.21.9
+
+-------------------------------------------------------------------
 Thu Jan 12 15:49:16 UTC 2012 - coolo@suse.com
 
 - yast's license is GPL-2.0 in doubt, not "GPL"

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jun 18 11:50:33 CEST 2012 - aschnell@suse.de
+
+- link agents against y2util and ycpvalues
+- 2.23.0
+
+-------------------------------------------------------------------
 Thu May  3 08:12:00 UTC 2012 - mfilka@suse.com
 
 - updated Makefile.am.common - rebuilds ybc when make package-local 

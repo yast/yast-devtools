@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
 Mon Jun 18 11:50:33 CEST 2012 - aschnell@suse.de
 
-- link agents against y2util and ycpvalues
+- link agents against y2util and ycpvalues to get proper rpm
+  dependencies (zypper and buildservice need them)
 - 2.23.0
 
 -------------------------------------------------------------------

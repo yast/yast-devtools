@@ -58,7 +58,7 @@ proposal_valid = False
 
 ##
  # Write only, used during autoinstallation.
- # Don't run services and SuSEconfig, it's all done at one place.
+ # Don't run services it's all done at one place.
  #
 write_only = False
 
@@ -201,7 +201,7 @@ def Write():
     caption = _("Saving XXpkgXX Configuration")
 
     # TODO FIXME And set the right number of stages
-    steps = 2
+    steps = 1
 
     sl = 0.5
     sleep(sl)
@@ -209,15 +209,11 @@ def Write():
     # TODO FIXME Names of real stages
     # We do not set help text here, because it was set outside
     ycp.Progress.New(caption, " ", steps, [
-            # Progress stage 1/2
+            # Progress stage
             _("Write the settings"),
-            # Progress stage 2/2
-            _("Run SuSEconfig")
         ], [
-            # Progress step 1/2
+            # Progress step
             _("Writing the settings..."),
-            # Progress step 2/2
-            _("Running SuSEconfig..."),
             # Progress finished
             _("Finished")
         ],
@@ -229,13 +225,6 @@ def Write():
     # Error message
     if False:
         ycp.Report.Error (_("Cannot write settings."))
-    sleep(sl)
-
-    # run SuSEconfig
-    ycp.Progress.NextStage()
-    # Error message
-    if False:
-        ycp.Report.Error(ycp.Message.SuSEConfigFailed())
     sleep(sl)
 
     # Progress finished

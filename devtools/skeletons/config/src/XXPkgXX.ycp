@@ -56,7 +56,7 @@ boolean proposal_valid = false;
 
 /**
  * Write only, used during autoinstallation.
- * Don't run services and SuSEconfig, it's all done at one place.
+ * Don't run services, it's all done at one place.
  */
 boolean write_only = false;
 
@@ -222,7 +222,7 @@ global boolean Write() {
     string caption = _("Saving XXpkgXX Configuration");
 
     // TODO FIXME And set the right number of stages
-    integer steps = 2;
+    integer steps = 1;
 
     integer sl = 500;
     sleep(sl);
@@ -230,15 +230,11 @@ global boolean Write() {
     // TODO FIXME Names of real stages
     // We do not set help text here, because it was set outside
     Progress::New(caption, " ", steps, [
-	    /* Progress stage 1/2 */
+	    /* Progress stage */
 	    _("Write the settings"),
-	    /* Progress stage 2/2 */
-	    _("Run SuSEconfig")
 	], [
-	    /* Progress step 1/2 */
+	    /* Progress step */
 	    _("Writing the settings..."),
-	    /* Progress step 2/2 */
-	    _("Running SuSEconfig..."),
 	    /* Progress finished */
 	    _("Finished")
 	],
@@ -250,13 +246,6 @@ global boolean Write() {
     Progress::NextStage();
     /* Error message */
     if(false) Report::Error (_("Cannot write settings."));
-    sleep(sl);
-
-    // run SuSEconfig
-    if(Abort()) return false;
-    Progress::NextStage ();
-    /* Error message */
-    if(false) Report::Error (Message::SuSEConfigFailed());
     sleep(sl);
 
     if(Abort()) return false;

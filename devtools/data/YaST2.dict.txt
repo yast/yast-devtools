@@ -119,7 +119,6 @@ SSL
 SUSE
 SaX
 SuSE
-SuSEconfig
 SuSEfirewall
 SyncPPP
 TLS

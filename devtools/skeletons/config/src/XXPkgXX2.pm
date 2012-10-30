@@ -57,7 +57,7 @@ my $proposal_valid = 0;
 
 ##
  # Write only, used during autoinstallation.
- # Don't run services and SuSEconfig, it's all done at one place.
+ # Don't run services, it's all done at one place.
  #
 my $write_only = 0;
 
@@ -211,7 +211,7 @@ sub Write {
     my $caption = __("Saving XXpkgXX Configuration");
 
     # TODO FIXME And set the right number of stages
-    my $steps = 2;
+    my $steps = 1;
 
     my $sl = 0.5;
     sleep($sl);
@@ -219,15 +219,11 @@ sub Write {
     # TODO FIXME Names of real stages
     # We do not set help text here, because it was set outside
     Progress->New($caption, " ", $steps, [
-	    # Progress stage 1/2
+	    # Progress stage
 	    __("Write the settings"),
-	    # Progress stage 2/2
-	    __("Run SuSEconfig")
 	], [
-	    # Progress step 1/2
+	    # Progress step
 	    __("Writing the settings..."),
-	    # Progress step 2/2
-	    __("Running SuSEconfig..."),
 	    # Progress finished
 	    __("Finished")
 	],
@@ -240,15 +236,6 @@ sub Write {
     if(0)
     {
 	Report->Error (__("Cannot write settings."));
-    }
-    sleep($sl);
-
-    # run SuSEconfig
-    Progress->NextStage ();
-    # Error message
-    if(0)
-    {
-	Report->Error (Message->SuSEConfigFailed());
     }
     sleep($sl);
 

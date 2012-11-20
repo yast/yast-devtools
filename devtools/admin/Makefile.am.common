@@ -35,7 +35,7 @@ check-syntax: $(client_DATA) $(ycpchook)
 	  if $(CHECK_SYNTAX); then \
 	    TO_CHECK="$(filter %.ycp,$^)"; \
 	    echo "Checking syntax of $${TO_CHECK}"; \
-	    if ! $(YCPC) -qE -M. -I. $(YCPCFLAGS) $${TO_CHECK}; then \
+	    if ! Y2DIR=$(YCPC_Y2DIR) LD_LIBRARY_PATH=$(YCPC_LD_LIBRARY_PATH) $(YCPC) -qE -M. -I. $(YCPCFLAGS) $${TO_CHECK}; then \
 	      echo "Failed. Disable by 'make ... CHECK_SYNTAX=false' at your own risk"; \
 	      exit 1; \
 	    fi; \

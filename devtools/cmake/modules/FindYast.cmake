@@ -31,24 +31,27 @@ FIND_LIBRARY(YAST_LIBRARY NAMES y2
   PATHS
   ${LIB_INSTALL_DIR}
   /usr/local/lib
+  /usr/${LIB}
 )
 
 FIND_LIBRARY(YAST_YCP_LIBRARY NAMES ycp
   PATHS
   ${LIB_INSTALL_DIR}
+  /usr/${LIB}
   /usr/local/lib
 )
 
 FIND_LIBRARY(YAST_YUI_LIBRARY NAMES yui
   PATHS
   ${LIB_INSTALL_DIR}
+  /usr/${LIB}
   /usr/local/lib
 )
 
 FIND_LIBRARY(YAST_PLUGIN_WFM_LIBRARY NAMES py2wfm
   PATHS
   ${YAST_PLUGIN_DIR}
-  /usr/lib
+  /usr/${LIB}
   /usr/local/lib
 )
 
@@ -56,6 +59,7 @@ FIND_LIBRARY(YAST_PLUGIN_SCR_LIBRARY NAMES py2scr
   PATHS
   ${YAST_PLUGIN_DIR}
   ${LIB_INSTALL_DIR}
+  /usr/${LIB}
   /usr/local/lib
 )
 
@@ -63,6 +67,7 @@ FIND_LIBRARY(YAST_PLUGIN_UI_LIBRARY NAMES py2UI
   PATHS
   ${YAST_PLUGIN_DIR}
   ${LIB_INSTALL_DIR}
+  /usr/${LIB}
   /usr/local/lib
 )
 

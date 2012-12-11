@@ -1,7 +1,0 @@
-Makefile
-Makefile.in
-*.mo
-*.pot
-*.pox
-*.bak
-Makefile.am

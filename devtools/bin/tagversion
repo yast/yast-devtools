@@ -1,15 +1,16 @@
 #!/bin/bash
 # $Id$
 usage () {
-    echo "tagversion, tag version in subversion"
+    echo "tagversion, tag version in git and push it"
+    echo "Tag format is stable-<VERSION> for master or <branch>-<VERSION>,"
+    echo "e.g. stable-2.26.3 or Code-11-SP3-2.25.15"
+    echo ""
     echo "options:"
-    echo "  -h, --help:    this help"
-    echo "  -n, --echo:    don't tag, just echo tag name"
-    echo "  -u, --echourl: don't tag, just echo tag url (Subversion only)"
-    echo "  -r, --remove:  remove the tag (after adding it by mistake, SVN only)"
+    echo "  -h, --help:     this help"
+    echo "  -c, --check:    check if package is already tagged (quick local check)"
 }
 
-OPTIONS=`getopt --name $0 --options hnru --longoptions help,echo,echourl,remove -- "$@"` || { usage; exit 1; }
+OPTIONS=`getopt --name $0 --options hc --longoptions help,check -- "$@"` || { usage; exit 1; }
 eval set -- "$OPTIONS"
 while true; do
     case "$1" in
@@ -21,14 +22,8 @@ while true; do
 	    usage
 	    exit
 	    ;;
-	-n|--echo)
-	    ECHO=1
-	    ;;
-	-r|--remove)
-	    REMOVE=1
-	    ;;
-	-u|--echourl)
-	    ECHOURL=1
+  -c|--check)
+	    CHECK=1
 	    ;;
     esac
     shift
@@ -41,72 +36,25 @@ if [ -z "$p" -o -z "$v" ]; then
     exit 1
 fi
 
-if [ -d CVS ]; then
-
-    b=`cvs status VERSION | grep 'SuSE-.*-Branch' | sed 's/^.*SuSE-\(.*\)-Branch.*$/\1/'`
-    if [ "$b" ]; then
-      t=branch-$b-$v
-    else
-      t=stable-$v
-    fi
-    if [ "$ECHO" ]; then
-	echo "$t"
-    elif [ "$ECHOURL" ]; then
-	echo "echo tag url not supported in CVS"
-    elif [ "$REMOVE" ]; then
-	echo "echo tag removing not supported in CVS"
-    else
-	echo "$p $t"
-	cvs tag $t
-    fi
-    
+BRANCH=`git branch | sed '/^[^\*]/d;s/^\*[[:space:]]*//;'`
+if [ "$BRANCH" = "master" ]; then
+  t=stable-$v
 else
-
-    # sed -n -e 's///;T;p;q'
-    # means: print just the line on which the subst succeeded
-
-    # URLs don't contain spaces so it's safe to use them as delimiters
-    svn info | sed -n -e 's@^URL: \(.*\)/\(trunk\|branches/.*\)/\([^/]*\)$@\1 \2 \3@;T;p;q' | {
-    # the pipe creates a subshell. the variables will be lost when it's left
-    # therefore the {braces}
-    read REPOSITORY BRANCH MODULE
-    : $REPOSITORY $BRANCH $MODULE
-    b=${BRANCH##branches*/}
-    b=${b#SuSE-}
-    b=${b%-Branch}
-    if [ "$b" = "trunk" ]; then
-	t=stable-$v
-    else
-	t=branch-$b-$v
-    fi
-
-    URL_t=$REPOSITORY/tags/$t
-    if [ "$ECHO" ]; then
-	echo "$t"
-    elif [ "$ECHOURL" ]; then
-	echo "$URL_t/$MODULE"
-    elif [ "$REMOVE" ]; then
-	svn rm --message "Removed tag $t for $MODULE" "$URL_t/$MODULE"
-    else
-	echo "$p $t"
-	svn mkdir --message "Created tag $t" $REPOSITORY/tags/$t
-
-	# create parent directories
-	# (they may exist already)
-	case $MODULE in
-	    */*) MODULEPARENT=${MODULE%/*} ;;
-	    *) MODULEPARENT="" ;;
-	esac
-	MDIR=""
-	# this will iterate thru directory components of MODULEPARENT
-	OIFS="$IFS"; IFS="/"
-	for DIR in $MODULEPARENT; do
-	    MDIR="$MDIR$DIR/"
-	    svn mkdir --message "Created tag $t for $MDIR" "$REPOSITORY/tags/$t/$MDIR"
-	done
-	IFS="$OIFS"
-
-        svn copy --message "Created tag $t for $MODULE" "$REPOSITORY/$BRANCH/$MODULE" "$URL_t"
-    fi
-    }
+  t=$BRANCH-$v
 fi
+
+if [ $CHECK -eq 1 ]; then
+  # simple check local tags if developer do not forget to create tag
+  COUNT=`git tag | grep -c $t`
+  if [ $COUNT -ge 1 ]; then
+    echo "Tag is there."
+    exit 0
+  else
+    echo "Tag '$t' missing."
+    exit 1
+  fi
+else
+  git tag $t
+  git push --tags
+fi
+

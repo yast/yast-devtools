@@ -158,19 +158,14 @@ package: check-up-to-date check-tagversion check-textdomain package-local
 
 TAGVERSION	 = $(Y2TOOL) tagversion
 
-check-up-to-date check-cvs-up-to-date check-svn-up-to-date:
-	if [ -d $(srcdir)/CVS ]; then \
-	  cd $(srcdir) && ! cvs -q -n up 2>/dev/null | grep '^[MCAR] ';\
-	else \
-	  cd $(srcdir) && ! LC_ALL=C svn status --show-updates --quiet | grep -v '^Status against revision' ;\
+# check if there is no modified files and all commits were pushed
+check-up-to-date:
+	if [ `git status --short --branch | sed '/##[^[]*$/d;/^??/d' | wc -l` -gt 0 ]; then \
+	  (echo "ERROR: Source is not commited and pushed. See `git status`"; false) \
 	fi
 
 check-tagversion:
-	@if [ -d $(srcdir)/CVS ]; then \
-	  cd $(srcdir) && cvs status -v VERSION | grep -w `$(TAGVERSION) -n` ;\
-	else \
-	  cd $(srcdir) && svn cat `$(TAGVERSION) --echourl`/VERSION; \
-	fi >/dev/null; \
+	cd $(srcdir) && $(TAGVERSION) --check >/dev/null; \
 	[ $$? = 0 ] || ( echo "ERROR: Please run 'tagversion' first"; false )
 
 check-parse-old:

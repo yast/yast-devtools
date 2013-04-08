@@ -3,10 +3,11 @@
 usage () {
     echo "tagversion, tag version in git"
     echo "options:"
-    echo "  -h, --help:    this help"
+    echo "  -h, --help:     this help"
+    echo "  -c, --check:    check if package is already tagged"
 }
 
-OPTIONS=`getopt --name $0 --options hnru --longoptions help,echo,echourl,remove -- "$@"` || { usage; exit 1; }
+OPTIONS=`getopt --name $0 --options hc --longoptions help,check -- "$@"` || { usage; exit 1; }
 eval set -- "$OPTIONS"
 while true; do
     case "$1" in
@@ -17,6 +18,9 @@ while true; do
 	-h|--help)
 	    usage
 	    exit
+	    ;;
+  -c|--check)
+	    CHECK=1
 	    ;;
     esac
     shift
@@ -39,6 +43,17 @@ else
   t=$BRANCH-$v
 fi
 
-git tag $t
-git push --tags
+if [ $CHECK -eq 1 ]; then
+  COUNT=`git tag | grep -c $t`
+  if [ $COUNT -ge 1 ]; then
+    echo "Tag is there."
+    exit 0
+  else
+    echo "Tag missing."
+    exit 1
+  fi
+else
+  git tag $t
+  git push --tags
+fi
 

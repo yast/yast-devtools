@@ -158,8 +158,9 @@ package: check-up-to-date check-tagversion check-textdomain package-local
 
 TAGVERSION	 = $(Y2TOOL) tagversion
 
+# check if there is no modified files and all commits were pushed
 check-up-to-date:
-	if [ `git status -sb | sed '/##.*ahead.*/d;/^\?\?/d' | wc -l` -gt 0 ]; then \
+	if [ `git status --short --branch | sed '/##[^[]*$/d;/^??/d' | wc -l` -gt 0 ]; then \
 	  (echo "ERROR: Source is not commited and pushed. See `git status`"; false) \
 	fi
 

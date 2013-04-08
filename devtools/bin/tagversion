@@ -1,10 +1,13 @@
 #!/bin/bash
 # $Id$
 usage () {
-    echo "tagversion, tag version in git"
+    echo "tagversion, tag version in git and push it"
+    echo "Tag format is stable-<VERSION> for master or <branch>-<VERSION>,"
+    echo "e.g. stable-2.26.3 or Code-11-SP3-2.25.15"
+    echo ""
     echo "options:"
     echo "  -h, --help:     this help"
-    echo "  -c, --check:    check if package is already tagged"
+    echo "  -c, --check:    check if package is already tagged (quick local check)"
 }
 
 OPTIONS=`getopt --name $0 --options hc --longoptions help,check -- "$@"` || { usage; exit 1; }
@@ -33,9 +36,6 @@ if [ -z "$p" -o -z "$v" ]; then
     exit 1
 fi
 
-  # sed -n -e 's///;T;p;q'
-  # means: print just the line on which the subst succeeded
-
 BRANCH=`git branch | sed '/^[^\*]/d;s/^\*[[:space:]]*//;'`
 if [ "$BRANCH" = "master" ]; then
   t=stable-$v
@@ -44,12 +44,13 @@ else
 fi
 
 if [ $CHECK -eq 1 ]; then
+  # simple check local tags if developer do not forget to create tag
   COUNT=`git tag | grep -c $t`
   if [ $COUNT -ge 1 ]; then
     echo "Tag is there."
     exit 0
   else
-    echo "Tag missing."
+    echo "Tag '$t' missing."
     exit 1
   fi
 else

@@ -20,12 +20,12 @@ printhelp()
         echo "Usage: $0 [OPTIONS]"
         echo
         echo "OPTIONS:"
-        echo "  -h, --help           this message"
-        echo "  -d, --devel-project  development project to submit to; default YaST:Head"
-        echo "  -p, --project        project to create submit request to"
-        echo "  -l, --log            the logfile, default ~/.y2submitlog"
-        echo "  -e, --empty-log      empty the log before starting"
-        echo "  -i, --ignore-changes submit even if changes doesn't change"
+        echo "  -h, --help                       this message"
+        echo "  -d, --devel-project              development project to submit to; default YaST:Head"
+        echo "  -p, --project                    project to create submit request to"
+        echo "  -l, --log                        the logfile, default ~/.y2submitlog"
+        echo "  -e, --empty-log                  empty the log before starting"
+        echo "  -i, --ignore-unchanged-changelog changes submit even if changes doesn't change"
         echo
 }
 
@@ -48,7 +48,7 @@ while true ; do
 		-d|--devel-project) OBS_PROJECT="$2"; shift 2; ;;
 		-p|--project) OBS_MOVE_PROJECT="$2"; shift 2; ;;
                 -e|--empty-log) EMPTY_LOG=1; shift; ;;
-    -i|--ignore-changes) IGNORE_CHANGES=1; shift; ;;
+    -i|--ignore-unchanged-changelog) IGNORE_CHANGES=1; shift; ;;
 		--) shift ; break ;;
                 *) echo "Unrecognized option $1" ; exit 1 ;;
 
@@ -102,15 +102,15 @@ if grep '^>' diff ; then
     exit 4
 fi
 
-if grep '^<' diff || [ $IGNORE_CHANGES -eq 1 ] ; then
+if grep '^<' diff; then
     echo -n "";
 else
+  if [ $IGNORE_CHANGES -eq 1 ]; then
+    echo "resubmit" > diff
+  else
     echo "There are no new changes in SVN." | tee -a $LOGFILE
     exit 4
-fi
-
-if [ $IGNORE_CHANGES -eq 1 -a `grep -c '^<' diff` -eq 0 ]; then
-  echo "resubmit" > diff
+  fi
 fi
 
 echo -n "Submitting the package... " | tee -a $LOGFILE

@@ -33,9 +33,10 @@ printhelp()
 OBS_PROJECT=YaST:Head
 OBS_MOVE_PROJECT=""
 LOGFILE=~/.y2submitlog
+IGNORE_CHANGES=0
 
 # parse parameters
-TEMP=`/usr/bin/getopt -o hil:d:p:e --long help,ignore-changes,log:,devel-project:,project:,empty-log \
+TEMP=`/usr/bin/getopt -o hil:d:p:e --long help,ignore-unchanged-changelog,log:,devel-project:,project:,empty-log \
      -n 'oscsubmit' -- "$@"`
 
 # Note the quotes around `$TEMP': they are essential!
@@ -79,7 +80,12 @@ echo "" >>$LOGFILE;
 if osc co $OBS_PROJECT $PACKAGE >>$LOGFILE 2>&1; then
     echo "OK" | tee -a $LOGFILE
 else
-    echo "Failed" | tee -a $LOGFILE; exit 3
+    #new package, so lets create it. Set editor to ed, so we can create it automatic
+    export EDITOR=ed
+    osc meta pkg $OBS_PROJECT $PACKAGE -e <<<$'H\n,s/<title>/<title>YaST module/g\nw' >>$LOGFILE 2>&1
+    if !osc co $OBS_PROJECT $PACKAGE >>$LOGFILE 2>&1; then
+        echo "Failed" | tee -a $LOGFILE; exit 3
+    fi
 fi
 
 echo -n "Preparing new package for submission... " | tee -a $LOGFILE

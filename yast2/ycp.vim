@@ -385,6 +385,10 @@ syn keyword	ycpWidgetSpecial	topMargin
 syn keyword	ycpWidgetSpecial	bottomMargin
 syn keyword	ycpWidgetSpecial	BackgroundPixmap
 
+" folding region definition
+syn region      ycpFold                 start="{" end="}" transparent fold
+syn sync        fromstart
+
 " comment miniles
 if !exists("c_minlines")
   let c_minlines = 15

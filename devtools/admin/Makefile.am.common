@@ -31,7 +31,7 @@ dist-hook: check-syntax
 
 CHECK_SYNTAX = true
 check-syntax: $(client_DATA) $(ycpchook) $(ybcfiles)
-	@if test "$(client_DATA)"; then \
+	@if test "$(filter %.ycp,client_DATA)"; then \
 	  if $(CHECK_SYNTAX); then \
 	    TO_CHECK="$(filter %.ycp,$^)"; \
 	    echo "Checking syntax of $${TO_CHECK}"; \

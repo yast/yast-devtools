@@ -33,9 +33,10 @@ printhelp()
 OBS_PROJECT=YaST:Head
 OBS_MOVE_PROJECT=""
 LOGFILE=~/.y2submitlog
+IGNORE_CHANGES=0
 
 # parse parameters
-TEMP=`/usr/bin/getopt -o hil:d:p:e --long help,ignore-changes,log:,devel-project:,project:,empty-log \
+TEMP=`/usr/bin/getopt -o hil:d:p:e --long help,ignore-unchanged-changelog,log:,devel-project:,project:,empty-log \
      -n 'oscsubmit' -- "$@"`
 
 # Note the quotes around `$TEMP': they are essential!

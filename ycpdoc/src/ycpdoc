@@ -1191,7 +1191,7 @@ sub create_index ($)
 	push @entries, @{$f->{"provides"} || []};
     }
 
-    for my $one ( sort {$a->{"signature"} cmp $b->{"signature"}} @entries )
+    for my $one ( sort { ($a->{"signature"} cmp $b->{"signature"}) || ($a->{"file"} cmp $b->{"file"}) } @entries )
     {
 	if($one->{"kind"} ne "info")
 	{

@@ -24,7 +24,7 @@ AUTODOCS_STRIP ?= $(srcdir)/../../src
 
 index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM)
 #including *.pm, for the index
-	${YCPDOC} -d. -s$(AUTODOCS_STRIP) $(AUTODOCS_YCP)
+	if [ -n "$(AUTODOCS_YCP)" ]; then ${YCPDOC} -d. -s$(AUTODOCS_STRIP) $(AUTODOCS_YCP); fi
 	for i in $(AUTODOCS_PM); do \
 		b=$${i##$(AUTODOCS_STRIP)}; b=$${b#/}; b=$${b//\//__}; b=$${b%.pm}; \
 		pod2html --title=$$b --infile=$$i --outfile=$$b.html; \

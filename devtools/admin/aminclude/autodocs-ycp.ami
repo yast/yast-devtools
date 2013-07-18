@@ -17,26 +17,22 @@
 
 htmldir = $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
 
-html_DATA = index.html $(filter-out index.html, $(wildcard *.html))
-CLEANFILES = $(html_DATA) pod2htm*.tmp
+# use nobase_ prefix to keep the directory structure
+nobase_html_DATA = index.html $(filter-out index.html, $(wildcard *.html)) $(wildcard js/*) $(wildcard css/*) $(wildcard Yast/*)
+CLEANFILES = $(nobase_html_DATA) pod2htm*.tmp
 
 AUTODOCS_YCP ?= $(wildcard $(srcdir)/../../src/*.ycp)
 AUTODOCS_PM  ?= $(wildcard $(srcdir)/../../src/*.pm)
-AUTODOCS_RB  ?= $(wildcard $(srcdir)/../../src/modules/*.rb) $(wildcard $(srcdir)/../../src/include/*/*.rb)
+AUTODOCS_RB  ?= $(wildcard $(srcdir)/../../src/modules/*.rb $(srcdir)/../../src/include/*/*.rb)
 AUTODOCS_STRIP ?= $(srcdir)/../../src
 
 # yard specific options
 YARD ?= yard
-YARD_EXTRA ?= js css
-YARD_EXTRA_OPTIONAL ?= Yast
 
-# yard specific hooks
+# yard specific clean
 clean-local:
-	rm -rf $(YARD_EXTRA) $(YARD_EXTRA_OPTIONAL)
+	rm -rf js css Yast .yardoc
 
-install-data-hook:
-	cp -r -a $(YARD_EXTRA) "$(DESTDIR)$(htmldir)"
-	if [ -e "$(YARD_EXTRA_OPTIONAL)" ]; then cp -r -a $(YARD_EXTRA_OPTIONAL) "$(DESTDIR)$(htmldir)"; fi
 
 index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM) $(AUTODOCS_RB)
 #including *.pm, for the index

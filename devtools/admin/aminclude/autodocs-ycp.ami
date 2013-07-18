@@ -8,6 +8,8 @@
 #   		  Optional - the default is $(srcdir)/../../src/*.ycp
 #   AUTODOCS_PM: Files that the perl autodocs is built from
 #   		  Optional - the default is $(srcdir)/../../src/*.pm
+#   AUTODOCS_RB: Files that the ruby autodocs is built from (using yard)
+#   		  Optional - the default is $(srcdir)/../../src/modules/*.rb) $(srcdir)/../../src/include/*/*.rb
 #   AUTODOCS_SUBDIR: To install the result to $(docdir)/SUBDIR/autodocs
 #		Optional - the default is no subdir, $(docdir)/autodocs
 #   AUTODOCS_STRIP: Strip it from filenames. The remaining / are replaced by __
@@ -20,9 +22,23 @@ CLEANFILES = $(html_DATA) pod2htm*.tmp
 
 AUTODOCS_YCP ?= $(wildcard $(srcdir)/../../src/*.ycp)
 AUTODOCS_PM  ?= $(wildcard $(srcdir)/../../src/*.pm)
+AUTODOCS_RB  ?= $(wildcard $(srcdir)/../../src/modules/*.rb) $(wildcard $(srcdir)/../../src/include/*/*.rb)
 AUTODOCS_STRIP ?= $(srcdir)/../../src
 
-index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM)
+# yard specific options
+YARD ?= yard
+YARD_EXTRA ?= js css
+YARD_EXTRA_OPTIONAL ?= Yast
+
+# yard specific hooks
+clean-local:
+	rm -rf $(YARD_EXTRA) $(YARD_EXTRA_OPTIONAL)
+
+install-data-hook:
+	cp -r -a $(YARD_EXTRA) "$(DESTDIR)$(htmldir)"
+	if [ -e "$(YARD_EXTRA_OPTIONAL)" ]; then cp -r -a $(YARD_EXTRA_OPTIONAL) "$(DESTDIR)$(htmldir)"; fi
+
+index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM) $(AUTODOCS_RB)
 #including *.pm, for the index
 	if [ -n "$(AUTODOCS_YCP)" ]; then ${YCPDOC} -d. -s$(AUTODOCS_STRIP) $(AUTODOCS_YCP); fi
 	for i in $(AUTODOCS_PM); do \
@@ -30,3 +46,4 @@ index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM)
 		pod2html --title=$$b --infile=$$i --outfile=$$b.html; \
 		echo "<a href='$$b.html'>$${b/__/::}</a>" > $$b.mod.html; \
 	done
+	if [ -n "$(AUTODOCS_RB)" ]; then $(YARD) doc -o . $(AUTODOCS_RB); fi

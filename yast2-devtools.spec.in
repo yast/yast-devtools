@@ -18,6 +18,8 @@ Requires:       libxslt
 Requires:       pkgconfig >= 0.16
 Requires:       automake autoconf
 Requires:       gettext-tools
+# for building Ruby autodocs
+Requires:	rubygem-yard
 Recommends:     cmake
 # /usr/lib/YaST2/bin/ydoxygen needs it
 Recommends:     doxygen

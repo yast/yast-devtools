@@ -31,7 +31,7 @@ YARD ?= yard
 
 # yard specific clean
 clean-local:
-	rm -rf js css Yast
+	rm -rf js css Yast .yardoc
 
 
 index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM) $(AUTODOCS_RB)

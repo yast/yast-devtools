@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 22 13:56:47 UTC 2013 - lslezak@suse.cz
+
+- autodocs - use markdown format in ruby documentation comments,
+  added YARD_OPTIONS to allow overriding the defaults
+- 2.24.4
+
+-------------------------------------------------------------------
 Thu Jul 18 11:14:32 UTC 2013 - mvidner@suse.com
 
 - fixed automake warnings about configure.in and INCLUDES

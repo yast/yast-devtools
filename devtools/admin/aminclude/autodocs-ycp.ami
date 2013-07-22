@@ -28,6 +28,8 @@ AUTODOCS_STRIP ?= $(srcdir)/../../src
 
 # yard specific options
 YARD ?= yard
+# use markdown format by default
+YARD_OPTIONS ?= -o . -m markdown
 
 # yard specific clean
 clean-local:
@@ -42,4 +44,4 @@ index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM) $(AUTODOCS_RB)
 		pod2html --title=$$b --infile=$$i --outfile=$$b.html; \
 		echo "<a href='$$b.html'>$${b/__/::}</a>" > $$b.mod.html; \
 	done
-	if [ -n "$(AUTODOCS_RB)" ]; then $(YARD) doc -o . $(AUTODOCS_RB); fi
+	if [ -n "$(AUTODOCS_RB)" ]; then $(YARD) doc $(YARD_OPTIONS) $(AUTODOCS_RB); fi

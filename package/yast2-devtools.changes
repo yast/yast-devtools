@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jul 24 08:02:44 UTC 2013 - lslezak@suse.cz
+
+- require rubygem-redcarpet in openSUSE <= 12.3, needed for yard
+  Markdown formatting
+- 2.24.5
+
+-------------------------------------------------------------------
 Mon Jul 22 13:56:47 UTC 2013 - lslezak@suse.cz
 
 - autodocs - use markdown format in ruby documentation comments,

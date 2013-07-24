@@ -20,6 +20,12 @@ Requires:       automake autoconf
 Requires:       gettext-tools
 # for building Ruby autodocs
 Requires:	rubygem-yard
+
+%if 0%{?suse_version} <= 1230
+# extra package for yard Markdown formatting in openSUSE <= 12.3
+Requires:       rubygem-redcarpet
+%endif
+
 Recommends:     cmake
 # /usr/lib/YaST2/bin/ydoxygen needs it
 Recommends:     doxygen

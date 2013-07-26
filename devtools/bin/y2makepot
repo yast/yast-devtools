@@ -22,37 +22,24 @@ function gettext_call()
     SOURCE_FILES=$2
     SOURCE_RUBY_FILES=$3
 
-    XGETTEXT_OPTIONS=""
-    MERGE=""
-
     # Is POT file merge needed? (both Ruby and non-Ruby files found)
     if [ -n "$SOURCE_FILES" -a -n "$SOURCE_RUBY_FILES" ]; then
         # only one header is sufficient when merging POT files,
         # more over it has undefined CHARSET which makes trouble
         # when merging with rxgettext POT file (declares UTF-8 charset)
-        XGETTEXT_OPTIONS="--omit-header"
-        MERGE="true"
-    fi
-
-    if [ -n "$SOURCE_FILES" ]; then
-        xgettext_call "$MODULE" "$SOURCE_FILES" "$XGETTEXT_OPTIONS"
-    fi
-
-    if [ -n "$MERGE" ]; then
+        xgettext_call "$MODULE" "$SOURCE_FILES" "--omit-header"
         mv "$MODULE.pot" "$MODULE.xgettext.pot"
-    fi
 
-    if [ -n "$SOURCE_RUBY_FILES" ]; then
-      rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
-    fi
-
-    if [ -n "$MERGE" ]; then
+        rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
         mv "$MODULE.pot" "$MODULE.rxgettext.pot"
-        echo "Merging the .pot files..."
 
         # merge the rxgettext POT with the xgettext POT file
+        echo "Merging the .pot files..."
         msgcat -o "$MODULE.pot" "$MODULE.rxgettext.pot" "$MODULE.xgettext.pot"
         rm "$MODULE.xgettext.pot" "$MODULE.rxgettext.pot"
+    else
+        xgettext_call "$MODULE" "$SOURCE_FILES"
+        rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
     fi
 }
 
@@ -62,12 +49,14 @@ function xgettext_call()
     FILES=$2
     OPTIONS=$3
 
-    echo "Creating ./$MODULE.pot from $FILES ...";
-    $XGETTEXT --no-wrap --add-comments --add-location \
-	--keyword=_ --keyword=_:1,2 --keyword=__ \
-	--foreign-user $OPTIONS \
-	--copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
-	--default-domain=$MODULE --output=$MODULE.pot $FILES
+    if [ -n "$FILES" ]; then
+        echo "Creating ./$MODULE.pot from $FILES ...";
+        $XGETTEXT --no-wrap --add-comments --add-location \
+            --keyword=_ --keyword=_:1,2 --keyword=__ \
+            --foreign-user $OPTIONS \
+            --copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
+            --default-domain=$MODULE --output=$MODULE.pot $FILES
+    fi
 }
 
 function rxgettext_call()
@@ -75,14 +64,16 @@ function rxgettext_call()
     MODULE=$1
     FILES=$2
 
-    echo "Creating ./$MODULE.pot from $FILES ...";
+    if [ -n "$FILES" ]; then
+        echo "Creating ./$MODULE.pot from $FILES ...";
 
-    # rubygem-gettext is a weak dependency, check if it is present
-    if [ -x $RXGETTEXT ]; then
-        $RXGETTEXT --output=$MODULE.pot $FILES;
-    else
-        echo "ERROR: $RXGETTEXT is missing; please install rubygem-gettext package" 1>&2
-        exit 1
+        # rubygem-gettext is a weak dependency, check if it is present
+        if [ -x $RXGETTEXT ]; then
+            $RXGETTEXT --output=$MODULE.pot $FILES;
+        else
+            echo "ERROR: $RXGETTEXT is missing; please install rubygem-gettext package" 1>&2
+            exit 1
+        fi
     fi
 }
 

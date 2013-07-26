@@ -31,6 +31,10 @@ Recommends:     cmake
 Recommends:     doxygen
 # for svn builds of binary packages
 Recommends:     libtool
+# for extracting translatable strings from *.rb files using "make pot" command
+# weak dependency, "make pot" is usually not needed
+Suggests:       rubygem-gettext
+
 Provides:       ycpdoc ydoc
 Obsoletes:      ycpdoc ydoc
 Provides:       yast2-config-newmodule yast2-trans-newmodule

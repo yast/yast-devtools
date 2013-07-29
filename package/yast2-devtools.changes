@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Mon Jul 29 06:27:32 UTC 2013 - lslezak@suse.cz
+
+- autodocs fixes:
+  - doxygen: install _all_ JS and CSS files (dynsections.js,
+    jquery.js and tabs.css were missing, resulting in unusable
+    documentation)
+  - doxygen: updated the default doxygen config file - removed
+    obsolete options which caused warnings during build
+  - yard: use --title option with package name
+- 2.24.7
+
+-------------------------------------------------------------------
 Fri Jul 26 13:22:40 UTC 2013 - lslezak@suse.cz
 
 - y2makepot (used in "make pot") - extract translatable strings

@@ -15,7 +15,7 @@
 AUTODOCS_CC ?= $(srcdir)/../../src
 AUTODOCS_DEPS ?= $(AUTODOCS_CC)/*.h
 
-html_data = index.html $(filter-out index.html, $(wildcard *.html *.png)) doxygen.css @RPMNAME@.tag
+html_data = index.html $(filter-out index.html, $(wildcard *.html *.png *.css *.js)) @RPMNAME@.tag
 CLEANFILES = $(html_data) doxygen.log doxygen.conf installdox
 
 doxygen.css @RPMNAME@.tag: index.html

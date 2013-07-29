@@ -16,18 +16,65 @@
 CWD=`dirname $0`
 . $CWD/gettextdomains
 
+function gettext_call()
+{
+    MODULE=$1
+    SOURCE_FILES=$2
+    SOURCE_RUBY_FILES=$3
+
+    # Is POT file merge needed? (both Ruby and non-Ruby files found)
+    if [ -n "$SOURCE_FILES" -a -n "$SOURCE_RUBY_FILES" ]; then
+        # only one header is sufficient when merging POT files,
+        # more over it has undefined CHARSET which makes trouble
+        # when merging with rxgettext POT file (declares UTF-8 charset)
+        xgettext_call "$MODULE" "$SOURCE_FILES" "--omit-header"
+        mv "$MODULE.pot" "$MODULE.xgettext.pot"
+
+        rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
+        mv "$MODULE.pot" "$MODULE.rxgettext.pot"
+
+        # merge the rxgettext POT with the xgettext POT file
+        echo "Merging the .pot files..."
+        msgcat -o "$MODULE.pot" "$MODULE.rxgettext.pot" "$MODULE.xgettext.pot"
+        rm "$MODULE.xgettext.pot" "$MODULE.rxgettext.pot"
+    else
+        xgettext_call "$MODULE" "$SOURCE_FILES"
+        rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
+    fi
+}
 
 function xgettext_call()
 {
     MODULE=$1
     FILES=$2
+    OPTIONS=$3
 
-    echo "Creating ./$MODULE.pot from $FILES ...";
-    $XGETTEXT --no-wrap --add-comments --add-location \
-	--keyword=_ --keyword=_:1,2 --keyword=__ \
-	--foreign-user \
-	--copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
-	--default-domain=$MODULE --output=$MODULE.pot $FILES
+    if [ -n "$FILES" ]; then
+        echo "Creating ./$MODULE.pot from $FILES ...";
+        $XGETTEXT --no-wrap --add-comments --add-location \
+            --keyword=_ --keyword=_:1,2 --keyword=__ \
+            --foreign-user $OPTIONS \
+            --copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
+            --default-domain=$MODULE --output=$MODULE.pot $FILES
+    fi
+}
+
+function rxgettext_call()
+{
+    MODULE=$1
+    FILES=$2
+
+    if [ -n "$FILES" ]; then
+        echo "Creating ./$MODULE.pot from $FILES ...";
+
+        # rubygem-gettext is a weak dependency, check if it is present
+        if [ -x $RXGETTEXT ]; then
+            $RXGETTEXT --output=$MODULE.pot $FILES;
+        else
+            echo "ERROR: $RXGETTEXT is missing; please install rubygem-gettext package" 1>&2
+            exit 1
+        fi
+    fi
 }
 
 function usage()
@@ -62,6 +109,8 @@ function generate_potfiles()
 
     # gather files that share a domain to FILES and call xgettext
     FILES="";
+    RUBY_FILES=""
+
     for I in $DOMAINS; do
 	D=${I%%:*} ;
 	F=${I#*:} ;
@@ -69,18 +118,24 @@ function generate_potfiles()
 	if [ "$D" != "$MODULE" ]; then
 	    POT_DST="$POT_DST $MODULE.pot"
 
-	    xgettext_call "$MODULE" "$FILES";
+            gettext_call "$MODULE" "$FILES" "$RUBY_FILES"
+
 	    echo
 	    MODULE=$D;
-	    FILES=$F;
-	else
-	    FILES="$FILES $F" ;
+	    FILES=""
+            RUBY_FILES=""
 	fi
 
+        # is it a Ruby file?
+        if [[ "$F" =~ \.rb$ ]]; then
+            RUBY_FILES="$RUBY_FILES $F";
+        else
+            FILES="$FILES $F" ;
+        fi
     done
 
     POT_DST="$POT_DST $MODULE.pot"
-    xgettext_call "$MODULE" "$FILES"
+    gettext_call "$MODULE" "$FILES" "$RUBY_FILES"
     echo
 }
 
@@ -135,6 +190,8 @@ function checkin_potfiles()
 # define global variables
 CHECKIN=1
 XGETTEXT="xgettext"
+RXGETTEXT=/usr/bin/rxgettext
+
 SRCDIR="."
 POT_DST=""
 

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Aug  2 05:50:37 UTC 2013 - lslezak@suse.cz
+
+- enhanced syntax check in 'make check-syntax':
+  - check Ruby source files
+  - check YCP data files (some are still present even after Ruby
+    conversion)
+- 3.0.1
+
+-------------------------------------------------------------------
 Tue Jul 30 08:28:39 UTC 2013 - yast-devel@opensuse.org
 
 - version 3.0.0

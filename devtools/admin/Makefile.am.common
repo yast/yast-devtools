@@ -30,15 +30,29 @@ NEWDEP=${top_builddir}/.dep.new
 dist-hook: check-syntax
 
 CHECK_SYNTAX = true
-check-syntax: $(client_DATA) $(ycpchook) $(ybcfiles)
-	@if test "$(filter %.ycp,client_DATA)"; then \
+check-syntax: $(client_DATA) $(module_DATA) $(ynclude_DATA) $(ydata_DATA) $(ycpchook) $(ybcfiles)
+	@if test "$(filter %.ycp, $(client_DATA) $(ydata_DATA))"; then \
 	  if $(CHECK_SYNTAX); then \
-	    TO_CHECK="$(filter %.ycp,$^)"; \
+	    TO_CHECK="$(filter %.ycp, $(client_DATA) $(ydata_DATA))"; \
 	    echo "Checking syntax of $${TO_CHECK}"; \
 	    if ! $(YCPC) -qE -M. -I. $(YCPCFLAGS) $${TO_CHECK}; then \
 	      echo "Failed. Disable by 'make ... CHECK_SYNTAX=false' at your own risk"; \
 	      exit 1; \
 	    fi; \
+	  else \
+	    echo "Syntax check disabled"; \
+	  fi; \
+	fi
+	@if test "$(filter %.rb, $^)"; then \
+	  if $(CHECK_SYNTAX); then \
+	    TO_CHECK="$(filter %.rb, $^)"; \
+	    echo "Checking syntax of $${TO_CHECK}"; \
+	    for f in $${TO_CHECK}; do \
+	      if ! ruby -c $$f > /dev/null; then \
+		echo "Failed. Disable by 'make ... CHECK_SYNTAX=false' at your own risk"; \
+		exit 1; \
+	      fi; \
+	    done; \
 	  else \
 	    echo "Syntax check disabled"; \
 	  fi; \

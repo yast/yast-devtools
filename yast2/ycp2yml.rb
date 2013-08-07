@@ -34,7 +34,7 @@ module Yast
     end
 
     def convert(from, to)
-      data = SCR.Read(path(".target.ycp"), from)
+      data = Builtins.eval(SCR.Read(path(".target.ycp"), from))
       File.open(to, 'w') {|f| f.write(data.to_yaml) }
     end
   end

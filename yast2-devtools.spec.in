@@ -91,6 +91,8 @@ EOF
 @ybindir@
 %dir %{_prefix}/share/YaST2
 @ydatadir@
+%dir @clientdir@
+@clientdir@/*.rb
 %{_prefix}/share/aclocal/*.m4
 @pkgconfigdatadir@/@RPMNAME@.pc
 %doc @docdir@

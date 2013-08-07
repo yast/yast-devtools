@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  7 07:38:46 UTC 2013 - lslezak@suse.cz
+
+- added ycp2yml client for converting static YCP data files into
+  YAML format
+- 3.0.2
+
+-------------------------------------------------------------------
 Fri Aug  2 05:50:37 UTC 2013 - lslezak@suse.cz
 
 - enhanced syntax check in 'make check-syntax':

@@ -15,6 +15,7 @@ ${ybcfiles}: %.ybc: %.ycp $(ycpchook)
 CLEANFILES = ${ybcfiles}
 DISTCLEANFILES = .dep
 
+if HAS_YCP_MODULES
 # Needs to be outside "." because of cases
 # where ycpchook contains a symlink to "."
 # Otherwise "." keeps being newer than .dep and we loop.
@@ -26,6 +27,8 @@ NEWDEP=${top_builddir}/.dep.new
 	${YCPMAKEDEP} --prefix=${prefix} ${YCPCFLAGS} > ${NEWDEP}
 	cat ${NEWDEP} > .dep
 	rm ${NEWDEP}
+-include .dep
+endif
 
 dist-hook: check-syntax
 
@@ -58,4 +61,3 @@ check-syntax: $(client_DATA) $(module_DATA) $(ynclude_DATA) $(ydata_DATA) $(ycpc
 	  fi; \
 	fi
 
--include .dep

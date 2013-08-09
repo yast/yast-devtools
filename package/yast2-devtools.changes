@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug  9 08:53:18 UTC 2013 - lslezak@suse.cz
+
+- Makefile.am.common - do not create empty ".dep" YCP dependency
+  file when there is no YCP module file
+- 3.0.3
+
+-------------------------------------------------------------------
 Wed Aug  7 07:38:46 UTC 2013 - lslezak@suse.cz
 
 - added ycp2yml client for converting static YCP data files into

@@ -17,8 +17,11 @@
 
 htmldir = $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
 
+# find all files in Yast/ subdirectory if it exists
+YARD_YAST_FILES = $(shell test -d Yast && find Yast -type f)
+
 # use nobase_ prefix to keep the directory structure
-nobase_html_DATA = index.html $(filter-out index.html, $(wildcard *.html)) $(wildcard js/*) $(wildcard css/*) $(wildcard Yast/*)
+nobase_html_DATA = index.html $(filter-out index.html, $(wildcard *.html)) $(wildcard js/*) $(wildcard css/*) $(YARD_YAST_FILES)
 CLEANFILES = $(nobase_html_DATA) pod2htm*.tmp
 
 AUTODOCS_YCP ?= $(wildcard $(srcdir)/../../src/*.ycp)

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 13 12:42:04 UTC 2013 - lslezak@suse.cz
+
+- correctly handle yard documentation in Yast/ subdirectories
+- 3.0.4
+
+-------------------------------------------------------------------
 Fri Aug  9 08:53:18 UTC 2013 - lslezak@suse.cz
 
 - Makefile.am.common - do not create empty ".dep" YCP dependency

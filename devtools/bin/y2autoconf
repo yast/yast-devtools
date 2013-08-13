@@ -390,6 +390,19 @@ fi
 AC_CHECK_FILE($devtools_yast2dir/data/testsuite/Makefile.testsuite, [], [
     AC_MSG_WARN([yast2-testsuite.rpm is not installed])
 ])
+
+# handle .dep files in Makefile.am.common if any YCP module is present
+AC_MSG_CHECKING([for YCP modules])
+
+# YCP module file name starts with an upper case letter
+[find . -type f | grep -q "[[:upper:]][^/]*\\.ycp$" && has_ycp_modules=1]
+AM_CONDITIONAL([HAS_YCP_MODULES], [test -n "$has_ycp_modules"])
+
+if test -n "$has_ycp_modules"; then
+  AC_MSG_RESULT([found])
+else
+  AC_MSG_RESULT([not found])
+fi
 ',
 
     # generate output

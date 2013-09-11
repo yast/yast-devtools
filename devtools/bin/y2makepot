@@ -69,7 +69,24 @@ function rxgettext_call()
 
         # rubygem-gettext is a weak dependency, check if it is present
         if [ -x $RXGETTEXT ]; then
-            $RXGETTEXT --output=$MODULE.pot $FILES;
+            $RXGETTEXT --copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
+                --add-comments --output=$MODULE.pot $FILES;
+
+            # remove plural forms template, the dummy values are invalid
+            # and do not pass the following check
+            sed -i '/^"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;/d' $MODULE.pot
+
+            # verify if the output is valid, rxgettext had some bugs resulting
+            # in invalid file, be sure that GNU gettext is able to read it, huh :-(
+            echo "Verifying $MODULE.pot validity..."
+            msgfmt --check -o /dev/null $MODULE.pot
+
+            if [ "$?" != "0" ]; then
+                echo "ERROR: $MODULE.pot is not valid, it looks like a rxgettext bug..."
+                exit 1
+            fi
+
+            echo "...OK"
         else
             echo "ERROR: $RXGETTEXT is missing; please install rubygem-gettext package" 1>&2
             exit 1

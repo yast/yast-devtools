@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # svnall - invoke "svn" with a command in every subdir that has a .svn subdir
 # Example: "svnall up"

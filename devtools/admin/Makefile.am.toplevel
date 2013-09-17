@@ -150,8 +150,10 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 	fi
 	here=`pwd`; \
 	cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \
-	    newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
-	    $(Y2TOOL) create-spec < $$i > $$here/package/$${newname} ; \
+	    if [ -f "$$i" ]; then \
+		newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
+		$(Y2TOOL) create-spec < $$i > $$here/package/$${newname} ; \
+	    fi \
 	done
 
 package: check-up-to-date check-tagversion check-textdomain package-local

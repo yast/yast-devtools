@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Sep 17 11:16:45 UTC 2013 - lslezak@suse.cz
+
+- added yast RPM macros (/etc/rpm/macros.yast)
+- use *.spec directly instead of expanding *.spec.in
+- make *.spec.in files optional (do not fail if missing)
+- 3.0.6
+
+-------------------------------------------------------------------
 Wed Sep 11 09:16:06 UTC 2013 - lslezak@suse.cz
 
 - y2makepot (used in "make pot" call) - added support for ruby

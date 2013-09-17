@@ -2,4 +2,4 @@
 # Makefile.am for devtools/ycpdoc
 #
 
-SUBDIRS = doc src testsuite
+SUBDIRS = doc src

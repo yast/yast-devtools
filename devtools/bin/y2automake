@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # y2automake - generate YaST2 "Makefile.am"
 # toplevel directory: from template and ./SUBDIRS

@@ -6,13 +6,11 @@ License:        GPL-2.0+
 BuildRequires:  docbook-xsl-stylesheets 
 BuildRequires:  gcc-c++
 BuildRequires:  libxslt 
-BuildRequires:  perl-XML-Writer 
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
 BuildRequires:  libtool
 BuildRequires:  automake
 Requires:       perl
-Requires:       perl-XML-Writer
 Requires:       libxslt
 # we install our .pc under $prefix/share
 Requires:       pkgconfig >= 0.16

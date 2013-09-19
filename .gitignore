@@ -4,7 +4,6 @@ Makefile.in
 
 *.out.tmp
 *.err.tmp
-/package/*.spec
 /package/*.tar.bz2
 /Makefile.am
 /Makefile.am.common

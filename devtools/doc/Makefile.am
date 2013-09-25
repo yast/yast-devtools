@@ -2,8 +2,6 @@
 # Makefile.am for devtools/devtools/doc
 #
 
-SUBDIRS = skeletons
-
 htmldir = $(docdir)/devtools
 
 STYLESHEET_HTML=../../docbook/stylesheets/customize-html.xsl

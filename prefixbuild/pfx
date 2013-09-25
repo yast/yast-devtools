@@ -1,9 +1,0 @@
-#! /bin/sh
-# set environment for prefixed yast
-if [ $# = 0 ]; then
-    echo "Usage: $0 <program> <arguments>" >&2
-    exit 1
-fi
-: ${PREFIX=$HOME/pfx}
-export PREFIX
-epfx "$@"

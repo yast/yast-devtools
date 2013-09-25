@@ -1,0 +1,52 @@
+#
+# common RPM macro definitions used by YaST
+#
+
+%yast_dir %{_prefix}/share/YaST2
+
+%yast_ydatadir %{yast_dir}/data
+%yast_imagedir %{yast_dir}/images
+%yast_themedir %{yast_dir}/theme
+%yast_localedir %{yast_dir}/locale
+%yast_clientdir %{yast_dir}/clients
+%yast_moduledir %{yast_dir}/modules
+%yast_yncludedir %{yast_dir}/include
+%yast_schemadir %{yast_dir}/schema
+%yast_scrconfdir %{yast_dir}/scrconf
+%yast_desktopdir %{_prefix}/share/applications/YaST2
+
+%yast_ybindir %{_prefix}/lib/YaST2/bin
+%yast_ystartupdir %{_prefix}/lib/YaST2
+%yast_plugindir %{_libdir}/YaST2/plugin
+%yast_includedir %{_prefix}/include/YaST2
+%yast_docdir %{_prefix}/share/doc/packages/%{name}
+%yast_logdir /var/log/YaST2
+%yast_vardir /var/lib/YaST2
+%yast_fillupdir /var/adm/fillup-templates
+
+%yast_execcompdir %{_prefix}/lib/YaST2
+%yast_agentdir %{yast_execcompdir}/servers_non_y2
+
+# build the yast module using autotools/make
+%yast_build \
+    %{_prefix}/bin/y2tool y2autoconf \
+    %{_prefix}/bin/y2tool y2automake \
+    autoreconf --force --install \
+    \
+    export CFLAGS="$RPM_OPT_FLAGS -DNDEBUG" \
+    export CXXFLAGS="$RPM_OPT_FLAGS -DNDEBUG" \
+    \
+    ./configure --libdir=%{_libdir} --prefix=%{_prefix} --mandir=%{_mandir} \
+    # V=1: verbose build in case we used AM_SILENT_RULES(yes) \
+    # so that RPM_OPT_FLAGS check works \
+    make %{?jobs:-j%jobs} V=1
+
+# install the yast module using autotools/make
+%yast_install \
+    make install DESTDIR="$RPM_BUILD_ROOT" \
+    [ -e "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ] || Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" make check DESTDIR="$RPM_BUILD_ROOT" \
+    for f in `find $RPM_BUILD_ROOT/%{yast_desktopdir}/ -name "*.desktop"` ; do \
+        d=${f##*/} \
+        %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
+    done
+

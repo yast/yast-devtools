@@ -54,13 +54,6 @@ AM_CONDITIONAL(CHECK_QT4, test "$qt" = "true")
 
 AC_SUBST(MOC)
 
-## needed for documentation
-CHECK_PERL_MODULE(XML::Writer, XMLWRITER)
-if test "$XMLWRITER" = "false"; then
-	AC_MSG_ERROR([perl xml writer not installed])
-	exit
-fi
-
 ## and generate the output
 AC_CONFIG_FILES([
 	devtools/bin/version], [chmod +x devtools/bin/version])

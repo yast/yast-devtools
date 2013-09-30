@@ -25,6 +25,7 @@ Source0:        %{name}-%{version}.tar.bz2
 
 BuildRequires:  automake
 BuildRequires:  docbook-xsl-stylesheets
+BuildRequires:  fdupes
 BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  libxslt
@@ -107,6 +108,8 @@ When yast2 core is broken and the interpreter does not work,
 submitting yast2-devtools with the flag file existing will
 prevent ycp developers being flooded by testsuite failures.
 EOF
+
+%fdupes %buildroot/%_prefix
 
 %files
 %defattr(-,root,root)

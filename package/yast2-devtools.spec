@@ -19,6 +19,7 @@
 Name:           yast2-devtools
 Version:        3.1.1
 Release:        0
+Url:            http://github.com/yast/yast-devtools
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2

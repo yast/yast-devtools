@@ -17,21 +17,22 @@
 
 
 Name:           yast2-devtools
-Version:        3.0.6
+Version:        3.1.2
 Release:        0
+Url:            http://github.com/yast/yast-devtools
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
 BuildRequires:  automake
 BuildRequires:  docbook-xsl-stylesheets
+BuildRequires:  fdupes
 BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
-Requires:       libxslt
 Requires:       perl
 Requires:       perl-XML-Writer
 # we install our .pc under $prefix/share
@@ -80,7 +81,7 @@ YCP and C++).
 %setup -n yast2-devtools-%{version}
 
 %build
-autoreconf --force --install
+make -f Makefile.cvs all
 
 ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 make
@@ -107,6 +108,8 @@ When yast2 core is broken and the interpreter does not work,
 submitting yast2-devtools with the flag file existing will
 prevent ycp developers being flooded by testsuite failures.
 EOF
+
+%fdupes %buildroot/%_prefix
 
 %files
 %defattr(-,root,root)

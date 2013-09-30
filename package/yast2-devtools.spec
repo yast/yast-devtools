@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.0.6
+Version:        3.1.1
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -80,7 +80,7 @@ YCP and C++).
 %setup -n yast2-devtools-%{version}
 
 %build
-autoreconf --force --install
+make -f Makefile.cvs all
 
 ./configure --prefix=%{_prefix} --libdir=%{_libdir}
 make

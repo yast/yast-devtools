@@ -3,6 +3,7 @@ Mon Sep 30 08:23:49 UTC 2013 - jreidinger@suse.com
 
 - fix bunch of build service warnings
 - add Rakefile to allow uniform access to all yast modules
+- start using fdupes to reduce duplicities
 - 3.1.2
 
 -------------------------------------------------------------------

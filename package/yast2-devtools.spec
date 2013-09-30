@@ -33,7 +33,6 @@ BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
-Requires:       libxslt
 Requires:       perl
 Requires:       perl-XML-Writer
 # we install our .pc under $prefix/share

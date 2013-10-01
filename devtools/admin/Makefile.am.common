@@ -1,2 +1,5 @@
 # Makefile.am.common					-*- Makefile -*-
 # Generated file, do not edit!
+
+# Empty do to drop ycp compilation. When all includes of this file will removed,
+# then we can remove also this file (otherwise build will fail)

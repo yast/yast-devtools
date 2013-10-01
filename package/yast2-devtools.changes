@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct  1 06:09:04 UTC 2013 - jreidinger@suse.com
+
+- fix Makefile.am.common to respect removed tools and killed ycp
+- 3.1.3
+
+-------------------------------------------------------------------
 Mon Sep 30 08:23:49 UTC 2013 - jreidinger@suse.com
 
 - fix bunch of build service warnings

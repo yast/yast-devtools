@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct  2 12:14:30 UTC 2013 - mvidner@suse.com
+
+- rpm macros: Use "make check VERBOSE=1"
+  to debug failures directly from build logs
+- 3.1.4
+
+-------------------------------------------------------------------
 Tue Oct  1 06:09:04 UTC 2013 - jreidinger@suse.com
 
 - fix Makefile.am.common to respect removed tools and killed ycp

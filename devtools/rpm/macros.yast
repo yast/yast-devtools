@@ -44,7 +44,12 @@
 # install the yast module using autotools/make
 %yast_install \
     make install DESTDIR="$RPM_BUILD_ROOT" \
-    [ -e "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ] || Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" make check DESTDIR="$RPM_BUILD_ROOT" \
+    if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
+        make check \\\
+            VERBOSE=1 \\\
+            Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" \\\
+            DESTDIR="$RPM_BUILD_ROOT" \
+    fi \
     for f in `find $RPM_BUILD_ROOT/%{yast_desktopdir}/ -name "*.desktop"` ; do \
         d=${f##*/} \
         %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \

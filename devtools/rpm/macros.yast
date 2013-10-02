@@ -46,6 +46,7 @@
     make install DESTDIR="$RPM_BUILD_ROOT" \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
         make check \\\
+            VERBOSE=1 \\\
             Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" \\\
             DESTDIR="$RPM_BUILD_ROOT" \
     fi \

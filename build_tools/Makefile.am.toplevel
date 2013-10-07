@@ -20,7 +20,7 @@ HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
 DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir),$(Y2DEVTOOLS_PREFIX)/share/YaST2/data/devtools)
-LEGALESE_DIR		= $(DEVTOOLS_DIR)/build_tools/copyright/gpl)
+LEGALESE_DIR		= $(DEVTOOLS_DIR)/build_tools/copyright/gpl
 
 COPYRIGHT_files_gpl	= README COPYING
 

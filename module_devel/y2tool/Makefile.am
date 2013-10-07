@@ -25,7 +25,6 @@ pkgdata_SCRIPTS = 				\
 	tagversion 				\
 	oscsubmit 				\
 	obssync					\
-	version					\
 	y2autoconf 				\
 	y2automake 				\
 	y2compile				\
@@ -36,5 +35,4 @@ pkgdata_SCRIPTS = 				\
 	gen_logic_deps				\
 	gen_logic_deps_nodes
 
-EXTRA_DIST = $(bin_SCRIPTS) $(ybin_SCRIPTS) $(pkgdata_SCRIPTS) version.in
-
+EXTRA_DIST = $(bin_SCRIPTS) $(ybin_SCRIPTS) $(pkgdata_SCRIPTS)

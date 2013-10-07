@@ -2,7 +2,7 @@
 # Makefile.am for devtools/devtools/admin
 #
 
-SUBDIRS = copyright aclocal aminclude cmake data
+SUBDIRS = copyright aclocal aminclude cmake data doc
 
 admindir = @YAST2DEVTOOLS@/admin
 

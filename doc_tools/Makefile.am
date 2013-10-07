@@ -2,4 +2,4 @@
 # Makefile.am for devtools/devtools/admin
 #
 
-SUBDIRS = scrdoc
+SUBDIRS = scrdoc docbook

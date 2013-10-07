@@ -2,8 +2,6 @@
 # Makefile.am for devtools/yast2
 #
 
-SUBDIRS = check_ycp
-
 # bnc#396315 
 pkgdatadir = @YAST2DEVTOOLS@/bin
 pkgdata_SCRIPTS = ycp_puttext

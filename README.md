@@ -1,17 +1,29 @@
 ## Directory Structure
-### build\_tools
-Contains tools related to build package. Needed only as dependency for package
-build. It is not expected to be directly used by developers.
 
-### module\_devel
-Tools that helps with developing modules like log viewer, generators or checkers.
+### [ytools](ytools)
 
-### mass\_changes
-Tools that helps with mass changes to all yast modules repositories living in yast
-organization like checkout all modules, do maintenance branch or run script for
-all of them.
+The main set of YaST Tools that help with developing modules.
+Examples: log viewer, generators, checkers.
 
-### doc\_tools
-Tools used to generate yast2 documentation, partly obsolete and is kept to be
-used as base for new document tool. It make sense only for developer who is
-interested in generating new documentation.
+### [build-tools](build-tools)
+
+Tools related to building an RPM package.
+They are needed only as a dependency for package building. They go into a
+separate RPM sub-package to reduce build-time dependencies.
+They are not expected to be directly used by developers.
+
+### [mass-tools](mass-tools)
+
+Tools that help with mass changes to all YaST repositories
+living in the [YaST organization](https://github.com/yast/).
+Examples: check out all modules, make a maintenance branch,
+or run a script for all of them.
+
+### [doc-tools](doc-tools)
+
+Tools used to generate
+the [YaST documentation](http://doc.opensuse.org/#yast-doc).
+They are partly obsolete and are kept to be used as a base for a new
+documentation tool.
+They make sense only for a developer who is interested in generating
+new documentation.

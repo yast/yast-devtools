@@ -10,3 +10,8 @@ Tools that helps with developing modules like log viewer, generators or checkers
 Tools that helps with mass changes to all yast modules repositories living in yast
 organization like checkout all modules, do maintenance branch or run script for
 all of them.
+
+### doc\_tools
+Tools used to generate yast2 documentation, partly obsolete and is kept to be
+used as base for new document tool. It make sense only for developer who is
+interested in generating new documentation.

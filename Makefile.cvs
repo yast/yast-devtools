@@ -9,10 +9,10 @@ configure: all
 	./configure --prefix=$(PREFIX) --libdir=$(PREFIX)/$(LIB)
 
 all:
-	./devtools/bin/y2autoconf --bootstrap ./devtools/admin
-	./devtools/bin/y2automake --bootstrap ./devtools/admin
+	./module_devel/y2tool/y2autoconf --bootstrap ./build_tools/
+	./module_devel/y2tool/y2automake --bootstrap ./build_tools/
 	#ACLOCAL_AMFLAGS is recommended but we have a common Makefile.am
-	cat ./devtools/admin/aclocal/*.m4 > acinclude.m4
+	cat ./build_tools/aclocal/*.m4 > acinclude.m4
 	autoreconf -v --force --install
 
 install: configure

@@ -4,7 +4,7 @@
 
 htmldir = $(docdir)/devtools
 
-STYLESHEET_HTML=../../docbook/stylesheets/customize-html.xsl
+STYLESHEET_HTML=../../doc_tools/docbook/stylesheets/customize-html.xsl
 
 XSLTPROC=@XSLTPROC@
 XSLTPROC_FLAGS=@XSLTPROC_FLAGS@
@@ -25,8 +25,8 @@ html/index.html: yast2-devtools.xml
 
 
 html/yast2docs.css: html/index.html
-	cp $(srcdir)/../../docbook/css/yast2docs.css $@
-	cp -a $(srcdir)/../../docbook/images html
+	cp $(srcdir)/../../doc_tools/docbook/css/yast2docs.css $@
+	cp -a $(srcdir)/../../doc_tools/docbook/images html
 	-find html -name "Makefile*"  | xargs rm
 	-find html -name .svn -type d -exec rm -rf '{}' \; 
 

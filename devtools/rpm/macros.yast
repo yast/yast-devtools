@@ -43,7 +43,7 @@
 
 # install the yast module using autotools/make
 %yast_install \
-    make install DESTDIR="$RPM_BUILD_ROOT" \
+    %make_install \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
         make check \\\
             VERBOSE=1 \\\

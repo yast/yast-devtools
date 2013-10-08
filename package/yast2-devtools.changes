@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct  8 14:05:02 UTC 2013 - jreidinger@suse.com
+
+- rpm macros: Use "%configure" to properly configure also 
+  sysconfdir and sbindir
+- 3.1.5
+
+-------------------------------------------------------------------
 Wed Oct  2 12:14:30 UTC 2013 - mvidner@suse.com
 
 - rpm macros: Use "make check VERBOSE=1"

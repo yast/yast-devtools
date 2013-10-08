@@ -36,7 +36,7 @@
     export CFLAGS="$RPM_OPT_FLAGS -DNDEBUG" \
     export CXXFLAGS="$RPM_OPT_FLAGS -DNDEBUG" \
     \
-    ./configure --libdir=%{_libdir} --prefix=%{_prefix} --mandir=%{_mandir} \
+    %configure \
     # V=1: verbose build in case we used AM_SILENT_RULES(yes) \
     # so that RPM_OPT_FLAGS check works \
     make %{?jobs:-j%jobs} V=1

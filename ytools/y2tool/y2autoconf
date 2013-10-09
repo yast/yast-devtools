@@ -251,13 +251,9 @@ dbdir=${devtools_yast2dir}/data/docbook
 STYLESHEET_HTML=${dbdir}/stylesheets/customize-html.xsl
 STYLESHEET_PDF=${dbdir}/stylesheets/customize-fo.xsl
 STYLESHEET_CSS=${dbdir}/css/yast2docs.css
-STYLESHEET_YDOC=${dbdir}/stylesheets/ydoc.xsl
-STYLESHEET_YCPDOC=${dbdir}/stylesheets/ycpdoc.xsl
 AC_SUBST(STYLESHEET_HTML)
 AC_SUBST(STYLESHEET_PDF)
 AC_SUBST(STYLESHEET_CSS)
-AC_SUBST(STYLESHEET_YDOC)
-AC_SUBST(STYLESHEET_YCPDOC)
 
 ',
 

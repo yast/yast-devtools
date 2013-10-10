@@ -1,8 +1,8 @@
 -------------------------------------------------------------------
 Wed Oct  9 15:11:45 UTC 2013 - jreidinger@suse.com
 
-- cmake module read VERSION instead of VERSION.cmake to be 
-  persistent 
+- cmake module: read VERSION instead of VERSION.cmake to be 
+  consistent across all packages
 - 3.1.6
 
 -------------------------------------------------------------------

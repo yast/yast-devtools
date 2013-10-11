@@ -33,6 +33,33 @@ BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
+Requires:       yast2-buildtools
+
+Provides:       ycpdoc
+Provides:       ydoc
+Obsoletes:      ycpdoc
+Obsoletes:      ydoc
+Provides:       yast2-config-newmodule
+Provides:       yast2-trans-newmodule
+Obsoletes:      yast2-config-newmodule
+Obsoletes:      yast2-trans-newmodule
+
+Summary:        YaST2 - Development Tools
+License:        GPL-2.0+
+Group:          System/YaST
+
+BuildArch:      noarch
+
+%description
+Scripts and templates for developing YaST2 modules and components.
+
+%package -n yast2-buildtools
+Summary: Minimal set of tools needed to build yast module
+
+%description -n yast2-buildtools
+Scripts and templates required for rebuilding the existing YaST2
+modules and components (both ruby and C++).
+
 Requires:       perl
 Requires:       perl-XML-Writer
 # we install our .pc under $prefix/share
@@ -56,26 +83,6 @@ Recommends:     libtool
 # for extracting translatable strings from *.rb files using "make pot" command
 # weak dependency, "make pot" is usually not needed
 Suggests:       rubygem-gettext
-
-Provides:       ycpdoc
-Provides:       ydoc
-Obsoletes:      ycpdoc
-Obsoletes:      ydoc
-Provides:       yast2-config-newmodule
-Provides:       yast2-trans-newmodule
-Obsoletes:      yast2-config-newmodule
-Obsoletes:      yast2-trans-newmodule
-
-Summary:        YaST2 - Development Tools
-License:        GPL-2.0+
-Group:          System/YaST
-
-BuildArch:      noarch
-
-%description
-Scripts and templates for developing YaST2 modules and components.
-Required for rebuilding the existing YaST2 modules and components (both
-YCP and C++).
 
 %prep
 %setup -n yast2-devtools-%{version}
@@ -113,7 +120,6 @@ EOF
 
 %files
 %defattr(-,root,root)
-/etc/rpm/macros.yast
 %{_prefix}/bin/y2tool
 %{_prefix}/bin/yastdoc
 %dir %{_prefix}/share/emacs
@@ -130,10 +136,11 @@ EOF
 %{_prefix}/lib/YaST2/bin
 %dir %{_prefix}/share/YaST2
 %{_prefix}/share/YaST2/data
-%dir %{_prefix}/share/YaST2/clients
-%{_prefix}/share/YaST2/clients/*.rb
+%doc %{_prefix}/share/doc/packages/%{name}
+
+%files -n yast2-buildtools
+%{sysconfdir}/rpm/macros.yast
 %{_prefix}/share/aclocal/*.m4
 %{_prefix}/share/pkgconfig/yast2-devtools.pc
-%doc %{_prefix}/share/doc/packages/%{name}
 
 %changelog

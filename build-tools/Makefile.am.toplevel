@@ -20,23 +20,15 @@ HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
 DEVTOOLS_DIR 		= $(if $(IS_DEVTOOLS),$(srcdir),$(Y2DEVTOOLS_PREFIX)/share/YaST2/data/devtools)
-LEGALESE_DIR		= $(DEVTOOLS_DIR)/build_tools/copyright/gpl
-
-COPYRIGHT_files_gpl	= README COPYING
-
-COPYRIGHT_files_yast	= YAST_LICENSE README COPYING COPYRIGHT.english \
-			  COPYRIGHT.french COPYRIGHT.german COPYRIGHT.spanish
-
-extra_COPYRIGHT_files =  $(if $(HAS_YAST_LICENSE), $(COPYRIGHT_files_yast), $(COPYRIGHT_files_gpl))
 
 # less strict; prefer bzip2
 AUTOMAKE_OPTIONS = foreign dist-bzip2 no-dist-gzip
 # where devtools install m4 snippets
 # argh, executed literally
 #ACLOCAL_AMFLAGS = -I $(Y2DEVTOOLS_PREFIX)/share/aclocal
-ACLOCAL_AMFLAGS = -I . -I `if test -d ./build_tools; then echo ./build_tools; else pkg-config --print-errors --variable=datadir yast2-devtools; fi`/aclocal
+ACLOCAL_AMFLAGS = -I . -I `if test -d ./build-tools; then echo ./build-tools; else pkg-config --print-errors --variable=datadir yast2-devtools; fi`/aclocal
 
-Makefile.am.common: $(DEVTOOLS_DIR)/build_tools/Makefile.am.common
+Makefile.am.common: $(DEVTOOLS_DIR)/build-tools/Makefile.am.common
 	cmp -s $< $@ || cp -f $< $@
 
 # create bzip2ed tar and make some sanity checks

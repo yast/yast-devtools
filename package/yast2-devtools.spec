@@ -56,10 +56,6 @@ Scripts and templates for developing YaST2 modules and components.
 %package -n yast2-buildtools
 Summary: Minimal set of tools needed to build yast module
 
-%description -n yast2-buildtools
-Scripts and templates required for rebuilding the existing YaST2
-modules and components (both ruby and C++).
-
 Requires:       perl
 Requires:       perl-XML-Writer
 # we install our .pc under $prefix/share
@@ -83,6 +79,11 @@ Recommends:     libtool
 # for extracting translatable strings from *.rb files using "make pot" command
 # weak dependency, "make pot" is usually not needed
 Suggests:       rubygem-gettext
+
+
+%description -n yast2-buildtools
+Scripts and templates required for rebuilding the existing YaST2
+modules and components (both ruby and C++).
 
 %prep
 %setup -n yast2-devtools-%{version}
@@ -120,27 +121,33 @@ EOF
 
 %files
 %defattr(-,root,root)
-%{_prefix}/bin/y2tool
-%{_prefix}/bin/yastdoc
-%dir %{_prefix}/share/emacs
-%dir %{_prefix}/share/emacs/site-lisp
-%{_prefix}/share/emacs/site-lisp/*ycp-mode.el
-%dir %{_prefix}/share/vim
-%dir %{_prefix}/share/vim/site
-%dir %{_prefix}/share/vim/site/syntax
-%{_prefix}/share/vim/site/syntax/ycp.vim
-%dir %{_prefix}/share/vim/site/ftdetect
-%{_prefix}/share/vim/site/ftdetect/ycp_filetype.vim
+%dir %{_datadir}/emacs
+%dir %{_datadir}/emacs/site-lisp
+%{_datadir}/emacs/site-lisp/*ycp-mode.el
+%dir %{_datadir}/vim
+%dir %{_datadir}/vim/site
+%dir %{_datadir}/vim/site/syntax
+%{_datadir}/vim/site/syntax/ycp.vim
+%dir %{_datadir}/vim/site/ftdetect
+%{_datadir}/vim/site/ftdetect/ycp_filetype.vim
 %dir %{_prefix}/lib/YaST2
-%{_prefix}/share/cmake
-%{_prefix}/lib/YaST2/bin
-%dir %{_prefix}/share/YaST2
-%{_prefix}/share/YaST2/data
-%doc %{_prefix}/share/doc/packages/%{name}
+%{_datadir}/cmake
+%dir %{_datadir}/YaST2
+%{_datadir}/YaST2/data
+%doc %{_datadir}/doc/packages/%{name}
+%dir %{_prefix}/lib/YaST2/bin
+%{_prefix}/lib/YaST2/bin/scrdoc
+%{_prefix}/lib/YaST2/bin/ycp_puttext
+%{_prefix}/lib/YaST2/bin/ydoxygen
+%dir %{_datadir}/YaST2/clients/
+%{_datadir}/YaST2/clients/ycp2yml.rb
 
 %files -n yast2-buildtools
-%{sysconfdir}/rpm/macros.yast
-%{_prefix}/share/aclocal/*.m4
-%{_prefix}/share/pkgconfig/yast2-devtools.pc
+%defattr(-,root,root)
+%{_sysconfdir}/rpm/macros.yast
+%{_bindir}/y2tool
+%{_datadir}/aclocal/*.m4
+%{_datadir}/pkgconfig/yast2-devtools.pc
+
 
 %changelog

@@ -1,3 +1,4 @@
+#! /usr/bin/env ruby
 # script for mass delete of jobs in our jenkins
 # credentials stored in jenkins.yml
 # modify JOB_NAME_PATTERN before use to specify pattern of job to delete

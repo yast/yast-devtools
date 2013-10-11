@@ -8,7 +8,5 @@ If you can do your task quicker than reading the script
 then it is not the right tool for you.
 
 They can be used only if you have an account with proper rights.
-In the same directory, create a file `jenkins.yml`, a trivial map with:
-
-    user: foo
-    pwd: bar
+In the same directory, copy the template `jenkins.yml.template` to a file
+`jenkins.yml` and fill required credentials.

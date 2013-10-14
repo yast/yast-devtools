@@ -1,8 +1,0 @@
-// ycp-grep knows when a "&" is an operator
-{
-	integer i = 7 & 3;
-	// a nasty trick: can your grep detect this? ;)
-	string s = "
-	integer i = 7 & 3;
-	";
-}

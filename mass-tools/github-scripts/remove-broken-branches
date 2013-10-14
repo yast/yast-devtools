@@ -1,0 +1,25 @@
+#! /bin/bash
+# Remove all "broken/*" branches and tags from a remote github repo
+set -e
+set -u
+USER_SLASH_REPO=${1?\$1 should be USER/REPO eg. yast/yast-network}
+REPO=${USER_SLASH_REPO#*/}
+if ! git remote -v | grep /$REPO\\.git; then
+    echo "Error: must be in a working copy of $REPO."
+    exit 1
+fi
+PREFIX=broken
+REMOTE=killbroken
+git remote add $REMOTE git@github.com:$USER_SLASH_REPO.git
+git fetch $REMOTE
+
+# ":broken/foo :broken/bar"
+REFSPECS=$(git branch -r | sed -n "/$REMOTE\\/$PREFIX/{s,$REMOTE/,:,;p}")
+git push $REMOTE $REFSPECS
+
+TAGS=(`git tag -l "$PREFIX/*"`)           # array of tags matching prefix
+git tag -d ${TAGS[@]}                     # delete them locally
+git push $REMOTE ${TAGS[@]/#/:refs/tags/} # delete them from origin
+
+git remote rm $REMOTE
+git fetch --all --prune

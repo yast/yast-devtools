@@ -123,8 +123,8 @@ EOF
 %{_datadir}/vim/site/ftdetect/ycp_filetype.vim
 %dir %{_prefix}/lib/YaST2
 %{_datadir}/cmake
+
 %dir %{_datadir}/YaST2
-%{_datadir}/YaST2/data
 %doc %{_datadir}/doc/packages/%{name}
 %dir %{_prefix}/lib/YaST2/bin
 %{_prefix}/lib/YaST2/bin/scrdoc
@@ -132,6 +132,16 @@ EOF
 %{_prefix}/lib/YaST2/bin/ydoxygen
 %dir %{_datadir}/YaST2/clients/
 %{_datadir}/YaST2/clients/ycp2yml.rb
+%{_datadir}/YaST2/data/devtools/bin/check-textdomain
+%{_datadir}/YaST2/data/devtools/bin/check_icons
+%{_datadir}/YaST2/data/devtools/bin/get-lib
+%{_datadir}/YaST2/data/devtools/bin/pot-spellcheck
+%{_datadir}/YaST2/data/devtools/bin/rny2rnc
+%{_datadir}/YaST2/data/devtools/bin/showy2log
+%{_datadir}/YaST2/data/devtools/bin/tagversion
+%{_datadir}/YaST2/data/devtools/bin/y2makepot
+%{_datadir}/YaST2/data/devtools/bin/ycp_puttext
+
 
 %files -n yast2-buildtools
 %defattr(-,root,root)
@@ -139,6 +149,19 @@ EOF
 %{_bindir}/y2tool
 %{_datadir}/aclocal/*.m4
 %{_datadir}/pkgconfig/yast2-devtools.pc
+%{_datadir}/YaST2/data/docbook
+%dir %{_datadir}/YaST2/data
+%dir %{_datadir}/YaST2/data/devtools
+%dir %{_datadir}/YaST2/data/devtools/bin
+%{_datadir}/YaST2/data/devtools/admin
+%{_datadir}/YaST2/data/devtools/Doxyfile
+# needed for doxygen, not nice
+%{_datadir}/YaST2/data/devtools/footer-notimestamp.html
+%{_datadir}/YaST2/data/devtools/data
+%{_datadir}/YaST2/data/devtools/bin/y2autoconf
+%{_datadir}/YaST2/data/devtools/bin/y2automake
+
+
 
 
 %changelog

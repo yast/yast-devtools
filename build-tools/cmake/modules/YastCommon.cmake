@@ -54,68 +54,6 @@ file (STRINGS ${CMAKE_SOURCE_DIR}/VERSION VERSION)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-####################################################################
-# RPM SPEC                                                         #
-####################################################################
-
-MACRO(SPECFILE)
-  MESSAGE(STATUS "Writing spec file...")
-  
-  SET(SPECIN ${CMAKE_SOURCE_DIR}/${PACKAGE}.spec.cmake)
-  IF (NOT EXISTS ${SPECIN})
-    SET(SPECIN ${CMAKE_SOURCE_DIR}/${PACKAGE}.spec.in)
-  ENDIF (NOT EXISTS ${SPECIN})
-
-  # License and Group may be present(new) or missing(old)
-  FILE(READ ${SPECIN} SPECIN_S)
-  # test only in main package, HEADER is not used for subpackages
-  STRING(REGEX REPLACE "\n%package.*" "" SPECIN_S ${SPECIN_S})
-  IF(NOT SPECIN_S MATCHES "\nLicense:")
-    SET(DEFAULTLICENSE "License:\tGPL")
-  ENDIF(NOT SPECIN_S MATCHES "\nLicense:")
-  IF(NOT SPECIN_S MATCHES "\nGroup:")
-    SET(DEFAULTGROUP "Group:\tSystem/YaST")
-  ENDIF(NOT SPECIN_S MATCHES "\nGroup:")
-
-  SET(HEADERCOMMENT
-    "#
-# spec file for package ${RPMNAME} (Version ${VERSION})
-#
-# norootforbuild",
-    )
-
-  SET(HEADER
-"Name:           ${RPMNAME}
-Version:        ${VERSION}
-Release:        0
-${DEFAULTLICENSE}
-${DEFAULTGROUP}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Source0:        ${RPMNAME}-${VERSION}.tar.bz2"
-    )
-
-  SET(PREP
-"%prep
-%setup -n ${RPMNAME}-${VERSION}"
-    )
-
-  SET(CLEAN
-"%clean
-rm -rf \"\$RPM_BUILD_ROOT\""
-    )
-
-  SET(INSTALL
-"%install
-make install DESTDIR=\"$RPM_BUILD_ROOT\""
-    )
-
-  CONFIGURE_FILE(${SPECIN} ${CMAKE_BINARY_DIR}/package/${PACKAGE}.spec @ONLY)
-  MESSAGE(STATUS "I hate you rpm-lint...!!!")
-  IF (EXISTS ${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake)
-    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake ${CMAKE_BINARY_DIR}/package/${PACKAGE}-rpmlintrc @ONLY)
-  ENDIF (EXISTS ${CMAKE_SOURCE_DIR}/package/${PACKAGE}-rpmlint.cmake)
-ENDMACRO(SPECFILE)
-
 MACRO(PKGCONFGFILE)
   MESSAGE(STATUS "Writing pkg-config file...")
   CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/${PACKAGE}.pc.cmake ${CMAKE_BINARY_DIR}/${PACKAGE}.pc @ONLY)
@@ -162,7 +100,6 @@ MACRO(GENERATE_PACKAGING PACKAGE VERSION)
   INCLUDE(CPack)
   
   SET(PACKAGE ${RPMNAME})
-  SPECFILE()
   
   ADD_CUSTOM_TARGET( svncheck
     COMMAND cd $(CMAKE_SOURCE_DIR) && ! LC_ALL=C svn status --show-updates --quiet | grep -v '^Status against revision'

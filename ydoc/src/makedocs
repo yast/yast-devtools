@@ -1,8 +1,0 @@
-#!/bin/bash
-
-
-for i in $*
-do
-    echo "Generating ${i%in}..."
-    ../admin/makehtml $i > ${i%.in}
-done

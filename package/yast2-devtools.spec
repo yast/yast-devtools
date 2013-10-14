@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.5
+Version:        3.1.7
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -33,6 +33,20 @@ BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
+Requires:       yast2-buildtools
+
+Summary:        YaST2 - Development Tools
+License:        GPL-2.0+
+Group:          System/YaST
+
+BuildArch:      noarch
+
+%description
+Scripts and templates for developing YaST2 modules and components.
+
+%package -n yast2-buildtools
+Summary: Minimal set of tools needed to build yast module
+
 Requires:       perl
 Requires:       perl-XML-Writer
 # we install our .pc under $prefix/share
@@ -57,25 +71,10 @@ Recommends:     libtool
 # weak dependency, "make pot" is usually not needed
 Suggests:       rubygem-gettext
 
-Provides:       ycpdoc
-Provides:       ydoc
-Obsoletes:      ycpdoc
-Obsoletes:      ydoc
-Provides:       yast2-config-newmodule
-Provides:       yast2-trans-newmodule
-Obsoletes:      yast2-config-newmodule
-Obsoletes:      yast2-trans-newmodule
 
-Summary:        YaST2 - Development Tools
-License:        GPL-2.0+
-Group:          System/YaST
-
-BuildArch:      noarch
-
-%description
-Scripts and templates for developing YaST2 modules and components.
-Required for rebuilding the existing YaST2 modules and components (both
-YCP and C++).
+%description -n yast2-buildtools
+Scripts and templates required for rebuilding the existing YaST2
+modules and components (both ruby and C++).
 
 %prep
 %setup -n yast2-devtools-%{version}
@@ -113,27 +112,56 @@ EOF
 
 %files
 %defattr(-,root,root)
-/etc/rpm/macros.yast
-%{_prefix}/bin/y2tool
-%{_prefix}/bin/yastdoc
-%dir %{_prefix}/share/emacs
-%dir %{_prefix}/share/emacs/site-lisp
-%{_prefix}/share/emacs/site-lisp/*ycp-mode.el
-%dir %{_prefix}/share/vim
-%dir %{_prefix}/share/vim/site
-%dir %{_prefix}/share/vim/site/syntax
-%{_prefix}/share/vim/site/syntax/ycp.vim
-%dir %{_prefix}/share/vim/site/ftdetect
-%{_prefix}/share/vim/site/ftdetect/ycp_filetype.vim
+%dir %{_datadir}/emacs
+%dir %{_datadir}/emacs/site-lisp
+%{_datadir}/emacs/site-lisp/*ycp-mode.el
+%dir %{_datadir}/vim
+%dir %{_datadir}/vim/site
+%dir %{_datadir}/vim/site/syntax
+%{_datadir}/vim/site/syntax/ycp.vim
+%dir %{_datadir}/vim/site/ftdetect
+%{_datadir}/vim/site/ftdetect/ycp_filetype.vim
 %dir %{_prefix}/lib/YaST2
-%{_prefix}/share/cmake
-%{_prefix}/lib/YaST2/bin
-%dir %{_prefix}/share/YaST2
-%{_prefix}/share/YaST2/data
-%dir %{_prefix}/share/YaST2/clients
-%{_prefix}/share/YaST2/clients/*.rb
-%{_prefix}/share/aclocal/*.m4
-%{_prefix}/share/pkgconfig/yast2-devtools.pc
-%doc %{_prefix}/share/doc/packages/%{name}
+%{_datadir}/cmake
+
+%dir %{_datadir}/YaST2
+%doc %{_datadir}/doc/packages/%{name}
+%dir %{_prefix}/lib/YaST2/bin
+%{_prefix}/lib/YaST2/bin/scrdoc
+%{_prefix}/lib/YaST2/bin/ycp_puttext
+%{_prefix}/lib/YaST2/bin/ydoxygen
+%dir %{_datadir}/YaST2/clients/
+%{_datadir}/YaST2/clients/ycp2yml.rb
+%{_datadir}/YaST2/data/devtools/bin/check-textdomain
+%{_datadir}/YaST2/data/devtools/bin/check_icons
+%{_datadir}/YaST2/data/devtools/bin/get-lib
+%{_datadir}/YaST2/data/devtools/bin/pot-spellcheck
+%{_datadir}/YaST2/data/devtools/bin/rny2rnc
+%{_datadir}/YaST2/data/devtools/bin/showy2log
+%{_datadir}/YaST2/data/devtools/bin/tagversion
+%{_datadir}/YaST2/data/devtools/bin/y2makepot
+%{_datadir}/YaST2/data/devtools/bin/ycp_puttext
+
+
+%files -n yast2-buildtools
+%defattr(-,root,root)
+%{_sysconfdir}/rpm/macros.yast
+%{_bindir}/y2tool
+%{_datadir}/aclocal/*.m4
+%{_datadir}/pkgconfig/yast2-devtools.pc
+%{_datadir}/YaST2/data/docbook
+%dir %{_datadir}/YaST2/data
+%dir %{_datadir}/YaST2/data/devtools
+%dir %{_datadir}/YaST2/data/devtools/bin
+%{_datadir}/YaST2/data/devtools/admin
+%{_datadir}/YaST2/data/devtools/Doxyfile
+# needed for doxygen, not nice
+%{_datadir}/YaST2/data/devtools/footer-notimestamp.html
+%{_datadir}/YaST2/data/devtools/data
+%{_datadir}/YaST2/data/devtools/bin/y2autoconf
+%{_datadir}/YaST2/data/devtools/bin/y2automake
+
+
+
 
 %changelog

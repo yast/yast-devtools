@@ -1,0 +1,471 @@
+#! /usr/bin/perl -w
+my $message = << 'END';
+#y2autoconf [-h|--help]
+#
+#Create YaST2 configure.ac from configure.ac.in (or from configure.in.in)
+#
+#Available macros in the configure.ac.in:
+#  @RPMNAME@                - reads it from file RPMNAME
+#  @VERSION@                - reads it from file VERSION
+#  @MAINTAINER@             - reads it from file MAINTAINER
+#
+#  @YAST2-INIT-COMMON@      - Initialization. The generated configure.ac
+#                              will not work without it (or its equivalent)
+#  @YAST2-INIT-PROGRAM@     - Initilazation necessary for packages with programs
+#  @YAST2-INIT-PO@          -                        with translations
+#  @YAST2-INIT-YCP@         -                        with YCP
+#
+#  @YAST2-CHECKS-COMMON@    - Checks for tools needed by all YaST2 code
+#  @YAST2-CHECKS-PROGRAM@   - Additional checks for packages with programs
+#  @YAST2-CHECKS-PO@        -                        with translations
+#  @YAST2-CHECKS-YCP@       -                        with YCP
+#  @YAST2-CHECKS-TESTSUITE@ - Checks for expect and dejagnu
+#
+#  @YAST2-OUTPUT@           - Creates list of Makefiles to be generated
+END
+#Authors:
+#  Jan Holesovsky <kendy@suse.cz>, 2001
+#  Michal Svec <msvec@suse.cz>
+#  Martin Vidner <mvidner@suse.cz>
+#
+# $Id$
+
+if ($#ARGV >= 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help"))
+{
+    $message =~ s/^#//gm;	# there used to be sed here
+    die $message;
+}
+
+$RPMNAME = `cat RPMNAME`;
+$VERSION = `cat VERSION`;
+$MAINTAINER = `cat MAINTAINER`;
+chomp $RPMNAME;
+chomp $VERSION;
+chomp $MAINTAINER;
+
+# Better finding of subdirs: do not do "find" since that does not
+# honor SUBDIRS in Makefiles.am and that messes with the skeletons
+
+# http://www.faqs.org/faqs/editor-faq/sed/ 3.2 #13:
+# join lines ending with backslashes
+# we want '/\\$/N; s/\\\n//; ta' in the shell
+my $unbackslashify = q{-e :a -e '/\\\\$/N; s/\\\\\\n//; ta'};
+
+# Given a list of directories, filter and recursively find those
+# that should be processed by automake: look at SUBDIRS in Makefile.am
+# Example: qw(autom4te.cache src) -> qw(src src/foo src/bar)
+sub find_subdirs {
+    my @dirs = @_;
+
+    my @outdirs = ();
+    @dirs = grep { -f "$_/Makefile.am" } @dirs;
+    foreach my $dir (@dirs) {
+	my $subdirs = `sed -n $unbackslashify -e '/SUBDIRS/{P;q}' $dir/Makefile.am`; # find SUBDIRS
+	$subdirs =~ s/#.*//;		# strip comment
+	$subdirs =~ s/SUBDIRS\s*=\s*//;	# leave only the value
+	my @subdirs = split (/\s+/, $subdirs);
+	@subdirs = grep { $_ ne "." } @subdirs; # avoid infinite recursion
+	@subdirs = map { "$dir/$_" } @subdirs; # add the full path
+	push @outdirs, find_subdirs (@subdirs), $dir; # recurse+add current dir
+    }
+    return @outdirs;
+}
+
+# synchronize with y2automake
+@SUBDIRS = split (/\s+/, (`cat SUBDIRS 2> /dev/null` ||
+			`ls */Makefile.am | sed -e 's:/Makefile.am::' | sort | grep -v "^$RPMNAME-" | tr '\n' ' '`));
+@SUBDIRS = find_subdirs (@SUBDIRS);
+# "po" hacking: y2automake runs after us so "po" may not have Makefile.am yet
+push (@SUBDIRS, "po") if (-d "po" && ! grep { $_ eq "po" } @SUBDIRS);
+
+$OUTPUT = join ("\n", map { "$_/Makefile" } @SUBDIRS);
+
+%macros =
+(
+
+    # common variables
+    '@RPMNAME@' => $RPMNAME,
+    '@VERSION@' => $VERSION,
+    '@MAINTAINER@' => $MAINTAINER,
+
+    # init: common stuff
+    '@YAST2-INIT-COMMON@' =>
+"AC_INIT($RPMNAME, $VERSION, http://bugs.opensuse.org/, $RPMNAME)
+dnl Check for presence of file 'RPMNAME'
+AC_CONFIG_SRCDIR([RPMNAME])
+
+dnl Checking host/target/build systems, for make, install etc.
+AC_CANONICAL_TARGET
+dnl Perform program name transformation
+AC_ARG_PROGRAM
+
+AC_PREFIX_DEFAULT(/usr)
+
+dnl long filenames; we use GNU Make extensions and that's ok
+AM_INIT_AUTOMAKE(tar-ustar -Wno-portability)
+
+dnl Important YaST2 variables
+VERSION=\"$VERSION\"
+RPMNAME=\"$RPMNAME\"
+MAINTAINER=\"$MAINTAINER\"
+". '
+dnl pkgconfig honors lib64
+pkgconfigdir=\${libdir}/pkgconfig
+pkgconfigdatadir=\${datadir}/pkgconfig
+yast2dir=\${prefix}/share/YaST2
+
+ybindir=\${prefix}/lib/YaST2/bin
+# FIXME duplicates execcompdir
+ystartupdir=\${prefix}/lib/YaST2
+plugindir=\${libdir}/YaST2/plugin
+includedir=\${prefix}/include/YaST2
+potdir=\${docdir}/pot
+
+docdir=\${prefix}/share/doc/packages/$RPMNAME
+mandir=\${prefix}/share/man
+
+execcompdir=\${prefix}/lib/YaST2
+agentdir=${execcompdir}/servers_non_y2
+
+ydatadir=${yast2dir}/data
+imagedir=${yast2dir}/images
+themedir=${yast2dir}/theme
+localedir=${yast2dir}/locale
+clientdir=${yast2dir}/clients
+moduledir=${yast2dir}/modules
+yncludedir=${yast2dir}/include
+schemadir=${yast2dir}/schema
+scrconfdir=${yast2dir}/scrconf
+desktopdir=\${prefix}/share/applications/YaST2
+
+AC_SUBST(VERSION)
+AC_SUBST(RPMNAME)
+AC_SUBST(MAINTAINER)
+
+AC_SUBST(pkgconfigdir)
+AC_SUBST(pkgconfigdatadir)
+
+AC_SUBST(yast2dir)
+
+AC_SUBST(ybindir)
+AC_SUBST(ystartupdir)
+AC_SUBST(plugindir)
+AC_SUBST(includedir)
+AC_SUBST(potdir)
+AC_SUBST(execcompdir)
+
+AC_SUBST(docdir)
+AC_SUBST(mandir)
+
+AC_SUBST(ydatadir)
+AC_SUBST(imagedir)
+AC_SUBST(themedir)
+AC_SUBST(localedir)
+AC_SUBST(clientdir)
+AC_SUBST(moduledir)
+AC_SUBST(yncludedir)
+AC_SUBST(schemadir)
+AC_SUBST(scrconfdir)
+AC_SUBST(agentdir)
+AC_SUBST(desktopdir)
+
+fillupdir_d="/var/adm/fillup-templates"
+AC_ARG_WITH(fillupdir,
+    AS_HELP_STRING([--with-fillupdir=DIR],
+		   [where to place fillup templates (default $fillupdir_d.]),
+    [ fillupdir="$withval" ],
+    [ fillupdir="$fillupdir_d" ])
+AC_SUBST(fillupdir)
+',
+
+    # init: prog
+    '@YAST2-INIT-PROGRAM@' =>
+'dnl Automake 1.11 enables silent compilation,
+dnl Disable it by "configure --disable-silent-rules" or "make V=1"
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])',
+
+    # init: translation
+    '@YAST2-INIT-PO@' =>
+'LL=${RPMNAME##*-}
+AC_SUBST(LL)
+ISO639=${LL%_*}
+AC_SUBST(ISO639)
+
+AC_ARG_WITH(own_compendium,
+	    AS_HELP_STRING([--with-own_compendium=FILE],
+			   [Location of compendium file]),
+	    y2compendium=yes, y2compendium=no)
+if test "x$with_own_compendium" = "x" ; then
+  if test -d ../50-memory ; then
+    COMPENDIUM=\'../../50-memory/yast2.$(LL).po\'
+  else
+    COMPENDIUM=\'../../memory/yast2.$(LL).po\'
+  fi
+else
+  COMPENDIUM=${with_own_compendium}
+fi
+AC_SUBST(COMPENDIUM)
+if test -d ../50-pot ; then
+  POTDIR=../../50-pot
+else
+  POTDIR=../../pot/pot
+fi
+AC_SUBST(POTDIR)
+',
+
+    # init: YCP sources
+    '@YAST2-INIT-YCP@' =>
+'',
+
+    # check: common stuff
+    '@YAST2-CHECKS-COMMON@' =>
+'dnl Checks for programs.
+AC_PROG_INSTALL
+dnl The YCP interpreter checks whether dependent ybc files are older
+dnl so we must preserve their timestamps
+INSTALL="${INSTALL} -p"
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+dnl pkgconfig
+AC_ARG_VAR([PKG_CONFIG_PATH], [where to search for pkg-config files])
+dnl devtools
+dnl ...
+
+dnl no need for AC_ARG_VAR
+AC_PATH_PROG(XGETTEXT, xgettext)
+if test -z "$XGETTEXT" ; then
+    AC_MSG_ERROR(xgettext is missing; please install gettext-tools.)
+fi
+
+Y2DEVTOOLS_PREFIX=`pkg-config --print-errors --variable=prefix yast2-devtools`
+AC_SUBST(Y2DEVTOOLS_PREFIX)
+devtools_ybindir=`pkg-config --print-errors --variable=ybindir yast2-devtools`
+devtools_yast2dir=`pkg-config --print-errors --variable=yast2dir yast2-devtools`
+
+dnl producing pkg-config for others?
+AM_CONDITIONAL(CREATE_PKGCONFIG, test "x${CREATE_PKGCONFIG}" != x)
+AM_CONDITIONAL(CREATE_PKGCONFIG_NOARCH, test "x${CREATE_PKGCONFIG}" = xnoarch)
+
+dbdir=${devtools_yast2dir}/data/docbook
+STYLESHEET_HTML=${dbdir}/stylesheets/customize-html.xsl
+STYLESHEET_PDF=${dbdir}/stylesheets/customize-fo.xsl
+STYLESHEET_CSS=${dbdir}/css/yast2docs.css
+AC_SUBST(STYLESHEET_HTML)
+AC_SUBST(STYLESHEET_PDF)
+AC_SUBST(STYLESHEET_CSS)
+
+',
+
+    # check: program
+    '@YAST2-CHECKS-PROGRAM@' =>
+'
+AC_PATH_PROG(YDOXYGEN, ydoxygen, false, $PATH:$devtools_ybindir)
+if test "$YDOXYGEN" = "false"; then
+    AC_MSG_ERROR([ydoxygen is not installed])
+fi
+
+AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+
+# If we have core, get its Y2CORE_CFLAGS.
+# When building core itself, it has set Y2CORE_CFLAGS elsewhere already
+PKG_CHECK_EXISTS([yast2-core],[
+    PKG_CHECK_MODULES(Y2CORE, yast2-core)
+])
+
+CFLAGS="${CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
+CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2"
+
+: ${AGENT_LIBADD:=\'-L$(libdir) -lscr -ly2util -lycpvalues\'}
+AC_SUBST(AGENT_LIBADD)
+
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
+AM_PROG_LIBTOOL dnl for libraries
+
+dnl generate the config header
+AC_CONFIG_HEADERS([config.h]) dnl at the distribution this done
+
+AC_FUNC_ALLOCA
+AC_HEADER_STDC
+',
+
+    # check: qt
+    '@YAST2-CHECKS-QT@' =>
+'dnl Check qt paths
+QTDIR="/usr/lib/qt3"
+QTLIBDIR="/usr/lib/qt3/lib"
+AC_ARG_WITH(qt-dir,
+    AS_HELP_STRING([--with-qt-dir=DIR],
+		   [where the root of Qt is installed.]),
+    [ QTDIR="$withval" ])
+AC_ARG_WITH(qt-libdir,
+    AS_HELP_STRING([--with-qt-libdir=DIR],
+		   [where the Qt library is installed.]),
+    [ QTLIBDIR="$withval" ])
+AC_SUBST(QTDIR)
+AC_SUBST(QTLIBDIR)
+
+dnl Try to find the X includes and libraries
+AC_PATH_X
+if test -n "$x_includes"; then
+	CPPFLAGS="$CPPFLAGS -I$x_includes"
+fi
+if test -n "$x_libraries"; then
+	LDFLAGS="$LDFLAGS -L$x_libraries"
+fi
+',
+
+    # check: Qt4
+    '@YAST2-CHECKS-QT4@' =>
+'dnl Check Qt4 paths
+dnl both QTDIR and QTLIBDIR are obsolete with Qt4
+dnl Try to find the X includes and libraries
+AC_PATH_X
+if test -n "$x_includes"; then
+	CPPFLAGS="$CPPFLAGS -I$x_includes"
+fi
+if test -n "$x_libraries"; then
+	LDFLAGS="$LDFLAGS -L$x_libraries"
+fi
+',
+
+    # check: testsuite
+    '@YAST2-CHECKS-TESTSUITE@' =>
+'dnl Check packages expect and dejagnu
+AC_PATH_PROG(MYEXPECT, expect, false)
+if test "$MYEXPECT" = "false"; then
+	AC_MSG_ERROR([expect not installed])
+fi
+AC_PATH_PROG(MYRUNTEST, runtest, false)
+if test "$MYRUNTEST" = "false"; then
+	AC_MSG_ERROR([dejagnu not installed])
+fi
+',
+
+    # check: translations
+    '@YAST2-CHECKS-PO@' =>
+'dnl searches for some needed programs
+AC_PATH_PROG(MSGFMT, msgfmt, no, /usr/bin)
+if test x$MSGFMT != x"/usr/bin/msgfmt"; then
+  AC_MSG_ERROR(msgfmt is missing; please install gettext.)
+fi
+AC_PATH_PROGS(MSGCAT, msgcat pmsgcat, no)
+if test x$MSGCAT = xno; then
+  AC_MSG_ERROR(msgcat is missing; please install gettext-0.11pre or better.)
+fi
+
+AC_PATH_PROG(MSGMERGE, msgmerge, no, /usr/bin)
+if test x$MSGMERGE != x"/usr/bin/msgmerge"; then
+  AC_MSG_ERROR(msgmerge is missing; please install gettext.)
+fi
+
+AC_PATH_PROG(MSGCONV, msgconv, no, /usr/bin)
+if test x$MSGCONV != x"/usr/bin/msgconv"; then
+  AC_MSG_ERROR(msgconv is missing; please install gettext.)
+fi
+',
+
+    # check: YCP sources
+    '@YAST2-CHECKS-YCP@' =>
+'AC_CHECK_FILE($devtools_yast2dir/data/testsuite/Makefile.testsuite, [], [
+    AC_MSG_WARN([yast2-testsuite.rpm is not installed])
+])
+
+# handle .dep files in Makefile.am.common if any YCP module is present
+AC_MSG_CHECKING([for YCP modules])
+
+# YCP module file name starts with an upper case letter
+[find . -type f | grep -q "[[:upper:]][^/]*\\.ycp$" && has_ycp_modules=1]
+AM_CONDITIONAL([HAS_YCP_MODULES], [test -n "$has_ycp_modules"])
+
+if test -n "$has_ycp_modules"; then
+  AC_MSG_RESULT([found])
+else
+  AC_MSG_RESULT([not found])
+fi
+',
+
+    # generate output
+    '@YAST2-OUTPUT@' =>
+"AC_CONFIG_FILES(Makefile $OUTPUT)
+AC_OUTPUT
+"
+);
+
+# mark created packages with the devtools version
+my $devtools_version;
+if ($#ARGV >= 0 && $ARGV[0] eq "--bootstrap")
+{
+    $devtools_version = $VERSION;
+}
+else
+{
+    $devtools_version = `y2tool version`;
+}
+chomp $devtools_version;
+
+# main program
+print STDERR "y2autoconf: Generating toplevel configure.ac\n";
+
+open(INPUT, '<', "configure.ac.in") or
+    open(INPUT, '<', "configure.in.in") or
+    die "y2autoconf: Cannot open configure.ac.in nor configure.in.in !\n";
+open(OUTPUT, '>', "configure.ac") or die "y2autoconf: Cannot open configure.ac!\n";
+unlink("configure.in"); # avoid 'configure.ac' and 'configure.in' both present
+
+print OUTPUT
+    "dnl configure.ac for $RPMNAME\n" .
+    "dnl\n" .
+    "dnl -- This file is generated by y2autoconf ${devtools_version} - DO NOT EDIT! --\n" .
+    "dnl    (edit configure.ac.in or configure.in.in instead)\n";
+
+# FIXME: when all packages use create-spec and everything works fine,
+# replace these macros in all sources and remove them here.
+%obsolete_macros =
+(
+    '@YAST2-INIT-AGENT@' => '@YAST2-INIT-PROGRAM@',
+    '@YAST2-CHECKS-AGENT@' => '@YAST2-CHECKS-PROGRAM@',
+    '@YAST2-INIT-LIB@' => '@YAST2-INIT-PROGRAM@',
+    '@YAST2-CHECKS-LIB@' => '@YAST2-CHECKS-PROGRAM@',
+    '@YAST2-INIT-PROG@' => '@YAST2-INIT-PROGRAM@',
+    '@YAST2-CHECKS-PROG@' => '@YAST2-CHECKS-PROGRAM@',
+);
+
+$unknown_macro = 0;
+
+while (<INPUT>)
+{
+    if (! /^##.*/)
+    {
+	foreach $macro_name ( keys %obsolete_macros )
+	{
+	    s/$macro_name/$obsolete_macros{$macro_name}/g;
+	}
+
+	foreach $macro_name ( keys %macros )
+	{
+	    s/$macro_name/$macros{$macro_name}/g;
+	}
+
+	if (/^\@.+\@/)
+	{
+	    chomp;
+	    print STDERR "y2autoconf: ERROR: unknown macro $_\n";
+	    $unknown_macro = 1;
+	}
+
+	print OUTPUT;
+    }
+}
+close (INPUT);
+close (OUTPUT);
+
+if ($unknown_macro)
+{
+    print STDERR "y2autoconf: ERROR: unknown macro - update your yast2-devtools\n";
+    exit 1;
+}

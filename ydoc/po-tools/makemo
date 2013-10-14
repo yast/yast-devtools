@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# Usage: makemo po-file mo-file
-
-/usr/lib/YaST2/bin/recode_po_file_to_utf $1 | msgfmt --check -o $2 -
-
-# eof

@@ -1,7 +1,0 @@
-TODO
-----
-- checks for various YaST2 tools in configure.in
-- config skeleton:
-  - add return values to the all functions
-  - XXpkgXX_auto.ycp: - should be possible to call it without previous settings
-                      - fake autodetection

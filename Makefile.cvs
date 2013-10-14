@@ -2,17 +2,17 @@
 # Makefile.cvs
 #
 
-LIB = $(shell ./devtools/bin/get-lib)
+LIB = $(shell ./ytools/y2tool/get-lib)
 PREFIX = /usr
 
 configure: all
 	./configure --prefix=$(PREFIX) --libdir=$(PREFIX)/$(LIB)
 
 all:
-	./devtools/bin/y2autoconf --bootstrap ./devtools/admin
-	./devtools/bin/y2automake --bootstrap ./devtools/admin
+	./build-tools/scripts/y2autoconf --bootstrap ./build-tools/
+	./build-tools/scripts/y2automake --bootstrap ./build-tools/
 	#ACLOCAL_AMFLAGS is recommended but we have a common Makefile.am
-	cat ./devtools/admin/aclocal/*.m4 > acinclude.m4
+	cat ./build-tools/aclocal/*.m4 > acinclude.m4
 	autoreconf -v --force --install
 
 install: configure

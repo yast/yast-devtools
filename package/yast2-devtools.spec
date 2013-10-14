@@ -35,15 +35,6 @@ BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
 Requires:       yast2-buildtools
 
-Provides:       ycpdoc
-Provides:       ydoc
-Obsoletes:      ycpdoc
-Obsoletes:      ydoc
-Provides:       yast2-config-newmodule
-Provides:       yast2-trans-newmodule
-Obsoletes:      yast2-config-newmodule
-Obsoletes:      yast2-trans-newmodule
-
 Summary:        YaST2 - Development Tools
 License:        GPL-2.0+
 Group:          System/YaST

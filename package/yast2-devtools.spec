@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.8
+Version:        3.1.9
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 

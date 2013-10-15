@@ -1,8 +1,16 @@
 -------------------------------------------------------------------
+Tue Oct 15 11:13:39 UTC 2013 - jreidinger@suse.com
+
+- y2automake: properly install required COPYING file from top 
+  directory
+- 3.1.9
+
+-------------------------------------------------------------------
 Mon Oct 14 16:31:09 UTC 2013 - jreidinger@suse.com
 
 - cmake module: Do not generate spec file from spec.in as it is
   obsolete with spec file including rpm macros
+- 3.1.8
 
 -------------------------------------------------------------------
 Mon Oct 14 11:52:00 UTC 2013 - jreidinger@suse.com

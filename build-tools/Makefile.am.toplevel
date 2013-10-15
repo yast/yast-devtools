@@ -14,7 +14,8 @@ RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
 
-HAS_YAST_LICENSE	= $(shell test -e $(srcdir)/YAST_LICENSE && echo YAST_LICENSE)
+COPYRIGHT_files    = COPYING
+doc_DATA = $(COPYRIGHT_files)
 
 # do we do Makefile.am for devtools? It is a little special...
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
@@ -46,6 +47,7 @@ POT_DST = $(shell find -type d -name testsuite -prune , \
 
 EXTRA_DIST = \
 	VERSION RPMNAME MAINTAINER configure.in.in		\
+	$(COPYRIGHT_files)                                      \
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
 	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))
 
@@ -69,22 +71,6 @@ endif
 
 EXTRA_DIST += $(RPMNAME).pc.in
 endif
-
-dist-hook:
-	@for I in $(extra_COPYRIGHT_files) ;					\
-	do									\
-	    EX="" ;								\
-	    if test -f $(srcdir)/$$I ; then					\
-		EX=$(srcdir)/$$I ;						\
-	    elif test -f $(LEGALESE_DIR)/$$I ; then				\
-		EX=$(LEGALESE_DIR)/$$I ;					\
-	    else								\
-	        echo "Error: No file $$I in $(srcdir)/ or in $$LEGALESE_DIR/";	\
-		exit 1 ;							\
-	    fi ;								\
-	    echo "cp $$EX $(distdir)" ;						\
-	    cp $$EX "$(distdir)" ;						\
-	done
 
 pot:
 	$(Y2TOOL) y2makepot -s $(srcdir)
@@ -111,23 +97,6 @@ spellcheck: pot
 	$(Y2TOOL) pot-spellcheck
 
 # all-local: $(if $(IS_DEVTOOLS),,$(POT_DST))
-
-install-data-local: # $(if $(IS_DEVTOOLS),,install-pot)
-	mkdir -p $(DESTDIR)$(docdir)
-	@for I in $(extra_COPYRIGHT_files) ;					\
-	do									\
-	    EX="" ;								\
-	    if test -f $(srcdir)/$$I ; then					\
-		EX=$(srcdir)/$$I ;						\
-	    elif test -f $(LEGALESE_DIR)/$$I ; then				\
-		EX=$(LEGALESE_DIR)/$$I ;					\
-	    else								\
-		echo "Error: No file $$I in $(srcdir)/ or in $(LEGALESE_DIR)/";	\
-		exit 1 ;							\
-	    fi ;								\
-	    echo "$(INSTALL_DATA) $$EX $(DESTDIR)$(docdir)" ;			\
-	    $(INSTALL_DATA) $$EX $(DESTDIR)$(docdir) ;				\
-	done
 
 package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION).tar.bz2
 	rm -f package/$(RPMNAME)-*.tar.bz2

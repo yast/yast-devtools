@@ -16,4 +16,4 @@ In the same directory, copy the template `jenkins.yml.template` to a file
 ## Hints about jenkins
 
 - general API hint: look at ci.opensuse.org/api . For api for given page append `/api/xml`.
-  For config xml append to job view `/config.xml`.
+  For config xml append to job view `/config.xml` like <https://ci.opensuse.org/view/Yast/job/yast-users-master/config.xml>.

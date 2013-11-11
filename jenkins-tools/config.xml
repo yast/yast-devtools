@@ -1,16 +1,16 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <actions/>
-  <description></description>
+  <description/>
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@1.5.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <name></name>
-        <refspec></refspec>
-        <url>https://github.com/yast/yast-core.git</url>
+        <name/>
+        <refspec/>
+        <url>https://github.com/yast/yast-add-on-creator.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -31,15 +31,15 @@
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
-    <relativeTargetDir></relativeTargetDir>
-    <reference></reference>
-    <excludedRegions></excludedRegions>
-    <excludedUsers></excludedUsers>
-    <gitConfigName></gitConfigName>
-    <gitConfigEmail></gitConfigEmail>
+    <relativeTargetDir/>
+    <reference/>
+    <excludedRegions/>
+    <excludedUsers/>
+    <gitConfigName/>
+    <gitConfigEmail/>
     <skipTag>false</skipTag>
-    <includedRegions></includedRegions>
-    <scmName></scmName>
+    <includedRegions/>
+    <scmName/>
   </scm>
   <assignedNode>yast-jenkins</assignedNode>
   <canRoam>false</canRoam>
@@ -55,11 +55,15 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>
-cd $WORKSPACE; rake osc:commit; cd -
-      </command>
+      <command>cd $WORKSPACE; rake osc:sr; cd -      </command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.tasks.Mailer plugin="mailer@1.5">
+      <recipients>yast-commit@opensuse.org</recipients>
+      <dontNotifyEveryUnstableBuild>true</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>true</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
   <buildWrappers/>
 </project>

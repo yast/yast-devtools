@@ -1,0 +1,29 @@
+#!/bin/bash
+# Assist in API cleanup by finding published ("global") functions/variables
+# that are not used by other code.
+#
+# Usage:
+# cd [a clean checkout of all yast repositories]
+# MODULE_RB=yast2/library/network/src/modules/NetworkPopup.rb
+# find-unused-published $MODULE_RB
+
+# $1 YaST Module in Ruby, pathname
+published() {
+    # lines like
+    #    publish :function => :Add, :type => "boolean ()"
+    # transformed to
+    #    Add
+    sed -n -e '/publish/s/[^>]*> :\([^,]*\),.*/\1/;T;p' "$1"
+}
+
+# stdin: one identifier per line
+# $1: namespace
+find_unused() {
+    while read SYM; do
+        grep -E -r "$1(\.|::|->)$SYM" > /dev/null || echo $SYM
+    done
+}
+
+NAMESPACE="${1##*/}"
+NAMESPACE="${NAMESPACE%.rb}"
+published "$1" | find_unused "$NAMESPACE"

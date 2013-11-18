@@ -24,11 +24,21 @@ find_unused() {
     done
 }
 
-if [ $# -ne 1 ]; then
-  echo "Usage:
+usage() {
+    echo "Usage:
     cd [a clean checkout of all yast repositories]
     find-unused-published yast2/library/network/src/modules/NetworkPopup.rb" >&2
-  exit 1
+}
+
+if [ $# -ne 1 ]; then
+    usage
+    exit 1
+fi
+
+if [ ! -f $1 ]; then
+    echo "ERROR: File do not exist" >&2
+    usage
+    exit 2
 fi
 
 NAMESPACE="${1##*/}"

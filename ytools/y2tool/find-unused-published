@@ -24,6 +24,13 @@ find_unused() {
     done
 }
 
+if [ $# -ne 1 ]; then
+  echo "Usage:
+    cd [a clean checkout of all yast repositories]
+    find-unused-published yast2/library/network/src/modules/NetworkPopup.rb" >&2
+  exit 1
+fi
+
 NAMESPACE="${1##*/}"
 NAMESPACE="${NAMESPACE%.rb}"
 published "$1" | find_unused "$NAMESPACE"

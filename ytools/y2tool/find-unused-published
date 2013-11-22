@@ -2,10 +2,13 @@
 # Assist in API cleanup by finding published ("global") functions/variables
 # that are not used by other code.
 #
-# Usage:
-# cd [a clean checkout of all yast repositories]
-# MODULE_RB=yast2/library/network/src/modules/NetworkPopup.rb
-# find-unused-published $MODULE_RB
+
+usage() {
+    echo "Usage:
+    cd [a clean checkout of all yast repositories]
+    find-unused-published yast2/library/network/src/modules/NetworkPopup.rb" >&2
+}
+
 
 # $1 YaST Module in Ruby, pathname
 published() {
@@ -23,6 +26,17 @@ find_unused() {
         grep -E -r "$1(\.|::|->)$SYM" > /dev/null || echo $SYM
     done
 }
+
+if [ $# -ne 1 ]; then
+    usage
+    exit 1
+fi
+
+if [ ! -f $1 ]; then
+    echo "ERROR: File '$1' do not exist" >&2
+    usage
+    exit 2
+fi
 
 NAMESPACE="${1##*/}"
 NAMESPACE="${NAMESPACE%.rb}"

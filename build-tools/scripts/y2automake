@@ -54,7 +54,7 @@ common=$y2adminpath/Makefile.am.common
 
 RPMNAME=`cat ./RPMNAME`
 
-if [ ! -e VERSION ]; then
+if [ ! -e MAINTAINER ]; then
     echo "${self} ERROR: Start this only in YaST2 toplevel project directories!" >&2
     exit 1
 fi

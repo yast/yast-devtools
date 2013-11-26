@@ -6,7 +6,7 @@ my $message = << 'END';
 #
 #Available macros in the configure.ac.in:
 #  @RPMNAME@                - reads it from file RPMNAME
-#  @VERSION@                - reads it from file VERSION
+#  @VERSION@                - reads it from package/*.spec file
 #  @MAINTAINER@             - reads it from file MAINTAINER
 #
 #  @YAST2-INIT-COMMON@      - Initialization. The generated configure.ac
@@ -37,10 +37,12 @@ if ($#ARGV >= 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help"))
 }
 
 $RPMNAME = `cat RPMNAME`;
-$VERSION = `cat VERSION`;
-$MAINTAINER = `cat MAINTAINER`;
 chomp $RPMNAME;
+
+$VERSION = `grep '^[[:space:]]*Version:' package/$RPMNAME.spec | sed -e 's/Version:[[:space:]]*\([[:print:]]\+\)/\1/'`;
 chomp $VERSION;
+
+$MAINTAINER = `cat MAINTAINER`;
 chomp $MAINTAINER;
 
 # Better finding of subdirs: do not do "find" since that does not

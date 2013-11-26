@@ -30,9 +30,9 @@ while true; do
 done
 
 p=`cat RPMNAME`
-v=`cat VERSION | tr "." "_"`
+v=`grep '^[[:space:]]*Version:' package/$p.spec | sed -e 's/Version:[[:space:]]*\([[:print:]]\+\)/\1/' | tr "." "_"`
 if [ -z "$p" -o -z "$v" ]; then
-    echo "Cannot find RPMNAME or VERSION in `pwd`"
+    echo "Cannot find RPMNAME or Version value in package/$p.spec in `pwd`"
     exit 1
 fi
 

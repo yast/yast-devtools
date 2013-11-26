@@ -9,8 +9,8 @@
 #where devtools are
 Y2TOOL = $(Y2DEVTOOLS_PREFIX)/bin/y2tool
 
-VERSION			= $(shell cat $(srcdir)/VERSION)
 RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
+VERSION			= $(shell grep '^[[:space:]]*Version:' $(srcdir)/package/$(RPMNAME).spec | sed -e 's/Version:[[:space:]]*\([[:print:]]\+\)/\1/')
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
 
@@ -46,7 +46,7 @@ POT_DST = $(shell find -type d -name testsuite -prune , \
 	-type f -name "*.pot") 
 
 EXTRA_DIST = \
-	VERSION RPMNAME MAINTAINER configure.in.in		\
+	RPMNAME MAINTAINER configure.in.in                      \
 	$(COPYRIGHT_files)                                      \
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
 	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))

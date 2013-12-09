@@ -50,7 +50,11 @@ IF (NOT DEFINED RPMNAME)
 ENDIF (NOT DEFINED RPMNAME)
 
 MESSAGE(STATUS "package name set to '${RPMNAME}'")
-file (STRINGS ${CMAKE_SOURCE_DIR}/VERSION VERSION)
+file (GLOB spec_files "package/*.spec")
+execute_process(COMMAND "grep" "^[[:space:]]*Version:" ${spec_files}
+  COMMAND "sed" "-e" "s/Version:[[:space:]]*\\([[:print:]]\\+\\)/\\1/"
+  OUTPUT_VARIABLE VERSION)
+message(STATUS "Version: ${VERSION}")
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 

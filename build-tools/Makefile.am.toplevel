@@ -10,7 +10,7 @@
 Y2TOOL = $(Y2DEVTOOLS_PREFIX)/bin/y2tool
 
 RPMNAME 		= $(shell cat $(srcdir)/RPMNAME)
-VERSION			= $(shell grep '^[[:space:]]*Version:' $(srcdir)/package/$(RPMNAME).spec | sed -e 's/Version:[[:space:]]*\([[:print:]]\+\)/\1/')
+VERSION			= $(shell rpm --specfile --qf "%{VERSION}" $(srcdir)/package/$(RPMNAME).spec)
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
 

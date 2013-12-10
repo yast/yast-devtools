@@ -39,7 +39,8 @@ if ($#ARGV >= 0 && ($ARGV[0] eq "-h" || $ARGV[0] eq "--help"))
 $RPMNAME = `cat RPMNAME`;
 chomp $RPMNAME;
 
-$VERSION = `grep '^[[:space:]]*Version:' package/$RPMNAME.spec | sed -e 's/Version:[[:space:]]*\([[:print:]]\+\)/\1/'`;
+# the query is different from other places, need to escape %
+$VERSION = `rpm --specfile --qf "\%{VERSION}" package/$RPMNAME.spec`;
 chomp $VERSION;
 
 $MAINTAINER = `cat MAINTAINER`;

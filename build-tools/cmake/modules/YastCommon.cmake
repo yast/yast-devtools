@@ -50,7 +50,10 @@ IF (NOT DEFINED RPMNAME)
 ENDIF (NOT DEFINED RPMNAME)
 
 MESSAGE(STATUS "package name set to '${RPMNAME}'")
-file (STRINGS ${CMAKE_SOURCE_DIR}/VERSION VERSION)
+file (GLOB spec_files "package/*.spec")
+execute_process(COMMAND "rpm" "--specfile" "--qf" "%{VERSION}" ${spec_files}
+  OUTPUT_VARIABLE VERSION)
+message(STATUS "Version: ${VERSION}")
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 

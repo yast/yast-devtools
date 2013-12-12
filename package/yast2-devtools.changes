@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Dec 11 18:16:18 UTC 2013 - lslezak@suse.cz
+
+- y2autoconf - in perl we need extra backslash escaping
+- 3.1.12
+
+-------------------------------------------------------------------
 Wed Dec 11 14:32:06 UTC 2013 - lslezak@suse.cz
 
 - use grep/sed instead of rpm for parsing spec files (rpm prints

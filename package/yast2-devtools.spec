@@ -156,6 +156,9 @@ EOF
 %dir %{_datadir}/YaST2/data/devtools/bin
 %{_datadir}/YaST2/data/devtools/admin
 %{_datadir}/YaST2/data/devtools/Doxyfile
+%if 0%{?qemu_user_space_build}
+%{_datadir}/YaST2/data/devtools/NO_MAKE_CHECK
+%endif
 # needed for doxygen, not nice
 %{_datadir}/YaST2/data/devtools/footer-notimestamp.html
 %{_datadir}/YaST2/data/devtools/data

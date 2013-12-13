@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec 13 10:36:59 UTC 2013 - guillaume@opensuse.org
+
+- Fix QEMU-ARM build by adding 
+  %{_datadir}/YaST2/data/devtools/NO_MAKE_CHECK file in file list
+  when built in qemu since no make check are done in this case
+
+-------------------------------------------------------------------
 Wed Dec 11 18:16:18 UTC 2013 - lslezak@suse.cz
 
 - y2autoconf - in perl we need extra backslash escaping

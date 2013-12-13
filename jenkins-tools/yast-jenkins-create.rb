@@ -16,7 +16,7 @@ JOB_NAME_PATTERN = "yast-%s-master"
 
 ARGV.each do |mod|
   #test if module already exist
-  response_code = `curl -sL -w "%{http_code}" https://#{USER}:#{PWD}@ci.opensuse.org/view/Yast/job/yast-#{mod}-master/ -o /dev/null`
+  response_code = `curl -sL -w "%{http_code}" https://#{USER}:#{PWD}@ci.opensuse.org/job/yast-#{mod}-master/ -o /dev/null`
   next if response_code == "200"
 
   FileUtils.rm_f "config.xml.tmp"

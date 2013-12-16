@@ -51,7 +51,7 @@ ENDIF (NOT DEFINED RPMNAME)
 
 MESSAGE(STATUS "package name set to '${RPMNAME}'")
 file (GLOB spec_files "package/*.spec")
-execute_process(COMMAND "grep" "^[[:space:]]*Version:" ${spec_files}
+execute_process(COMMAND "grep" "-m" "1" "^[[:space:]]*Version:" ${spec_files}
   COMMAND "sed" "-e" "s/Version:[[:space:]]*\\([[:print:]]\\+\\)/\\1/"
   OUTPUT_VARIABLE VERSION)
 message(STATUS "Version: ${VERSION}")

@@ -12,6 +12,7 @@
 %yast_moduledir %{yast_dir}/modules
 %yast_yncludedir %{yast_dir}/include
 %yast_libdir %{yast_dir}/lib
+%yast_controldir %{yast_dir}/control
 %yast_schemadir %{yast_dir}/schema
 %yast_scrconfdir %{yast_dir}/scrconf
 %yast_desktopdir %{_prefix}/share/applications/YaST2

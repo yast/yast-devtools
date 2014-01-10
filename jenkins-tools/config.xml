@@ -8,7 +8,7 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/yast/yast-yast2.git</url>
+        <url>https://github.com/yast/yast-apparmor.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -20,6 +20,7 @@
     <submoduleCfg class="list"/>
     <extensions>
       <hudson.plugins.git.extensions.impl.CleanCheckout/>
+      <hudson.plugins.git.extensions.impl.DisableRemotePoll/>
     </extensions>
   </scm>
   <assignedNode>yast-jenkins</assignedNode>
@@ -40,7 +41,7 @@
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <hudson.tasks.Mailer plugin="mailer@1.5">
+    <hudson.tasks.Mailer plugin="mailer@1.6">
       <recipients>yast-commit@opensuse.org</recipients>
       <dontNotifyEveryUnstableBuild>true</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>true</sendToIndividuals>

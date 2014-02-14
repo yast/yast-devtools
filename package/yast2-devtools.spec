@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.15
+Version:        3.1.16
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -141,6 +141,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/showy2log
 %{_datadir}/YaST2/data/devtools/bin/tagversion
 %{_datadir}/YaST2/data/devtools/bin/y2makepot
+%{_datadir}/YaST2/data/devtools/bin/gettextdomains
 %{_datadir}/YaST2/data/devtools/bin/ycp_puttext
 
 

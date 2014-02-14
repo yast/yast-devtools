@@ -141,6 +141,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/showy2log
 %{_datadir}/YaST2/data/devtools/bin/tagversion
 %{_datadir}/YaST2/data/devtools/bin/y2makepot
+%{_datadir}/YaST2/data/devtools/bin/gettextdomains
 %{_datadir}/YaST2/data/devtools/bin/ycp_puttext
 
 

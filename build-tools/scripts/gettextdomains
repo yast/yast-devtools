@@ -1,4 +1,4 @@
-### sourced by 'check-textdomain' and 'y2makepot' ### -*- sh -*- 
+### sourced by 'check-textdomain' and 'y2makepot' ### -*- sh -*-
 
 #
 # get_domains_and_err():
@@ -21,13 +21,14 @@ function get_domains_and_err()
                                 -o -name "*.pm"  \
                                 -o -name "*.c"   \
                                 -o -name "*.cc"  \
-                                -o -name "*.cpp"`
+                                -o -name "*.cpp" \
+                                -o -name "*.rb"  `
 
     if test "$?" != "0"; then
         echo "Error: check-pot terminated unexpected."
         exit 1
     fi
-    
+
     for F in $SRCFILES; do
         # strip comments from the files and match [_]_( "..." )
         # 1. perl: strip one-line-comments

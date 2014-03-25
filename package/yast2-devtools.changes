@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Mar 25 14:15:03 UTC 2014 - lslezak@suse.cz
+
+- y2makepot: added support for extracting translatable strings from
+  ERB files (*.erb)
+- 3.1.17
+
+-------------------------------------------------------------------
 Fri Feb 14 08:59:05 UTC 2014 - jreidinger@suse.com
 
 - return back gettextdomains to allow generating translations

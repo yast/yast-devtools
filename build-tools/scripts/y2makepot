@@ -144,7 +144,7 @@ function generate_potfiles()
 	fi
 
         # is it a Ruby file?
-        if [[ "$F" =~ \.rb$ ]]; then
+        if [[ "$F" =~ \.(erb|rb)$ ]]; then
             RUBY_FILES="$RUBY_FILES $F";
         else
             FILES="$FILES $F" ;

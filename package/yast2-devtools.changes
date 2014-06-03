@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun  3 15:48:06 UTC 2014 - jreidinger@suse.com
+
+- gettextdomains fix detection of files including somewhere "/*"
+  bnc#880659
+- 3.1.18
+
+-------------------------------------------------------------------
 Tue Mar 25 14:15:03 UTC 2014 - lslezak@suse.cz
 
 - y2makepot: added support for extracting translatable strings from

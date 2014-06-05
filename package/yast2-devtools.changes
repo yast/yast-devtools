@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Jun  5 13:07:52 UTC 2014 - lslezak@suse.cz
+
+- y2makepot: transform control files into glade compatible format
+  so they can be processed by xgettext (the latest xgettext does
+  some format validation before processing) (bnc#881278)
+- 3.1.19
+
+-------------------------------------------------------------------
 Tue Jun  3 15:48:06 UTC 2014 - jreidinger@suse.com
 
 - gettextdomains fix detection of files including somewhere "/*"

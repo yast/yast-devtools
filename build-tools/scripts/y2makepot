@@ -16,6 +16,9 @@
 CWD=`dirname $0`
 . $CWD/gettextdomains
 
+# list of generated files which should be removed at the end
+CLEAN_FILES=""
+
 function gettext_call()
 {
     MODULE=$1
@@ -40,6 +43,12 @@ function gettext_call()
     else
         xgettext_call "$MODULE" "$SOURCE_FILES"
         rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
+    fi
+
+    if [ -n "$CLEAN_FILES" ]; then
+        echo "Removing generated files: $CLEAN_FILES"
+        rm -f $CLEAN_FILES
+        CLEAN_FILES=""
     fi
 }
 
@@ -147,7 +156,15 @@ function generate_potfiles()
         if [[ "$F" =~ \.(erb|rb)$ ]]; then
             RUBY_FILES="$RUBY_FILES $F";
         else
-            FILES="$FILES $F" ;
+            if [[ "$F" =~ \.glade$ ]]; then
+                echo "Processing $F file..."
+                GLADE_FILE="$F.translations.glade"
+                xsltproc /usr/share/YaST2/control/control_to_glade.xsl "$F" > "$GLADE_FILE"
+                FILES="$FILES $GLADE_FILE" ;
+                CLEAN_FILES="$CLEAN_FILES $GLADE_FILE" ;
+            else
+                FILES="$FILES $F" ;
+            fi
         fi
     done
 

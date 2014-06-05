@@ -11,4 +11,6 @@ pkgdata_SCRIPTS = 				\
 	y2makepot				\
 	gettextdomains
 
+dist_control_DATA = control_to_glade.xsl
+
 EXTRA_DIST = $(bin_SCRIPTS) $(pkgdata_SCRIPTS)

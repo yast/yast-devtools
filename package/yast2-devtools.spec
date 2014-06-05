@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.18
+Version:        3.1.19
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -143,6 +143,8 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/y2makepot
 %{_datadir}/YaST2/data/devtools/bin/gettextdomains
 %{_datadir}/YaST2/data/devtools/bin/ycp_puttext
+%dir %{_datadir}/YaST2/control/
+%{_datadir}/YaST2/control/control_to_glade.xsl
 
 
 %files -n yast2-buildtools

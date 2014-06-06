@@ -51,7 +51,7 @@ function get_domains_and_err()
     for F in $TR_FILES $POTFILES; do
         D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
             sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
-                 "(>]*[[:space:]]*\([-_a-zA-Z0-9]*\).*/\1/'`;
+                 '\''"(>]*[[:space:]]*\([-_[:alnum:]]*\).*/\1/'`;
         if [ -z $D ]; then
             ERR="$PWD/$F $ERR" ;
         else

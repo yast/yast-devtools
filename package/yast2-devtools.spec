@@ -55,11 +55,11 @@ Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
 # for building Ruby autodocs
-Requires:       rubygem-yard
+Requires:       rubygem(%{rb_default_ruby_abi}:yard)
 
 %if 0%{?suse_version} <= 1230
 # extra package for yard Markdown formatting in openSUSE <= 12.3
-Requires:       rubygem-redcarpet
+Requires:       rubygem(%{rb_default_ruby_abi}:redcarpet)
 %endif
 
 Recommends:     cmake
@@ -69,7 +69,7 @@ Recommends:     doxygen
 Recommends:     libtool
 # for extracting translatable strings from *.rb files using "make pot" command
 # weak dependency, "make pot" is usually not needed
-Suggests:       rubygem-gettext
+Suggests:       rubygem(%{rb_default_ruby_abi}:gettext)
 
 
 %description -n yast2-buildtools

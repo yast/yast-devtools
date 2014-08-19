@@ -1,0 +1,13 @@
+language: cpp
+compiler:
+    - gcc
+# install additional packages
+# http://docs.travis-ci.com/user/installing-dependencies/
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install -y docbook-xsl xsltproc
+script:
+    - make -f Makefile.cvs
+    - make
+    - sudo make install
+

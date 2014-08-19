@@ -1,3 +1,8 @@
+## Yast Development Tools
+
+[![Build Status](https://travis-ci.org/yast/yast-devtools.png?branch=master)](https://travis-ci.org/yast/yast-devtools)
+
+
 ## Directory Structure
 
 ### [ytools](ytools)

@@ -1,3 +1,9 @@
+#!/usr/bin/env ruby
+
+# - Create maintenance branch BRANCH_NAME
+# - Edit Rakefile to build and submit to corresponding projects
+# - Commit and push
+
 # constants for tuning script to create desired branch
 BRANCH_NAME="SLE-12-GA"
 USE_IBS=true

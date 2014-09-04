@@ -18,6 +18,13 @@ require "cheetah"
 # by default pass output of commands to stdout and stderr
 Cheetah.default_options = { :stdout => STDOUT, :stderr => STDERR }
 
+def check_real_upstream
+  res = Cheetah.run "git", "remote", "-v", :stdout => :capture
+  if res.grep(/origin\s*git@github.com:yast/).empty?
+    raise "This script can work only on upstream clone, where upstream remote is marked as origin"
+  end
+end
+
 def already_exists?
   res = Cheetah.run "git", "branch", "-r", :stdout => :capture
   res = res.lines
@@ -51,6 +58,8 @@ def modify_rakefile
 
   File.write("Rakefile", lines.join(""))
 end
+
+check_real_upstream
 
 if already_exists?
   puts "already exists, skipping"

@@ -134,6 +134,7 @@ EOF
 %{_datadir}/YaST2/clients/ycp2yml.rb
 %{_datadir}/YaST2/data/devtools/bin/check-textdomain
 %{_datadir}/YaST2/data/devtools/bin/check_icons
+%{_datadir}/YaST2/data/devtools/bin/create_maintenance_branch
 %{_datadir}/YaST2/data/devtools/bin/find-unused-published
 %{_datadir}/YaST2/data/devtools/bin/get-lib
 %{_datadir}/YaST2/data/devtools/bin/pot-spellcheck

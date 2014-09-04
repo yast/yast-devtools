@@ -4,7 +4,7 @@
 
 # bnc#396315 
 pkgdatadir = @YAST2DEVTOOLS@/bin
-pkgdata_SCRIPTS = ycp_puttext create_maintenance_branch.rb
+pkgdata_SCRIPTS = ycp_puttext create_maintenance_branch
 install-data-local:
 	ln -snf $(pkgdatadir)/ycp_puttext $(DESTDIR)$(ybindir)
 

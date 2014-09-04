@@ -1,0 +1,91 @@
+#!/usr/bin/env ruby
+
+# - Create maintenance branch BRANCH_NAME
+# - Edit Rakefile to build and submit to corresponding projects
+# - Commit and push
+
+# constants for tuning script to create desired branch
+BRANCH_NAME="SLE-12-GA"
+USE_IBS=true
+DEVEL_PROJECT="Devel:YaST:SLE-12"
+TARGET_PROJECT="SUSE:SLE-12:GA"
+BUILD_TARGET="SLE-12"
+
+# start of non-configuration part
+CONF_OPTIONS = {
+  "obs_project"    => DEVEL_PROJECT,
+  "obs_sr_project" => TARGET_PROJECT,
+  "obs_target"     => BUILD_TARGET,
+  "obs_api"        => USE_IBS ? "https://api.suse.de/" : "https://api.opensuse.org"
+}
+
+require "cheetah"
+
+# by default pass output of commands to stdout and stderr
+Cheetah.default_options = { :stdout => STDOUT, :stderr => STDERR }
+
+def check_real_upstream
+  res = Cheetah.run "git", "remote", "-v", :stdout => :capture
+  if res.grep(/origin\s*git@github.com:yast/).empty?
+    raise "This script can work only on upstream clone, where upstream remote is marked as origin"
+  end
+end
+
+def already_exists?
+  res = Cheetah.run "git", "branch", "-r", :stdout => :capture
+  res = res.lines
+  return !res.grep(/origin\/#{BRANCH_NAME}/).empty?
+end
+
+def modify_rakefile
+  raise "Cannot find Rakefile in pwd" unless File.exist?("Rakefile")
+
+  lines = File.readlines("Rakefile")
+  conf_line = lines.grep(/Yast::Tasks.configuration do/).first
+  if conf_line
+    conf_var = conf_line[/do \|\s*(\S+)\s*\|/, 1]
+    line_index = lines.index(conf_line)
+  else
+    line_index = 2
+    conf_var = "conf"
+    conf_line = "Yast::Tasks.configuration do |#{conf_var}|\n"
+    lines.insert(line_index, conf_line, "end\n")
+  end
+
+  CONF_OPTIONS.each do |key, value|
+    config_line = lines.grep(/#{conf_var}\.#{key}\s*=/).first
+    new_line = "  #{conf_var}.#{key} = #{value.inspect}\n"
+    if config_line
+      lines[lines.index[config_line]] = new_line
+    else
+      lines.insert(line_index + 1, new_line)
+    end
+  end
+
+  File.write("Rakefile", lines.join(""))
+end
+
+check_real_upstream
+
+if already_exists?
+  puts "already exists, skipping"
+  exit 0
+end
+
+#switch to master branch
+Cheetah.run "git", "checkout", "master"
+
+#create new branch ( ensure we use the latest non modified pushed version )
+Cheetah.run "git", "fetch", "origin"
+Cheetah.run "git", "branch", BRANCH_NAME, "origin/master"
+Cheetah.run "git", "checkout", BRANCH_NAME
+
+modify_rakefile
+
+commit_msg = "adapt Rakefile to submit to correct build service project in maintenance branch #{BRANCH_NAME}"
+
+Cheetah.run "git", "commit", "-m", commit_msg, "Rakefile"
+
+Cheetah.run "git", "push", "--set-upstream", "origin", BRANCH_NAME
+
+puts "Maintenance branch properly created"

@@ -60,8 +60,10 @@ end
 #switch to master branch
 Cheetah.run "git", "checkout", "master"
 
-#create new branch
-Cheetah.run "git", "checkout", "-b", BRANCH_NAME
+#create new branch ( ensure we use the latest non modified pushed version )
+Cheetah.run "git", "fetch", "origin"
+Cheetah.run "git", "branch", BRANCH_NAME, "origin/master"
+Cheetah.run "git", "checkout", BRANCH_NAME
 
 modify_rakefile
 

@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.20
+Version:        3.1.21
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -55,11 +55,11 @@ Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
 # for building Ruby autodocs
-Requires:       rubygem-yard
+Requires:       rubygem(yard)
 
 %if 0%{?suse_version} <= 1230
 # extra package for yard Markdown formatting in openSUSE <= 12.3
-Requires:       rubygem-redcarpet
+Requires:       rubygem(redcarpet)
 %endif
 
 Recommends:     cmake

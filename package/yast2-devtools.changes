@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep  5 07:02:54 UTC 2014 - jreidinger@suse.com
+
+- create_maintenance_branch: fix build target for SLE-12 branch
+- 3.1.23
+
+-------------------------------------------------------------------
 Thu Sep  4 13:19:11 UTC 2014 - jreidinger@suse.com
 
 - add tool for easy creation of maintenance branches to ytools

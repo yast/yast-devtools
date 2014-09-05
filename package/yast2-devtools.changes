@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep  5 12:51:57 UTC 2014 - mvidner@suse.com
+
+- Merged git and IBS
+- 3.1.24
+
+-------------------------------------------------------------------
 Fri Sep  5 07:02:54 UTC 2014 - jreidinger@suse.com
 
 - create_maintenance_branch: fix build target for SLE-12 branch

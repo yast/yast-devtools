@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.23
+Version:        3.1.24
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -69,7 +69,7 @@ Recommends:     doxygen
 Recommends:     libtool
 # for extracting translatable strings from *.rb files using "make pot" command
 # weak dependency, "make pot" is usually not needed
-Suggests:       rubygem-gettext
+Suggests:       rubygem(gettext)
 
 
 %description -n yast2-buildtools

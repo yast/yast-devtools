@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep  5 12:51:57 UTC 2014 - mvidner@suse.com
+
+- Merged git and IBS
+- 3.1.24
+
+-------------------------------------------------------------------
 Fri Sep  5 07:02:54 UTC 2014 - jreidinger@suse.com
 
 - create_maintenance_branch: fix build target for SLE-12 branch
@@ -15,6 +21,12 @@ Thu Sep  4 12:18:27 UTC 2014 - mvidner@suse.com
 
 - Use a more flexible rubygem requirement syntax (bnc#895069)
 - 3.1.21
+
+-------------------------------------------------------------------
+Fri Jul 18 14:35:20 UTC 2014 - mrueckert@suse.de
+
+- switch to rubygem() based buildrequires so we can easily switch
+  the ruby version.
 
 -------------------------------------------------------------------
 Fri Jun  6 14:32:01 CEST 2014 - locilka@suse.com
@@ -2052,7 +2064,7 @@ Thu Sep  5 13:24:47 2002 - ke@suse.de
 - Update to version 2.6.11.
 
 -------------------------------------------------------------------
-Thu Sep  5 12:07:50 CEST 2002
+Thu Sep  5 12:07:50 CEST 2002 - ke@suse.de
 
 - devtools/devtools/admin/all-packages: add yast2-trans-da.
 

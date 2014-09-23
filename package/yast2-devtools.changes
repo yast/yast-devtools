@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 23 09:25:35 UTC 2014 - jreidinger@suse.com
+
+- prevent crash for non standard maintainer file
+- 3.1.25
+
+-------------------------------------------------------------------
 Fri Sep  5 12:51:57 UTC 2014 - mvidner@suse.com
 
 - Merged git and IBS

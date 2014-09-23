@@ -7,7 +7,6 @@ AC_CONFIG_SRCDIR([RPMNAME])
 
 RPMNAME=`cat RPMNAME`
 VERSION=`cat VERSION`
-MAINTAINER=`cat MAINTAINER`
 
 AC_INIT($RPMNAME, $VERSION, http://bugs.opensuse.org/, $RPMNAME)
 
@@ -23,7 +22,6 @@ AM_INIT_AUTOMAKE(tar-ustar) dnl searches for some needed programs
 dnl Important YaST2 variables
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
-AC_SUBST(MAINTAINER)
 
 dnl pkgconfig honors lib64
 pkgconfigdir=\${libdir}/pkgconfig

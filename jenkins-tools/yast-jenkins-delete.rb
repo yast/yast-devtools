@@ -8,12 +8,12 @@ require "yaml"
 conf = YAML.load(File.read("jenkins.yml"))
 USER = conf["user"]
 PWD  = conf["pwd"]
-URL = "https://#{USER}:#{PWD}@ci.opensuse.org"
-#URL = "http://river.suse.de"
+URL_BASE = "https://#{USER}:#{PWD}@ci.opensuse.org"
+#URL_BASE = "http://river.suse.de"
 # %s is replaced by arguments passed to program
 JOB_NAME_PATTERN = "yast-%s-test"
 
 ARGV.each do |mod|
   # address to delete from http://jenkins-ci.361315.n4.nabble.com/Deleting-a-job-through-the-Remote-API-td3622851.html
-  `curl -X POST #{URL}/job/#{JOB_NAME_PATTERN %  mod}/doDelete`
+  `curl -X POST #{URL_BASE}/job/#{JOB_NAME_PATTERN %  mod}/doDelete`
 end

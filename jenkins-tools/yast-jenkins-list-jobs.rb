@@ -7,6 +7,7 @@ JOB_NAME_REGEXP = /\Ayast-(.*)-master\z/
 
 #test if module already exist
 all_modules = `curl -sL  http://ci.opensuse.org/view/Yast/api/xml`
+#all_modules = `curl -sL  http://river.suse.de/view/YaST/api/xml`
 
 raise "module list cannot load" if $?.exitstatus != 0
 

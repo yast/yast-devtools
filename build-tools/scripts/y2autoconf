@@ -7,7 +7,6 @@ my $message = << 'END';
 #Available macros in the configure.ac.in:
 #  @RPMNAME@                - reads it from file RPMNAME
 #  @VERSION@                - reads it from package/*.spec file
-#  @MAINTAINER@             - reads it from file MAINTAINER
 #
 #  @YAST2-INIT-COMMON@      - Initialization. The generated configure.ac
 #                              will not work without it (or its equivalent)
@@ -41,9 +40,6 @@ chomp $RPMNAME;
 
 $VERSION = `grep -m 1 '^[[:space:]]*Version:' package/$RPMNAME.spec | sed -e 's/Version:[[:space:]]*\\([[:print:]]\\+\\)/\\1/'`;
 chomp $VERSION;
-
-$MAINTAINER = `cat MAINTAINER`;
-chomp $MAINTAINER;
 
 # Better finding of subdirs: do not do "find" since that does not
 # honor SUBDIRS in Makefiles.am and that messes with the skeletons
@@ -88,7 +84,6 @@ $OUTPUT = join ("\n", map { "$_/Makefile" } @SUBDIRS);
     # common variables
     '@RPMNAME@' => $RPMNAME,
     '@VERSION@' => $VERSION,
-    '@MAINTAINER@' => $MAINTAINER,
 
     # init: common stuff
     '@YAST2-INIT-COMMON@' =>
@@ -109,7 +104,6 @@ AM_INIT_AUTOMAKE(tar-ustar -Wno-portability)
 dnl Important YaST2 variables
 VERSION=\"$VERSION\"
 RPMNAME=\"$RPMNAME\"
-MAINTAINER=\"$MAINTAINER\"
 ". '
 dnl pkgconfig honors lib64
 pkgconfigdir=\${libdir}/pkgconfig
@@ -144,7 +138,6 @@ desktopdir=\${prefix}/share/applications/YaST2
 
 AC_SUBST(VERSION)
 AC_SUBST(RPMNAME)
-AC_SUBST(MAINTAINER)
 
 AC_SUBST(pkgconfigdir)
 AC_SUBST(pkgconfigdatadir)

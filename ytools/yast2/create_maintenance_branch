@@ -8,7 +8,7 @@
 BRANCH_NAME="SLE-12-GA"
 USE_IBS=true
 DEVEL_PROJECT="Devel:YaST:SLE-12"
-TARGET_PROJECT="SUSE:SLE-12:GA"
+TARGET_PROJECT="SUSE:SLE-12:Update:Test"
 BUILD_TARGET="SLE_12"
 
 # start of non-configuration part
@@ -26,7 +26,7 @@ Cheetah.default_options = { :stdout => STDOUT, :stderr => STDERR }
 
 def check_real_upstream
   res = Cheetah.run "git", "remote", "-v", :stdout => :capture
-  if res.grep(/origin\s*git@github.com:yast/).empty?
+  if res.lines.grep(/origin\s*git@github.com:yast/).empty?
     raise "This script can work only on upstream clone, where upstream remote is marked as origin"
   end
 end

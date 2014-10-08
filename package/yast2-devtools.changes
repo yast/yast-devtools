@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Tue Sep 23 09:25:35 UTC 2014 - jreidinger@suse.com
 
-- prevent crash for non standard 'MAINTAINER' file
+- Do not read (and have ./configure evaluate) the MAINTAINER file.
 - 3.1.25
 
 -------------------------------------------------------------------

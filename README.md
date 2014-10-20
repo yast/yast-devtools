@@ -1,6 +1,7 @@
 ## Yast Development Tools
 
-[![Build Status](https://travis-ci.org/yast/yast-devtools.png?branch=master)](https://travis-ci.org/yast/yast-devtools)
+Travis: [![Build Status](https://travis-ci.org/yast/yast-devtools.png?branch=master)](https://travis-ci.org/yast/yast-devtools)
+Jenkins: [![Jenkins Build](http://img.shields.io/jenkins/s/https/ci.opensuse.org/yast-devtools-master.svg)](https://ci.opensuse.org/view/Yast/job/yast-devtools-master/)
 
 
 ## Directory Structure

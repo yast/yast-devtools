@@ -224,7 +224,7 @@ function checkin_potfiles()
 # define global variables
 CHECKIN=1
 XGETTEXT="xgettext"
-RXGETTEXT=/usr/bin/rxgettext
+RXGETTEXT="rxgettext"
 
 SRCDIR="."
 POT_DST=""

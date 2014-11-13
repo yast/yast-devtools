@@ -27,14 +27,14 @@ AUTOMAKE_OPTIONS = foreign dist-bzip2 no-dist-gzip
 # where devtools install m4 snippets
 # argh, executed literally
 #ACLOCAL_AMFLAGS = -I $(Y2DEVTOOLS_PREFIX)/share/aclocal
-ACLOCAL_AMFLAGS = -I . -I `if test -d ./build-tools; then echo ./build-tools; else pkg-config --print-errors --variable=datadir yast2-devtools; fi`/aclocal
+ACLOCAL_AMFLAGS = -I . -I $(if test -d ./build-tools; then echo ./build-tools; else pkg-config --print-errors --variable=datadir yast2-devtools; fi)/aclocal
 
 Makefile.am.common: $(DEVTOOLS_DIR)/build-tools/Makefile.am.common
 	cmp -s $< $@ || cp -f $< $@
 
 # create bzip2ed tar and make some sanity checks
 $(RPMNAME)-$(VERSION).tar.bz2: checkpo dist-bzip2
-	@if [ `bunzip2 -c $(RPMNAME)-$(VERSION).tar.bz2 | wc --bytes` = 0 ] ; then \
+	@if [ $(bunzip2 -c $(RPMNAME)-$(VERSION).tar.bz2 | wc --bytes) = 0 ] ; then \
 	    echo "Error: created tar is empty" ; \
 	    exit 1 ; \
 	fi
@@ -76,8 +76,8 @@ pot:
 	$(Y2TOOL) y2makepot -s $(srcdir)
 
 install-pot: pot
-	@POT_DST=`find -type d -name testsuite -prune , \
-		-type f -name "*.pot"` ; \
+	@POT_DST=$(find -type d -name testsuite -prune , \
+		-type f -name "*.pot") ; \
 	if [ -n "$$POT_DST" ] ; then \
 	    echo "mkdir -p $(DESTDIR)$(potdir)" ; \
 	    mkdir -p $(DESTDIR)$(potdir) ; \
@@ -109,10 +109,10 @@ package-local: check-parse $(if $(IS_DEVTOOLS),,$(POT_DST)) $(RPMNAME)-$(VERSION
 	    echo "You have to install yast2-devtools to making a package"; \
 	    false; \
 	fi
-	here=`pwd`; \
+	here=$(pwd); \
 	cd $(srcdir) && for i in $(RPMNAME)*.spec.in; do \
 	    if [ -f "$$i" ]; then \
-		newname="`echo "$$i" | sed "s/\.in$$//g"`"; \
+		newname="$(echo "$$i" | sed "s/\.in$$//g")"; \
 		$(Y2TOOL) create-spec < $$i > $$here/package/$${newname} ; \
 	    fi \
 	done
@@ -123,7 +123,7 @@ TAGVERSION	 = $(Y2TOOL) tagversion
 
 # check if there is no modified files and all commits were pushed
 check-up-to-date:
-	if [ `git status --short --branch | sed '/##[^[]*$/d;/^??/d' | wc -l` -gt 0 ]; then \
+	if [ $(git status --short --branch | sed '/##[^[]*$/d;/^??/d' | wc -l) -gt 0 ]; then \
 	  (echo "ERROR: Source is not commited and pushed. See `git status`"; false) \
 	fi
 
@@ -132,7 +132,7 @@ check-tagversion:
 	[ $$? = 0 ] || ( echo "ERROR: Please run 'tagversion' first"; false )
 
 check-parse-old:
-	@if [ `find -type f -name "*.ycp" | wc -l` -gt 0 -a "$(RPMNAME)" != "yast2-core" ] ; then \
+	@if [ $(find -type f -name "*.ycp" | wc -l) -gt 0 -a "$(RPMNAME)" != "yast2-core" ] ; then \
 		echo "Running parseycp..." ; \
 		parseycp -q -R ; \
 	else \

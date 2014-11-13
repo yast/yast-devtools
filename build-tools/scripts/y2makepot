@@ -76,8 +76,10 @@ function rxgettext_call()
     if [ -n "$FILES" ]; then
         echo "Creating ./$MODULE.pot from $FILES ...";
 
+        RXGETTEXT_PATH=`which $RXGETTEXT`
+
         # rubygem-gettext is a weak dependency, check if it is present
-        if [ -x $RXGETTEXT ]; then
+        if [ -x "$RXGETTEXT_PATH" ]; then
             $RXGETTEXT --copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
                 --add-comments --output=$MODULE.pot $FILES;
 

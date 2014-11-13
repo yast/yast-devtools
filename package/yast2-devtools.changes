@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Nov 13 11:46:32 UTC 2014 - jreidinger@suse.com
+
+- fix building with new libtool which use variable in backticks
+  causing double backticks and failure to build
+- 3.1.26
+
+-------------------------------------------------------------------
 Tue Sep 23 09:25:35 UTC 2014 - jreidinger@suse.com
 
 - Do not read (and have ./configure evaluate) the MAINTAINER file.

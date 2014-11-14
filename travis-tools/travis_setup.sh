@@ -13,9 +13,15 @@
 
 set -x
 
+# Remove extra repositories to avoid unnecessary downloads at repo refresh,
+# we do not need the latest postgres, mysql, couchdb, rabbitmq, ...
+# The standard Ubuntu repos in /etc/apt/sources.list are kept.
+sudo rm /etc/apt/sources.list.d/*
+
 # prepare the system for installing additional packages from OBS
 curl http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04/Release.key | sudo apt-key add -
 echo "deb http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04/ ./" | sudo tee -a /etc/apt/sources.list
+
 sudo apt-get update -q
 
 while getopts ":p:g:" opt; do

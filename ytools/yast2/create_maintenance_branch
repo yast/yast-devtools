@@ -1,15 +1,19 @@
 #!/usr/bin/env ruby
 
+# optional argument for source commit, if not specified use master
+# create_maintenance.rb # creates branch for master
+# create_maintenance.rb abcdef # creates branch from commit abcdef
+
 # - Create maintenance branch BRANCH_NAME
 # - Edit Rakefile to build and submit to corresponding projects
 # - Commit and push
 
 # constants for tuning script to create desired branch
-BRANCH_NAME="SLE-12-GA"
-USE_IBS=true
-DEVEL_PROJECT="Devel:YaST:SLE-12"
-TARGET_PROJECT="SUSE:SLE-12:Update:Test"
-BUILD_TARGET="SLE_12"
+BRANCH_NAME="openSUSE-13_2"
+USE_IBS=false
+DEVEL_PROJECT="YaST:openSUSE:13.2"
+TARGET_PROJECT="openSUSE:13.2:Update"
+BUILD_TARGET="openSUSE_13.2"
 
 # start of non-configuration part
 CONF_OPTIONS = {
@@ -56,7 +60,7 @@ def modify_rakefile
     config_line = lines.grep(/#{conf_var}\.#{key}\s*=/).first
     new_line = "  #{conf_var}.#{key} = #{value.inspect}\n"
     if config_line
-      lines[lines.index[config_line]] = new_line
+      lines[lines.index(config_line)] = new_line
     else
       lines.insert(line_index + 1, new_line)
     end
@@ -72,12 +76,15 @@ if already_exists?
   exit 0
 end
 
+# allow to branch from non master
+source_commit = ARGV.empty? ? "origin/master" : ARGV.first
+
 #switch to master branch
 Cheetah.run "git", "checkout", "master"
 
 #create new branch ( ensure we use the latest non modified pushed version )
 Cheetah.run "git", "fetch", "origin"
-Cheetah.run "git", "branch", BRANCH_NAME, "origin/master"
+Cheetah.run "git", "branch", BRANCH_NAME, source_commit
 Cheetah.run "git", "checkout", BRANCH_NAME
 
 modify_rakefile
@@ -86,6 +93,6 @@ commit_msg = "adapt Rakefile to submit to correct build service project in maint
 
 Cheetah.run "git", "commit", "-m", commit_msg, "Rakefile"
 
-Cheetah.run "git", "push", "--set-upstream", "origin", BRANCH_NAME
+Cheetah.run "git", "push", "--set-upstream", "origin", "#{BRANCH_NAME}:#{BRANCH_NAME}"
 
 puts "Maintenance branch properly created"

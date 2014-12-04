@@ -18,9 +18,26 @@ set -x
 # The standard Ubuntu repos in /etc/apt/sources.list are kept.
 sudo rm /etc/apt/sources.list.d/*
 
+# BASE URL on OBS project, so it works with same script for all supported branches. See https://github.com/yast/yast-network/pull/273#discussion_r21291484
+OBS_PROJECT=$(sed -n '/obs_project =/s/^.*\"\(.*\)\".*$/\1/p' Rakefile)
+case $OBS_PROJECT in
+  # SLE-12
+  Devel:YaST:SLE-12)
+    REPO_URL="http://download.opensuse.org/repositories/YaST:/SLE-12:/GA:/Travis/xUbuntu_12.04/"
+    ;;
+  # OpenSUSE 13.2
+  YaST:openSUSE:13.2)
+    REPO_URL="http://download.opensuse.org/repositories/YaST:/openSUSE:/13.2:/Travis/xUbuntu_12.04"
+    ;;
+  # master
+  *)
+    REPO_URL="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04"
+    ;;
+esac
+
 # prepare the system for installing additional packages from OBS
-curl http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04/Release.key | sudo apt-key add -
-echo "deb http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04/ ./" | sudo tee -a /etc/apt/sources.list
+curl $REPO_URL/Release.key | sudo apt-key add -
+echo "deb $REPO_URL/ ./" | sudo tee -a /etc/apt/sources.list
 
 sudo apt-get update -q
 

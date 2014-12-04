@@ -18,7 +18,7 @@ set -x
 # The standard Ubuntu repos in /etc/apt/sources.list are kept.
 sudo rm /etc/apt/sources.list.d/*
 
-# BASE URL on OBS project, so it works with same script for all supported branches. See https://github.com/yast/yast-network/pull/273#discussion_r21291484
+# BASE URL on OBS project, so it works with same script for all supported branches.
 OBS_PROJECT=$(sed -n '/obs_project =/s/^.*\"\(.*\)\".*$/\1/p' Rakefile)
 case $OBS_PROJECT in
   # SLE-12

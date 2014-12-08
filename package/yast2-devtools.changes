@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Dec  8 09:13:22 UTC 2014 - lslezak@suse.cz
+
+- y2makepot - do not hardcode the rxgettext path, fixes failure
+  at Travis builds (Ubuntu uses /usr/local/bin path)
+
+-------------------------------------------------------------------
 Fri Sep  5 12:51:57 UTC 2014 - mvidner@suse.com
 
 - Merged git and IBS

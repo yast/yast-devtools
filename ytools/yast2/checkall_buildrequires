@@ -8,6 +8,7 @@ MISSING=`rpm -q -- $PKGS | grep "not installed" | sed -e 's/^package //' -e 's/ 
 if [ -z "$MISSING" ]; then
     echo "All required packages are installed"
 else
-    echo -e "MISSING PACKAGES\n" >&2
+    echo "MISSING PACKAGES" >&2
+    echo >&2
     echo "$MISSING"
 fi

@@ -14,4 +14,8 @@ pkgdata_SCRIPTS = 				\
 	showy2log				\
 	tagversion
 
-EXTRA_DIST = $(pkgdata_SCRIPTS)
+confdatadir = @YAST2DEVTOOLS@/data
+confdata_DATA = \
+	.rubocop_yast_style.yml
+
+EXTRA_DIST = $(pkgdata_SCRIPTS) $(confdata_DATA)

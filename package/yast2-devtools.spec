@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.26
+Version:        3.1.27
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -144,6 +144,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/y2makepot
 %{_datadir}/YaST2/data/devtools/bin/gettextdomains
 %{_datadir}/YaST2/data/devtools/bin/ycp_puttext
+%{_datadir}/YaST2/data/devtools/data/rubocop_yast_style.yml
 %dir %{_datadir}/YaST2/control/
 %{_datadir}/YaST2/control/control_to_glade.xsl
 
@@ -165,7 +166,8 @@ EOF
 %endif
 # needed for doxygen, not nice
 %{_datadir}/YaST2/data/devtools/footer-notimestamp.html
-%{_datadir}/YaST2/data/devtools/data
+%dir %{_datadir}/YaST2/data/devtools/data
+%{_datadir}/YaST2/data/devtools/data/YaST2.dict.txt
 %{_datadir}/YaST2/data/devtools/bin/y2autoconf
 %{_datadir}/YaST2/data/devtools/bin/y2automake
 

@@ -144,7 +144,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/y2makepot
 %{_datadir}/YaST2/data/devtools/bin/gettextdomains
 %{_datadir}/YaST2/data/devtools/bin/ycp_puttext
-%{_datadir}/YaST2/data/devtools/data/.rubocop_yast_style.yml
+%{_datadir}/YaST2/data/devtools/data/rubocop_yast_style.yml
 %dir %{_datadir}/YaST2/control/
 %{_datadir}/YaST2/control/control_to_glade.xsl
 

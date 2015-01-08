@@ -21,8 +21,12 @@ Style/WordArray:
 # align arrows:
 # "foo"     => true
 # "foo_bar" => false
+# and also colons:
+# foo:     true
+# foo_bar: false
 Style/AlignHash:
   EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
 
 # no extra indentation for multiline function calls
 Style/AlignParameters:
@@ -39,3 +43,7 @@ Style/NegatedIf:
 # use "raise" instead of "fail"
 Style/SignalException:
   EnforcedStyle: only_raise
+
+# do not force %r
+Style/RegexpLiteral:
+  Enabled: false

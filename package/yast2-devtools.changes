@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan  8 10:22:24 UTC 2015 - jreidinger@suse.com
+
+- Add shared rubocop yast style config
+- 3.1.27
+
+-------------------------------------------------------------------
 Thu Nov 13 11:46:32 UTC 2014 - jreidinger@suse.com
 
 - fix building with new libtool which use variable in backticks

@@ -47,7 +47,3 @@ Style/SignalException:
 # do not force %r
 Style/RegexpLiteral:
   Enabled: false
-
-# Forbid and/or usage in conditionals
-Style/AndOr:
-  EnforcedStyle: conditionals

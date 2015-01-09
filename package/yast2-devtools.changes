@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan  9 09:45:17 UTC 2015 - jreidinger@suse.com
+
+- backport rubocop shared style
+- 3.1.24.1
+
+-------------------------------------------------------------------
 Fri Sep  5 12:51:57 UTC 2014 - mvidner@suse.com
 
 - Merged git and IBS

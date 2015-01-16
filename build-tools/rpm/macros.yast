@@ -43,17 +43,22 @@
     # so that RPM_OPT_FLAGS check works \
     make %{?jobs:-j%jobs} V=1
 
-# install the yast module using autotools/make
-%yast_install \
-    %make_install \
+%yast_check \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
         make check \\\
             VERBOSE=1 \\\
             Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" \\\
             DESTDIR="$RPM_BUILD_ROOT" \
-    fi \
+    fi
+
+%yast_desktop_files \
     for f in `find $RPM_BUILD_ROOT/%{yast_desktopdir}/ -name "*.desktop"` ; do \
         d=${f##*/} \
         %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
     done
 
+# install the yast module using autotools/make
+%yast_install \
+    %make_install \
+    %yast_check \
+    %yast_desktop_files

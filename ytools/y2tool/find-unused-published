@@ -14,9 +14,17 @@ usage() {
 published() {
     # lines like
     #    publish :function => :Add, :type => "boolean ()"
+    # or new ruby hash style
+    #    publish function: :Add, type: "boolean ()"
     # transformed to
     #    Add
-    sed -n -e '/publish/s/[^>]*> :\([^,]*\),.*/\1/;T;p' "$1"
+    RES=`sed -n -e '/publish/s/[^>]*> :\([^,]*\),.*/\1/;T;p' "$1"`
+    # file uses new ruby format
+    if [ -z $RES ]; then
+      RES=`sed -n -e '/publish/s/[^:]*: :\([^,]*\),.*/\1/;T;p' "$1"`
+    fi
+
+    echo $RES | tr -s "[[:blank:]]" "\n"
 }
 
 # stdin: one identifier per line

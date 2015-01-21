@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan 21 13:05:25 UTC 2015 - jreidinger@suse.com
+
+- find-unused-published: support new ruby hash syntax
+- 3.1.29
+
+-------------------------------------------------------------------
 Fri Jan 16 11:09:17 CET 2015 - aschnell@suse.de
 
 - split rpm macro %yast_install into submacros for finer control

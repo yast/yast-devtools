@@ -19,7 +19,7 @@ published() {
     # transformed to
     #    Add
     RES=`sed -n -e '/publish/s/[^>]*> :\([^,]*\),.*/\1/;T;p' "$1"`
-    # file use new ruby format
+    # file uses new ruby format
     if [ -z $RES ]; then
       RES=`sed -n -e '/publish/s/[^:]*: :\([^,]*\),.*/\1/;T;p' "$1"`
     fi

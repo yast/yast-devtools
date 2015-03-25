@@ -49,6 +49,8 @@ while getopts ":p:g:" opt; do
       ;;
     # install Ruby gems
     g)
+      # install Ruby headers (needed to compile binary gems)
+      sudo apt-get install ruby-dev
       sudo gem install $OPTARG
       ;;
     \?)

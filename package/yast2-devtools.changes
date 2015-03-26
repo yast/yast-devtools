@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Thu Mar 26 15:12:57 UTC 2015 - jreidinger@suse.com
+
+- yast-jenkins-modify:
+  - handle correctly modules that do not have github repo in
+    yast-{mod} format
+  - fix used sed to handle correctly oneliner xml
+  - improve error reporting for quicker detection of problems
+- 3.1.30
+
+-------------------------------------------------------------------
 Wed Jan 21 13:05:25 UTC 2015 - jreidinger@suse.com
 
 - find-unused-published: support new ruby hash syntax

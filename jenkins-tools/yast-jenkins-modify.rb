@@ -27,6 +27,7 @@ SPECIAL_MOD_NAMES = [
   "y2r"
 ]
 
+# All jobs on Jenkins have the name "yast-$MODULE-$BRANCH", but ARGV gets just a list of $MODULE
 ARGV.each do |mod|
   #test if module already exist
   response_code = `curl -sL -w "%{http_code}" #{URL_BASE}/job/#{JOB_NAME_PATTERN % mod}/ -o /dev/null`

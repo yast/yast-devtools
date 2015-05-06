@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed May 06 16:24:52 CEST 2015 - aschnell@suse.de
+
+- require rubygems of default ruby version (bsc#929899)
+- 3.1.31
+
+-------------------------------------------------------------------
 Thu Mar 26 15:12:57 UTC 2015 - jreidinger@suse.com
 
 - yast-jenkins-modify:

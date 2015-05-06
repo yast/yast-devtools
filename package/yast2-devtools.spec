@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-devtools
 #
-# Copyright (c) 2013 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2015 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        3.1.30
+Version:        3.1.31
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -55,11 +55,11 @@ Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
 # for building Ruby autodocs
-Requires:       rubygem(yard)
+Requires:       rubygem(%{rb_default_ruby_abi}:yard)
 
 %if 0%{?suse_version} <= 1230
 # extra package for yard Markdown formatting in openSUSE <= 12.3
-Requires:       rubygem(redcarpet)
+Requires:       rubygem(%{rb_default_ruby_abi}:redcarpet)
 %endif
 
 Recommends:     cmake

@@ -72,6 +72,11 @@ endif
 EXTRA_DIST += $(RPMNAME).pc.in
 endif
 
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
+
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status libtool
+
 pot:
 	$(Y2TOOL) y2makepot -s $(srcdir)
 

@@ -18,8 +18,9 @@ CREATE_PKGCONFIG=noarch
 # don't take all the garbage of YaST2-CHECKS-PROGRAM
 # this is anyway necessary only because autoreconf
 # gets confused by Makefile.am in skeletons
-AC_PROG_LIBTOOL
 AC_PROG_CXX
+LT_INIT([disable-static])
+AC_SUBST([LIBTOOL_DEPS])
 
 # perl checks
 AC_CHECK_PROG(PERL, perl, perl, no)

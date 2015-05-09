@@ -20,7 +20,9 @@ Makefile.in
 /config.sub
 /configure
 /configure.ac
+/configure.ac~
 /configure.in
+/compile
 /depcomp
 /install-sh
 /libtool

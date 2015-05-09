@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Sat May 09 13:14:55 CEST 2015 - besser82@fedoraproject.org
+
+- replace obsolete `AC_PROG_LIBTOOL` with `LT_INIT()`
+- use new `AC_INIT()`-syntax with args in square braces
+- 3.1.32
+
+-------------------------------------------------------------------
 Wed May 06 16:24:52 CEST 2015 - aschnell@suse.de
 
 - require rubygems of default ruby version (bsc#929899)

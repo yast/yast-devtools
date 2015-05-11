@@ -87,7 +87,7 @@ $OUTPUT = join ("\n", map { "$_/Makefile" } @SUBDIRS);
 
     # init: common stuff
     '@YAST2-INIT-COMMON@' =>
-"AC_INIT($RPMNAME, $VERSION, http://bugs.opensuse.org/, $RPMNAME)
+"AC_INIT([$RPMNAME],[$VERSION],[http://bugs.opensuse.org/],[$RPMNAME])
 dnl Check for presence of file 'RPMNAME'
 AC_CONFIG_SRCDIR([RPMNAME])
 
@@ -281,9 +281,9 @@ CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2"
 : ${AGENT_LIBADD:=\'-L$(libdir) -lscr -ly2util -lycpvalues\'}
 AC_SUBST(AGENT_LIBADD)
 
-AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
-AM_PROG_LIBTOOL dnl for libraries
+dnl for libraries
+LT_INIT([disable-static])
+AC_SUBST([LIBTOOL_DEPS])
 
 dnl generate the config header
 AC_CONFIG_HEADERS([config.h]) dnl at the distribution this done

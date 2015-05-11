@@ -5,6 +5,4 @@ SUBDIRS= navig admon
 
 dbimgdir = $(ydatadir)/docbook/images
 
-dbimg_DATA = $(wildcard *.png)
-
-EXTRA_DIST = $(dbimg_DATA)
+dist_dbimg_DATA = $(wildcard *.png)

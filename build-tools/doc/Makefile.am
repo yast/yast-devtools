@@ -5,4 +5,3 @@
 htmldir = $(docdir)/devtools
 
 EXTRA_DIST =  rny2rnc.html
-

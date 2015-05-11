@@ -4,6 +4,4 @@
 
 xsldir = $(ydatadir)/docbook/stylesheets
 
-xsl_DATA = $(wildcard *.xsl)
-
-EXTRA_DIST = $(xsl_DATA)
+dist_xsl_DATA = $(wildcard *.xsl)

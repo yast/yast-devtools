@@ -3,7 +3,7 @@
 #
 
 devtoolsdatadir = $(ydatadir)/devtools
-devtoolsdata_DATA = Doxyfile footer-notimestamp.html
-ybin_SCRIPTS = ydoxygen
-
-EXTRA_DIST = $(devtoolsdata_DATA) $(ybin_SCRIPTS)
+dist_devtoolsdata_DATA =		\
+		Doxyfile		\
+		footer-notimestamp.html
+dist_ybin_SCRIPTS = ydoxygen

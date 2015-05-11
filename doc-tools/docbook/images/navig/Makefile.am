@@ -3,6 +3,4 @@
 
 dbimgdir = $(ydatadir)/docbook/images/navig
 
-dbimg_DATA = $(wildcard *.png)
-
-EXTRA_DIST = $(dbimg_DATA)
+dist_dbimg_DATA = $(wildcard *.png)

@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Mon May 11 17:14:01 CEST 2015 - besser82@fedoraproject.org
+
+- add configure-option '--disable-debug'
+- use '--disable-debug' instead forcing $RPM_OPT_FLAGS into $ENV
+  handling $RPM_OPT_FLAGS is done by %configure-macro anyways
+- 'gettextdomains' is DATA not SCRIPT
+- use 'dist_'-prefix instead of 'EXTRA_DIST'
+- 3.1.33
+
+-------------------------------------------------------------------
 Sat May 09 13:14:55 CEST 2015 - besser82@fedoraproject.org
 
 - replace obsolete `AC_PROG_LIBTOOL` with `LT_INIT()`

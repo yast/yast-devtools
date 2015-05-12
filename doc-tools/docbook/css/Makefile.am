@@ -4,6 +4,4 @@
 
 cssdir = $(ydatadir)/docbook/css
 
-css_DATA = susebooks.css yast2docs.css
-
-EXTRA_DIST = $(css_DATA)
+dist_css_DATA = susebooks.css yast2docs.css

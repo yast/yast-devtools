@@ -4,7 +4,7 @@
 
 pkgdatadir = @YAST2DEVTOOLS@/bin
 
-pkgdata_SCRIPTS = 				\
+dist_pkgdata_SCRIPTS = 				\
 	check_icons				\
 	check-textdomain			\
 	find-unused-published			\
@@ -15,7 +15,4 @@ pkgdata_SCRIPTS = 				\
 	tagversion
 
 confdatadir = @YAST2DEVTOOLS@/data
-confdata_DATA = \
-	rubocop_yast_style.yml
-
-EXTRA_DIST = $(pkgdata_SCRIPTS) $(confdata_DATA)
+dist_confdata_DATA = rubocop_yast_style.yml

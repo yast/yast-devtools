@@ -33,7 +33,12 @@
 %yast_build \
     %{_prefix}/bin/y2tool y2autoconf \
     %{_prefix}/bin/y2tool y2automake \
-    autoreconf --force --install \
+    \
+    # '-Wobsolete' exposes deprecated / obsolete Autotools-macros \
+    autoreconf \\\
+        --force \\\
+        --install \\\
+        -Wobsolete \
     \
     # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
     %configure \\\

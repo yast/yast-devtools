@@ -49,11 +49,12 @@
     fi \
     \
     # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
+    # '--disable-silent-rules'-switch overrides 'AM_SILENT_RULES(yes)' \
     %configure \\\
-        --disable-debug \
-    # V=1: verbose build in case we used AM_SILENT_RULES(yes) \
-    # so that RPM_OPT_FLAGS check works \
-    make %{?jobs:-j%jobs} V=1
+        --disable-debug \\\
+        --disable-silent-rules \
+    \
+    %make_build
 
 %yast_check \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \

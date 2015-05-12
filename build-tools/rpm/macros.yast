@@ -73,10 +73,19 @@
     fi
 
 %yast_desktop_files \
-    for f in `find %{buildroot}/%{yast_desktopdir}/ -name "*.desktop"` ; do \
-        d=${f##*/} \
-        %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
-    done
+    \
+    # on SUSE we use %%suse_update_desktop_file \
+    # other distris use %%{_bindir}/desktop-file-validate \
+    %if 0%{?suse_version} \
+        for f in $(%{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop') ; do \
+            d=${f##*/} \
+            %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
+        done \
+    %else  # 0%%{?suse_version} \
+        %{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -print0 \\\
+            -name '*.desktop' | %{_bindir}/sort -uz | \\\
+            %{_bindir}/xargs -0 %{_bindir}/desktop-file-validate \
+    %endif # 0%%{?suse_version}
 
 # install the yast module using autotools/make
 %yast_install \

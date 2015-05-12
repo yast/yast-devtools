@@ -68,12 +68,12 @@
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
         make check \\\
             VERBOSE=1 \\\
-            Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" \\\
-            DESTDIR="$RPM_BUILD_ROOT" \
+            Y2DIR="%{buildroot}/%{yast_dir}" \\\
+            DESTDIR="%{buildroot}" \
     fi
 
 %yast_desktop_files \
-    for f in `find $RPM_BUILD_ROOT/%{yast_desktopdir}/ -name "*.desktop"` ; do \
+    for f in `find %{buildroot}/%{yast_desktopdir}/ -name "*.desktop"` ; do \
         d=${f##*/} \
         %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
     done

@@ -62,7 +62,11 @@
         %yast_configure \
     fi \
     \
-    %make_build
+    %if "x%{?make_build}" != "x" \
+        %make_build \
+    %else  # "x%%{?make_build}" != "x" \
+        %{__make} %{?jobs:-j%jobs}%{?!jobs:%{?_smp_mflags:%_smp_mflags}} \
+    %endif # "x%%{?make_build}" != "x"
 
 %yast_check \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \

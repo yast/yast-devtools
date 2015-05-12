@@ -4,6 +4,7 @@ Tue May 12 14:29:38 CEST 2015 - besser82@fedoraproject.org
 - show warnings about problems with Autotools-setup
 - split generation of Autotools into %yast_prep
 - run configure with '--disable-silent-rules' and use %make_build
+- use fallback if %make_build is not defined
 - split './configure'-step into %yast_configure
 - add %yast_libdir
 - use macros instead of hardcoded paths

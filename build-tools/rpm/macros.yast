@@ -35,10 +35,9 @@
     %{_prefix}/bin/y2tool y2automake \
     autoreconf --force --install \
     \
-    export CFLAGS="$RPM_OPT_FLAGS -DNDEBUG" \
-    export CXXFLAGS="$RPM_OPT_FLAGS -DNDEBUG" \
-    \
-    %configure \
+    # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
+    %configure \\\
+        --disable-debug \
     # V=1: verbose build in case we used AM_SILENT_RULES(yes) \
     # so that RPM_OPT_FLAGS check works \
     make %{?jobs:-j%jobs} V=1

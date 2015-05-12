@@ -90,5 +90,10 @@
 # install the yast module using autotools/make
 %yast_install \
     %make_install \
-    %yast_check \
+    \
+    # on SUSE run %%yast_check within %%install \
+    # other distris may choose to run them during %%check \
+    %if 0%{?suse_version} || 0%{?yast_check_during_install} \
+        %yast_check \
+    %endif # 0%%{?suse_version} || 0%%{?yast_check_during_install} \
     %yast_desktop_files

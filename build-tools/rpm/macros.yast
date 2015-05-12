@@ -29,8 +29,8 @@
 %yast_execcompdir %{_prefix}/lib/YaST2
 %yast_agentdir %{yast_execcompdir}/servers_non_y2
 
-# build the yast module using autotools/make
-%yast_build \
+# prepare sources for build
+%yast_prep \
     %{_prefix}/bin/y2tool y2autoconf \
     %{_prefix}/bin/y2tool y2automake \
     \
@@ -38,7 +38,15 @@
     autoreconf \\\
         --force \\\
         --install \\\
-        -Wobsolete \
+        -Wobsolete
+
+# build the yast module using autotools/make
+%yast_build \
+    \
+    # has %%yast_prep been run already? \
+    if [ ! -x "./configure" ]; then \
+        %yast_prep \
+    fi \
     \
     # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
     %configure \\\

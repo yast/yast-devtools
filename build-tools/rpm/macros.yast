@@ -40,6 +40,14 @@
         --install \\\
         -Wobsolete
 
+%yast_configure \
+    \
+    # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
+    # '--disable-silent-rules'-switch overrides 'AM_SILENT_RULES(yes)' \
+    %configure \\\
+        --disable-debug \\\
+        --disable-silent-rules
+
 # build the yast module using autotools/make
 %yast_build \
     \
@@ -48,11 +56,10 @@
         %yast_prep \
     fi \
     \
-    # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
-    # '--disable-silent-rules'-switch overrides 'AM_SILENT_RULES(yes)' \
-    %configure \\\
-        --disable-debug \\\
-        --disable-silent-rules \
+    # has %%yast_configure been run already? \
+    if [ ! -f "./Makefile" ]; then \
+        %yast_configure \
+    fi \
     \
     %make_build
 

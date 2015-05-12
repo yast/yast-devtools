@@ -35,11 +35,11 @@
     %{_bindir}/y2tool y2autoconf \
     %{_bindir}/y2tool y2automake \
     \
-    # '-Wobsolete' exposes deprecated / obsolete Autotools-macros \
+    # '-Wall' exposes several possible problems with our Autotools-setup \
     %{_bindir}/autoreconf \\\
         --force \\\
         --install \\\
-        -Wobsolete
+        -Wall
 
 %yast_configure \
     \

@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Tue May 12 14:29:38 CEST 2015 - besser82@fedoraproject.org
 
-- show warnings about obsoleted Autotools-macros
+- show warnings about problems with Autotools-setup
 - split generation of Autotools into %yast_prep
 - run configure with '--disable-silent-rules' and use %make_build
 - split './configure'-step into %yast_configure

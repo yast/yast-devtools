@@ -84,9 +84,10 @@ fi
 
 echo "${self}: Copying automakefiles for inclusion"
 AMIS="$common `find $y2adminpath/aminclude -name \*.ami`"
+mkdir -p m4
 for AMI in $AMIS; do
-    cp -f $AMI .
-    chmod u+w ${AMI##*/}
+    cp -f $AMI m4
+    chmod u+w m4/${AMI##*/}
 done
 
 echo "${self}: Generating toplevel Makefile.am"

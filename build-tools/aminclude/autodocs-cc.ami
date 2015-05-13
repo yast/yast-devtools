@@ -8,7 +8,7 @@
 # PARAMETERS: (additional to those of autodocs-cc-base)
 #   AUTODOCS_SUBDIR: htmldir will be $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
 
-include $(top_srcdir)/autodocs-cc-base.ami
+include $(top_srcdir)/m4/autodocs-cc-base.ami
 
 htmldir = $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
 html_DATA = $(html_data)

@@ -11,9 +11,10 @@ configure: all
 all:
 	./build-tools/scripts/y2autoconf --bootstrap ./build-tools/
 	./build-tools/scripts/y2automake --bootstrap ./build-tools/
+	#use m4sh-script-dir obsoleting pre-generation of acinclude.m4
 	#ACLOCAL_AMFLAGS is recommended but we have a common Makefile.am
-	cat ./build-tools/aclocal/*.m4 > acinclude.m4
-	autoreconf -v --force --install
+	#cat ./build-tools/aclocal/*.m4 > acinclude.m4
+	autoreconf -v --force --install -Wall
 
 install: configure
 	make

@@ -2,7 +2,7 @@
 # common RPM macro definitions used by YaST
 #
 
-%yast_dir %{_prefix}/share/YaST2
+%yast_dir %{_datadir}/YaST2
 
 %yast_ydatadir %{yast_dir}/data
 %yast_imagedir %{yast_dir}/images
@@ -15,49 +15,89 @@
 %yast_controldir %{yast_dir}/control
 %yast_schemadir %{yast_dir}/schema
 %yast_scrconfdir %{yast_dir}/scrconf
-%yast_desktopdir %{_prefix}/share/applications/YaST2
+%yast_desktopdir %{_datadir}/applications/YaST2
 
 %yast_ybindir %{_prefix}/lib/YaST2/bin
 %yast_ystartupdir %{_prefix}/lib/YaST2
-%yast_plugindir %{_libdir}/YaST2/plugin
-%yast_includedir %{_prefix}/include/YaST2
-%yast_docdir %{_prefix}/share/doc/packages/%{name}
-%yast_logdir /var/log/YaST2
-%yast_vardir /var/lib/YaST2
-%yast_fillupdir /var/adm/fillup-templates
+%yast_libdir %{_libdir}/YaST2
+%yast_plugindir %{yast_libdir}/plugin
+%yast_includedir %{_includedir}/YaST2
+%yast_docdir %{_docdir}/%{name}
+%yast_logdir %{_localstatedir}/log/YaST2
+%yast_vardir %{_sharedstatedir}/YaST2
+%yast_fillupdir %{_localstatedir}/adm/fillup-templates
 
 %yast_execcompdir %{_prefix}/lib/YaST2
 %yast_agentdir %{yast_execcompdir}/servers_non_y2
 
-# build the yast module using autotools/make
-%yast_build \
-    %{_prefix}/bin/y2tool y2autoconf \
-    %{_prefix}/bin/y2tool y2automake \
-    autoreconf --force --install \
+# prepare sources for build
+%yast_prep \
+    %{_bindir}/y2tool y2autoconf \
+    %{_bindir}/y2tool y2automake \
+    \
+    # '-Wall' exposes several possible problems with our Autotools-setup \
+    %{_bindir}/autoreconf \\\
+        --force \\\
+        --install \\\
+        -Wall
+
+%yast_configure \
     \
     # '--disable-debug' adds '-DNDEBUG' to C(XX)FLAGS used by %%configure \
+    # '--disable-silent-rules'-switch overrides 'AM_SILENT_RULES(yes)' \
     %configure \\\
-        --disable-debug \
-    # V=1: verbose build in case we used AM_SILENT_RULES(yes) \
-    # so that RPM_OPT_FLAGS check works \
-    make %{?jobs:-j%jobs} V=1
+        --disable-debug \\\
+        --disable-silent-rules
+
+# build the yast module using autotools/make
+%yast_build \
+    \
+    # has %%yast_prep been run already? \
+    if [ ! -x "./configure" ]; then \
+        %yast_prep \
+    fi \
+    \
+    # has %%yast_configure been run already? \
+    if [ ! -f "./Makefile" ]; then \
+        %yast_configure \
+    fi \
+    \
+    %if "x%{?make_build}" != "x" \
+        %make_build \
+    %else  # "x%%{?make_build}" != "x" \
+        %{__make} %{?jobs:-j%jobs}%{?!jobs:%{?_smp_mflags:%_smp_mflags}} \
+    %endif # "x%%{?make_build}" != "x"
 
 %yast_check \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
-        make check \\\
+        %{__make} check \\\
             VERBOSE=1 \\\
-            Y2DIR="$RPM_BUILD_ROOT/%{yast_dir}" \\\
-            DESTDIR="$RPM_BUILD_ROOT" \
+            Y2DIR="%{buildroot}/%{yast_dir}" \\\
+            DESTDIR="%{buildroot}" \
     fi
 
 %yast_desktop_files \
-    for f in `find $RPM_BUILD_ROOT/%{yast_desktopdir}/ -name "*.desktop"` ; do \
-        d=${f##*/} \
-        %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
-    done
+    \
+    # on SUSE we use %%suse_update_desktop_file \
+    # other distris use %%{_bindir}/desktop-file-validate \
+    %if 0%{?suse_version} \
+        for f in $(%{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop') ; do \
+            d=${f##*/} \
+            %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
+        done \
+    %else  # 0%%{?suse_version} \
+        %{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -print0 \\\
+            -name '*.desktop' | %{_bindir}/sort -uz | \\\
+            %{_bindir}/xargs -0 %{_bindir}/desktop-file-validate \
+    %endif # 0%%{?suse_version}
 
 # install the yast module using autotools/make
 %yast_install \
     %make_install \
-    %yast_check \
+    \
+    # on SUSE run %%yast_check within %%install \
+    # other distris may choose to run them during %%check \
+    %if 0%{?suse_version} || 0%{?yast_check_during_install} \
+        %yast_check \
+    %endif # 0%%{?suse_version} || 0%%{?yast_check_during_install} \
     %yast_desktop_files

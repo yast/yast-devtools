@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 14 08:35:30 UTC 2015 - jreidinger@suse.com
+
+- revert incompatible change for vardir as it break yast2.rpm
+  build
+- 3.1.35
+
+-------------------------------------------------------------------
 Tue May 12 14:29:38 CEST 2015 - besser82@fedoraproject.org
 
 - show warnings about problems with Autotools-setup

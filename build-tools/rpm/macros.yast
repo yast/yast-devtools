@@ -19,8 +19,7 @@
 
 %yast_ybindir %{_prefix}/lib/YaST2/bin
 %yast_ystartupdir %{_prefix}/lib/YaST2
-%yast_libdir %{_libdir}/YaST2
-%yast_plugindir %{yast_libdir}/plugin
+%yast_plugindir %{_libdir}/YaST2/plugin
 %yast_includedir %{_includedir}/YaST2
 %yast_docdir %{_docdir}/%{name}
 %yast_logdir %{_localstatedir}/log/YaST2

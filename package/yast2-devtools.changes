@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 21 18:16:29 UTC 2015 - lslezak@suse.cz
+
+- y2makepot: do not create confusing _MISSING_TEXTDOMAIN_* files
+  (they cause for example rubocop check to fail)
+- 3.1.36
+
+-------------------------------------------------------------------
 Thu May 14 08:35:30 UTC 2015 - jreidinger@suse.com
 
 - revert incompatible change for vardir as it break yast2.rpm

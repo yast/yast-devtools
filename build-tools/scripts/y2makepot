@@ -126,8 +126,7 @@ function generate_potfiles()
     # $ERR contains the files without textdomain (see gettextdomains)
     echo
     for F in $ERR; do
-        echo "Warning: empty textdomain in $F" ;
-        echo $F > _MISSING_TEXTDOMAIN_`basename $F` ;
+        echo "** WARNING: Missing textdomain in file $F" 1>&2;
     done
     echo
 

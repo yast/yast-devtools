@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Sat May 23 11:40:33 CEST 2015 - besser82@fedoraproject.org
+
+- use m4sh-script-dir obsoleting pre-generation of acinclude.m4
+- add '-Wall'-flag to autoreconf in Makefile.cvs
+- updated gitignore
+- 3.1.37
+
+-------------------------------------------------------------------
 Thu May 21 18:16:29 UTC 2015 - lslezak@suse.cz
 
 - y2makepot: do not create confusing _MISSING_TEXTDOMAIN_* files

@@ -33,3 +33,8 @@ They are partly obsolete and are kept to be used as a base for a new
 documentation tool.
 They make sense only for a developer who is interested in generating
 new documentation.
+
+### [obs-tools](obs-tools)
+
+Tools used to manipulate with YaST repositories at [open build service](http://build.opensuse.org/).
+They make sense only for a developer with permissions to target repositories.

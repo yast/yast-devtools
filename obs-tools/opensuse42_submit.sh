@@ -6,7 +6,7 @@ for i in $LIST; do
   # compare if something is new by comparing binaries ( as version is part of rpm output )
   OS42=$(osc list -b openSUSE:42 $i -r standard -a x86_64)
   FACTORY=$(osc list -b openSUSE:Factory $i -r standard -a x86_64)
-  if [ $OS42 == $FACTORY ]; then
+  if [ "$OS42" == "$FACTORY" ]; then
      continue
   fi
   echo "submitting $i..."

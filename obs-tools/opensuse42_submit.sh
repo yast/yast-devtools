@@ -10,5 +10,5 @@ for i in $LIST; do
      continue
   fi
   echo "submitting $i..."
-  osc sr openSUSE:Factory $i openSUSE:42 -m "update of yast2"
+  osc sr openSUSE:Factory $i openSUSE:42 -m "opensuse42_submit.sh: update of yast2 related package to the SLE12SP1 version"
 done

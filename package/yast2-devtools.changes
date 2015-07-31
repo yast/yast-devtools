@@ -2,7 +2,7 @@
 Thu May 21 18:16:29 UTC 2015 - lslezak@suse.cz
 
 - y2makepot: do not create confusing _MISSING_TEXTDOMAIN_* files
-  (they cause for example rubocop check to fail)
+  (they cause for example rubocop check to fail) (bnc#940203)
 - 3.1.36
 
 -------------------------------------------------------------------

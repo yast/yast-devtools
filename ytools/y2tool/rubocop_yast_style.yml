@@ -88,3 +88,9 @@ Style/CaseIndentation:
 Style/NegatedIf:
   Enabled: false
 
+# allow more than 10 lines for methods
+Metrics/MethodLength:
+  Max: 50
+
+Metrics/ClassLength:
+  Max: 250

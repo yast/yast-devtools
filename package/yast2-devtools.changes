@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  5 06:22:46 UTC 2015 - lslezak@suse.cz
+
+- integrate the common rubocop.yml file for the SUSE Ruby style
+  (bsc#940571)
+- 3.1.37
+
+-------------------------------------------------------------------
 Thu May 21 18:16:29 UTC 2015 - lslezak@suse.cz
 
 - y2makepot: do not create confusing _MISSING_TEXTDOMAIN_* files

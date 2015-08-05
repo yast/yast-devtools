@@ -1,32 +1,80 @@
-# Rubocop style configuration
+################################################################################
 #
-# Following
-# https://github.com/SUSE/style-guides/blob/master/Ruby.md
+# This part contains the shared Rubocop configuration for SUSE projects. It is
+# maintained at https://github.com/SUSE/style-guides/blob/master/rubocop-suse.yml
+#
+# NOTE: some rules have been commented out, see the YaST specific changes
+#       at the end of the file!
+#
+################################################################################
 
-# https://github.com/SUSE/style-guides/blob/master/Ruby.md#strings
+# Disabled, would require too many changes in the current code
+#Lint/EndAlignment:
+# StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
+#  AlignWith: variable
+
+Metrics/AbcSize:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricsabcsize
+  Max: 30
+
+Metrics/LineLength:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricslinelength
+  Max: 100
+  # To make it possible to copy or click on URIs in the code, we allow lines
+  # contaning a URI to be longer than Max.
+  AllowURI: true
+  URISchemes:
+    - http
+    - https
+
+Style/AlignHash:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylealignhash
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+# Disabled, see the YaST default at the end of the file
+#Style/AlignParameters:
+#  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylealignparameters
+#  Enabled: false
+
+Style/CollectionMethods:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylecollectionmethods
+  Enabled: false
+
+Style/EmptyLinesAroundBlockBody:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#styleemptylinesaroundblockbody
+  Enabled: false
+
+Style/MultilineOperationIndentation:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylemultilineoperationindentation
+  EnforcedStyle: indented
+
 Style/StringLiterals:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylestringliterals
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylestringliteralsininterpolation
   EnforcedStyle: double_quotes
 
-# Is there any justification for "aligned" which is the default?
-Style/MultilineOperationIndentation:
-  EnforcedStyle: indented
-
-# https://github.com/SUSE/style-guides/blob/master/Ruby.md#arrays
 Style/WordArray:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#deviations-from-the-upstream-style-guide
   Enabled: false
 
-# align arrows:
-# "foo"     => true
-# "foo_bar" => false
-# and also colons:
-# foo:     true
-# foo_bar: false
-Style/AlignHash:
-  EnforcedHashRocketStyle: table
-  EnforcedColonStyle: table
+Style/RegexpLiteral:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#deviations-from-the-upstream-style-guide
+  Enabled: false
+
+Style/SignalException:
+  StyleGuide: https://github.com/bbatsov/ruby-style-guide#fail-method
+  EnforcedStyle: only_raise
+
+
+################################################################################
+#
+# This part contains the YaST specific changes to the shared SUSE configuration
+#
+################################################################################
 
 # no extra indentation for multiline function calls
 Style/AlignParameters:
@@ -40,10 +88,3 @@ Style/CaseIndentation:
 Style/NegatedIf:
   Enabled: false
 
-# use "raise" instead of "fail"
-Style/SignalException:
-  EnforcedStyle: only_raise
-
-# do not force %r
-Style/RegexpLiteral:
-  Enabled: false

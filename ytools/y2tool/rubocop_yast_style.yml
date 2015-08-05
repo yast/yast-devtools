@@ -90,7 +90,7 @@ Style/NegatedIf:
 
 # allow more than 10 lines for methods
 Metrics/MethodLength:
-  Max: 50
+  Max: 30
 
 Metrics/ClassLength:
   Max: 250

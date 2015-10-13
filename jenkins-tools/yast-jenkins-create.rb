@@ -8,8 +8,8 @@ require "yaml"
 # modify JOB_NAME_PATTERN before use to specify pattern of job to delete
 
 conf = YAML.load(File.read("jenkins.yml"))
-USER = conf["user"]
-PWD  = conf["pwd"]
+USER = conf["username"]
+PWD  = conf["password"]
 URL_BASE = "https://#{USER}:#{PWD}@ci.opensuse.org"
 #URL_BASE = "http://river.suse.de"
 

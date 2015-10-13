@@ -1,2 +1,4 @@
-user: <jenkins_username>
-pwd: <jenkins_password>
+---
+server_ip: <server>
+username: <username>
+password: <password>

@@ -6,8 +6,8 @@
 require "yaml"
 
 conf = YAML.load(File.read("jenkins.yml"))
-USER = conf["user"]
-PWD  = conf["pwd"]
+USER = conf["username"]
+PWD  = conf["password"]
 URL_BASE = "https://#{USER}:#{PWD}@ci.opensuse.org"
 #URL_BASE = "http://river.suse.de"
 # %s is replaced by arguments passed to program

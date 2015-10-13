@@ -8,8 +8,8 @@ require "yaml"
 # modify JOB_NAME_PATTERN before use to specify pattern of job to delete
 
 conf = YAML.load(File.read("jenkins.yml"))
-USER = conf["user"]
-PWD  = conf["pwd"]
+USER = conf["username"]
+PWD  = conf["password"]
 
 # %s is replaced by arguments passed to program
 JOB_NAME_PATTERN = "yast-%s-master"

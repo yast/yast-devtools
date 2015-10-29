@@ -1,29 +1,30 @@
 #!/usr/bin/env ruby
 
-# optional argument for source commit, if not specified use master
-# create_maintenance.rb # creates branch for master
-# create_maintenance.rb abcdef # creates branch from commit abcdef
-
-# - Create maintenance branch BRANCH_NAME
+# - Create maintenance branch
 # - Edit Rakefile to build and submit to corresponding projects
 # - Commit and push
 
-# constants for tuning script to create desired branch
-BRANCH_NAME="openSUSE-13_2"
-USE_IBS=false
-DEVEL_PROJECT="YaST:openSUSE:13.2"
-TARGET_PROJECT="openSUSE:13.2:Update"
-BUILD_TARGET="openSUSE_13.2"
-
-# start of non-configuration part
-CONF_OPTIONS = {
-  "obs_project"    => DEVEL_PROJECT,
-  "obs_sr_project" => TARGET_PROJECT,
-  "obs_target"     => BUILD_TARGET,
-  "obs_api"        => USE_IBS ? "https://api.suse.de/" : "https://api.opensuse.org"
-}
-
 require "cheetah"
+
+if ARGV.size < 2
+  STDERR.puts <<EOS
+Bad arguments
+
+First argument: name of the branch
+Second argument: name of the target as recognized by yast-rake, see
+                 https://github.com/yast/yast-rake/blob/master/data/targets.yml
+Third argument (optional): source commit, if not specified use master
+
+Examples:
+#{File.basename($0)} SLE-12-SP1 sle12sp1 # creates branch for master
+#{File.basename($0)} SLE-12-SP1 sle12sp1 abcdef # creates branch from commit abcdef
+EOS
+  exit(1)
+end
+
+BRANCH_NAME = ARGV[0]
+TARGET = ARGV[1]
+SOURCE_COMMIT = ARGV[2] || "origin/master"
 
 # by default pass output of commands to stdout and stderr
 Cheetah.default_options = { :stdout => STDOUT, :stderr => STDERR }
@@ -45,25 +46,14 @@ def modify_rakefile
   raise "Cannot find Rakefile in pwd" unless File.exist?("Rakefile")
 
   lines = File.readlines("Rakefile")
-  conf_line = lines.grep(/Yast::Tasks.configuration do/).first
-  if conf_line
-    conf_var = conf_line[/do \|\s*(\S+)\s*\|/, 1]
-    line_index = lines.index(conf_line)
-  else
-    line_index = 2
-    conf_var = "conf"
-    conf_line = "Yast::Tasks.configuration do |#{conf_var}|\n"
-    lines.insert(line_index, conf_line, "end\n")
-  end
+  submit_to = "Yast::Tasks.submit_to"
 
-  CONF_OPTIONS.each do |key, value|
-    config_line = lines.grep(/#{conf_var}\.#{key}\s*=/).first
-    new_line = "  #{conf_var}.#{key} = #{value.inspect}\n"
-    if config_line
-      lines[lines.index(config_line)] = new_line
-    else
-      lines.insert(line_index + 1, new_line)
-    end
+  new_line = "#{submit_to} \"#{TARGET}\"\n"
+  line_index = lines.index {|l| l =~ /#{submit_to}/ }
+  if line_index
+    lines[line_index] = new_line
+  else
+    lines.insert(2, new_line, "\n")
   end
 
   File.write("Rakefile", lines.join(""))
@@ -76,15 +66,12 @@ if already_exists?
   exit 0
 end
 
-# allow to branch from non master
-source_commit = ARGV.empty? ? "origin/master" : ARGV.first
-
 #switch to master branch
 Cheetah.run "git", "checkout", "master"
 
 #create new branch ( ensure we use the latest non modified pushed version )
 Cheetah.run "git", "fetch", "origin"
-Cheetah.run "git", "branch", BRANCH_NAME, source_commit
+Cheetah.run "git", "branch", BRANCH_NAME, SOURCE_COMMIT
 Cheetah.run "git", "checkout", BRANCH_NAME
 
 modify_rakefile

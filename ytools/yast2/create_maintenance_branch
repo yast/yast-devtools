@@ -8,21 +8,18 @@
 # - Edit Rakefile to build and submit to corresponding projects
 # - Commit and push
 
+#
 # constants for tuning script to create desired branch
-BRANCH_NAME="openSUSE-13_2"
-USE_IBS=false
-DEVEL_PROJECT="YaST:openSUSE:13.2"
-TARGET_PROJECT="openSUSE:13.2:Update"
-BUILD_TARGET="openSUSE_13.2"
+#
+BRANCH_NAME="openSUSE-42_1"
+# See https://github.com/yast/yast-rake/blob/master/data/targets.yml
+TARGET="leap_42_1"
+# Individual config options are not usually needed now that we have submit_to
+CONF_OPTIONS = {}
 
+#
 # start of non-configuration part
-CONF_OPTIONS = {
-  "obs_project"    => DEVEL_PROJECT,
-  "obs_sr_project" => TARGET_PROJECT,
-  "obs_target"     => BUILD_TARGET,
-  "obs_api"        => USE_IBS ? "https://api.suse.de/" : "https://api.opensuse.org"
-}
-
+#
 require "cheetah"
 
 # by default pass output of commands to stdout and stderr
@@ -45,24 +42,36 @@ def modify_rakefile
   raise "Cannot find Rakefile in pwd" unless File.exist?("Rakefile")
 
   lines = File.readlines("Rakefile")
-  conf_line = lines.grep(/Yast::Tasks.configuration do/).first
-  if conf_line
-    conf_var = conf_line[/do \|\s*(\S+)\s*\|/, 1]
-    line_index = lines.index(conf_line)
+  submit_to = "Yast::Tasks.submit_to"
+
+  new_line = "#{submit_to} \"#{TARGET}\"\n"
+  line_index = lines.index {|l| l =~ /#{submit_to}/ }
+  if line_index
+    lines[line_index] = new_line
   else
-    line_index = 2
-    conf_var = "conf"
-    conf_line = "Yast::Tasks.configuration do |#{conf_var}|\n"
-    lines.insert(line_index, conf_line, "end\n")
+    lines.insert(2, new_line, "\n")
   end
 
-  CONF_OPTIONS.each do |key, value|
-    config_line = lines.grep(/#{conf_var}\.#{key}\s*=/).first
-    new_line = "  #{conf_var}.#{key} = #{value.inspect}\n"
-    if config_line
-      lines[lines.index(config_line)] = new_line
+  if !CONF_OPTIONS.empty?
+    conf_line = lines.grep(/Yast::Tasks.configuration do/).first
+    if conf_line
+      conf_var = conf_line[/do \|\s*(\S+)\s*\|/, 1]
+      line_index = lines.index(conf_line)
     else
-      lines.insert(line_index + 1, new_line)
+      line_index = lines.index {|l| l =~ /#{submit_to}/ } + 1
+      conf_var = "conf"
+      conf_line = "Yast::Tasks.configuration do |#{conf_var}|\n"
+      lines.insert(line_index, conf_line, "end\n")
+    end
+
+    CONF_OPTIONS.each do |key, value|
+      config_line = lines.grep(/#{conf_var}\.#{key}\s*=/).first
+      new_line = "  #{conf_var}.#{key} = #{value.inspect}\n"
+      if config_line
+        lines[lines.index(config_line)] = new_line
+      else
+        lines.insert(line_index + 1, new_line)
+      end
     end
   end
 

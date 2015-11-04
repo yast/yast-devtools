@@ -23,7 +23,7 @@ EOS
 end
 
 BRANCH_NAME = ARGV[0]
-TARGET = ARGV[1]
+TARGET = ARGV[1].delete(":")
 SOURCE_COMMIT = ARGV[2] || "origin/master"
 
 # by default pass output of commands to stdout and stderr
@@ -48,7 +48,7 @@ def modify_rakefile
   lines = File.readlines("Rakefile")
   submit_to = "Yast::Tasks.submit_to"
 
-  new_line = "#{submit_to} \"#{TARGET}\"\n"
+  new_line = "#{submit_to} :#{TARGET}\n"
   line_index = lines.index {|l| l =~ /#{submit_to}/ }
   if line_index
     lines[line_index] = new_line

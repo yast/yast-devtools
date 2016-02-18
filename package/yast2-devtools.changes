@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Feb  9 15:31:34 UTC 2016 - lslezak@suse.cz
+
+- YaST RPM macros - add support for Rake based packages, optionally
+  run additional tests (used at Jenkins CI builds)
+- 3.1.39
+
+-------------------------------------------------------------------
 Wed Aug  5 16:57:29 CEST 2015 - shundhammer@suse.de
 
 - reasonable defaults for method and class lengths in rubocop.yml

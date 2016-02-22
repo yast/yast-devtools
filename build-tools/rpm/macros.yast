@@ -67,13 +67,35 @@
         %{__make} %{?jobs:-j%jobs}%{?!jobs:%{?_smp_mflags:%_smp_mflags}} \
     %endif # "x%%{?make_build}" != "x"
 
+# Run the tests, when "--with=yast_run_ci_tests" osc option is set some
+# additional tests are executed (rubocop, spell check...).
 %yast_check \
-    if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
+    %if %{with yast_run_ci_tests} \
+    if [ -f "configure.in.in" ]; then \
+        # TODO: fix the check:ci task to also work with autotools based modules \
         %{__make} check \\\
             VERBOSE=1 \\\
             Y2DIR="%{buildroot}/%{yast_dir}" \\\
             DESTDIR="%{buildroot}" \
-    fi
+    elif [ -f "Rakefile" ]; then \
+        # TODO: coveralls support \
+        LC_ALL=en_US.UTF-8 rake --verbose --trace check:ci \
+    fi \
+    %else \
+    if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
+        if [ -f "configure.in.in" ]; then \
+            %{__make} check \\\
+                VERBOSE=1 \\\
+                Y2DIR="%{buildroot}/%{yast_dir}" \\\
+                DESTDIR="%{buildroot}" \
+        elif [ -f "Rakefile" ]; then \
+            rake test:unit \
+        else \
+            echo "Cannot run tests, no configure.in.in or Rakefile found" 1>&2 \
+            exit 1 \
+        fi \
+    fi \
+    %endif
 
 %yast_desktop_files \
     \
@@ -92,11 +114,17 @@
 
 # install the yast module using autotools/make
 %yast_install \
-    %make_install \
-    \
-    # on SUSE run %%yast_check within %%install \
-    # other distris may choose to run them during %%check \
-    %if 0%{?suse_version} || 0%{?yast_check_during_install} \
-        %yast_check \
-    %endif # 0%%{?suse_version} || 0%%{?yast_check_during_install} \
-    %yast_desktop_files
+    if [ -f "configure.in.in" ]; then \
+      %make_install \
+      # on SUSE run %%yast_check within %%install \
+      # other distris may choose to run them during %%check \
+      %if 0%{?suse_version} || 0%{?yast_check_during_install} \
+          %yast_check \
+      %endif # 0%%{?suse_version} || 0%%{?yast_check_during_install} \
+    elif [ -f "Rakefile" ]; then \
+      rake install DESTDIR="%{buildroot}" \
+    else \
+        echo "Cannot install the package, no configure.in.in or Rakefile found" 1>&2 \
+        exit 1 \
+    fi \
+    %yast_desktop_files \

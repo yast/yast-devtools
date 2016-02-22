@@ -79,7 +79,7 @@
             DESTDIR="%{buildroot}" \
     elif [ -f "Rakefile" ]; then \
         # TODO: coveralls support \
-        LC_ALL=en_US.utf8 rake --verbose --trace check:ci \
+        LC_ALL=en_US.UTF-8 rake --verbose --trace check:ci \
     fi \
     %else \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \

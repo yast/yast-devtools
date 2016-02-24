@@ -2,7 +2,7 @@
 Wed Feb 24 09:33:57 UTC 2016 - lslezak@suse.cz
 
 - YaST RPM macros - fix for the previous change: some packages
-  use configure.ac.in instead of the old configure.in.in
+  use configure.ac.in instead of the old configure.in.in (bsc#968002)
 - 3.1.40
 
 -------------------------------------------------------------------

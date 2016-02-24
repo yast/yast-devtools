@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Feb 24 09:33:57 UTC 2016 - lslezak@suse.cz
+
+- YaST RPM macros - fix for the previous change: some packages
+  use configure.ac.in instead of the old configure.in.in
+- 3.1.40
+
+-------------------------------------------------------------------
 Tue Feb  9 15:31:34 UTC 2016 - lslezak@suse.cz
 
 - YaST RPM macros - add support for Rake based packages, optionally

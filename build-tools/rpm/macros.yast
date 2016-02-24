@@ -71,7 +71,7 @@
 # additional tests are executed (rubocop, spell check...).
 %yast_check \
     %if %{with yast_run_ci_tests} \
-    if [ -f "configure.in.in" ]; then \
+    if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
         # TODO: fix the check:ci task to also work with autotools based modules \
         %{__make} check \\\
             VERBOSE=1 \\\
@@ -83,7 +83,7 @@
     fi \
     %else \
     if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
-        if [ -f "configure.in.in" ]; then \
+        if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
             %{__make} check \\\
                 VERBOSE=1 \\\
                 Y2DIR="%{buildroot}/%{yast_dir}" \\\
@@ -91,7 +91,7 @@
         elif [ -f "Rakefile" ]; then \
             rake test:unit \
         else \
-            echo "Cannot run tests, no configure.in.in or Rakefile found" 1>&2 \
+            echo "Cannot run tests, no configure.{ac|in}.in or Rakefile found" 1>&2 \
             exit 1 \
         fi \
     fi \
@@ -114,7 +114,7 @@
 
 # install the yast module using autotools/make
 %yast_install \
-    if [ -f "configure.in.in" ]; then \
+    if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
       %make_install \
       # on SUSE run %%yast_check within %%install \
       # other distris may choose to run them during %%check \
@@ -124,7 +124,7 @@
     elif [ -f "Rakefile" ]; then \
       rake install DESTDIR="%{buildroot}" \
     else \
-        echo "Cannot install the package, no configure.in.in or Rakefile found" 1>&2 \
+        echo "Cannot install the package, no configure.{ac|in}.in or Rakefile found" 1>&2 \
         exit 1 \
     fi \
     %yast_desktop_files \

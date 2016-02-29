@@ -77,28 +77,28 @@ fi \
 # additional tests are executed (rubocop, spell check...).
 %yast_check \
     %if %{with yast_run_ci_tests} \
-    if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
-        # TODO: fix the check:ci task to also work with autotools based modules \
-        %{__make} check \\\
-            VERBOSE=1 \\\
-            Y2DIR="%{buildroot}/%{yast_dir}" \\\
-            DESTDIR="%{buildroot}" \
-    fi \
-    %yast_ci_check \
+      if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
+          # TODO: fix the check:ci task to also work with autotools based modules \
+          %{__make} check \\\
+              VERBOSE=1 \\\
+              Y2DIR="%{buildroot}/%{yast_dir}" \\\
+              DESTDIR="%{buildroot}" \
+      fi \
+      %yast_ci_check \
     %else \
-    if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
-        if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
-            %{__make} check \\\
-                VERBOSE=1 \\\
-                Y2DIR="%{buildroot}/%{yast_dir}" \\\
-                DESTDIR="%{buildroot}" \
-        elif [ -f "Rakefile" ]; then \
-            rake test:unit \
-        else \
-            echo "Cannot run tests, no configure.{ac|in}.in or Rakefile found" 1>&2 \
-            exit 1 \
-        fi \
-    fi \
+      if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
+          if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
+              %{__make} check \\\
+                  VERBOSE=1 \\\
+                  Y2DIR="%{buildroot}/%{yast_dir}" \\\
+                  DESTDIR="%{buildroot}" \
+          elif [ -f "Rakefile" ]; then \
+              rake test:unit \
+          else \
+              echo "Cannot run tests, no configure.{ac|in}.in or Rakefile found" 1>&2 \
+              exit 1 \
+          fi \
+      fi \
     %endif
 
 %yast_desktop_files \

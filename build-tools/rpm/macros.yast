@@ -67,34 +67,38 @@
         %{__make} %{?jobs:-j%jobs}%{?!jobs:%{?_smp_mflags:%_smp_mflags}} \
     %endif # "x%%{?make_build}" != "x"
 
+# TODO: coveralls support
+%yast_ci_check \
+if [ -f "Rakefile" ]; then \
+    LC_ALL=en_US.UTF-8 rake --verbose --trace check:ci \
+fi \
+
 # Run the tests, when "--with=yast_run_ci_tests" osc option is set some
 # additional tests are executed (rubocop, spell check...).
 %yast_check \
     %if %{with yast_run_ci_tests} \
-    if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
-        # TODO: fix the check:ci task to also work with autotools based modules \
-        %{__make} check \\\
-            VERBOSE=1 \\\
-            Y2DIR="%{buildroot}/%{yast_dir}" \\\
-            DESTDIR="%{buildroot}" \
-    elif [ -f "Rakefile" ]; then \
-        # TODO: coveralls support \
-        LC_ALL=en_US.UTF-8 rake --verbose --trace check:ci \
-    fi \
+      if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
+          # TODO: fix the check:ci task to also work with autotools based modules \
+          %{__make} check \\\
+              VERBOSE=1 \\\
+              Y2DIR="%{buildroot}/%{yast_dir}" \\\
+              DESTDIR="%{buildroot}" \
+      fi \
+      %yast_ci_check \
     %else \
-    if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
-        if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
-            %{__make} check \\\
-                VERBOSE=1 \\\
-                Y2DIR="%{buildroot}/%{yast_dir}" \\\
-                DESTDIR="%{buildroot}" \
-        elif [ -f "Rakefile" ]; then \
-            rake test:unit \
-        else \
-            echo "Cannot run tests, no configure.{ac|in}.in or Rakefile found" 1>&2 \
-            exit 1 \
-        fi \
-    fi \
+      if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
+          if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
+              %{__make} check \\\
+                  VERBOSE=1 \\\
+                  Y2DIR="%{buildroot}/%{yast_dir}" \\\
+                  DESTDIR="%{buildroot}" \
+          elif [ -f "Rakefile" ]; then \
+              rake test:unit \
+          else \
+              echo "Cannot run tests, no configure.{ac|in}.in or Rakefile found" 1>&2 \
+              exit 1 \
+          fi \
+      fi \
     %endif
 
 %yast_desktop_files \
@@ -120,6 +124,9 @@
       # other distris may choose to run them during %%check \
       %if 0%{?suse_version} || 0%{?yast_check_during_install} \
           %yast_check \
+          %if %{with yast_run_ci_tests} \
+              %yast_ci_check \
+          %endif \
       %endif # 0%%{?suse_version} || 0%%{?yast_check_during_install} \
     elif [ -f "Rakefile" ]; then \
       rake install DESTDIR="%{buildroot}" \

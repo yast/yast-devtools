@@ -126,3 +126,10 @@ Metrics/ClassLength:
 Style/TrivialAccessors:
  # predicates cannot be done with accessors
  AllowPredicates: true
+
+# Allow using and/or for driving code flow as its original intention.
+# Forbid it only in conditionals
+# So this rule allow something like
+# a = action_a or raise "Cannot do a"
+Style/AndOr:
+  EnforcedStyle: conditionals

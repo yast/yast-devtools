@@ -133,3 +133,43 @@ Style/TrivialAccessors:
 # a = action_a or raise "Cannot do a"
 Style/AndOr:
   EnforcedStyle: conditionals
+
+# Access modified afect globally all following method definition, so
+# it deserve bigger visibility then hiddin in method definition block.
+# for that reason we found better style:
+# class C
+#   trash
+#   ....
+#   ...
+#
+# private
+#
+#   ....
+#   trash
+#   ...
+# end
+#
+# then style where access modifier can be easier to overlook in longer class:
+# class C
+#   trash
+#   ....
+#   ...
+#
+#   private
+#
+#   ....
+#   trash
+#   ...
+# end
+Style/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
+# Forcing ascii only comments prevents examples in code that deal with UTF
+# strings so we allow using it
+Style/AsciiComments:
+  Enabled: false
+
+# YaST code still have to deal with types in component system, so we allow
+# double negation to enforce boolean value
+Style/DoubleNegation:
+  Enabled: false

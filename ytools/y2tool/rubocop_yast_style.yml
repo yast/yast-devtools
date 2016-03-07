@@ -69,6 +69,7 @@ Style/SignalException:
   StyleGuide: https://github.com/bbatsov/ruby-style-guide#fail-method
   EnforcedStyle: only_raise
 
+# Do not require an underscore each three digits. Both 65536 and 65_536 are allowed.
 Style/NumericLiterals:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylenumericliterals
   Enabled: false
@@ -81,7 +82,18 @@ Style/NumericLiterals:
 
 # no extra indentation for multiline function calls.
 # Reason is that some legacy ruby API call have a lot of parameters and it makes
-# looking it ugly. Especially UI constructions with helpers.
+# looking it ugly. Especially UI constructions with helpers cannot fit into line
+# lenght.
+# required style ( and by default forbidden by rubocop ):
+#
+# SmartClass.smart_method(boring_parameter1, boring_parameter2,
+#   boring_parameter3, boring_parameter4)
+#
+# forbidden style ( require by default by rubocop )
+#
+# SmartClass.smart_method(boring_parameter1, boring_parameter2,
+#                         boring_parameter3, boring_parameter4)
+#
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
@@ -109,7 +121,7 @@ Style/AlignParameters:
 Style/CaseIndentation:
   IndentWhenRelativeTo: end
 
-# "unless" has a different connotation than "if not"
+# "unless" has a different connotation than "if not" so disable this check
 Style/NegatedIf:
   Enabled: false
 
@@ -121,44 +133,54 @@ Metrics/MethodLength:
 Metrics/ClassLength:
   Max: 250
 
-# YaST use older rubocop that do not have allow predicates as default to true,
-# so explicitelly allow it for older ones
+# YaST use older rubocop that does not allow predicates by default,
+# so explicitly allow it for older ones
 Style/TrivialAccessors:
  # predicates cannot be done with accessors
+ # Offense, a trivial accessor:
+ #
+ #    def favorite_color
+ #      @favorite_color
+ #    end
+ #
+ # No offense, a predicate:
+ #
+ #    def unladen_swallow?
+ #      @unladen_swallow
+ #    end
+ #
  AllowPredicates: true
 
 # Allow using and/or for driving code flow as its original intention.
 # Forbid it only in conditionals
 # So this rule allow something like
+#
 # a = action_a or raise "Cannot do a"
+#
+# and forbids ( due to confusing operator precedence for work-flow and/or )
+#
+# if a == 5 and b == 6
+#
 Style/AndOr:
   EnforcedStyle: conditionals
 
-# Access modified afect globally all following method definition, so
+# Access modified affect globally all following method definition, so
 # it deserve bigger visibility then hiddin in method definition block.
 # for that reason we found better style:
 # class C
-#   trash
-#   ....
 #   ...
 #
 # private
 #
-#   ....
-#   trash
 #   ...
 # end
 #
 # then style where access modifier can be easier to overlook in longer class:
 # class C
-#   trash
-#   ....
 #   ...
 #
 #   private
 #
-#   ....
-#   trash
 #   ...
 # end
 Style/AccessModifierIndentation:
@@ -171,5 +193,9 @@ Style/AsciiComments:
 
 # YaST code still have to deal with types in component system, so we allow
 # double negation to enforce boolean value
+# so this change allow code
+#
+# return !!result
+#
 Style/DoubleNegation:
   Enabled: false

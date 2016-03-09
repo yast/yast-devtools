@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# lists all repos for a organization 
-# arguments: organization
-
-curl -s http://github.com/api/v2/json/repos/show/${1} sed -e 's/[{}]/''/g' | awk -v RS=',"' -F: '/^name/ {print $2}' |  tr '\n' " " | sed -e 's/"//g' -e 's/,/ /g'

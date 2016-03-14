@@ -23,6 +23,15 @@
   </xsl:element>
 </xsl:template>
 
+<!-- comments for translators -->
+<!-- match a comment immediately preceding a <label>,
+     see http://stackoverflow.com/questions/2613159/xslt-and-xpath-match-preceding-comments -->
+<xsl:template match="comment()[following-sibling::*[1]/self::n:label]">
+  <xsl:copy>
+    <xsl:apply-templates/>
+  </xsl:copy>
+</xsl:template>
+
 <!--
   replace the root <productDefines> element by <interface>
   due to namespace it cannot be used literally

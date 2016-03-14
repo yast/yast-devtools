@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar 14 13:52:04 UTC 2016 - mvidner@suse.com
+
+- y2makepot: copy also comments for translators from control.xml
+  (FATE#317481)
+- 3.1.41
+
+-------------------------------------------------------------------
 Wed Feb 24 09:33:57 UTC 2016 - lslezak@suse.cz
 
 - YaST RPM macros - fix for the previous change: some packages

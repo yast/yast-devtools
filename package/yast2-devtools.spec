@@ -54,8 +54,6 @@ Requires:       autoconf
 Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
-# for building Ruby autodocs
-Requires:       rubygem(%{rb_default_ruby_abi}:yard)
 
 %if 0%{?suse_version} <= 1230
 # extra package for yard Markdown formatting in openSUSE <= 12.3

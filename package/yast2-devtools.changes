@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jun  3 12:13:51 UTC 2016 - igonzalezsosa@suse.com
+
+- Remove yard dependency as *-devel-doc packages are not being
+  generated anymore.
+
+-------------------------------------------------------------------
 Mon Mar 14 13:52:04 UTC 2016 - mvidner@suse.com
 
 - y2makepot: copy also comments for translators from control.xml

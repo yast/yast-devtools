@@ -10,8 +10,11 @@
 
 # Disabled, would require too many changes in the current code
 #Lint/EndAlignment:
-# StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
+#  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
 #  AlignWith: variable
+
+AllCops:
+  TargetRubyVersion: 2.1
 
 Metrics/AbcSize:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricsabcsize
@@ -199,3 +202,46 @@ Style/AsciiComments:
 #
 Style/DoubleNegation:
   Enabled: false
+
+# New Rubocop uses a different default ("special_inside_parentheses")
+# which adds too much indentation in some cases. Use the backward compatible value.
+Style/IndentArray:
+  EnforcedStyle: consistent
+
+# Use the backward compatible default
+Lint/EndAlignment:
+  AlignWith: start_of_line
+
+#  Allow block.call:
+#
+#  def foo(&block)
+#    var = block,call
+#    ...
+#
+# is better readable than
+#
+#  def foo
+#    var = yield
+#    ...
+#
+#  athough it is a bit slower
+Performance/RedundantBlockCall:
+  Enabled: false
+
+# Use the backward compatible default
+Style/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+# Do not check the module length, the YCP converted includes
+# are usually too long.
+Metrics/ModuleLength:
+  Enabled: false
+
+# Disable the "foo.size == 0" check, Yast::Term does not provide #empty?
+Style/ZeroLengthPredicate:
+  Enabled: false
+
+# Use the backward compatible default
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
+

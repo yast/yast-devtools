@@ -8,10 +8,9 @@
 #
 ################################################################################
 
-# Disabled, would require too many changes in the current code
-#Lint/EndAlignment:
-#  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
-#  AlignWith: variable
+Lint/EndAlignment:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
+  AlignWith: variable
 
 AllCops:
   TargetRubyVersion: 2.1
@@ -231,15 +230,6 @@ Performance/RedundantBlockCall:
 # Use the backward compatible default
 Style/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-
-# Do not check the module length, the YCP converted includes
-# are usually too long.
-Metrics/ModuleLength:
-  Enabled: false
-
-# Disable the "foo.size == 0" check, Yast::Term does not provide #empty?
-Style/ZeroLengthPredicate:
-  Enabled: false
 
 # Use the backward compatible default
 Style/MultilineOperationIndentation:

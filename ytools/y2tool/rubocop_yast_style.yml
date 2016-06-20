@@ -207,10 +207,6 @@ Style/DoubleNegation:
 Style/IndentArray:
   EnforcedStyle: consistent
 
-# Use the backward compatible default
-Lint/EndAlignment:
-  AlignWith: start_of_line
-
 #  Allow block.call:
 #
 #  def foo(&block)
@@ -226,12 +222,4 @@ Lint/EndAlignment:
 #  athough it is a bit slower
 Performance/RedundantBlockCall:
   Enabled: false
-
-# Use the backward compatible default
-Style/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-
-# Use the backward compatible default
-Style/MultilineOperationIndentation:
-  EnforcedStyle: indented
 

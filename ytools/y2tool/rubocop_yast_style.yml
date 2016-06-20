@@ -202,15 +202,10 @@ Style/AsciiComments:
 Style/DoubleNegation:
   Enabled: false
 
-# New Rubocop uses a different default ("special_inside_parentheses")
-# which adds too much indentation in some cases. Use the backward compatible value.
-Style/IndentArray:
-  EnforcedStyle: consistent
-
-#  Allow block.call:
+# Allow block.call:
 #
 #  def foo(&block)
-#    var = block,call
+#    var = block.call
 #    ...
 #
 # is better readable than
@@ -219,7 +214,7 @@ Style/IndentArray:
 #    var = yield
 #    ...
 #
-#  athough it is a bit slower
+# although it is a bit slower
 Performance/RedundantBlockCall:
   Enabled: false
 

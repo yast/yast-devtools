@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jul 13 13:49:59 UTC 2016 - lslezak@suse.cz
+
+- Update the Rubocop config so YaST can use a new Rubocop version
+  (0.41.x) (bsc#988759)
+- 3.1.42
+
+-------------------------------------------------------------------
 Fri Jun  3 12:13:51 UTC 2016 - igonzalezsosa@suse.com
 
 - Remove yard dependency as *-devel-doc packages are not being

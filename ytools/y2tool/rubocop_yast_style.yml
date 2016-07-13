@@ -8,10 +8,12 @@
 #
 ################################################################################
 
-# Disabled, would require too many changes in the current code
-#Lint/EndAlignment:
-# StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
-#  AlignWith: variable
+Lint/EndAlignment:
+  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
+  AlignWith: variable
+
+AllCops:
+  TargetRubyVersion: 2.1
 
 Metrics/AbcSize:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricsabcsize
@@ -199,3 +201,20 @@ Style/AsciiComments:
 #
 Style/DoubleNegation:
   Enabled: false
+
+# Allow block.call:
+#
+#  def foo(&block)
+#    var = block.call
+#    ...
+#
+# is better readable than
+#
+#  def foo
+#    var = yield
+#    ...
+#
+# although it is a bit slower
+Performance/RedundantBlockCall:
+  Enabled: false
+

@@ -218,3 +218,15 @@ Style/DoubleNegation:
 Performance/RedundantBlockCall:
   Enabled: false
 
+# alias method is more convenient method for method aliasing even when in class
+# context self scope is not so clear
+# see https://github.com/bbatsov/ruby-style-guide#alias-method-lexically
+# so force
+# class C
+#   alias_method :a, :b
+#
+# instead of:
+# class C
+#   alias b a
+Style/Alias:
+  EnforcedStyle: prefer_alias_method

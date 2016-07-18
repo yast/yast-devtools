@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Jul 18 14:06:06 UTC 2016 - jreidinger@suse.com
+
+- prevent yard failure as it is no longer dependency, so skip
+  ruby autodocs generation if not available (fix yast-rdp and
+  yard-smt build) (part of FATE#320356)
+- 3.1.44
+
+-------------------------------------------------------------------
 Thu Jul 14 11:36:15 UTC 2016 - jreidinger@suse.com
 
 - Update the Rubocop config to prefer method_alias over alias

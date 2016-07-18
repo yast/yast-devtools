@@ -48,9 +48,9 @@ index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM) $(AUTODOCS_RB)
 		echo "<a href='$$b.html'>$${b/__/::}</a>" > $$b.mod.html; \
 	done
 	if [ -n "$(AUTODOCS_RB)" ]; then \
-          if which yard 2>/dev/null; then \
+          if which $(YARD)yard 2>/dev/null; then \
             $(YARD) doc --title "@RPMNAME@ -- Development Documentation" $(YARD_OPTIONS) $(AUTODOCS_RB);\
           else \
-            echo "yard no available, skipping"; \
+            echo "yard not available, skipping"; \
           fi; \
         fi

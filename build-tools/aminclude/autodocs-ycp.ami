@@ -4,16 +4,16 @@
 # Builds source documentation for YCP sources
 # Uses ycpdoc
 # PARAMETERS:
-#   AUTODOCS_YCP: Files that the ycp autodocs is built from
-#   		  Optional - the default is $(srcdir)/../../src/*.ycp
-#   AUTODOCS_PM: Files that the perl autodocs is built from
-#   		  Optional - the default is $(srcdir)/../../src/*.pm
-#   AUTODOCS_RB: Files that the ruby autodocs is built from (using yard)
-#   		  Optional - the default is $(srcdir)/../../src/modules/*.rb) $(srcdir)/../../src/include/*/*.rb
-#   AUTODOCS_SUBDIR: To install the result to $(docdir)/SUBDIR/autodocs
-#		Optional - the default is no subdir, $(docdir)/autodocs
-#   AUTODOCS_STRIP: Strip it from filenames. The remaining / are replaced by __
-#		Optional - the default is $(srcdir)/../../src
+#		AUTODOCS_YCP: Files that the ycp autodocs is built from
+#				Optional - the default is $(srcdir)/../../src/*.ycp
+#		AUTODOCS_PM: Files that the perl autodocs is built from
+#				Optional - the default is $(srcdir)/../../src/*.pm
+#		AUTODOCS_RB: Files that the ruby autodocs is built from (using yard)
+#				Optional - the default is $(srcdir)/../../src/modules/*.rb) $(srcdir)/../../src/include/*/*.rb
+#		AUTODOCS_SUBDIR: To install the result to $(docdir)/SUBDIR/autodocs
+#				Optional - the default is no subdir, $(docdir)/autodocs
+#		AUTODOCS_STRIP: Strip it from filenames. The remaining / are replaced by __
+#				Optional - the default is $(srcdir)/../../src
 
 htmldir = $(docdir)/$(AUTODOCS_SUBDIR)/autodocs
 
@@ -48,9 +48,22 @@ index.html: $(AUTODOCS_YCP) $(AUTODOCS_PM) $(AUTODOCS_RB)
 		echo "<a href='$$b.html'>$${b/__/::}</a>" > $$b.mod.html; \
 	done
 	if [ -n "$(AUTODOCS_RB)" ]; then \
-          if which $(YARD) 2>/dev/null; then \
-            $(YARD) doc --title "@RPMNAME@ -- Development Documentation" $(YARD_OPTIONS) $(AUTODOCS_RB);\
-          else \
-            echo "yard not available, skipping"; \
-          fi; \
-        fi
+		if which $(YARD) 2>/dev/null; then \
+			$(YARD) doc --title "@RPMNAME@ -- Development Documentation" $(YARD_OPTIONS) $(AUTODOCS_RB);\
+		else \
+			echo "yard not available, skipping"; \
+			if [ ! -f index.html ]; then \
+				echo '<!DOCTYPE html>\
+					<html>\
+					<head>\
+					<meta charset="UTF-8">\
+					<title>YaST Package Documentation</title>\
+					</head>\
+					<body>\
+					<a href="http://yast.github.io/">Go to official YaST documentation</a>\
+					<p>This is just a stub, to generate the full source code documentation install the "yardoc" tool.</p>\
+					</body>\
+					</html>' > index.html;\
+			fi; \
+		fi; \
+	fi

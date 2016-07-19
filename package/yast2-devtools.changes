@@ -1,8 +1,8 @@
 -------------------------------------------------------------------
 Tue Jul 19 07:14:16 UTC 2016 - jreidinger@suse.com
 
-- Generate simple page if yard is not available( follow-up of
-  previous fix for building ) (part of FATE#320356)
+- Generate simple page if yard is not available (follow-up of
+  previous fix for building) (part of FATE#320356)
 - 3.1.45
 
 -------------------------------------------------------------------

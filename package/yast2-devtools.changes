@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug  5 10:38:44 UTC 2016 - mvidner@suse.com
+
+- y2makepot, gettextdomains: ignore test/ directories.
+
+-------------------------------------------------------------------
 Tue Jul 19 07:14:16 UTC 2016 - jreidinger@suse.com
 
 - Generate simple page if yard is not available (follow-up of

@@ -107,12 +107,10 @@ function rxgettext_call()
 
 function usage()
 {
-    echo
     echo -e "create *.pot files from a source tree.";
     echo -e "\nOptions:\n\t-c\t Check in the newly created files to SVN"
     echo -e "\t-s\t Specify the source dir where to look for translatable files (recursive)"
     echo -e "\nYou can specify additional files to .pot creation in $SRCDIR/POTFILES"
-    echo
 
     exit 0
 }
@@ -124,11 +122,9 @@ function generate_potfiles()
     get_domains_and_err $SRCDIR
 
     # $ERR contains the files without textdomain (see gettextdomains)
-    echo
     for F in $ERR; do
         echo "** WARNING: Missing textdomain in file $F" 1>&2;
     done
-    echo
 
     # all textdomains found by gettextdomains
     DOMAINS=`echo -en $DOMAINS | LC_COLLATE=C sort` ;
@@ -147,7 +143,6 @@ function generate_potfiles()
 
             gettext_call "$MODULE" "$FILES" "$RUBY_FILES"
 
-	    echo
 	    MODULE=$D;
 	    FILES=""
             RUBY_FILES=""
@@ -171,9 +166,7 @@ function generate_potfiles()
 
     POT_DST="$POT_DST $MODULE.pot"
     gettext_call "$MODULE" "$FILES" "$RUBY_FILES"
-    echo
 }
-
 
 
 function checkin_potfiles()
@@ -254,7 +247,6 @@ if test $CHECKIN = 0; then
     checkin_potfiles
 fi
 
-echo
 exit 0
 
 # -- main -- end ---------------------------------------------------------------

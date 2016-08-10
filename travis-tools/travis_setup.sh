@@ -23,21 +23,28 @@ OBS_PROJECT=$(sed -n '/obs_project =/s/^.*\"\(.*\)\".*$/\1/p' Rakefile)
 case $OBS_PROJECT in
   # SLE-12
   Devel:YaST:SLE-12)
-    REPO_URL="http://download.opensuse.org/repositories/YaST:/SLE-12:/GA:/Travis/xUbuntu_12.04/"
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/GA:/Travis/xUbuntu_12.04"
     ;;
   # OpenSUSE 13.2
   YaST:openSUSE:13.2)
-    REPO_URL="http://download.opensuse.org/repositories/YaST:/openSUSE:/13.2:/Travis/xUbuntu_12.04"
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/13.2:/Travis/xUbuntu_12.04"
+    ;;
+  # storage-ng
+  YaST:storage-ng)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04
+               http://download.opensuse.org/repositories/YaST:/storage-ng:/Travis/xUbuntu_12.04"
     ;;
   # master
   *)
-    REPO_URL="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04"
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04"
     ;;
 esac
 
 # prepare the system for installing additional packages from OBS
-curl $REPO_URL/Release.key | sudo apt-key add -
-echo "deb $REPO_URL/ ./" | sudo tee -a /etc/apt/sources.list
+for REPO_URL in $REPO_URLS; do
+  curl $REPO_URL/Release.key | sudo apt-key add -
+  echo "deb $REPO_URL/ ./" | sudo tee -a /etc/apt/sources.list
+done
 
 sudo apt-get update -q
 

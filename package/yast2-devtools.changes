@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Wed Aug 24 12:36:47 UTC 2016 - jreidinger@suse.com
 
-- ignore in spellcheck 'vc' because used as osc vc suggestion in
+- ignore in spellcheck 'vc' because used as 'osc vc' suggestion in
   CONTRIBUTING.md (needed to submit bnc#995333)
 - 3.1.46
 

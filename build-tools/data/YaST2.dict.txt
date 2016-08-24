@@ -134,6 +134,7 @@ UTC
 Uninstall
 Uninstalled
 Uzbekistan
+vc
 VCI
 VESA
 VLAN

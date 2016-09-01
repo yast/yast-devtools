@@ -52,8 +52,9 @@ def modify_rakefile
   line_index = lines.index {|l| l =~ /#{submit_to}/ }
   if line_index
     lines[line_index] = new_line
-  else
-    lines.insert(2, new_line, "\n")
+  else # line is not there yet, so place it below require line
+    line_index = lines.index {|l| l =~ /^\s*require.*yast\/rake/ }
+    lines.insert(line_index + 1, "\n", new_line)
   end
 
   File.write("Rakefile", lines.join(""))

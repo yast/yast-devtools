@@ -29,11 +29,35 @@ SOURCE_COMMIT = ARGV[2] || "origin/master"
 # by default pass output of commands to stdout and stderr
 Cheetah.default_options = { :stdout => STDOUT, :stderr => STDERR }
 
+def project
+  raise unless @project
+
+  @project
+end
+
+NAMESPACES_MAPPING = {
+  "libyui" => "Libyui",
+  "yast"   => "Yast"
+}
+
+def project_namespace
+  raise unless @project
+
+  NAMESPACES_MAPPING[@project] || raise("Unknown project #{@project}")
+end
+
+def project=(value)
+  @project = value
+end
+
 def check_real_upstream
   res = Cheetah.run "git", "remote", "-v", :stdout => :capture
-  if res.lines.grep(/origin\s*git@github.com:yast/).empty?
+  upstream = res.lines.grep(/origin\s*git@github.com:(yast|libyui)/)
+  if upstream.empty?
     raise "This script can work only on upstream clone, where upstream remote is marked as origin"
   end
+
+  self.project = upstream.first[/origin\s*git@github.com:(yast|libyui)/, 1]
 end
 
 def already_exists?
@@ -46,14 +70,14 @@ def modify_rakefile
   raise "Cannot find Rakefile in pwd" unless File.exist?("Rakefile")
 
   lines = File.readlines("Rakefile")
-  submit_to = "Yast::Tasks.submit_to"
+  submit_to = "#{project_namespace}::Tasks.submit_to"
 
   new_line = "#{submit_to} :#{TARGET}\n"
   line_index = lines.index {|l| l =~ /#{submit_to}/ }
   if line_index
     lines[line_index] = new_line
   else # line is not there yet, so place it below require line
-    line_index = lines.index {|l| l =~ /^\s*require.*yast\/rake/ }
+    line_index = lines.index {|l| l =~ /^\s*require.*#{project}\/rake/ }
     lines.insert(line_index + 1, "\n", new_line)
   end
 

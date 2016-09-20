@@ -79,7 +79,7 @@ fi \
     %if %{with yast_run_ci_tests} \
       if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
           # TODO: fix the check:ci task to also work with autotools based modules \
-          %{__make} check \\\
+          %{__make} check %{?jobs:-j%jobs}%{?!jobs:%{?_smp_mflags:%_smp_mflags}} \\\
               VERBOSE=1 \\\
               Y2DIR="%{buildroot}/%{yast_dir}" \\\
               DESTDIR="%{buildroot}" \
@@ -88,7 +88,7 @@ fi \
     %else \
       if [ ! -f "%{yast_ydatadir}/devtools/NO_MAKE_CHECK" ]; then \
           if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
-              %{__make} check \\\
+              %{__make} check %{?jobs:-j%jobs}%{?!jobs:%{?_smp_mflags:%_smp_mflags}} \\\
                   VERBOSE=1 \\\
                   Y2DIR="%{buildroot}/%{yast_dir}" \\\
                   DESTDIR="%{buildroot}" \

@@ -21,6 +21,12 @@ sudo rm /etc/apt/sources.list.d/*
 # BASE URL on OBS project, so it works with same script for all supported branches.
 OBS_PROJECT=$(sed -n '/obs_project =/s/^.*\"\(.*\)\".*$/\1/p' Rakefile)
 case $OBS_PROJECT in
+  Devel:YaST:SLE-12-SP2)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/SP2:/Travis/xUbuntu_12.04"
+    ;;
+  Devel:YaST:SLE-12-SP1)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/SP1:/Travis/xUbuntu_12.04"
+    ;;
   # SLE-12
   Devel:YaST:SLE-12)
     REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/GA:/Travis/xUbuntu_12.04"
@@ -29,10 +35,52 @@ case $OBS_PROJECT in
   YaST:openSUSE:13.2)
     REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/13.2:/Travis/xUbuntu_12.04"
     ;;
+  # OpenSUSE 42.1
+  YaST:openSUSE:42.1)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/42.1:/Travis/xUbuntu_12.04"
+    ;;
+  # OpenSUSE 42.2
+  YaST:openSUSE:42.2)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/42.2:/Travis/xUbuntu_12.04"
+    ;;
   # storage-ng
   YaST:storage-ng)
     REPO_URLS="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04
                http://download.opensuse.org/repositories/YaST:/storage-ng:/Travis/xUbuntu_12.04"
+    ;;
+  # master
+  *)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04"
+    ;;
+esac
+
+# Handle the new way (Yast::Tasks.submit_to :sle12sp1)
+# See https://github.com/yast/yast-rake/blob/master/data/targets.yml
+SUBMIT_TO=$(sed -n '/submit_to */s/^.*:\([^ \t]*\)/\1/p' Rakefile)
+case $SUBMIT_TO in
+  sle12sp3*)
+  # SLE-12-SP3
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/SP3:/Travis/xUbuntu_12.04"
+    ;;
+  # SLE-12-SP2
+  sle12sp2*)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/SP2:/Travis/xUbuntu_12.04"
+    ;;
+  # SLE-12-SP1
+  sle12sp1*)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/SP1:/Travis/xUbuntu_12.04"
+    ;;
+  # SLE-12-GA
+  sle12)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/GA:/Travis/xUbuntu_12.04"
+    ;;
+  # OpenSUSE Leap 42.1
+  leap_42_1)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/42.1:/Travis/xUbuntu_12.04"
+    ;;
+  # OpenSUSE Leap 42.2
+  leap_42_2)
+    REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/42.2:/Travis/xUbuntu_12.04"
     ;;
   # master
   *)

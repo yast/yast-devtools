@@ -57,6 +57,8 @@ esac
 # Handle the new way (Yast::Tasks.submit_to :sle12sp1)
 # See https://github.com/yast/yast-rake/blob/master/data/targets.yml
 SUBMIT_TO=$(sed -n '/submit_to */s/^.*:\([^ \t]*\)/\1/p' Rakefile)
+# If submit_to has any value, this overrides the previously set variables.
+# If it's blank, it does nothing (respect previous values).
 case $SUBMIT_TO in
   sle12sp3*)
   # SLE-12-SP3
@@ -81,10 +83,6 @@ case $SUBMIT_TO in
   # OpenSUSE Leap 42.2
   leap_42_2)
     REPO_URLS="http://download.opensuse.org/repositories/YaST:/openSUSE:/42.2:/Travis/xUbuntu_12.04"
-    ;;
-  # master
-  *)
-    REPO_URLS="http://download.opensuse.org/repositories/YaST:/Head:/Travis/xUbuntu_12.04"
     ;;
 esac
 

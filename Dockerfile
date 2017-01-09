@@ -1,3 +1,3 @@
-FROM yastdevel/cpp-tw
-COPY . /tmp/sources
+FROM yastdevel/cpp
+COPY . /usr/src/app
 

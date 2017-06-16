@@ -13,6 +13,7 @@ Bad arguments
 First argument: name of the branch
 Second argument: name of the target as recognized by yast-rake, see
                  https://github.com/yast/yast-rake/blob/master/data/targets.yml
+                second argument is also used for docker tag, just adds '-' before "sp" part
 Third argument (optional): source commit, if not specified use master
 
 Examples:
@@ -84,6 +85,25 @@ def modify_rakefile
   File.write("Rakefile", lines.join(""))
 end
 
+def modify_dockerfile
+  if !File.exist?("Dockerfile")
+    STDERR.puts "No Dockerfile, skipping its adaptation"
+    return
+  end
+
+  lines = File.readlines("Dockerfile")
+  from_index = lines.index { |l| l =~ /^FROM / }
+  raise "Missing FROM in dockerfile" unless from_index
+  line = lines[from_index]
+  docker_tag = ":" + TARGET.sub(/sp/, "-sp")
+  if line.include?(":") # docker file already use tag
+    line.sub!(/:.*$/, docker_tag + "\n")
+  else
+    line.sub!(/\s*$/, docker_tag + "\n")
+  end
+  File.write("Dockerfile", lines.join(""))
+end
+
 check_real_upstream
 
 if already_exists?
@@ -100,8 +120,9 @@ Cheetah.run "git", "branch", BRANCH_NAME, SOURCE_COMMIT
 Cheetah.run "git", "checkout", BRANCH_NAME
 
 modify_rakefile
+modify_dockerfile
 
-commit_msg = "adapt Rakefile to submit to correct build service project in maintenance branch #{BRANCH_NAME}"
+commit_msg = "adapt Rakefile and Dockerfile for #{BRANCH_NAME}"
 
 Cheetah.run "git", "commit", "-m", commit_msg, "Rakefile"
 

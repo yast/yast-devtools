@@ -86,7 +86,10 @@ def modify_rakefile
 end
 
 def modify_dockerfile
-  raise "Cannot find Rakefile in pwd" unless File.exist?("Dockerfile")
+  if !File.exist?("Dockerfile")
+    STDERR.puts "No Dockerfile, skipping its adaptation"
+    return
+  end
 
   lines = File.readlines("Dockerfile")
   from_index = lines.index { |l| l =~ /^FROM / }

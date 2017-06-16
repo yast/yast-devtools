@@ -124,7 +124,7 @@ modify_dockerfile
 
 commit_msg = "adapt Rakefile and Dockerfile for #{BRANCH_NAME}"
 
-Cheetah.run "git", "commit", "-m", commit_msg, "Rakefile"
+Cheetah.run "git", "commit", "-am", commit_msg
 
 Cheetah.run "git", "push", "--set-upstream", "origin", "#{BRANCH_NAME}:#{BRANCH_NAME}"
 

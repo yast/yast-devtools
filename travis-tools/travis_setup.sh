@@ -21,7 +21,7 @@ sudo rm /etc/apt/sources.list.d/*
 # BASE URL on OBS project, so it works with same script for all supported branches.
 OBS_PROJECT=$(sed -n '/obs_project =/s/^.*\"\(.*\)\".*$/\1/p' Rakefile)
 case $OBS_PROJECT in
-  Devel:YaST:SLE-12-SP2)
+  Devel:YaST:SLE-12-SP2 | Devel:YaST:CASP:1.0)
     REPO_URLS="http://download.opensuse.org/repositories/YaST:/SLE-12:/SP2:/Travis/xUbuntu_12.04"
     ;;
   Devel:YaST:SLE-12-SP1)

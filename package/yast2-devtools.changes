@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Oct 10 09:12:46 UTC 2017 - mvidner@suse.com
+
+- Use -Wno-format-nonliteral (bsc#982942)
+- 4.0.0
+
+-------------------------------------------------------------------
 Tue Sep 20 13:29:46 UTC 2016 - jreidinger@suse.com
 
 - run old yast testsuite in parallel to speed up build (bsc#999203)

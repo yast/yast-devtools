@@ -288,7 +288,7 @@ PKG_CHECK_EXISTS([yast2-core],[
 ])
 
 CFLAGS="${CFLAGS} -Wall -Wformat=2 -Wmissing-prototypes"
-CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2"
+CXXFLAGS="${CXXFLAGS} ${Y2CORE_CFLAGS} -Wall -Wformat=2 -Wno-format-nonliteral"
 
 : ${AGENT_LIBADD:=\'-L$(libdir) -lscr -ly2util -lycpvalues\'}
 AC_SUBST(AGENT_LIBADD)

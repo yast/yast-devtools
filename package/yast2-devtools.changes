@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov 29 16:22:16 UTC 2017 - igonzalezsosa@suse.com
+
+- Fix fillup-templates path (bsc#1070408)
+- 4.0.1
+
+-------------------------------------------------------------------
 Tue Oct 10 09:12:46 UTC 2017 - mvidner@suse.com
 
 - Use -Wno-format-nonliteral (bsc#982942)

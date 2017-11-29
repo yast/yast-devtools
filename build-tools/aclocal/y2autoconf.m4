@@ -80,7 +80,7 @@ AC_SUBST(scrconfdir)
 AC_SUBST(agentdir)
 AC_SUBST(desktopdir)
 
-fillupdir_d="/var/adm/fillup-templates"
+fillupdir_d="/usr/share/fillup-templates"
 AC_ARG_WITH(fillupdir,
     AS_HELP_STRING([--with-fillupdir=DIR],
 		   [where to place fillup templates (default $fillupdir_d.]),

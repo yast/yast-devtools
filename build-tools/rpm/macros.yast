@@ -24,7 +24,7 @@
 %yast_docdir %{_docdir}/%{name}
 %yast_logdir %{_localstatedir}/log/YaST2
 %yast_vardir %{_localstatedir}/lib/YaST2
-%yast_fillupdir %{_localstatedir}/adm/fillup-templates
+%yast_fillupdir %{_datadir}/fillup-templates
 
 %yast_execcompdir %{_prefix}/lib/YaST2
 %yast_agentdir %{yast_execcompdir}/servers_non_y2

@@ -10,7 +10,8 @@
 function get_domains_and_err()
 {
     if [ -z "$1" ]; then
-        echo `basename $0`": argument missing"
+        echo `basename $0`": argument missing" >&2
+        exit 1
     fi
     SRCDIR=$1
 
@@ -27,7 +28,7 @@ function get_domains_and_err()
                                 -o -name "*.rb"  `
 
     if test "$?" != "0"; then
-        echo "Error: check-pot terminated unexpected."
+        echo "Error: check-pot terminated unexpected." >&2
         exit 1
     fi
 

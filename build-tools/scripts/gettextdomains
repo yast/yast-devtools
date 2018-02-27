@@ -33,12 +33,17 @@ function get_domains_and_err()
 
     for F in $SRCFILES; do
         # strip comments from the files and match [_]_( "..." )
-        # 1. perl: strip one-line-comments
+        # 1. perl: strip one-line-comments, except ruby "string #{interpolation}"
         # 2. perl: match for _( "...") and __("..." ) (multiline too)
+        # NOTE: be less strict here, if e.g. a gettext call is in a trailing comment:
+        # "foo" # _("not translated")
+        # then it will be ignored by the extractor later, we can only get a false
+        # warning about a missing text domain in the file. That's more acceptable
+        # then a completely missing translation because of too strict comment filtering.
 	# problems left:
 	# - false matches of comments inside strings
 	# - uncaught _( at line beginning
-        MATCH=`perl -n -e 'print "$ARGV: $_" if not /(\/\/|#)/' $F | \
+        MATCH=`perl -n -e 'print "$ARGV: $_" if not /(^\s*\/\/|^\s*#[^\{])/' $F | \
                perl -n -e 'print "$_" if /[^[:alnum:]_"<](_|__|gettext)\(/../\)/'`
         if [ -n "$MATCH" ]; then
             TR_FILES="$F $TR_FILES" ;

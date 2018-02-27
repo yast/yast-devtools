@@ -123,8 +123,11 @@ function generate_potfiles()
 
     # $ERR contains the files without textdomain (see gettextdomains)
     for F in $ERR; do
-        echo "** WARNING: Missing textdomain in file $F" 1>&2;
+        echo "** ERROR: Missing textdomain in file $F" >&2;
     done
+    if [ -n "$ERR" ]; then
+        exit 2
+    fi
 
     # all textdomains found by gettextdomains
     DOMAINS=`echo -en $DOMAINS | LC_COLLATE=C sort` ;

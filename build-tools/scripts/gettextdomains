@@ -25,6 +25,7 @@ function get_domains_and_err()
                                 -o -name "*.cc"  \
                                 -o -name "*.cpp" \
                                 -o -name "*.erb" \
+                                -o -name "*.glade" \
                                 -o -name "*.rb"  `
 
     if test "$?" != "0"; then

@@ -36,7 +36,8 @@ function get_domains_and_err()
     for F in $SRCFILES; do
         # strip comments from the files and match [_]_( "..." )
         # 1. perl: strip one-line-comments, except ruby "string #{interpolation}"
-        # 2. perl: match for _( "...") and __("..." ) (multiline too)
+        # 2. perl: match for _( "...") and __("..." ) (multiline too),
+        #          or "<label>" used in XML (*.glade) files
         # NOTE: be less strict here, if e.g. a gettext call is in a trailing comment:
         # "foo" # _("not translated")
         # then it will be ignored by the extractor later, we can only get a false

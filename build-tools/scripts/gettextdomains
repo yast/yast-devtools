@@ -46,7 +46,7 @@ function get_domains_and_err()
 	# - false matches of comments inside strings
 	# - uncaught _( at line beginning
         MATCH=`perl -n -e 'print "$ARGV: $_" if not /(^\s*\/\/|^\s*#[^\{])/' $F | \
-               perl -n -e 'print "$_" if /[^[:alnum:]_"<](_|__|gettext)\(/../\)/'`
+               perl -n -e 'print "$_" if /<label>|[^[:alnum:]_"<](_|__|gettext)\(/../\)/'`
         if [ -n "$MATCH" ]; then
             TR_FILES="$F $TR_FILES" ;
         fi

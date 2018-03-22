@@ -42,6 +42,17 @@
     </xsl:element>
 </xsl:template>
 
+<!--
+  Allow processing also the XSL files which contain translations.
+  Handle it like an XML file, just replace the root <xsl:stylesheet> tag
+  by <interface> as expected by xgettext in *.glade files.
+-->
+<xsl:template match="/xsl:stylesheet">
+    <interface>
+        <xsl:apply-templates select="node()|@*"/>
+    </interface>
+</xsl:template>
+
 <!-- remove the remaining non-matched text -->
 <xsl:template match="text()">
 </xsl:template>

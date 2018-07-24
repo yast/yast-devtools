@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jul 24 12:34:17 UTC 2018 - lslezak@suse.cz
+
+- Pass absolute paths to "yard", relative paths do not work anymore
+  because of a security update (bsc#1070263, CVE-2017-17042)
+- 3.1.38.1
+
+-------------------------------------------------------------------
 Wed Aug  5 16:57:29 CEST 2015 - shundhammer@suse.de
 
 - reasonable defaults for method and class lengths in rubocop.yml

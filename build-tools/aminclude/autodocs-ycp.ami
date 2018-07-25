@@ -26,7 +26,7 @@ CLEANFILES = $(nobase_html_DATA) pod2htm*.tmp
 
 AUTODOCS_YCP ?= $(wildcard $(srcdir)/../../src/*.ycp)
 AUTODOCS_PM  ?= $(wildcard $(srcdir)/../../src/*.pm)
-AUTODOCS_RB  ?= $(wildcard $(srcdir)/../../src/modules/*.rb $(srcdir)/../../src/include/*/*.rb)
+AUTODOCS_RB  ?= $(wildcard $(abs_top_srcdir)/src/modules/*.rb $(abs_top_srcdir)/src/include/*/*.rb)
 AUTODOCS_STRIP ?= $(srcdir)/../../src
 
 # yard specific options

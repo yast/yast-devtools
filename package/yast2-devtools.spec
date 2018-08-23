@@ -36,7 +36,7 @@ BuildRequires:  sgml-skel
 Requires:       yast2-buildtools
 
 Summary:        YaST2 - Development Tools
-License:        GPL-2.0+
+License:        GPL-2.0-or-later
 Group:          System/YaST
 
 BuildArch:      noarch

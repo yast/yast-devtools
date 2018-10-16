@@ -168,6 +168,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/data/YaST2.dict.txt
 %{_datadir}/YaST2/data/devtools/bin/y2autoconf
 %{_datadir}/YaST2/data/devtools/bin/y2automake
+%license COPYING
 
 
 

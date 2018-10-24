@@ -8,12 +8,14 @@
 #
 ################################################################################
 
-Lint/EndAlignment:
+Layout/EndAlignment:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
 
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 2.5
+  Exclude:
+    - 'package/*.spec'
 
 Metrics/AbcSize:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricsabcsize
@@ -29,13 +31,13 @@ Metrics/LineLength:
     - http
     - https
 
-Style/AlignHash:
+Layout/AlignHash:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylealignhash
   EnforcedHashRocketStyle: table
   EnforcedColonStyle: table
 
 # Disabled, see the YaST default at the end of the file
-#Style/AlignParameters:
+#Layout/AlignParameters:
 #  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylealignparameters
 #  Enabled: false
 
@@ -43,11 +45,11 @@ Style/CollectionMethods:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylecollectionmethods
   Enabled: false
 
-Style/EmptyLinesAroundBlockBody:
+Layout/EmptyLinesAroundBlockBody:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#styleemptylinesaroundblockbody
   Enabled: false
 
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylemultilineoperationindentation
   EnforcedStyle: indented
 
@@ -96,7 +98,7 @@ Style/NumericLiterals:
 # SmartClass.smart_method(boring_parameter1, boring_parameter2,
 #                         boring_parameter3, boring_parameter4)
 #
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
 # no extra indentation for case.
@@ -120,8 +122,8 @@ Style/AlignParameters:
 #     else
 #       action_c
 #   end
-Style/CaseIndentation:
-  IndentWhenRelativeTo: end
+Layout/CaseIndentation:
+  EnforcedStyle: end
 
 # "unless" has a different connotation than "if not" so disable this check
 Style/NegatedIf:
@@ -185,7 +187,7 @@ Style/AndOr:
 #
 #   ...
 # end
-Style/AccessModifierIndentation:
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
 
 # Forcing ascii only comments prevents examples in code that deal with UTF

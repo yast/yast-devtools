@@ -6,6 +6,7 @@
 
 %yast_ydatadir %{yast_dir}/data
 %yast_imagedir %{yast_dir}/images
+%yast_icondir %{_datadir}/icons/**
 %yast_themedir %{yast_dir}/theme
 %yast_localedir %{yast_dir}/locale
 %yast_clientdir %{yast_dir}/clients

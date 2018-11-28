@@ -126,6 +126,7 @@ agentdir=${execcompdir}/servers_non_y2
 ydatadir=${yast2dir}/data
 imagedir=${yast2dir}/images
 themedir=${yast2dir}/theme
+icondir=\${prefix}/share/icons
 localedir=${yast2dir}/locale
 clientdir=${yast2dir}/clients
 moduledir=${yast2dir}/modules
@@ -156,6 +157,7 @@ AC_SUBST(mandir)
 
 AC_SUBST(ydatadir)
 AC_SUBST(imagedir)
+AC_SUBST(icondir)
 AC_SUBST(themedir)
 AC_SUBST(localedir)
 AC_SUBST(clientdir)

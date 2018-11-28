@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov 28 09:04:45 UTC 2018 - lslezak@suse.cz
+
+- Fix up for the icondir path expansion (boo#1109310)
+- 4.1.2
+
+-------------------------------------------------------------------
 Tue Nov 27 15:16:44 UTC 2018 - Stasiek Michalski <hellcp@mailbox.org>
 
 - Provide icon with module (boo#1109310)

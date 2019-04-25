@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Thu Apr 25 15:56:13 UTC 2019 - Stasiek Michalski <hellcp@mailbox.org>
 
-- Check if directory exists before updating desktop files
+- Check if directory exists before updating desktop files (boo#1133433)
 - 4.2.0
 
 -------------------------------------------------------------------

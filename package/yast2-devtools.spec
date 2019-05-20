@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        4.2.0
+Version:        4.2.1
 Release:        0
 Url:            http://github.com/yast/yast-devtools
 
@@ -54,6 +54,8 @@ Requires:       autoconf
 Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
+Requires:       rubygem(builder)
+Requires:       rubygem(inifile)
 
 %if 0%{?suse_version} <= 1230
 # extra package for yard Markdown formatting in openSUSE <= 12.3
@@ -168,6 +170,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/data/YaST2.dict.txt
 %{_datadir}/YaST2/data/devtools/bin/y2autoconf
 %{_datadir}/YaST2/data/devtools/bin/y2automake
+%{_datadir}/YaST2/data/devtools/bin/y2metainfo
 %license COPYING
 
 

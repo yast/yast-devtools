@@ -8,7 +8,8 @@ dist_bin_SCRIPTS = y2tool
 dist_pkgdata_SCRIPTS = 				\
 	y2autoconf 				\
 	y2automake 				\
-	y2makepot
+	y2makepot				\
+	y2metainfo
 
 # This file should have 0644 perms, since it gets
 # sourced by 'check-textdomain' and 'y2makepot'.

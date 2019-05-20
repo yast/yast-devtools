@@ -111,7 +111,7 @@ fi \
         for f in $(%{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop') ; do \
             d=${f##*/} \
             %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
-            %{yast_ydatadir}/devtools/bin/y2metainfo -f ${f} -l %{license} -o %{yast_metainfodir}/ \
+            %{yast_ydatadir}/devtools/bin/y2metainfo -f ${f} -l "%{license}" -o %{yast_metainfodir}/ \
         done \
     %else  # 0%%{?suse_version} \
         %{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -print0 \\\

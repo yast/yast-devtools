@@ -1,13 +1,20 @@
 #!/usr/bin/env ruby
-require 'builder'
-require 'optparse'
-require 'inifile'
+#
+# y2metainfo - Automagically generate appstream data for YaST modules based on their desktop files
+#
+# Author: Stasiek Michalski <hellcp@opensuse.org>
+# Copyright 2019
+#
+
+require "rexml/document"
+require "optparse"
+require "inifile"
 
 options = {}
 
 OptionParser.new do |parser|
   parser.banner = "Usage: y2metainfo [options]"
-  parser.on("-h", "--help", "Show this help message") do ||
+  parser.on("-h", "--help", "Show this help message") do
     puts parser
   end
   parser.on("-f", "--file FILEPATH", "The desktop file of the module") do |v|
@@ -22,37 +29,38 @@ OptionParser.new do |parser|
 end.parse!
 
 def metainfo_gen(desktop, license)
-  output = ''
-  xml = ::Builder::XmlMarkup.new(:target => output, :indent => 2)
-  file = IniFile.load(desktop, :comment => nil)
+  output = ""
+  xml = REXML::Document.new
+  file = IniFile.load(desktop, comment: nil)
   data = file["Desktop Entry"]
-  xml.instruct!
-  xml.component('type' => 'addon','xmlns' => 'https://specifications.freedesktop.org/metainfo/1.0') do
-    xml.id File.basename(desktop)
-    xml.launchable(File.basename(desktop), 'type' => 'desktop-id')
-    xml._name data["Name"]
-    xml._summary data["GenericName"]
-    xml.extends 'YaST2.desktop'
-    xml.metadata_license 'CC0-1.0'
-    xml.project_license license if license
-    categories = data["Categories"].split(';')
-    xml.categories do
-      categories.each do |category|
-        xml.category category
-      end
-    end
-    xml.url('https://yast.opensuse.org', 'type' => 'homepage')
-    xml.url('https://bugzilla.opensuse.org', 'type' => 'bugtracker')
-    xml.developer_name 'YaST Team'
+
+  xml << REXML::XMLDecl.new("1.0", "UTF-8")
+  base = xml.add_element("component", "type" => "addon", "xmlns" => "https://specifications.freedesktop.org/metainfo/1.0")
+  base.add_element("id").add_text(File.basename(desktop, ".desktop"))
+  base.add_element("launchable", "type" => "desktop-id").add_text(File.basename(desktop))
+  base.add_element("_name").add_text(data["Name"])
+  base.add_element("_summary").add_text(data["GenericName"])
+  base.add_element("entends").add_text("org.openSUSE.YaST")
+  base.add_element("metadata_license").add_text("CC0-1.0")
+  base.add_element("project_license").add_text(license) if license
+  cat = base.add_element("categories")
+  data["Categories"].split(";").each do |category|
+    cat.add_element("category").add_text(category)
   end
+  base.add_element("url", "type" => "homepage").add_text("https://yast.opensuse.org")
+  base.add_element("url", "type" => "bugtracker").add_text("https://bugzilla.opensuse.org")
+  base.add_element("developer_name").add_text("YaST Team")
+  base.add_element("update_contact").add_text("yast-devel@opensuse.org")
+
+  formatter = REXML::Formatters::Pretty.new(2)
+  formatter.compact = true
+  formatter.write(xml, output)
   output
 end
 
 if options[:output]
   filename = options[:output] + File.basename(options[:file], ".desktop") + ".metainfo.xml"
-  out_file = File.new(filename, "w")
-  out_file.puts(metainfo_gen(options[:file], options[:license]))
-  out_file.close
+  File.write(filename, metainfo_gen(options[:file], options[:license]))
 else
   puts metainfo_gen(options[:file], options[:license])
 end

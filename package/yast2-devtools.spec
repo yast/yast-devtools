@@ -54,7 +54,6 @@ Requires:       autoconf
 Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
-Requires:       rubygem(builder)
 Requires:       rubygem(inifile)
 
 %if 0%{?suse_version} <= 1230

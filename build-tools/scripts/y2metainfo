@@ -43,8 +43,16 @@ def metainfo_gen(desktop, license)
   base.add_element("id").add_text(File.basename(desktop, ".desktop"))
   # Exectutes based on id of desktop file https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-launchable
   base.add_element("launchable", "type" => "desktop-id").add_text(File.basename(desktop))
-  base.add_element("_name").add_text(data["Name"])
-  base.add_element("_summary").add_text(data["GenericName"])
+  data.select{ |x| x.start_with?("Name") }.each do |key, value|
+    name = base.add_element("name").add_text(value)
+    lang = (/(?<=\[).*(?=\])/).match(key)
+    name.add_attribute("xml:lang", lang) if lang
+  end
+  data.select{ |x| x.start_with?("GenericName") }.each do |key, value|
+    name = base.add_element("summary").add_text(value)
+    lang = (/(?<=\[).*(?=\])/).match(key)
+    name.add_attribute("xml:lang", lang) if lang
+  end
   cat = base.add_element("categories")
   data["Categories"].split(";").each do |category|
     cat.add_element("category").add_text(category)

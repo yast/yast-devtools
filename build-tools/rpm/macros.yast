@@ -7,6 +7,7 @@
 %yast_ydatadir %{yast_dir}/data
 %yast_imagedir %{yast_dir}/images
 %yast_icondir %{_datadir}/icons
+%yast_metainfodir %{_datadir}/metainfo
 %yast_themedir %{yast_dir}/theme
 %yast_localedir %{yast_dir}/locale
 %yast_clientdir %{yast_dir}/clients
@@ -101,6 +102,12 @@ fi \
           fi \
       fi \
     %endif
+
+%yast_metainfo \
+    \
+    for f in $(%{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop') ; do \
+        %{yast_ydatadir}/devtools/bin/y2metainfo -f ${f} -l "%{license}" -o %{buildroot}/%{yast_metainfodir}/ \
+    done
 
 %yast_desktop_files \
     \

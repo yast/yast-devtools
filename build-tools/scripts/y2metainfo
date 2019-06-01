@@ -30,9 +30,15 @@ OptionParser.new do |parser|
   parser.on("-o", "--output DIRECTORY", "The output directory") do |v|
     options[:output] = v
   end
+  parser.on("-u", "--url URL", "The project url") do |v|
+    options[:url] = v
+  end
+  parser.on("-v", "--version VERSION", "Current version of the component") do |v|
+    options[:version] = v
+  end
 end.parse!
 
-def metainfo_gen(desktop, license)
+def metainfo_gen(desktop, license, url, version)
   output = ""
   xml = REXML::Document.new
   xml << REXML::XMLDecl.new("1.0", "UTF-8")
@@ -43,12 +49,12 @@ def metainfo_gen(desktop, license)
   base.add_element("id").add_text(File.basename(desktop, ".desktop"))
   # Exectutes based on id of desktop file https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-launchable
   base.add_element("launchable", "type" => "desktop-id").add_text(File.basename(desktop))
-  data.select{ |x| x.start_with?("Name") }.each do |key, value|
+  data.select{ |x| x.start_with?("GenericName") }.each do |key, value|
     name = base.add_element("name").add_text(value)
     lang = (/(?<=\[).*(?=\])/).match(key)
     name.add_attribute("xml:lang", lang) if lang
   end
-  data.select{ |x| x.start_with?("GenericName") }.each do |key, value|
+  data.select{ |x| x.start_with?("Comment") }.each do |key, value|
     name = base.add_element("summary").add_text(value)
     lang = (/(?<=\[).*(?=\])/).match(key)
     name.add_attribute("xml:lang", lang) if lang
@@ -57,12 +63,24 @@ def metainfo_gen(desktop, license)
   data["Categories"].split(";").each do |category|
     cat.add_element("category").add_text(category)
   end
+  rel = base.add_element("releases")
+  rel.add_element("release").add_attribute("version", version)
+  if data["Mimetype"]
+    mime = base.add_element("mimetypes")
+    data["Mimetype"].split(";").each do |mimetype|
+      mime.add_element("mimetype").add_text(mimetype)
+    end
+  end
   if license
     base.add_element("metadata_license").add_text(license)
     base.add_element("project_license").add_text(license)
   end
   base.add_element("extends").add_text("org.openSUSE.YaST")
-  base.add_element("url", "type" => "homepage").add_text("https://yast.opensuse.org")
+  if url
+    base.add_element("url", "type" => "homepage").add_text(url)
+  else
+    base.add_element("url", "type" => "homepage").add_text("https://yast.opensuse.org")
+  end
   base.add_element("url", "type" => "bugtracker").add_text("https://bugzilla.opensuse.org")
   base.add_element("update_contact").add_text("yast-devel@opensuse.org")
 
@@ -72,7 +90,7 @@ def metainfo_gen(desktop, license)
   output
 end
 
-result = metainfo_gen(options[:file], options[:license])
+result = metainfo_gen(options[:file], options[:license], options[:url], options[:version])
 if options[:output] && options[:file]
   filename = options[:output] + File.basename(options[:file], ".desktop") + ".metainfo.xml"
   File.write(filename, result)

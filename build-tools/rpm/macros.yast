@@ -106,7 +106,7 @@ fi \
 %yast_metainfo \
     \
     for f in $(%{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop') ; do \
-        %{yast_ydatadir}/devtools/bin/y2metainfo -f ${f} -l "%{license}" -o %{buildroot}/%{yast_metainfodir}/ \
+        %{yast_ydatadir}/devtools/bin/y2metainfo -f ${f} -l "%{license}" -o %{buildroot}/%{yast_metainfodir}/ -u "%{url}" -v "%{version}" \
     done
 
 %yast_desktop_files \

@@ -12,16 +12,18 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-devtools
-Version:        4.2.2
+Version:        4.2.3
 Release:        0
-Url:            http://github.com/yast/yast-devtools
+Url:            https://github.com/yast/yast-devtools
+Summary:        YaST2 - Development Tools
+License:        GPL-2.0-or-later
+Group:          System/YaST
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
 BuildRequires:  automake
@@ -33,11 +35,8 @@ BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
-Requires:       yast2-buildtools
 
-Summary:        YaST2 - Development Tools
-License:        GPL-2.0-or-later
-Group:          System/YaST
+Requires:       yast2-buildtools
 
 BuildArch:      noarch
 
@@ -69,13 +68,12 @@ Recommends:     libtool
 # weak dependency, "make pot" is usually not needed
 Suggests:       rubygem(gettext)
 
-
 %description -n yast2-buildtools
 Scripts and templates required for rebuilding the existing YaST2
 modules and components (both ruby and C++).
 
 %prep
-%setup -n yast2-devtools-%{version}
+%setup -q
 
 %build
 make -f Makefile.cvs all
@@ -84,32 +82,31 @@ make -f Makefile.cvs all
 make
 
 %install
-make install DESTDIR="$RPM_BUILD_ROOT"
-[ -e "%{_prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK" ] || Y2DIR="$RPM_BUILD_ROOT/%{_prefix}/share/YaST2" make check DESTDIR="$RPM_BUILD_ROOT"
-for f in `find $RPM_BUILD_ROOT/%{_prefix}/share/applications/YaST2 -name "*.desktop"` ; do
+make install DESTDIR="%{buildroot}"
+[ -e "%{_datadir}/YaST2/data/devtools/NO_MAKE_CHECK" ] || Y2DIR="%{buildroot}%{_datadir}/YaST2" make check DESTDIR="%{buildroot}"
+for f in `find %{buildroot}%{_datadir}/applications/YaST2 -name "*.desktop"` ; do
     d=${f##*/}
     %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop}
 done
 
 %if 0%{?qemu_user_space_build}
 # disable testsuite on QEMU builds, will fail
-cat > "$RPM_BUILD_ROOT/%{_prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK" <<EOF
+cat > "%{buildroot}%{_datadir}/YaST2/data/devtools/NO_MAKE_CHECK" <<EOF
 Disabling testsuite on QEMU builds, as the userspace emulation
 is not complete enough for yast2-core
 EOF
 %endif
 
 # Change false to true in the following line when yast2 core is broken
-false && cat > "$RPM_BUILD_ROOT/%{_prefix}/share/YaST2/data/devtools/NO_MAKE_CHECK" <<EOF
+false && cat > "%{buildroot}%{_datadir}/YaST2/data/devtools/NO_MAKE_CHECK" <<EOF
 When yast2 core is broken and the interpreter does not work,
 submitting yast2-devtools with the flag file existing will
 prevent ycp developers being flooded by testsuite failures.
 EOF
 
-%fdupes %buildroot/%_prefix
+%fdupes %{buildroot}%{_prefix}
 
 %files
-%defattr(-,root,root)
 %dir %{_datadir}/emacs
 %dir %{_datadir}/emacs/site-lisp
 %{_datadir}/emacs/site-lisp/*ycp-mode.el
@@ -121,7 +118,6 @@ EOF
 %{_datadir}/vim/site/ftdetect/ycp_filetype.vim
 %dir %{_prefix}/lib/YaST2
 %{_datadir}/cmake
-
 %dir %{_datadir}/YaST2
 %doc %{_datadir}/doc/packages/%{name}
 %dir %{_prefix}/lib/YaST2/bin
@@ -146,9 +142,7 @@ EOF
 %dir %{_datadir}/YaST2/control/
 %{_datadir}/YaST2/control/control_to_glade.xsl
 
-
 %files -n yast2-buildtools
-%defattr(-,root,root)
 %{_sysconfdir}/rpm/macros.yast
 %{_bindir}/y2tool
 %{_datadir}/aclocal/*.m4
@@ -170,8 +164,5 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/y2automake
 %{_datadir}/YaST2/data/devtools/bin/y2metainfo
 %license COPYING
-
-
-
 
 %changelog

@@ -75,7 +75,7 @@ def metainfo_gen(desktop, license, url, version)
     base.add_element("metadata_license").add_text(license)
     base.add_element("project_license").add_text(license)
   end
-  base.add_element("extends").add_text("org.opensuse.yast")
+  base.add_element("extends").add_text("org.opensuse.YaST")
   if url
     base.add_element("url", "type" => "homepage").add_text(url)
   else

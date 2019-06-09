@@ -17,7 +17,7 @@
 %yast_controldir %{yast_dir}/control
 %yast_schemadir %{yast_dir}/schema
 %yast_scrconfdir %{yast_dir}/scrconf
-%yast_desktopdir %{_datadir}/applications/YaST2
+%yast_desktopdir %{_datadir}/applications
 
 %yast_ybindir %{_prefix}/lib/YaST2/bin
 %yast_ystartupdir %{_prefix}/lib/YaST2

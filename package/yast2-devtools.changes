@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jun 25 11:43:00 UTC 2019 - Josef Reidinger <jreidinger@suse.com>
+
+- Allow smooth adaptation of newer rubocop by adding defaults for
+  it (bsc#1139270)
+- 4.2.4
+
+-------------------------------------------------------------------
 Sat Jun  1 21:58:50 UTC 2019 - Stasiek Michalski <hellcp@mailbox.org>
 
 - Adapt to desktop file changes (boo#1084864)

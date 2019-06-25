@@ -1,15 +1,4 @@
-################################################################################
-#
-# This part contains the shared Rubocop configuration for SUSE projects. It is
-# maintained at https://github.com/SUSE/style-guides/blob/master/rubocop-suse.yml
-#
-# NOTE: some rules have been commented out, see the YaST specific changes
-#       at the end of the file!
-#
-################################################################################
-
 Layout/EndAlignment:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#lintendalignment
   EnforcedStyleAlignWith: variable
 
 AllCops:
@@ -19,11 +8,9 @@ AllCops:
   TargetRubyVersion: 2.6
 
 Metrics/AbcSize:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricsabcsize
   Max: 30
 
 Metrics/LineLength:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#metricslinelength
   Max: 100
   # To make it possible to copy or click on URIs in the code, we allow lines
   # contaning a URI to be longer than Max.
@@ -33,60 +20,39 @@ Metrics/LineLength:
     - https
 
 Layout/AlignHash:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylealignhash
   EnforcedHashRocketStyle: table
   EnforcedColonStyle: table
 
-# Disabled, see the YaST default at the end of the file
-#Style/AlignParameters:
-#  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylealignparameters
-#  Enabled: false
-
 Style/CollectionMethods:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylecollectionmethods
   Enabled: false
 
 Layout/EmptyLinesAroundBlockBody:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#styleemptylinesaroundblockbody
   Enabled: false
 
 Layout/MultilineOperationIndentation:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylemultilineoperationindentation
   EnforcedStyle: indented
 
 Style/StringLiterals:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylestringliterals
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylestringliteralsininterpolation
   EnforcedStyle: double_quotes
 
 Style/WordArray:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#deviations-from-the-upstream-style-guide
   Enabled: false
 
 Style/SymbolArray:
   EnforcedStyle: brackets
 
 Style/RegexpLiteral:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#deviations-from-the-upstream-style-guide
   Enabled: false
 
 Style/SignalException:
-  StyleGuide: https://github.com/bbatsov/ruby-style-guide#fail-method
   EnforcedStyle: only_raise
 
 # Do not require an underscore each three digits. Both 65536 and 65_536 are allowed.
 Style/NumericLiterals:
-  StyleGuide: https://github.com/SUSE/style-guides/blob/master/Ruby.md#stylenumericliterals
   Enabled: false
-
-################################################################################
-#
-# This part contains the YaST specific changes to the shared SUSE configuration
-#
-################################################################################
 
 # no extra indentation for multiline function calls.
 # Reason is that some legacy ruby API call have a lot of parameters and it makes

@@ -145,24 +145,6 @@ Metrics/MethodLength:
 Metrics/ClassLength:
   Max: 250
 
-# YaST use older rubocop that does not allow predicates by default,
-# so explicitly allow it for older ones
-Style/TrivialAccessors:
- # predicates cannot be done with accessors
- # Offense, a trivial accessor:
- #
- #    def favorite_color
- #      @favorite_color
- #    end
- #
- # No offense, a predicate:
- #
- #    def unladen_swallow?
- #      @unladen_swallow
- #    end
- #
- AllowPredicates: true
-
 # Allow using and/or for driving code flow as its original intention.
 # Forbid it only in conditionals
 # So this rule allow something like
@@ -212,22 +194,6 @@ Style/AsciiComments:
 Style/DoubleNegation:
   Enabled: false
 
-# Allow block.call:
-#
-#  def foo(&block)
-#    var = block.call
-#    ...
-#
-# is better readable than
-#
-#  def foo
-#    var = yield
-#    ...
-#
-# although it is a bit slower
-# Performance/RedundantBlockCall:
-#   Enabled: false
-
 # alias method is more convenient method for method aliasing even when in class
 # context self scope is not so clear
 # see https://github.com/bbatsov/ruby-style-guide#alias-method-lexically
@@ -258,6 +224,8 @@ Style/AccessModifierDeclarations:
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
 
-# format string is not unified and depending on usage.
+# format string is not unified and depending on usage. All three usages has advantages
+# simple style is understandable for translators, but when there are more params it needs names.
+# And template version is needed if there are more params and it needs some formatting.
 Style/FormatStringToken:
   Enabled: false

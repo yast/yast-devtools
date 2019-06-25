@@ -1,8 +1,11 @@
-Lint/EndAlignment:
-  AlignWith: variable
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
 
 AllCops:
-  TargetRubyVersion: 2.1
+  Exclude:
+    # avoid confusion of rpm spec and gem spec
+    - "**/*.spec"
+  TargetRubyVersion: 2.6
 
 Metrics/AbcSize:
   Max: 30
@@ -16,17 +19,17 @@ Metrics/LineLength:
     - http
     - https
 
-Style/AlignHash:
+Layout/AlignHash:
   EnforcedHashRocketStyle: table
   EnforcedColonStyle: table
 
 Style/CollectionMethods:
   Enabled: false
 
-Style/EmptyLinesAroundBlockBody:
+Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 
 Style/StringLiterals:
@@ -37,6 +40,9 @@ Style/StringLiteralsInInterpolation:
 
 Style/WordArray:
   Enabled: false
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
 
 Style/RegexpLiteral:
   Enabled: false
@@ -51,7 +57,7 @@ Style/NumericLiterals:
 # no extra indentation for multiline function calls.
 # Reason is that some legacy ruby API call have a lot of parameters and it makes
 # looking it ugly. Especially UI constructions with helpers cannot fit into line
-# lenght.
+# lenght. Same applies to method calls separated by dot.
 # required style ( and by default forbidden by rubocop ):
 #
 # SmartClass.smart_method(boring_parameter1, boring_parameter2,
@@ -62,8 +68,12 @@ Style/NumericLiterals:
 # SmartClass.smart_method(boring_parameter1, boring_parameter2,
 #                         boring_parameter3, boring_parameter4)
 #
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
+Layout/AlignArguments:
+  EnforcedStyle: with_fixed_indentation
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
 
 # no extra indentation for case.
 # We prefer style
@@ -86,8 +96,8 @@ Style/AlignParameters:
 #     else
 #       action_c
 #   end
-Style/CaseIndentation:
-  IndentWhenRelativeTo: end
+Layout/CaseIndentation:
+  EnforcedStyle: end
 
 # "unless" has a different connotation than "if not" so disable this check
 Style/NegatedIf:
@@ -100,24 +110,6 @@ Metrics/MethodLength:
 # allow more than 100 lines for class as some team member feel unconfortable with it
 Metrics/ClassLength:
   Max: 250
-
-# YaST use older rubocop that does not allow predicates by default,
-# so explicitly allow it for older ones
-Style/TrivialAccessors:
- # predicates cannot be done with accessors
- # Offense, a trivial accessor:
- #
- #    def favorite_color
- #      @favorite_color
- #    end
- #
- # No offense, a predicate:
- #
- #    def unladen_swallow?
- #      @unladen_swallow
- #    end
- #
- AllowPredicates: true
 
 # Allow using and/or for driving code flow as its original intention.
 # Forbid it only in conditionals
@@ -151,7 +143,7 @@ Style/AndOr:
 #
 #   ...
 # end
-Style/AccessModifierIndentation:
+Layout/AccessModifierIndentation:
   EnforcedStyle: outdent
 
 # Forcing ascii only comments prevents examples in code that deal with UTF
@@ -168,22 +160,6 @@ Style/AsciiComments:
 Style/DoubleNegation:
   Enabled: false
 
-# Allow block.call:
-#
-#  def foo(&block)
-#    var = block.call
-#    ...
-#
-# is better readable than
-#
-#  def foo
-#    var = yield
-#    ...
-#
-# although it is a bit slower
-Performance/RedundantBlockCall:
-  Enabled: false
-
 # alias method is more convenient method for method aliasing even when in class
 # context self scope is not so clear
 # see https://github.com/bbatsov/ruby-style-guide#alias-method-lexically
@@ -196,3 +172,26 @@ Performance/RedundantBlockCall:
 #   alias b a
 Style/Alias:
   EnforcedStyle: prefer_alias_method
+
+# often return code of shell call is compared and using `exitstatus == 0`
+# is more obvious then exitstatus.zero? especially when SCR can return nil
+Style/NumericPredicate:
+  Enabled: false
+
+# no strong preference if 5 == a or a == 5 should be enforced
+Style/YodaCondition:
+  Enabled: false
+
+# Do not enforce neither style of access modifiers as both are useful
+Style/AccessModifierDeclarations:
+  Enabled: false
+
+# when ternany is complex is should be clear enclosed in parentheses for easier read
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex
+
+# format string is not unified and depending on usage. All three usages has advantages
+# simple style is understandable for translators, but when there are more params it needs names.
+# And template version is needed if there are more params and it needs some formatting.
+Style/FormatStringToken:
+  Enabled: false

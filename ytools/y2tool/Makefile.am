@@ -15,4 +15,4 @@ dist_pkgdata_SCRIPTS = 				\
 	tagversion
 
 confdatadir = @YAST2DEVTOOLS@/data
-dist_confdata_DATA = rubocop_yast_style.yml
+dist_confdata_DATA = rubocop_yast_style.yml rubocop-0.71.0_yast_style.yml

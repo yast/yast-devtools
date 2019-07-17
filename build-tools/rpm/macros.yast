@@ -143,6 +143,6 @@ fi \
         echo "Cannot install the package, no configure.{ac|in}.in or Rakefile found" 1>&2 \
         exit 1 \
     fi \
-    if [ -d "%{buildroot}/%{yast_desktopdir}"]; then \
+    if [ -d "%{buildroot}/%{yast_desktopdir}" ]; then \
       %yast_desktop_files \
     fi \

@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Jul 17 07:25:46 UTC 2019 - Ladislav Slezák <lslezak@suse.cz>
+
+- Fixed syntax error in the RPM macros causing
+  "line 53: [: missing `]'" error during package build
+- Related to the desktop file changes (boo#1084864)
+- 4.2.5
+
+-------------------------------------------------------------------
 Tue Jun 25 11:43:00 UTC 2019 - Josef Reidinger <jreidinger@suse.com>
 
 - Allow smooth adaptation of newer rubocop by adding defaults for

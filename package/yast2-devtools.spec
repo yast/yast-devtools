@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        4.2.4
+Version:        4.2.5
 Release:        0
 Url:            https://github.com/yast/yast-devtools
 Summary:        YaST2 - Development Tools

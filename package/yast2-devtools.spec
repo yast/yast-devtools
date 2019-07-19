@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        4.2.5
+Version:        4.2.6
 Release:        0
 Url:            https://github.com/yast/yast-devtools
 Summary:        YaST2 - Development Tools
@@ -53,6 +53,12 @@ Requires:       autoconf
 Requires:       automake
 Requires:       gettext-tools
 Requires:       pkgconfig >= 0.16
+%if 0%{?suse_version}
+# yast_install references %%suse_update_desktop_file, so pretty much every
+# consumer of yast2-devtools will need update-desktop-files
+# Conditionalized in a if suse_version, as the same check is done in the macro
+Requires:       update-desktop-files
+%endif
 
 %if 0%{?suse_version} <= 1230
 # extra package for yard Markdown formatting in openSUSE <= 12.3

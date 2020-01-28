@@ -61,7 +61,8 @@ def metainfo_gen(desktop, license, url, version)
   end
   cat = base.add_element("categories")
   rejected_categories = ["Settings", "ConsoleOnly", "DesktopSettings"]
-  data["Categories"].split(";").reject{ |c| rejected_categories.include?(c) }.each do |category|
+  categories = data["Categories"].split(";") - rejected_categories
+  categories.each do |category|
     cat.add_element("category").add_text(category)
   end
   rel = base.add_element("releases")

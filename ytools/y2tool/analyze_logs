@@ -3,6 +3,7 @@
 require "tmpdir"
 require "cheetah"
 require "yaml"
+require "optionparser"
 
 result = {}
 
@@ -93,15 +94,16 @@ def single_file(result, file)
     else
       raise "Should not happen :)"
     end
-    puts "archive #{archive} destination #{file}"
+    log.info "archive #{archive} destination #{file}"
   end
 
   if File.directory?(file)
-    Dir["#{file}/**/y2log*"].each do |f|
-      puts "directory #{file} file #{f}"
+    Dir["#{file}/**/y2log{,-[1-9]}{,.*}"].each do |f|
+      log.info "directory #{file} analyze file #{f}"
       analyze_log(result, f)
     end
   else
+    log.info "analyze file #{file}"
     analyze_log(result, file)
   end
 ensure
@@ -110,6 +112,29 @@ ensure
   end
 end
 
-ARGV.each { |f| single_file(result, f) }
+logger = "/dev/null"
+output = nil
 
-puts result.to_yaml
+OptionParser.new do |opts|
+  opts.banner = "Usage: analyze_logs [options] [paths...]\nDefaults: analyze_logs ." + File::SEPARATOR
+  opts.on("-l", "--log LOG", "File to which log") { |o| logger = o }
+  opts.on("-o", "--output OUTPUT", "File to which YAML will be written.") { |o| output = o }
+end.parse!
+
+@log = Logger.new(logger)
+
+def log
+  @log
+end
+
+ARGV.each { |f| single_file(result, f) }
+if ARGV.empty?
+  single_file(result, ".")
+end
+
+final = result.to_yaml
+if output
+  File.write(output, final)
+else
+  puts final
+end

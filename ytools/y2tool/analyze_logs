@@ -5,8 +5,6 @@ require "cheetah"
 require "yaml"
 require "optionparser"
 
-result = {}
-
 def unpack_file(file)
   case file
   when /\.gz$/
@@ -28,12 +26,12 @@ end
 
 def set_mod_ui(result, mod, ui)
   result[:modules] ||= {}
-  result[:modules][mod] ||= {}
-  result[:modules][mod][:count] ||= 0
-  result[:modules][mod][:count] += 1
-  result[:modules][mod][:ui] ||= {}
-  result[:modules][mod][:ui][ui] ||= 0
-  result[:modules][mod][:ui][ui] += 1
+  result[:modules][mod.to_sym] ||= {}
+  result[:modules][mod.to_sym][:count] ||= 0
+  result[:modules][mod.to_sym][:count] += 1
+  result[:modules][mod.to_sym][:ui] ||= {}
+  result[:modules][mod.to_sym][:ui][ui] ||= 0
+  result[:modules][mod.to_sym][:ui][ui] += 1
 end
 
 def find_modules(result, content)
@@ -80,7 +78,8 @@ end
 TARBALLS_REGEXPS = [/\.tar\./, /\.tbz2$/, /\.tgz$/, /\.txz$/, /\.t7z$/]
 ZIP_REGEXPS = [/\.zip$/]
 RAR_REGEXPS = [/\.rar$/]
-def single_file(result, file)
+def single_file(file)
+  result = {}
   if (TARBALLS_REGEXPS + ZIP_REGEXPS + RAR_REGEXPS).any?{ |r| file =~ r }
     temp_dir = true
     archive = file
@@ -106,9 +105,23 @@ def single_file(result, file)
     log.info "analyze file #{file}"
     analyze_log(result, file)
   end
+
+  result
 ensure
   if temp_dir
     Cheetah.run("rm", "-rf", file)
+  end
+end
+
+def merge_results(total, single)
+  return unless single[:modules]
+  single[:modules].each_pair do |m, data|
+    total[:modules] ||= {}
+    total[:modules][m] ||= {}
+    total[:modules][m][:count] ||= 0
+    total[:modules][m][:count] += data[:count]
+    total[:modules][m][:at_least_once] ||= 0
+    total[:modules][m][:at_least_once] += 1
   end
 end
 
@@ -133,7 +146,11 @@ def log
   @log
 end
 
-ARGV.each { |f| single_file(result, f) }
+result = {}
+
+ARGV.each do |arg|
+  merge_results(result, single_file(arg))
+end
 
 final = result.to_yaml
 if output

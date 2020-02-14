@@ -115,6 +115,8 @@ end
 
 def merge_results(total, single)
   return unless single[:modules]
+  total[:logs_analyzed] ||= 0
+  total[:logs_analyzed] += 1
   single[:modules].each_pair do |m, data|
     total[:modules] ||= {}
     total[:modules][m] ||= {}

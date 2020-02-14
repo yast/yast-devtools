@@ -65,11 +65,22 @@ def find_modules(result, content)
   end
 end
 
+def find_base_product(result, content)
+  # use os-release. Line looks like:
+  # 2014-05-19 09:31:54 <1> linux(2541) [Ruby] modules/Misc.rb:197 ."/mnt/etc/os-release"."PRETTY_NAME": 'SUSE Linux Enterprise Server 12'
+  os_release = content.lines.grep(/os-release.*PRETTY_NAME":/).last
+  if os_release
+    product = os_release[/'(.*)'/, 1]
+    result[:product] = product
+  end
+end
+
 def analyze_log(result, file)
   file = unpack_file(file)
   # TODO: can be memory consuming
   content = File.read(file)
   find_modules(result, content)
+  find_base_product(result, content)
 rescue ArgumentError => e
   raise "Failed in #{file} with #{e.inspect}"
 end
@@ -124,6 +135,13 @@ def merge_results(total, single)
     total[:modules][m][:count] += data[:count]
     total[:modules][m][:at_least_once] ||= 0
     total[:modules][m][:at_least_once] += 1
+  end
+
+  total[:products] ||= {}
+  product = single[:product]
+  if product
+    total[:products][product] ||= 0
+    total[:products][product] += 1
   end
 end
 

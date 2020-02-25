@@ -120,7 +120,7 @@ def single_file(file)
   result
 ensure
   if temp_dir
-    Cheetah.run("rm", "-rf", file)
+    FileUtils.rm_rf file
   end
 end
 

@@ -7,28 +7,34 @@
 require "cheetah"
 
 if ARGV.size < 2
-  STDERR.puts <<EOS
-Bad arguments
+  warn <<~HELP
+    Bad arguments
 
-First argument: name of the branch
-Second argument: name of the target as recognized by yast-rake, see
-                 https://github.com/yast/yast-rake/blob/master/data/targets.yml
-                second argument is also used for docker tag, just adds '-' before "sp" part
-Third argument (optional): source commit, if not specified use master
+    First argument: name of the branch
+    Second argument: name of the target as recognized by yast-rake, see
+                     https://github.com/yast/yast-rake/blob/master/data/targets.yml
+                    second argument is also used for docker tag, just adds '-' before "sp" part
+    Third argument (optional): source commit, if not specified use master
 
-Examples:
-#{File.basename($0)} SLE-12-SP1 sle12sp1 # creates branch for master
-#{File.basename($0)} SLE-12-SP1 sle12sp1 abcdef # creates branch from commit abcdef
-EOS
+    Options:
+
+      --dry-run     Do not commit and push the changes, useful for testing
+                    the changes.
+
+    Examples:
+    #{File.basename($PROGRAM_NAME)} SLE-12-SP1 sle12sp1 # creates branch for master
+    #{File.basename($PROGRAM_NAME)} SLE-12-SP1 sle12sp1 abcdef # creates branch from commit abcdef
+  HELP
   exit(1)
 end
 
+DRY_RUN = !!ARGV.delete("--dry-run")
 BRANCH_NAME = ARGV[0]
 TARGET = ARGV[1].delete(":")
 SOURCE_COMMIT = ARGV[2] || "origin/master"
 
 # by default pass output of commands to stdout and stderr
-Cheetah.default_options = { :stdout => STDOUT, :stderr => STDERR }
+Cheetah.default_options = { stdout: STDOUT, stderr: STDERR }
 
 def project
   raise unless @project
@@ -39,7 +45,7 @@ end
 NAMESPACES_MAPPING = {
   "libyui" => "Libyui",
   "yast"   => "Yast"
-}
+}.freeze
 
 def project_namespace
   raise unless @project
@@ -52,19 +58,17 @@ def project=(value)
 end
 
 def check_real_upstream
-  res = Cheetah.run "git", "remote", "-v", :stdout => :capture
+  res = Cheetah.run "git", "remote", "-v", stdout: :capture
   upstream = res.lines.grep(/origin\s*git@github.com:(yast|libyui)/)
-  if upstream.empty?
-    raise "This script can work only on upstream clone, where upstream remote is marked as origin"
-  end
+  raise "This script can work only on upstream clone, where upstream remote is marked as origin" if upstream.empty?
 
   self.project = upstream.first[/origin\s*git@github.com:(yast|libyui)/, 1]
 end
 
 def already_exists?
-  res = Cheetah.run "git", "branch", "-r", :stdout => :capture
+  res = Cheetah.run "git", "branch", "-r", stdout: :capture
   res = res.lines
-  return !res.grep(/origin\/#{BRANCH_NAME}/).empty?
+  !res.grep(/origin\/#{BRANCH_NAME}\z/).empty?
 end
 
 def modify_rakefile
@@ -74,11 +78,11 @@ def modify_rakefile
   submit_to = "#{project_namespace}::Tasks.submit_to"
 
   new_line = "#{submit_to} :#{TARGET}\n"
-  line_index = lines.index {|l| l =~ /#{submit_to}/ }
+  line_index = lines.index { |l| l =~ /#{submit_to}/ }
   if line_index
     lines[line_index] = new_line
   else # line is not there yet, so place it below require line
-    line_index = lines.index {|l| l =~ /^\s*require.*#{project}\/rake/ }
+    line_index = lines.index { |l| l =~ /^\s*require.*#{project}\/rake/ }
     lines.insert(line_index + 1, "\n", new_line)
   end
 
@@ -87,20 +91,38 @@ end
 
 def modify_dockerfile
   if !File.exist?("Dockerfile")
-    STDERR.puts "No Dockerfile, skipping its adaptation"
+    warn "No Dockerfile, skipping its adaptation"
     return
   end
 
   lines = File.readlines("Dockerfile")
   from_index = lines.index { |l| l =~ /^FROM / }
   raise "Missing FROM in dockerfile" unless from_index
+
   line = lines[from_index]
-  docker_tag = ":" + TARGET.sub(/sp/, "-sp")
-  if line.include?(":") # docker file already use tag
-    line.sub!(/:.*$/, docker_tag + "\n")
+
+  if line.include?("registry.opensuse.org")
+    # new OBS Docker image
+    project_path = TARGET.sub(/sp/, "/sp").sub(/sle/, "sle-")
+
+    registry = if project == "yast"
+      img_type = line.include?("cpp") ? "cpp" : "ruby"
+      "registry.opensuse.org/yast/#{project_path}/containers/yast-#{img_type}"
+    else
+      "registry.opensuse.org/devel/libraries/libyui/#{project_path}/containers/libyui-devel"
+    end
+
+    line.replace("FROM #{registry}\n")
   else
-    line.sub!(/\s*$/, docker_tag + "\n")
+    # old Docker Hub image
+    docker_tag = ":" + TARGET.sub(/sp/, "-sp")
+    if line.include?(":") # docker file already use tag
+      line.sub!(/:.*$/, docker_tag + "\n")
+    else
+      line.sub!(/\s*$/, docker_tag + "\n")
+    end
   end
+
   File.write("Dockerfile", lines.join(""))
 end
 
@@ -111,10 +133,10 @@ if already_exists?
   exit 0
 end
 
-#switch to master branch
+# switch to master branch
 Cheetah.run "git", "checkout", "master"
 
-#create new branch ( ensure we use the latest non modified pushed version )
+# create new branch ( ensure we use the latest non modified pushed version )
 Cheetah.run "git", "fetch", "origin"
 Cheetah.run "git", "branch", BRANCH_NAME, SOURCE_COMMIT
 Cheetah.run "git", "checkout", BRANCH_NAME
@@ -122,10 +144,14 @@ Cheetah.run "git", "checkout", BRANCH_NAME
 modify_rakefile
 modify_dockerfile
 
-commit_msg = "adapt Rakefile and Dockerfile for #{BRANCH_NAME}"
+commit_msg = "Adapt Rakefile and Dockerfile for #{BRANCH_NAME}"
 
-Cheetah.run "git", "commit", "-am", commit_msg
-
-Cheetah.run "git", "push", "--set-upstream", "origin", "#{BRANCH_NAME}:#{BRANCH_NAME}"
-
-puts "Maintenance branch properly created"
+if DRY_RUN
+  puts "Dry run mode active, run these commands to manually push the changes:"
+  puts "  git commit -am \"#{commit_msg}\""
+  puts "  git push --set-upstream origin #{BRANCH_NAME}:#{BRANCH_NAME}"
+else
+  Cheetah.run "git", "commit", "-am", commit_msg
+  Cheetah.run "git", "push", "--set-upstream", "origin", "#{BRANCH_NAME}:#{BRANCH_NAME}"
+  puts "Maintenance branch properly created"
+end

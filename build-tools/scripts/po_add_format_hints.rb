@@ -71,6 +71,7 @@ module Yast
       class PoAddFormatHints
         SHORT_MSG_LIMIT = 50
         attr_accessor :dry_run, :verbose, :silent, :perl_brace_format
+        attr_reader :current_file_modifications, :total_modifications
 
         # Constructor
         def initialize
@@ -180,7 +181,7 @@ module Yast
           when /%[0-9]*\$[sdixXoeEfgGbB]/
             log_verbose("  Detected positional parameters in printf()-like format")
             "c-format"
-          when /%-?[0-9]+[sdixXoeEfgGbB]/, /%-?[0-9]+\.[0-9]+[sdixXoeEfgGbB]/
+          when /%[-+ ]?[0-9]+[sdixXoeEfgGbB]/, /%[-+ ]?[0-9]+\.[0-9]+[sdixXoeEfgGbB]/
             # More elaborate printf-like formats.
             # Notice this does not catch all weird cases, but a translator
             # should not confronted with this anyway; this should be formatted

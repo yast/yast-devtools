@@ -26,8 +26,9 @@
 #
 # This script will add format marker hints to .po and .pot files:
 #
-#   %s %d etc. -> c-format
-#   %1 %2 etc. -> ycp-format
+#   %s %d etc.    -> c-format
+#   %1 %2 etc.    -> ycp-format
+#   %{foo} %{bar} -> perl-brace-format
 #
 # msgfmt and msgmerge understand those formats and will check if a translation
 # has the same placeholders as the untranslated message.
@@ -52,7 +53,7 @@
 #
 # Use a standard xgettext comment to override this script:
 #
-#   # xgettext: c-format
+#   # xgettext:c-format
 #   foo(_"... %1 ...")
 #
 # Author: Stefan Hundhammer <shundhammer@suse.com>
@@ -69,13 +70,14 @@ module Yast
       # Class to add format marker hints to .po and .pot files
       class PoAddFormatHints
         SHORT_MSG_LIMIT = 50
-        attr_accessor :dry_run, :verbose, :silent
+        attr_accessor :dry_run, :verbose, :silent, :perl_brace_format
 
         # Constructor
         def initialize
           @dry_run = false
           @verbose = false
           @silent = false
+          @perl_brace_format = true
           @current_file_modifications = 0
           @total_modifications = 0
           @po_format_options =
@@ -89,7 +91,9 @@ module Yast
         def run(command_line_args)
           po_files = parse_command_line(command_line_args)
           po_files.each { |po_file| add_format_hints(po_file) }
-          puts("Total: #{@total_modifications} format flags added") unless @silent
+          if po_files.size > 1 && !@silent
+            puts("Total: #{@total_modifications} format flags added")
+          end
         end
 
         # Read and parse a .po or .pot file named 'po_file', check each entry
@@ -147,11 +151,11 @@ module Yast
               log_verbose("  Skipping existing format: \"#{short_msg(msg)}\"")
               next
             end
-            # log_verbose("Checking \"#{msg}\"")
+            # log_verbose("Checking \"#{short_msg(msg)}\"")
             format = find_known_formats(msg)
             if format
-              log_verbose("* Detected #{format} in \"#{short_msg(msg)}\"")
-              entry.flags << format unless entry.flags.include?(format)
+              log_verbose("* Adding #{format} to \"#{short_msg(msg)}\"")
+              entry.flags << format
               @current_file_modifications += 1
               @total_modifications += 1
             end
@@ -187,6 +191,17 @@ module Yast
           when /%[1-9]/ # sformat-like %1 %2 %3 ...
             log_verbose("  Detected sformat()-like positional parameters")
             "ycp-format"
+          when /%{[a-zA-Z][a-zA-Z0-9]*}/ # Named parameters %{foo} %{bar}
+            if @perl_brace_format
+              log_verbose("  Detected named parameters %{value}")
+              "perl-brace-format"
+            else
+              log_verbose("  Detected named parameters %{value} (ignored as requested)")
+              nil
+            end
+          when /%<[a-zA-Z][a-zA-Z0-9]*>/ # Named parameters %{foo} %{bar}
+            log_verbose("  Detected named parameters %<value> (no suitable xgettext format flag)")
+            nil
           else
             nil
           end
@@ -216,19 +231,24 @@ module Yast
           parser.banner = ("Usage: %s [OPTIONS] PO_FILE1 [PO_FILE2] ...") % File.basename($0)
           parser.separator("")
           parser.separator("Add PO format marker hints to .pot and .po files:")
-          parser.separator("  \"%s %d\" etc. -> c-format")
-          parser.separator("  \"%1 %2\" etc. -> ycp-format")
+          parser.separator("  \"%s %d\" etc.         -> c-format")
+          parser.separator("  \"%1 %2\" etc.         -> ycp-format")
+          parser.separator("  \"%{foo} %{bar}\" etc. -> perl-brace-format")
           parser.separator("")
           parser.separator("The markers are added in-place unless the --dry-run option is given.")
           parser.separator("")
           parser.separator("Use the usual xgettext comments to override this:")
-          parser.separator("  # xgettext: c-format")
+          parser.separator("  # xgettext:c-format")
           parser.separator("  foo(_(\"... %1 ...\"))")
           parser.separator("")
           parser.separator("Options:")
 
           parser.on("-n", "--dry-run", "Dry run; don't modify the file.") do |dry_run|
             @dry_run = dry_run
+          end
+
+          parser.on("-p", "--no-perl-brace-format", "Don't use the perl-brace-format") do |p|
+            @perl_brace_format = false
           end
 
           parser.on("-v", "--verbose", "More output") do |verbose|

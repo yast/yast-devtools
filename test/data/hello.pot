@@ -1,0 +1,46 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-28 17:42+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: hello.c:33
+msgid "Hello, world!\n"
+msgstr ""
+
+#: hello.c:34
+msgid "How are you today?"
+msgstr ""
+
+#: hello.c:36
+msgid "printf-like parameters %s and %s\n"
+msgstr ""
+
+#: hello.c:37
+msgid "Numbered printf parameters %2$s and %1$s\n"
+msgstr ""
+
+#: hello.c:40
+msgid "sformat-like message with parameters %1 and %2"
+msgstr ""
+
+#: hello.c:45
+msgid "Named parameters %{foo} and %{bar}"
+msgstr ""
+
+#: hello.c:46
+msgid "Named parameters %<foo> and %<bar>"
+msgstr ""

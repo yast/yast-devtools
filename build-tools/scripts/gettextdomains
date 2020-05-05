@@ -34,6 +34,14 @@ function get_domains_and_err()
     fi
 
     for F in $SRCFILES; do
+        case $F in
+            # Skip known files that contain the gettext marker, but no translations
+            */po_add_format_hints.rb)
+                echo "Skipping $F"
+                continue
+                ;;
+        esac
+
         # strip comments from the files and match [_]_( "..." )
         # 1. perl: strip one-line-comments, except ruby "string #{interpolation}"
         # 2. perl: match for _( "...") and __("..." ) (multiline too),

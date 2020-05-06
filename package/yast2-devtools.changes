@@ -2,7 +2,7 @@
 Tue May  5 13:20:44 UTC 2020 - Stefan Hundhammer <shundhammer@suse.com>
 
 - New script to add format hints for translated messages:
-  po_add_format_hints.rb (bsc#954505, bsc#980329)
+  po_add_format_hints (bsc#954505, bsc#980329)
 - 4.2.6
 
 -------------------------------------------------------------------

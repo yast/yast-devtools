@@ -18,7 +18,7 @@ CWD=`dirname $0`
 
 # Helper script to add c-format or ycp-format markers;
 # this is assumed to be in the same directory as this script.
-PO_ADD_FORMAT_HINTS=$CWD/po_add_format_hints.rb
+PO_ADD_FORMAT_HINTS=$CWD/po_add_format_hints
 
 
 # list of generated files which should be removed at the end

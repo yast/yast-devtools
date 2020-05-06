@@ -1,6 +1,6 @@
 #!/usr/bin/env rspec
 
-require_relative "../build-tools/scripts/po_add_format_hints.rb"
+require_relative "../build-tools/scripts/po_add_format_hints"
 
 describe Yast::GetText::Tools::PoAddFormatHints do
   subject { described_class.new }

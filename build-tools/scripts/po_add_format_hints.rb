@@ -43,9 +43,10 @@
 #
 # Options:
 #
-#   -n, --dry-run :  dry run; don't modify the file.
-#   -v, --verbose :  more output
-#   -s, --silent  :  no output
+#   -n, --dry-run :               Dry run; don't modify the file
+#   -v, --verbose :               More output
+#   -s, --silent  :               No output
+#   -p, --no-perl-brace-format :  Don't use the perl-brace-format
 #
 # It is NOT necessary to call this for each .po file for each language as well:
 # The "msgmerge" command will do that while it merges new or changed messages
@@ -241,7 +242,7 @@ module Yast
           parser.separator("")
           parser.separator("Options:")
 
-          parser.on("-n", "--dry-run", "Dry run; don't modify the file.") do |dry_run|
+          parser.on("-n", "--dry-run", "Dry run; don't modify the file") do |dry_run|
             @dry_run = dry_run
           end
 

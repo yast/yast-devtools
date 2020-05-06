@@ -114,7 +114,6 @@ module Yast
 
         # Read a file named 'po_file' and return the corresponding PO object.
         def read_po(po_file)
-          raise ArgumentError, "Can't open #{po_file}" unless File.exist?(po_file)
           po = ::GetText::PO.new
           po_parser.parse_file(po_file, po)
           @current_file_modifications = 0
@@ -122,21 +121,19 @@ module Yast
         end
 
         # Write a PO object 'po' to a file named 'po_file' unless there was no
-        # modification.
+        # modification. This returns 'true' if okay, 'false' if error.
         def write_po(po_file, po, force = false)
           if current_file_unmodified? && !force
             log_verbose("Not modified: #{po_file}")
-            return
+            return true
           end
           po_string = po.to_s(@po_format_options)
           if po_string.empty?
-            STDERR.puts("#{$0}: No output for #{po_file}")
+            warn("#{$0}: No output for #{po_file}")
             return false
           end
           log_verbose("Writing #{po_file}")
-          File.open(po_file, "w") do |file|
-            file.print(po_string)
-          end
+          File.write(po_file, po_string)
           true
         end
 
@@ -149,7 +146,7 @@ module Yast
             next if entry.msgid.empty?
             msg = entry.msgid.chomp
             if has_format_flag?(entry)
-              log_verbose("  Skipping existing format: \"#{short_msg(msg)}\"")
+              log_indented("Skipping existing format: \"#{short_msg(msg)}\"")
               next
             end
             # log_verbose("Checking \"#{short_msg(msg)}\"")
@@ -174,12 +171,12 @@ module Yast
         # If yes, return that format as a string ("c-format", "ycp-format").
         # If no, return 'nil'.
         def find_known_formats(msg)
-          case msg
+          case remove_escaped_percent(msg)
           when /%[sdixXoeEfgGbB]/ # simple printf-like %s %d %x ...
-            log_verbose("  Detected simple printf()-like format")
+            log_indented("Detected simple printf()-like format")
             "c-format"
           when /%[0-9]*\$[sdixXoeEfgGbB]/
-            log_verbose("  Detected positional parameters in printf()-like format")
+            log_indented("Detected positional parameters in printf()-like format")
             "c-format"
           when /%[-+ ]?[0-9]+[sdixXoeEfgGbB]/, /%[-+ ]?[0-9]+\.[0-9]+[sdixXoeEfgGbB]/
             # More elaborate printf-like formats.
@@ -187,21 +184,21 @@ module Yast
             # should not confronted with this anyway; this should be formatted
             # into a string first and THEN put into a message that the
             # translator sees.
-            log_verbose("  Detected complex printf()-like format")
+            log_indented("Detected complex printf()-like format")
             "c-format"
           when /%[1-9]/ # sformat-like %1 %2 %3 ...
-            log_verbose("  Detected sformat()-like positional parameters")
+            log_indented("Detected sformat()-like positional parameters")
             "ycp-format"
-          when /%{[a-zA-Z][a-zA-Z0-9]*}/ # Named parameters %{foo} %{bar}
+          when /%{[a-zA-Z_][a-zA-Z0-9_]*}/ # Named parameters %{foo} %{bar}
             if @perl_brace_format
-              log_verbose("  Detected named parameters %{value}")
+              log_indented("Detected named parameters %{value}")
               "perl-brace-format"
             else
-              log_verbose("  Detected named parameters %{value} (ignored as requested)")
+              log_indented("Detected named parameters %{value} (ignored as requested)")
               nil
             end
-          when /%<[a-zA-Z][a-zA-Z0-9]*>/ # Named parameters %{foo} %{bar}
-            log_verbose("  Detected named parameters %<value> (no suitable xgettext format flag)")
+          when /%<[a-zA-Z_][a-zA-Z0-9_]*>/ # Named parameters %{foo} %{bar}
+            log_indented("Detected named parameters %<value> (no suitable xgettext format flag)")
             nil
           else
             nil
@@ -274,12 +271,23 @@ module Yast
           puts(msg) if @verbose
         end
 
+        # Write a message to stdout if --verbose is set with indentation.
+        def log_indented(msg)
+          log_verbose("  " + msg)
+        end
+
         # Return a message suitable for debug output:
         # All newlines translated to "\n" and 50 chars max
         def short_msg(msg)
           result = msg.chomp.gsub("\n", "\\n")
           return result if result.size <= SHORT_MSG_LIMIT
           result[0..SHORT_MSG_LIMIT-1] + "..."
+        end
+
+        # Remove escaped percent characters in a text to avoid false positives
+        # during pattern matching.
+        def remove_escaped_percent(msg)
+          msg.gsub("%%", "")
         end
 
         def current_file_unmodified?

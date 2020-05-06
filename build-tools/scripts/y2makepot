@@ -16,6 +16,11 @@
 CWD=`dirname $0`
 . $CWD/gettextdomains
 
+# Helper script to add c-format or ycp-format markers;
+# this is assumed to be in the same directory as this script.
+PO_ADD_FORMAT_HINTS=$CWD/po_add_format_hints
+
+
 # list of generated files which should be removed at the end
 CLEAN_FILES=""
 
@@ -86,6 +91,20 @@ function rxgettext_call()
             # remove plural forms template, the dummy values are invalid
             # and do not pass the following check
             sed -i '/^"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;/d' $MODULE.pot
+
+            # Add format marker hints for placeholders:
+            #   %s %d etc. -> c-format
+            #   %1 %2 etc. -> ycp-format
+            #
+            # msgfmt and msgmerge understand those formats and will check if a
+            # translation has the same placeholders as the untranslated message.
+            #
+            # This can be overridden for each message in the source code with
+            # the usual xgettext comments:
+            #
+            #   # xgettext:c-format
+            #   # foo(_("... %1 ..."))
+            $PO_ADD_FORMAT_HINTS $MODULE.pot
 
             # verify if the output is valid, rxgettext had some bugs resulting
             # in invalid file, be sure that GNU gettext is able to read it, huh :-(

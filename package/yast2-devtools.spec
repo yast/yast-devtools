@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        4.2.5
+Version:        4.2.6
 Release:        0
 Url:            https://github.com/yast/yast-devtools
 Summary:        YaST2 - Development Tools
@@ -136,6 +136,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/bin/showy2log
 %{_datadir}/YaST2/data/devtools/bin/tagversion
 %{_datadir}/YaST2/data/devtools/bin/y2makepot
+%{_datadir}/YaST2/data/devtools/bin/po_add_format_hints
 %{_datadir}/YaST2/data/devtools/bin/gettextdomains
 %{_datadir}/YaST2/data/devtools/bin/ycp_puttext
 %{_datadir}/YaST2/data/devtools/data/rubocop_yast_style.yml

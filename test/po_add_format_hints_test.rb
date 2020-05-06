@@ -90,19 +90,21 @@ describe Yast::GetText::Tools::PoAddFormatHints do
   end
 
   describe "#run" do
+    HELLO_POT = "#{__dir__}/data/hello.pot".freeze
+
     # Always use "--dry-run" to avoid modifying the sample .pot file!
     it "Reports the expected number of changes" do
-      argv = ["--dry-run", "data/hello.pot"]
+      argv = ["--dry-run", HELLO_POT]
       expect { subject.run(argv) }.to output(/^.*hello.pot: 4 format flags added$/).to_stdout
     end
 
     it "Reports one less change when disabling perl-brace-format" do
-      argv = ["--dry-run", "--no-perl-brace-format", "data/hello.pot"]
+      argv = ["--dry-run", "--no-perl-brace-format", HELLO_POT]
       expect { subject.run(argv) }.to output(/3 format flags added/).to_stdout
     end
 
     it "Reports the added formats in verbose mode" do
-      argv = ["--dry-run", "--verbose", "data/hello.pot"]
+      argv = ["--dry-run", "--verbose", HELLO_POT]
       added = /Adding c-format.*Adding c-format.*Adding ycp-format.*Adding perl-brace-format/m
       expect { subject.run(argv) }.to output(added).to_stdout
     end

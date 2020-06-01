@@ -84,7 +84,7 @@ make
 %install
 make install DESTDIR="%{buildroot}"
 [ -e "%{_datadir}/YaST2/data/devtools/NO_MAKE_CHECK" ] || Y2DIR="%{buildroot}%{_datadir}/YaST2" make check DESTDIR="%{buildroot}"
-for f in `find %{buildroot}%{_datadir}/applications/YaST2 -name "*.desktop"` ; do
+for f in `find %{buildroot}%{_datadir}/applications -name "*.desktop"` ; do
     d=${f##*/}
     %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop}
 done

@@ -46,7 +46,7 @@ def metainfo_gen(desktop, license, url, version)
 
   file = File.open(desktop).read
   data = Hash[file.scan(/(.*)?=\s*?(.*)/).map { |k,v| [k.strip, v.strip] }]
-  base.add_element("id").add_text(File.basename(desktop, ".desktop"))
+  base.add_element("id").add_text(File.basename(desktop))
   # Exectutes based on id of desktop file https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-launchable
   base.add_element("launchable", "type" => "desktop-id").add_text(File.basename(desktop))
   data.select{ |x| x.start_with?("GenericName") }.each do |key, value|
@@ -60,7 +60,9 @@ def metainfo_gen(desktop, license, url, version)
     name.add_attribute("xml:lang", lang) if lang
   end
   cat = base.add_element("categories")
-  data["Categories"].split(";").each do |category|
+  rejected_categories = ["Settings", "ConsoleOnly", "DesktopSettings"]
+  categories = data["Categories"].split(";") - rejected_categories
+  categories.each do |category|
     cat.add_element("category").add_text(category)
   end
   rel = base.add_element("releases")
@@ -75,7 +77,7 @@ def metainfo_gen(desktop, license, url, version)
     base.add_element("metadata_license").add_text(license)
     base.add_element("project_license").add_text(license)
   end
-  base.add_element("extends").add_text("org.opensuse.YaST")
+  base.add_element("extends").add_text("org.opensuse.YaST.desktop")
   if url
     base.add_element("url", "type" => "homepage").add_text(url)
   else

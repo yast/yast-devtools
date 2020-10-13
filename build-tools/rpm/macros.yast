@@ -120,8 +120,8 @@ fi \
             %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
         done \
     %else  # 0%%{?suse_version} \
-        %{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -print0 \\\
-            -name '*.desktop' | %{_bindir}/sort -uz | \\\
+        %{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop' \\\
+            -print0 | %{_bindir}/sort -uz | \\\
             %{_bindir}/xargs -0 %{_bindir}/desktop-file-validate \
     %endif # 0%%{?suse_version}
 

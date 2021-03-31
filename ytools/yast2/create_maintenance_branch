@@ -126,6 +126,19 @@ def modify_dockerfile
   File.write("Dockerfile", lines.join(""))
 end
 
+def modify_github_actions
+  image_path = TARGET.sub(/sp/, "/sp").sub(/sle/, "sle-")
+
+  Dir[".github/workflows/*.{yml,yaml}"].map do |file|
+    content = File.read(file)
+    content.gsub!(
+      "registry.opensuse.org/yast/head/containers/yast-",
+      "registry.opensuse.org/yast/#{image_path}/containers/yast-"
+    )
+    File.write(file, content)
+  end
+end
+
 check_real_upstream
 
 if already_exists?
@@ -143,8 +156,9 @@ Cheetah.run "git", "checkout", BRANCH_NAME
 
 modify_rakefile
 modify_dockerfile
+modify_github_actions
 
-commit_msg = "Adapt Rakefile and Dockerfile for #{BRANCH_NAME}"
+commit_msg = "Adapt Rakefile and GitHub Actions for #{BRANCH_NAME}"
 
 if DRY_RUN
   puts "Dry run mode active, run these commands to manually push the changes:"

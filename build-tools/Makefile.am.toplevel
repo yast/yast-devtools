@@ -14,9 +14,6 @@ VERSION			= $(shell grep -m 1 '^[[:space:]]*Version:' $(srcdir)/package/$(RPMNAM
 SUBDIRS_FILE		= $(shell test -e $(srcdir)/SUBDIRS      && echo SUBDIRS)
 ACINCLUDE_FILE		= $(shell test -e $(srcdir)/acinclude.m4 && echo acinclude.m4)
 
-COPYRIGHT_files    = COPYING
-doc_DATA = $(COPYRIGHT_files)
-
 # do we do Makefile.am for devtools? It is a little special...
 IS_DEVTOOLS		= $(findstring yast2-devtools,$(RPMNAME))
 
@@ -46,8 +43,7 @@ POT_DST = $(shell find -type d -name testsuite -prune , \
 	-type f -name "*.pot") 
 
 EXTRA_DIST = \
-	RPMNAME MAINTAINER configure.in.in                      \
-	$(COPYRIGHT_files)                                      \
+	RPMNAME MAINTAINER COPYING configure.in.in              \
 	$(SUBDIRS_FILE) $(ACINCLUDE_FILE)			\
 	$(if $(IS_DEVTOOLS),Makefile.am.common,$(POT_DST))
 

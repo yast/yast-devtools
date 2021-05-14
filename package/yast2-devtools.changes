@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri May 14 16:33:01 UTC 2021 - Ladislav Slezák <lslezak@suse.cz>
+
+- Change the %yast_icondir RPM macro from /usr/share/icons to
+  /usr/share/icons/hicolor, /usr/share/icons is owned by
+  "filesystem" package with different permissions (bsc#1186066)
+- 4.4.1
+
+-------------------------------------------------------------------
 Wed Apr  7 19:37:37 UTC 2021 - Dirk Müller <dmueller@suse.com>
 
 - stop installing COPYING as documentation - it is already installed

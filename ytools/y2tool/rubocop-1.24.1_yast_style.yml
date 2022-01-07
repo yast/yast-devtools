@@ -211,3 +211,15 @@ Naming/VariableNumber:
 # so calls path.to_s and append element. Result is wrong path.
 Style/StringConcatenation:
   Enabled: false
+
+# while there is agreement on reducing openstruct usage,
+# it is still used too widely, so disable only per module when
+# it is ready
+Style/OpenStructUse:
+  Enabled: false
+
+# Skip warning for constant definition in tests
+# as in rspec we often locate testing data close to respective test
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - "**/test/**/*.rb"

@@ -223,3 +223,14 @@ Style/OpenStructUse:
 Lint/ConstantDefinitionInBlock:
   Exclude:
     - "**/test/**/*.rb"
+
+# Both styles has advantages and disadvantages and we decided to keep it
+# up to code writer which one fits better. Can be changed when we use more
+# widely type checking which needs separated style.
+Style/AccessorGrouping:
+  Enabled: false
+
+Metrics/BlockLength:
+  # rspec is known as DSL with big blocks
+  Exclude:
+    - "**/test/**/*"

@@ -31,8 +31,8 @@
   <xsl:param name="str"/>
 
   <xsl:choose>
-    <!-- starts with a new line or space? -->
-    <xsl:when test="string-length($str) &gt; 0 and (substring($str, 1, 1) = '&#x0a;' or substring($str, 1, 1) = ' ')">
+    <!-- starts with a new line, tab or space? -->
+    <xsl:when test="string-length($str) &gt; 0 and (substring($str, 1, 1) = '&#x0a;' or substring($str, 1, 1) = '&#x09;' or substring($str, 1, 1) = ' ')">
       <!-- recursively call self with the string without the first character -->
       <xsl:call-template name="trim">
         <xsl:with-param name="str">
@@ -40,8 +40,8 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:when>
-    <!-- ends with a new line or space? -->
-    <xsl:when test="string-length($str) &gt; 0 and (substring($str, string-length($str)) = '&#x0a;' or substring($str, string-length($str)) = ' ')">
+    <!-- ends with a new line, tab or space? -->
+    <xsl:when test="string-length($str) &gt; 0 and (substring($str, string-length($str)) = '&#x0a;' or substring($str, string-length($str)) = '&#x09;' or substring($str, string-length($str)) = ' ')">
       <!-- recursively call self with the string without the last character -->
       <xsl:call-template name="trim">
         <xsl:with-param name="str">

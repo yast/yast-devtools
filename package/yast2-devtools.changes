@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Apr 13 08:45:45 UTC 2022 - Ladislav Slezák <lslezak@suse.cz>
+
+- Fix for previous change, trim also the tabs (bsc#1197965)
+- 4.5.2
+
+-------------------------------------------------------------------
 Tue Apr 12 13:20:40 UTC 2022 - Ladislav Slezák <lslezak@suse.cz>
 
 - Fixed generating POT files from XML, trim the leading and

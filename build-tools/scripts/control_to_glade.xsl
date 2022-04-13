@@ -16,10 +16,52 @@
   <xsl:attribute name="translatable">yes</xsl:attribute>
 </xsl:attribute-set>
 
-<!-- replace <label> by <property>, keep the original value -->
+<!--
+  Template for trimming leading and trailing white space (spaces and new lines)
+  from a string.
+
+  Notes:
+    - The XSL already contains built-in function "normalize-space()", unfortunately
+      this also trims extra white space *inside* the string which we do not want
+      in this case. :-(
+    - Inspired by https://stackoverflow.com/a/30463195
+    - In XSL "substring()" function the index starts from 1!!
+-->
+<xsl:template name="trim">
+  <xsl:param name="str"/>
+
+  <xsl:choose>
+    <!-- starts with a new line or space? -->
+    <xsl:when test="string-length($str) &gt; 0 and (substring($str, 1, 1) = '&#x0a;' or substring($str, 1, 1) = ' ')">
+      <!-- recursively call self with the string without the first character -->
+      <xsl:call-template name="trim">
+        <xsl:with-param name="str">
+          <xsl:value-of select="substring($str, 2)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:when>
+    <!-- ends with a new line or space? -->
+    <xsl:when test="string-length($str) &gt; 0 and (substring($str, string-length($str)) = '&#x0a;' or substring($str, string-length($str)) = ' ')">
+      <!-- recursively call self with the string without the last character -->
+      <xsl:call-template name="trim">
+        <xsl:with-param name="str">
+          <xsl:value-of select="substring($str, 1, string-length($str) - 1)"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:when>
+    <!-- otherwise just return the original string -->
+    <xsl:otherwise>
+      <xsl:value-of select="$str"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- replace <label> by <property>, trim the leading and trailing white space from the value -->
 <xsl:template match="n:label">
   <xsl:element name="property" use-attribute-sets="translatable_label">
-    <xsl:copy-of select="text()"/>
+    <xsl:call-template name="trim">
+      <xsl:with-param name="str" select="text()"/>
+    </xsl:call-template>
   </xsl:element>
 </xsl:template>
 

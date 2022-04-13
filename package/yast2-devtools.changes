@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Apr 12 13:20:40 UTC 2022 - Ladislav Slezák <lslezak@suse.cz>
+
+- Fixed generating POT files from XML, trim the leading and
+  trailing white space to be compatible with the Ruby code
+  (bsc#1197965)
+- 4.5.1
+
+-------------------------------------------------------------------
 Wed Apr 06 13:24:58 UTC 2022 - Ladislav Slezák <lslezak@suse.cz>
 
 - Bump version to 4.5.0 (bsc#1198109)

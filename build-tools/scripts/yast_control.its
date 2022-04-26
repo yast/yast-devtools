@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Rules for extracting the translatable strings from YaST control files -->
+<!-- see https://www.gnu.org/software/gettext/manual/html_node/Preparing-ITS-Rules.html -->
+<!-- see https://www.w3.org/TR/its20/ -->
+<its:rules xmlns:its="http://www.w3.org/2005/11/its"
+           xmlns:gt="https://www.gnu.org/s/gettext/ns/its/extensions/1.0"
+           version="2.0">
+
+  <!-- by default all texts in file are translated, disable translations for all nodes below the root <productDefines> -->
+  <its:translateRule selector="/n:productDefines"
+                     translate="no"
+                     xmlns:n="http://www.suse.com/1.0/yast2ns"/>
+  <!-- or for all nodes in XSL definitions -->
+  <its:translateRule selector="/xsl:stylesheet"
+                     translate="no"
+                     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"/>
+  <!-- translate only the texts in the <label> nodes anywhere -->
+  <its:translateRule selector="//n:label"
+                     translate="yes"
+                     xmlns:n="http://www.suse.com/1.0/yast2ns"/>
+  <!-- gettext extension: disable escaping of special XML characters like "<", ">" in the texts -->
+  <gt:escapeRule selector="//n:label" escape="no" xmlns:n="http://www.suse.com/1.0/yast2ns"/>
+  <!-- gettext extension: trim the leading and trailing whitespace but keep it in the middle, -->
+  <!-- to be compatible with the YaST XML parser -->
+  <gt:preserveSpaceRule selector="//n:label" space="trim" xmlns:n="http://www.suse.com/1.0/yast2ns"/>
+
+</its:rules>

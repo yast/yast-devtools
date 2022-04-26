@@ -20,15 +20,22 @@ CWD=`dirname $0`
 # this is assumed to be in the same directory as this script.
 PO_ADD_FORMAT_HINTS=$CWD/po_add_format_hints
 
-
-# list of generated files which should be removed at the end
-CLEAN_FILES=""
+# use the local file when running from a Git checkout
+if [ -f "$CWD/yast_control.its" ]; then
+    CONTROL_ITS="$CWD/yast_control.its"
+else
+    CONTROL_ITS="/usr/share/YaST2/control/yast_control.its"
+fi
 
 function gettext_call()
 {
     MODULE=$1
     SOURCE_FILES=$2
     SOURCE_RUBY_FILES=$3
+    SOURCE_CONTROL_FILES=$4
+
+    # remove the old file
+    rm -f "$MODULE.pot"
 
     # Is POT file merge needed? (both Ruby and non-Ruby files found)
     if [ -n "$SOURCE_FILES" -a -n "$SOURCE_RUBY_FILES" ]; then
@@ -50,10 +57,25 @@ function gettext_call()
         rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
     fi
 
-    if [ -n "$CLEAN_FILES" ]; then
-        echo "Removing generated files: $CLEAN_FILES"
-        rm -f $CLEAN_FILES
-        CLEAN_FILES=""
+    if [ -n "$SOURCE_CONTROL_FILES" ]; then
+        # a POT file was created from other files, we need to do the merge
+        if [ -f "$MODULE.pot" ]; then
+            mv "$MODULE.pot" "$MODULE.other.pot"
+            xgettext_call "$MODULE" "$SOURCE_CONTROL_FILES" "--omit-header --its=$CONTROL_ITS"
+            if [ -f "$MODULE.pot" ]; then
+                # new file was created, merge the files
+                mv "$MODULE.pot" "$MODULE.control.pot"
+                echo "Merging the .pot files..."
+                msgcat -o "$MODULE.pot" "$MODULE.other.pot" "$MODULE.control.pot"
+                rm "$MODULE.control.pot" "$MODULE.other.pot"
+            else
+                # no new file created, just rename it back
+                mv "$MODULE.other.pot" "$MODULE.pot"
+            fi
+        else
+            # no merge needed, just run gettext and that's it
+            xgettext_call "$MODULE" "$SOURCE_CONTROL_FILES" "--its=$CONTROL_ITS"
+        fi
     fi
 }
 
@@ -65,7 +87,7 @@ function xgettext_call()
 
     if [ -n "$FILES" ]; then
         echo "Creating ./$MODULE.pot from $FILES ...";
-        $XGETTEXT --no-wrap --add-comments --add-location \
+        $XGETTEXT --no-wrap --add-comments="$POTCOMMENTS" --add-location \
             --keyword=_ --keyword=_:1,2 --keyword=__ \
             --foreign-user $OPTIONS \
             --copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
@@ -86,7 +108,7 @@ function rxgettext_call()
         # rubygem-gettext is a weak dependency, check if it is present
         if [ -x "$RXGETTEXT_PATH" ]; then
             $RXGETTEXT --copyright-holder="SuSE Linux Products GmbH, Nuernberg" \
-                --add-comments --output=$MODULE.pot $FILES;
+                --add-comments="$POTCOMMENTS" --output=$MODULE.pot $FILES;
 
             # remove plural forms template, the dummy values are invalid
             # and do not pass the following check
@@ -155,6 +177,7 @@ function generate_potfiles()
     # gather files that share a domain to FILES and call xgettext
     FILES="";
     RUBY_FILES=""
+    CONTROL_FILES=""
 
     for I in $DOMAINS; do
 	D=${I%%:*} ;
@@ -174,12 +197,15 @@ function generate_potfiles()
         if [[ "$F" =~ \.(erb|rb)$ ]]; then
             RUBY_FILES="$RUBY_FILES $F";
         else
-            if [[ "$F" =~ \.glade$ ]]; then
-                echo "Processing $F file..."
-                GLADE_FILE="$F.translations.glade"
-                xsltproc /usr/share/YaST2/control/control_to_glade.xsl "$F" > "$GLADE_FILE"
-                FILES="$FILES $GLADE_FILE" ;
-                CLEAN_FILES="$CLEAN_FILES $GLADE_FILE" ;
+            # TODO: later remove support for the .glade workaround,
+            # it is kept just for the backward compatibility
+            if [[ "$F" =~ \.glade$ || "$F" =~ \.ycontrol.x[ms]l$ ]]; then
+                # follow symlinks to have correct file locations
+                if [ -L "$F" ]; then
+                    CONTROL_FILES="$CONTROL_FILES `realpath --relative-to=. \"$F\"`";
+                else
+                    CONTROL_FILES="$CONTROL_FILES $F";
+                fi
             else
                 FILES="$FILES $F" ;
             fi
@@ -187,47 +213,7 @@ function generate_potfiles()
     done
 
     POT_DST="$POT_DST $MODULE.pot"
-    gettext_call "$MODULE" "$FILES" "$RUBY_FILES"
-}
-
-
-function checkin_potfiles()
-{
-    ADDED=""
-    CHANGED=""
-
-    for f in $POT_DST; do
-	MODIFIER="`svn status $f | cut -d' ' -f1`"
-
-        # file has changed in repository
-	if test "$MODIFIER" == "M"; then
-	    echo "$f is already under version control and has changed."
-	    CHANGED="$CHANGED $f"
-        # file has been added already
-	elif test "$MODIFIER" == "A"; then
-	    echo "$f has already been added."
-	    ADDED="$ADDED $f"
-	# file is not under version control
-	else
-	    if test "`svn add $f | cut -d' ' -f1`" == "A"; then
-		echo "Added $f to svn repository."
-		ADDED="$ADDED $f"
-	    else
-		echo "warning: Could not add $f to svn repository"
-	    fi
-	fi
-    done
-
-    if test -n "$ADDED" -o -n "$CHANGED"; then
-        # commit the added or changed files now
-        svn commit --message "Committed potfile(s) $f to repository" $ADDED $CHANGED
-
-        if test "$?" == "0"; then
-            echo "Committed files $ADDED $CHANGED to repository"
-        else
-	        echo "Error while committing files to repository";
-        fi    
-    fi
+    gettext_call "$MODULE" "$FILES" "$RUBY_FILES" "$CONTROL_FILES"
 }
 
 # -- function defininitions -- end ---------------------------------------------
@@ -244,12 +230,14 @@ RXGETTEXT="rxgettext"
 
 SRCDIR="."
 POT_DST=""
+# read the POTCOMMENTS file if it is present
+POTCOMMENTS=`test -e "$SRCDIR/POTCOMMENTS" && cat "$SRCDIR/POTCOMMENTS"`
 
 # parse command line options
 while getopts "chfs::" opt; do
     case $opt in
 	c)
-	    CHECKIN=0
+	    echo "y2makepot: ignoring obsolete option -c"
             ;;
 	f)
 	    echo "y2makepot: ignoring obsolete option -f"
@@ -264,10 +252,6 @@ while getopts "chfs::" opt; do
 done
 
 generate_potfiles
-
-if test $CHECKIN = 0; then
-    checkin_potfiles
-fi
 
 exit 0
 

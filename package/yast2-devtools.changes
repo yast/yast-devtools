@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue May 10 11:32:08 UTC 2022 - Noel Power <nopower@suse.com>
+
+- Add python source files to files processed by
+  get_domains_and_err so POT files can be generated;(boo#1199396).
+- 4.2.8
+
+-------------------------------------------------------------------
 Sun Oct  4 19:26:07 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
 
 - Adapt appstream builder to changes in control center (related to

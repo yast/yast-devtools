@@ -16,4 +16,4 @@ dist_pkgdata_SCRIPTS = 				\
 # sourced by 'check-textdomain' and 'y2makepot'.
 dist_pkgdata_DATA = gettextdomains
 
-dist_control_DATA = yast_control.its
+dist_control_DATA = yast_control.its qt_ui.its

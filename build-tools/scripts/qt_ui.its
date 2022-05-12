@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Gettext rules for extracting the translatable strings from Qt UI files -->
+<!-- see https://www.gnu.org/software/gettext/manual/html_node/Preparing-ITS-Rules.html -->
+<!-- see https://www.w3.org/TR/its20/ -->
+<its:rules xmlns:its="http://www.w3.org/2005/11/its"
+           xmlns:gt="https://www.gnu.org/s/gettext/ns/its/extensions/1.0"
+           version="2.0">
+
+  <!-- by default all texts in file are translated, disable translations for all nodes below the root <ui> -->
+  <its:translateRule selector="/ui"
+                     translate="no"/>
+  <!-- translate only the texts in the text widget propertes anywhere -->
+  <its:translateRule selector="//widget/property[@name='text']/string"
+                     translate="yes"/>
+  <!-- gettext extension: disable escaping of special XML characters like "&" in the texts -->
+  <gt:escapeRule selector="//widget/property[@name='text']/string" escape="no"/>
+  <!-- gettext extension: trim the leading and trailing whitespace but keep it in the middle -->
+  <gt:preserveSpaceRule selector="//widget/property[@name='text']/string" space="trim"/>
+
+</its:rules>

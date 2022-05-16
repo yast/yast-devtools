@@ -131,6 +131,7 @@ EOF
 %{_datadir}/YaST2/data/devtools/data/rubocop*_yast_style.yml
 %dir %{_datadir}/YaST2/control/
 %{_datadir}/YaST2/control/yast_control.its
+%{_datadir}/YaST2/control/qt_ui.its
 
 %files -n yast2-buildtools
 %{_rpmmacrodir}/macros.yast

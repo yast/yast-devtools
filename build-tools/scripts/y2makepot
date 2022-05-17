@@ -26,6 +26,39 @@ if [ -f "$CWD/yast_control.its" ]; then
 else
     CONTROL_ITS="/usr/share/YaST2/control/yast_control.its"
 fi
+if [ -f "$CWD/qt_ui.its" ]; then
+    UI_ITS="$CWD/qt_ui.its"
+else
+    UI_ITS="/usr/share/YaST2/control/qt_ui.its"
+fi
+
+function add_xml_translations()
+{
+    XML_FILES=$1
+    ITS_FILE=$2
+
+    if [ -n "$XML_FILES" ]; then
+        # a POT file was created from other files, we need to do the merge
+        if [ -f "$MODULE.pot" ]; then
+            mv "$MODULE.pot" "$MODULE.other.pot"
+            xgettext_call "$MODULE" "$XML_FILES" "--omit-header --its=$ITS_FILE"
+            if [ -f "$MODULE.pot" ]; then
+                # new file was created, merge the files
+                mv "$MODULE.pot" "$MODULE.xml.pot"
+                echo "Merging the .pot files..."
+                msgcat -o "$MODULE.pot" "$MODULE.other.pot" "$MODULE.xml.pot"
+                rm "$MODULE.xml.pot" "$MODULE.other.pot"
+            else
+                # no new file created, just rename it back
+                mv "$MODULE.other.pot" "$MODULE.pot"
+            fi
+        else
+            # no merge needed, just run gettext and that's it
+            xgettext_call "$MODULE" "$XML_FILES" "--its=$ITS_FILE"
+        fi
+    fi
+
+}
 
 function gettext_call()
 {
@@ -33,6 +66,7 @@ function gettext_call()
     SOURCE_FILES=$2
     SOURCE_RUBY_FILES=$3
     SOURCE_CONTROL_FILES=$4
+    SOURCE_UI_FILES=$5
 
     # remove the old file
     rm -f "$MODULE.pot"
@@ -57,26 +91,8 @@ function gettext_call()
         rxgettext_call "$MODULE" "$SOURCE_RUBY_FILES"
     fi
 
-    if [ -n "$SOURCE_CONTROL_FILES" ]; then
-        # a POT file was created from other files, we need to do the merge
-        if [ -f "$MODULE.pot" ]; then
-            mv "$MODULE.pot" "$MODULE.other.pot"
-            xgettext_call "$MODULE" "$SOURCE_CONTROL_FILES" "--omit-header --its=$CONTROL_ITS"
-            if [ -f "$MODULE.pot" ]; then
-                # new file was created, merge the files
-                mv "$MODULE.pot" "$MODULE.control.pot"
-                echo "Merging the .pot files..."
-                msgcat -o "$MODULE.pot" "$MODULE.other.pot" "$MODULE.control.pot"
-                rm "$MODULE.control.pot" "$MODULE.other.pot"
-            else
-                # no new file created, just rename it back
-                mv "$MODULE.other.pot" "$MODULE.pot"
-            fi
-        else
-            # no merge needed, just run gettext and that's it
-            xgettext_call "$MODULE" "$SOURCE_CONTROL_FILES" "--its=$CONTROL_ITS"
-        fi
-    fi
+    add_xml_translations "$SOURCE_CONTROL_FILES" "$CONTROL_ITS"
+    add_xml_translations "$SOURCE_UI_FILES" "$UI_ITS"
 }
 
 function xgettext_call()
@@ -178,6 +194,7 @@ function generate_potfiles()
     FILES="";
     RUBY_FILES=""
     CONTROL_FILES=""
+    UI_FILES=""
 
     for I in $DOMAINS; do
 	D=${I%%:*} ;
@@ -196,24 +213,24 @@ function generate_potfiles()
         # is it a Ruby file?
         if [[ "$F" =~ \.(erb|rb)$ ]]; then
             RUBY_FILES="$RUBY_FILES $F";
-        else
+        elif [[ "$F" =~ \.glade$ || "$F" =~ \.ycontrol.x[ms]l$ ]]; then
             # TODO: later remove support for the .glade workaround,
             # it is kept just for the backward compatibility
-            if [[ "$F" =~ \.glade$ || "$F" =~ \.ycontrol.x[ms]l$ ]]; then
-                # follow symlinks to have correct file locations
-                if [ -L "$F" ]; then
-                    CONTROL_FILES="$CONTROL_FILES `realpath --relative-to=. \"$F\"`";
-                else
-                    CONTROL_FILES="$CONTROL_FILES $F";
-                fi
+            # follow symlinks to have correct file locations
+            if [ -L "$F" ]; then
+                CONTROL_FILES="$CONTROL_FILES `realpath --relative-to=. \"$F\"`";
             else
-                FILES="$FILES $F" ;
+                CONTROL_FILES="$CONTROL_FILES $F";
             fi
+        elif [[ "$F" =~ \.ui$ ]]; then
+            UI_FILES="$UI_FILES $F"
+        else
+            FILES="$FILES $F" ;
         fi
     done
 
     POT_DST="$POT_DST $MODULE.pot"
-    gettext_call "$MODULE" "$FILES" "$RUBY_FILES" "$CONTROL_FILES"
+    gettext_call "$MODULE" "$FILES" "$RUBY_FILES" "$CONTROL_FILES" "$UI_FILES"
 }
 
 # -- function defininitions -- end ---------------------------------------------

@@ -1,5 +1,18 @@
 ### sourced by 'check-textdomain' and 'y2makepot' ### -*- sh -*-
 
+# Try reading the default text domain from the TEXTDOMAIN file
+#    Argument:  $1 -> directory to search
+#               $F -> the source file
+#    Returns:   $D -> the found text domain
+function default_textdomain()
+{
+    local TD="$1/TEXTDOMAIN"
+    if [ -f "$TD" ]; then
+        echo "File $F: Using default text domain from $TD"
+        D=`cat "$TD"`
+    fi
+}
+
 #
 # get_domains_and_err():
 #     Argument:  $1        -> directory to search
@@ -26,6 +39,7 @@ function get_domains_and_err()
                                 -o -name "*.cpp" \
                                 -o -name "*.erb" \
                                 -o -name "*.glade" \
+                                -o -name "*.ui" \
                                 -o -name "*.ycontrol.xml" \
                                 -o -name "*.ycontrol.xsl" \
                                 -o -name "*.rb"  `
@@ -49,7 +63,7 @@ function get_domains_and_err()
 	# - false matches of comments inside strings
 	# - uncaught _( at line beginning
         MATCH=`perl -n -e 'print "$ARGV: $_" if not /(^\s*\/\/|^\s*#[^\{])/' $F | \
-               perl -n -e 'print "$_" if /<label>|[^[:alnum:]_"<](_|__|gettext)\(/../\)/'`
+               perl -n -e 'print "$_" if /<label>|<property\s+name\s*=\s*"text"|[^[:alnum:]_"<](_|__|gettext)\(/../\)/'`
         if [ -n "$MATCH" ]; then
             TR_FILES="$F $TR_FILES" ;
         fi
@@ -63,7 +77,22 @@ function get_domains_and_err()
         D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
             sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
                  '\''"(>]*[[:space:]]*\([-_[:alnum:]]*\).*/\1/'`;
-        if [ -z $D ]; then
+        # if the text domain is not specified directly in the file then
+        # search for the TEXTDOMAIN file in the source directory or in its parents
+        if [ -z "$D" ]; then
+            DIR=`dirname "$F"`
+            # search in the parent dirs
+            while [ -z "$D" -a "$DIR" != "." ]; do
+                default_textdomain "$DIR"
+                DIR=`dirname "$DIR"`
+            done
+            # search in the top level dir
+            if [ -z "$D" ]; then
+                default_textdomain "$DIR"
+            fi
+        fi
+
+        if [ -z "$D" ]; then
             ERR="$PWD/$F $ERR" ;
         else
             DOMAINS="$D:$F\n$DOMAINS" ;

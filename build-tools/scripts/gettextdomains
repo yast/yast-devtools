@@ -42,7 +42,8 @@ function get_domains_and_err()
                                 -o -name "*.ui" \
                                 -o -name "*.ycontrol.xml" \
                                 -o -name "*.ycontrol.xsl" \
-                                -o -name "*.rb"  `
+                                -o -name "*.rb"  \
+                                -o -name "*.py"  `
 
     if test "$?" != "0"; then
         echo "Error: check-pot terminated unexpected." >&2

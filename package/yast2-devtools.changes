@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Aug  4 15:25:48 UTC 2022 - Noel Power <nopower@suse.com>
+
+- Add python source files to files processed by
+  get_domains_and_err so POT files can be generated;(boo#1199396).
+- 4.5.5
+
+-------------------------------------------------------------------
 Mon May 16 07:03:10 UTC 2022 - Ladislav Slezák <lslezak@suse.cz>
 
 - Extract the translatable strings also from the Qt *.ui files

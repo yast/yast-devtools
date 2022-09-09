@@ -74,7 +74,7 @@ function get_domains_and_err()
 
     DOMAINS="" ;
     for F in $TR_FILES $POTFILES; do
-        D=`egrep '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
+        D=`grep -E '^[[:space:]]*<?[Tt]extdomain>?' $F | head -n 1 | \
             sed 's/^[[:space:]]*<\?[Tt]extdomain[[:space:]]*[=: \
                  '\''"(>]*[[:space:]]*\([-_[:alnum:]]*\).*/\1/'`;
         # if the text domain is not specified directly in the file then

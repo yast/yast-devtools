@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jul 31 08:02:37 UTC 2023 - Andreas Schwab <schwab@suse.de>
+
+- Don't disable testsuites on qemu build
+
+-------------------------------------------------------------------
 Fri Mar 10 17:23:47 UTC 2023 - Ladislav Slezák <lslezak@suse.com>
 
 - Rubocop configuration update: Disable autocorrection for the

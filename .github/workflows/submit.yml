@@ -1,0 +1,98 @@
+# See https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+
+# TODO: share this action with all packages
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows
+
+name: Submit
+
+on:
+  # when committing to master
+  push:
+    # FIXME:
+    # branches: master
+    branches: autosubmission
+
+permissions:
+  issues: write
+  pull-requests: read
+
+jobs:
+  submit:
+    # do not run in forks
+    if: github.repository_owner == 'yast'
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: registry.opensuse.org/yast/head/containers_tumbleweed/yast-rake:latest
+      # "osc build" needs to mount /proc in the build system chroot
+      options: --privileged
+      volumes:
+        # bind mount the GitHub CLI tool from the Ubuntu host,
+        # it is a statically linked binary so it should work everywhere
+        - /usr/bin/gh:/usr/bin/gh
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Fix permissions to avoid git failures
+        run:  chown -R -c 0 .
+
+      - name: Configure osc
+        run: .github/workflows/osc/configure_osc.sh
+        env:
+          OBS_USER:     ${{ secrets.OBS_USER }}
+          OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
+
+      - name: Run rake
+        id: rake
+        # the default timeout is 6 hours, do not wait for that long if osc gets stucked
+        timeout-minutes: 20
+        run: |
+          OUTFILE=$(mktemp -p '' rake_osc_sr_XXXXXXX)
+          rake osc:sr | tee $OUTFILE
+          SR=$(grep "^created request id [0-9]+" $OUTFILE | sed -e 's/created request id //')
+          # pass the SR number
+          echo "submit=$SR" >> $GITHUB_OUTPUT
+          rm $OUTFILE
+
+      - name: Success status comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUBMIT:   ${{ steps.rake.outputs.submit }}
+        run: |
+          PR=$(gh pr list --state merged --search ${{ github.sha }} --json number --jq '.[0].number')
+
+          if [ -n "$PR" ]; then
+            echo "Found pull request $PR (${{ github.server_url }}/${{ github.repository }}/pull/$PR)"
+            JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            MSG=":heavy_check_mark: Autosubmission job [#${{ github.run_id }}]($JOB_URL) successfully finished"
+
+            if [ -n "$SUBMIT"]; then
+              SR_URL="https://build.opensuse.org/request/show/$SUBMIT"
+              echo "Created submit request $SUBMIT ($SR_URL)"
+              MSG="$MSG\n:heavy_check_mark: Created submit request [#$SUBMIT]($SR_URL)"
+            fi
+
+            gh issue comment $PR --body "$MSG"
+          else
+            echo "Pull request not found, skipping status comment"
+          fi
+
+      - name: Failed status comment
+        # not succeeded (failed, aborted, ...)
+        if: !sucess()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR=$(gh pr list --state merged --search ${{ github.sha }} --json number --jq '.[0].number')
+
+          if [ -n "$PR" ]; then
+            echo "Found pull request $PR (${{ github.server_url }}/${{ github.repository }}/pull/$PR)"
+            JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            MSG=":x: Autosubmission job [#${{ github.run_id }}]($JOB_URL) failed"
+            gh issue comment $PR --body "$MSG"
+          else
+            echo "Pull request not found, skipping status comment"
+          fi

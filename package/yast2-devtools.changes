@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 11 18:43:12 UTC 2023 - Andreas Schwab <schwab@suse.de>
+
+- Don't disable testsuites on qemu build
+
+-------------------------------------------------------------------
 Wed Aug 30 20:16:10 UTC 2023 - Josef Reidinger <jreidinger@suse.cz>
 
 - 5.0.0 (bsc#1185510)

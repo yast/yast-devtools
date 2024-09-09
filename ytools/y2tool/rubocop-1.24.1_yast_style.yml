@@ -234,3 +234,22 @@ Metrics/BlockLength:
   # rspec is known as DSL with big blocks
   Exclude:
     - "**/test/**/*"
+
+# Disable the Lint/ScriptPermission check.
+#
+# When Rubocop finds a shebang ("#!/usr/bin/env ruby") at the beginning of
+# a file it checks for the executable file flag. That makes sense.
+# However, the autocorrection action is to always add the exec flag to the file,
+# but in some situations the correct fix is to actually remove the shebang as it
+# does not make sense (e.g. the file just defines a class and there is nothing
+# to execute).
+#
+# NOTE: Ideally the check should be enabled with autocorrection disabled. But
+# there is a bug in Rubocop 1.24.1 and disabled autocorrection is ignored,
+# it always adds the exec flag. :-(
+#
+# So disable the cop completely and check how it behaves in the future Rubocop
+# versions.
+#
+Lint/ScriptPermission:
+  Enabled: false

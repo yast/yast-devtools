@@ -195,3 +195,16 @@ Style/TernaryParentheses:
 # And template version is needed if there are more params and it needs some formatting.
 Style/FormatStringToken:
   Enabled: false
+
+# Disable autocorrection for the Lint/ScriptPermission check.
+#
+# When Rubocop finds a shebang ("#!/usr/bin/env ruby") at the beginning of
+# a file it checks for the executable file flag. That makes sense.
+# However, the autocorrection action is to always add the exec flag to the file,
+# but in some situations the correct fix is to actually remove the shebang as it
+# does not make sense. For example the file just defines a class and there is
+# nothing to execute).
+#
+# So require the developer to decide what is the correct fix.
+Lint/ScriptPermission:
+  AutoCorrect: false

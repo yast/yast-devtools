@@ -33,6 +33,8 @@ BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
+# required by some scripts like y2makepot
+Requires:       which
 Requires:       yast2-buildtools
 BuildArch:      noarch
 

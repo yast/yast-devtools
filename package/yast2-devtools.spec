@@ -17,7 +17,7 @@
 
 
 Name:           yast2-devtools
-Version:        5.0.0
+Version:        5.0.1
 Release:        0
 Summary:        YaST2 - Development Tools
 License:        GPL-2.0-or-later
@@ -33,6 +33,8 @@ BuildRequires:  libxslt
 BuildRequires:  perl-XML-Writer
 BuildRequires:  pkgconfig
 BuildRequires:  sgml-skel
+# required by some scripts like y2makepot
+Requires:       which
 Requires:       yast2-buildtools
 BuildArch:      noarch
 

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan 23 13:33:52 UTC 2025 - Andreas Schwab <schwab@suse.de>
+
+- Don't disable testsuites on qemu build
+
+-------------------------------------------------------------------
 Mon Sep 16 08:11:39 UTC 2024 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
 
 - Add "which" to the list of dependencies

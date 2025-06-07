@@ -1,0 +1,180 @@
+#! /usr/bin/ruby
+
+require "tmpdir"
+require "cheetah"
+require "yaml"
+require "optionparser"
+
+def unpack_file(file)
+  case file
+  when /\.gz$/
+    Cheetah.run("gzip", "-d", file)
+    file[/(.*).gz$/, 1]
+  when /\.bz2?$/
+    Cheetah.run("bzip2", "-d", file)
+    file[/(.*).bz2?$/, 1]
+  when /\.xz$/
+    Cheetah.run("xz", "-d", file)
+    file[/(.*).xz$/, 1]
+  when /\.7z$/
+    Cheetah.run("7z", "e", file)
+    file[/(.*).7z$/, 1]
+  else
+    file
+  end
+end
+
+def set_mod_ui(result, mod, ui)
+  result[:modules] ||= {}
+  result[:modules][mod.to_sym] ||= {}
+  result[:modules][mod.to_sym][:count] ||= 0
+  result[:modules][mod.to_sym][:count] += 1
+  result[:modules][mod.to_sym][:ui] ||= {}
+  result[:modules][mod.to_sym][:ui][ui] ||= 0
+  result[:modules][mod.to_sym][:ui][ui] += 1
+end
+
+def find_modules(result, content)
+  # y2start kind of log line. example:
+  # 2020-01-06 11:31:14 <1> localhost(3282) [Ruby] bin/y2start:22 y2base called with ["installation", "--arg", "continue", "qt", "--noborder", "--auto-fonts", "--fullscreen"]
+  content.lines.grep(/y2base called with /).each do |line|
+    mod = line[/\["([^"]+)"/, 1]
+    raise "invalid module for #{line}." unless mod
+    interface = case line
+      when /"qt"/ then :qt
+      when /"ncurses"/ then :ncurses
+      when /"UI"/ then :no
+      else raise "Unknown UI in #{line}."
+      end
+    # TODO CLI detection
+    set_mod_ui(result, mod, interface)
+  end
+  # y2base kind of log line. example:
+  # 2017-11-29 06:25:29 <1> install(3162) [liby2] genericfrontend.cc(main):617 Launched YaST2 component 'y2base' 'installation' '("initial")' 'qt' '--noborder' '--auto-fonts' '--fullscreen'
+  content.lines.grep(/Launched YaST2 component 'y2base' /).each do |line|
+    mod = line[/'y2base' '([^']+)'/, 1]
+    raise "invalid module for #{line}." unless mod
+    interface = case line
+      when /'qt'/ then :qt
+      when /'ncurses'/ then :ncurses
+      when /'UI'/ then :no
+      else raise "Unknown UI in #{line}."
+      end
+    # TODO CLI detection
+    set_mod_ui(result, mod, interface)
+  end
+end
+
+def find_base_product(result, content)
+  # use os-release. Line looks like:
+  # 2014-05-19 09:31:54 <1> linux(2541) [Ruby] modules/Misc.rb:197 ."/mnt/etc/os-release"."PRETTY_NAME": 'SUSE Linux Enterprise Server 12'
+  os_release = content.lines.grep(/os-release.*PRETTY_NAME":/).last
+  if os_release
+    product = os_release[/'(.*)'/, 1]
+    result[:product] = product
+  end
+end
+
+def analyze_log(result, file)
+  file = unpack_file(file)
+  # TODO: can be memory consuming
+  content = File.read(file)
+  find_modules(result, content)
+  find_base_product(result, content)
+rescue ArgumentError => e
+  raise "Failed in #{file} with #{e.inspect}"
+end
+
+# Tarballs
+TARBALLS_REGEXPS = [/\.tar\./, /\.tbz2$/, /\.tgz$/, /\.txz$/, /\.t7z$/]
+ZIP_REGEXPS = [/\.zip$/]
+RAR_REGEXPS = [/\.rar$/]
+def single_file(file)
+  result = {}
+  if (TARBALLS_REGEXPS + ZIP_REGEXPS + RAR_REGEXPS).any?{ |r| file =~ r }
+    temp_dir = true
+    archive = file
+    file = Dir.mktmpdir("logs-analyzer")
+    if TARBALLS_REGEXPS.any? { |r| archive =~ r }
+      Cheetah.run("tar", "xvf", archive, "-C", file)
+    elsif ZIP_REGEXPS.any?  { |r| archive =~ r }
+      Cheetah.run("unzip", archive, "-d", file)
+    elsif RAR_REGEXPS.any?  { |r| archive =~ r }
+      Cheetah.run("unrar", "x", archive, file)
+    else
+      raise "Should not happen :)"
+    end
+    log.info "archive #{archive} destination #{file}"
+  end
+
+  if File.directory?(file)
+    Dir["#{file}/**/y2log{,-[1-9]}{,.*}"].each do |f|
+      log.info "directory #{file} analyze file #{f}"
+      analyze_log(result, f)
+    end
+  else
+    log.info "analyze file #{file}"
+    analyze_log(result, file)
+  end
+
+  result
+ensure
+  if temp_dir
+    FileUtils.rm_rf file
+  end
+end
+
+def merge_results(total, single)
+  return unless single[:modules]
+  total[:logs_analyzed] ||= 0
+  total[:logs_analyzed] += 1
+  single[:modules].each_pair do |m, data|
+    total[:modules] ||= {}
+    total[:modules][m] ||= {}
+    total[:modules][m][:count] ||= 0
+    total[:modules][m][:count] += data[:count]
+    total[:modules][m][:at_least_once] ||= 0
+    total[:modules][m][:at_least_once] += 1
+  end
+
+  total[:products] ||= {}
+  product = single[:product]
+  if product
+    total[:products][product] ||= 0
+    total[:products][product] += 1
+  end
+end
+
+logger = "/dev/null"
+output = nil
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: analyze_logs [options] path [other paths...]\nDefaults: analyze_logs <path>"
+  opts.on("-l", "--log LOG", "File to which log") { |o| logger = o }
+  opts.on("-o", "--output OUTPUT", "File to which YAML will be written.") { |o| output = o }
+end
+parser.parse!
+
+if ARGV.empty?
+  STDERR.puts parser.help
+  exit 1
+end
+
+@log = Logger.new(logger)
+
+def log
+  @log
+end
+
+result = {}
+
+ARGV.each do |arg|
+  merge_results(result, single_file(arg))
+end
+
+final = result.to_yaml
+if output
+  File.write(output, final)
+else
+  puts final
+end

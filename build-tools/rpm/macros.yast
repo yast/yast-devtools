@@ -110,21 +110,6 @@ fi \
         %{yast_ydatadir}/devtools/bin/y2metainfo -f ${f} -l "%{license}" -o %{buildroot}/%{yast_metainfodir}/ -u "%{url}" -v "%{version}" \
     done
 
-%yast_desktop_files \
-    \
-    # on SUSE we use %%suse_update_desktop_file \
-    # other distris use %%{_bindir}/desktop-file-validate \
-    %if 0%{?suse_version} \
-        for f in $(%{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop') ; do \
-            d=${f##*/} \
-            %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop} \
-        done \
-    %else  # 0%%{?suse_version} \
-        %{_bindir}/find %{buildroot}/%{yast_desktopdir}/ -name '*.desktop' \\\
-            -print0 | %{_bindir}/sort -uz | \\\
-            %{_bindir}/xargs -0 %{_bindir}/desktop-file-validate \
-    %endif # 0%%{?suse_version}
-
 # install the yast module using autotools/make
 %yast_install \
     if [ -f "configure.in.in" -o -f "configure.ac.in" ]; then \
@@ -142,7 +127,4 @@ fi \
     else \
         echo "Cannot install the package, no configure.{ac|in}.in or Rakefile found" 1>&2 \
         exit 1 \
-    fi \
-    if [ -d "%{buildroot}/%{yast_desktopdir}" ]; then \
-      %yast_desktop_files \
     fi \

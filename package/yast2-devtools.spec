@@ -17,9 +17,7 @@
 
 
 Name:           yast2-devtools
-
 Version:        5.0.4
-
 Release:        0
 Summary:        YaST2 - Development Tools
 License:        GPL-2.0-or-later

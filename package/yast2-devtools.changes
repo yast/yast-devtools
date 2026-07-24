@@ -1,8 +1,59 @@
 -------------------------------------------------------------------
-Thu Aug  4 15:25:48 UTC 2022 - Noel Power <nopower@suse.com>
+Tue Mar 10 18:25:48 UTC 2026 - Noel Power <nopower@suse.com>
 
 - Add python source files to files processed by
   get_domains_and_err so POT files can be generated;(boo#1199396).
+- 5.0.4
+
+-------------------------------------------------------------------
+Tue Mar 10 17:11:41 UTC 2026 - Michal Filka <mfilka@suse.com>
+
+- jsc#PED-14507
+  - dropped %yast_desktop_files macro
+- 5.0.3
+
+-------------------------------------------------------------------
+Fri Jun  6 14:47:29 UTC 2025 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
+
+- Drop usage of %jobs (boo#1237231) for reproducible builds
+  (by Bernhard M. Wiedemann).
+- 5.0.2
+
+-------------------------------------------------------------------
+Thu Jan 23 13:33:52 UTC 2025 - Andreas Schwab <schwab@suse.de>
+
+- Don't disable testsuites on qemu build
+
+-------------------------------------------------------------------
+Mon Sep 16 08:11:39 UTC 2024 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
+
+- Add "which" to the list of dependencies
+  (gh#yast/yast-devtools#176).
+- 5.0.1
+
+-------------------------------------------------------------------
+Wed Aug 30 20:16:10 UTC 2023 - Josef Reidinger <jreidinger@suse.cz>
+
+- 5.0.0 (bsc#1185510)
+
+-------------------------------------------------------------------
+Fri Mar 10 17:23:47 UTC 2023 - Ladislav Slezák <lslezak@suse.com>
+
+- Rubocop configuration update: Disable autocorrection for the
+  Lint/ScriptPermission cop or disable it completely.
+  (related to bsc#1209094)
+- 4.6.1
+
+-------------------------------------------------------------------
+Fri Mar 03 14:44:07 UTC 2023 - Ladislav Slezák <lslezak@suse.cz>
+
+- Bump version to 4.6.0 (bsc#1208913)
+
+-------------------------------------------------------------------
+Fri Sep  9 08:21:11 UTC 2022 - Michal Filka <mfilka@suse.com>
+
+- bsc#1203227
+  - Replaced egrep with grep -E.
 - 4.5.5
 
 -------------------------------------------------------------------

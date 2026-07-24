@@ -13,6 +13,11 @@ Fri Jun  6 14:47:29 UTC 2025 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
 - 5.0.2
 
 -------------------------------------------------------------------
+Thu Jan 23 13:33:52 UTC 2025 - Andreas Schwab <schwab@suse.de>
+
+- Don't disable testsuites on qemu build
+
+-------------------------------------------------------------------
 Mon Sep 16 08:11:39 UTC 2024 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
 
 - Add "which" to the list of dependencies

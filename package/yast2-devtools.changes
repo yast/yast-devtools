@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Mar 10 18:25:48 UTC 2026 - Noel Power <nopower@suse.com>
+
+- Add python source files to files processed by
+  get_domains_and_err so POT files can be generated;(boo#1199396).
+- 5.0.4
+
+-------------------------------------------------------------------
 Tue Mar 10 17:11:41 UTC 2026 - Michal Filka <mfilka@suse.com>
 
 - jsc#PED-14507
